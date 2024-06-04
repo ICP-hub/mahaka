@@ -1,0 +1,26 @@
+{
+  "canisters": {
+    "mahaka_backend": {
+      "main": "src/mahaka_backend/main.mo",
+      "type": "motoko"
+    },
+    "mahaka_frontend": {
+      "dependencies": [
+        "mahaka_backend"
+      ],
+      "source": [
+        "src/mahaka_frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "mahaka_frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
