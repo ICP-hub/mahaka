@@ -19,6 +19,30 @@ dfx help
 dfx canister --help
 ```
 
+- **run on node 16, dfx 0.18.0
+
+
+- install package & dfx start command
+
+```bash
+npm install
+dfx start --clean
+```
+
+- all commands for deploy locally
+
+```bash
+dfx generate
+cp src/declarations/mahaka_backend/* .dfx/local/canisters/mahaka_backend/
+dfx deploy
+```
+
+- deploy on network(for admin user)
+
+```bash
+dfx deploy --network ic
+```
+
 ## Running the project locally
 
 If you want to test your project locally, you can use the following commands:

@@ -15,9 +15,9 @@ function App() {
 
   return (
     <main>
-      <img src="/logo2.svg" alt="DFINITY logo" />
-      <br />
-      <br />
+      <h1 className="text-3xl font-bold underline text-red-500">
+      Hello world!
+    </h1>
       <form action="#" onSubmit={handleSubmit}>
         <label htmlFor="name">Enter your name: &nbsp;</label>
         <input id="name" alt="Name" type="text" />
