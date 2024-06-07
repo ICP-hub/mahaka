@@ -1,5 +1,10 @@
 /* tailwind import */
-@import "./assets/styles/tailwind.css";
+@import "@/assets/styles/tailwind.css";
 
 /* themes */
-@import "./assets/styles/themes.css";
+@import "@/assets/styles/themes.css";
+
+/* Override connect2ic button style */
+.connect-button {
+  all: unset !important;
+}

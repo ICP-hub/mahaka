@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
-import { mahaka_backend } from "declarations/mahaka_backend";
+import ConnectionSetup from "./connection/Connect";
+import { useSelector } from "react-redux";
 
 function App() {
   const [theme, setTheme] = useState("light");
+  const authStates = useSelector((state) => state.auth);
   useEffect(() => {
     // Get the saved theme from localStorage || "light"
     const savedTheme = localStorage.getItem("theme") || "light";
@@ -10,12 +12,15 @@ function App() {
     document.body.className = savedTheme;
   }, []);
 
+  // theme toggle
   const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
-    setTheme(newTheme);
-    document.body.className = newTheme;
-    localStorage.setItem("theme", newTheme); // Save new theme to localStorage
+    const currTheme = theme === "light" ? "dark" : "light";
+    setTheme(currTheme);
+    document.body.className = currTheme;
+    localStorage.setItem("theme", currTheme); // save current theme to localStorage
   };
+
+  console.log("auth coming from redux : ", authStates);
 
   return (
     <div className="p-4">
@@ -26,6 +31,9 @@ function App() {
       >
         Toggle Theme
       </button>
+      <ConnectionSetup btnStyle={"bg-error rounded-2xl"} />
+
+      <div>Principal ID : {authStates.userPlugPrincipal}</div>
     </div>
   );
 }

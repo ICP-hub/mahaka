@@ -16,6 +16,8 @@
     "src/mahaka_frontend"
   ],
   "dependencies": {
+    "@connect2ic/core": "^0.2.0-beta.24",
+    "@connect2ic/react": "^0.2.0-beta.24",
     "@reduxjs/toolkit": "^2.2.5",
     "react-redux": "^9.1.2",
     "redux": "^5.0.1",
