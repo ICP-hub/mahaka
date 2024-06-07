@@ -14,5 +14,11 @@
   "type": "module",
   "workspaces": [
     "src/mahaka_frontend"
-  ]
+  ],
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.2.5",
+    "react-redux": "^9.1.2",
+    "redux": "^5.0.1",
+    "redux-thunk": "^3.1.0"
+  }
 }

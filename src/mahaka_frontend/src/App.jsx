@@ -1,30 +1,32 @@
-import { useState } from 'react';
-import { mahaka_backend } from 'declarations/mahaka_backend';
+import { useState, useEffect } from "react";
+import { mahaka_backend } from "declarations/mahaka_backend";
 
 function App() {
-  const [greeting, setGreeting] = useState('');
+  const [theme, setTheme] = useState("light");
+  useEffect(() => {
+    // Get the saved theme from localStorage || "light"
+    const savedTheme = localStorage.getItem("theme") || "light";
+    setTheme(savedTheme);
+    document.body.className = savedTheme;
+  }, []);
 
-  function handleSubmit(event) {
-    event.preventDefault();
-    const name = event.target.elements.name.value;
-    mahaka_backend.greet(name).then((greeting) => {
-      setGreeting(greeting);
-    });
-    return false;
-  }
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    document.body.className = newTheme;
+    localStorage.setItem("theme", newTheme); // Save new theme to localStorage
+  };
 
   return (
-    <main>
-      <h1 className="text-3xl font-bold underline text-red-500">
-      Hello world!
-    </h1>
-      <form action="#" onSubmit={handleSubmit}>
-        <label htmlFor="name">Enter your name: &nbsp;</label>
-        <input id="name" alt="Name" type="text" />
-        <button type="submit">Click Me!</button>
-      </form>
-      <section id="greeting">{greeting}</section>
-    </main>
+    <div className="p-4">
+      <div className="bg-foreground p-4 rounded-2xl">I am {theme} theme.</div>
+      <button
+        onClick={toggleTheme}
+        className="bg-primary px-4 py-2 rounded-2xl"
+      >
+        Toggle Theme
+      </button>
+    </div>
   );
 }
 
