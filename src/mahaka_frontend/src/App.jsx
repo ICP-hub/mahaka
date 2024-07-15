@@ -1,26 +1,8 @@
-import { useState, useEffect } from "react";
-import ConnectionSetup from "./connection/Connect";
-import { useSelector } from "react-redux";
+import React from "react";
+import useTheme from "./common/hooks/ThemeSwitcher";
 
 function App() {
-  const [theme, setTheme] = useState("light");
-  const authStates = useSelector((state) => state.auth);
-  useEffect(() => {
-    // Get the saved theme from localStorage || "light"
-    const savedTheme = localStorage.getItem("theme") || "light";
-    setTheme(savedTheme);
-    document.body.className = savedTheme;
-  }, []);
-
-  // theme toggle
-  const toggleTheme = () => {
-    const currTheme = theme === "light" ? "dark" : "light";
-    setTheme(currTheme);
-    document.body.className = currTheme;
-    localStorage.setItem("theme", currTheme); // save current theme to localStorage
-  };
-
-  console.log("auth coming from redux : ", authStates);
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <div className="p-4">
@@ -31,9 +13,6 @@ function App() {
       >
         Toggle Theme
       </button>
-      <ConnectionSetup btnStyle={"bg-error rounded-2xl"} />
-
-      <div>Principal ID : {authStates.userPlugPrincipal}</div>
     </div>
   );
 }
