@@ -1,0 +1,107 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
+.logo{
+    font-family: "Outfit", sans-serif;
+}
+.crowsel{
+    background-image: url(/src/assets/images/hero.jpeg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    
+}
+
+.inside-crousel{
+    background: linear-gradient(to right, #124076, transparent);
+    width: 100%;
+    height: 100%;
+}
+
+
+
+.maskgroup{
+background-image: url(../../assets/images/MaskGroup.png);
+background-size: cover;
+background-position: center;
+}
+
+.gradienttext {
+    background: linear-gradient(to right, #ABAFBA 33.33%, #DDE0ED 66.66%, #FFFFFF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+  }
+  
+  .overlay-gradient {
+    background: linear-gradient(to top, rgb(24 23 23 / 97%), rgba(0, 0, 0, 0));
+  }
+
+
+  /* swiper custom button  */
+  .swiper-button-prev, .swiper-button-next {
+    background-color: #f97316;
+    color: white;
+    padding: 10px;
+    border-radius: 50%;
+}
+
+.swiper-button-prev:hover, .swiper-button-next:hover {
+    background-color: #fb923c; 
+}
+
+.swiper-pagination-bullet-active {
+    opacity: var(--swiper-pagination-bullet-opacity, 1);
+    background: #F08E1E;
+}
+/* //payment form radio button  */
+input[type="radio"] {
+    appearance: none;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    outline: none;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  input[type="radio"]:checked {
+    border-color: #f97316; 
+  }
+  
+  input[type="radio"]:checked::before {
+    content: '';
+    display: block;
+    width: 50%;
+    height: 50%;
+    background-color: #f97316;
+    border-radius: 50%;
+    position: absolute;
+    top: 25%;
+    left: 25%;
+  }
+  
+
+  /*navlink hover  styles.css */
+.hover-underline-animation {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .hover-underline-animation::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    display: block;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #F08E1E;
+    transition: width 0.3s;
+  }
+  
+  .hover-underline-animation:hover::after {
+    width: 100%;
+  }
+  

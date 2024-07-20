@@ -3,3 +3,26 @@
 
 /* themes */
 @import "@/assets/styles/themes.css";
+
+/*font family*/
+/* //outfit */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+/* //circular */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
+.logo{
+    font-family: "Outfit", sans-serif;
+}
+
+.nav-links{
+    font-family: "circular", sans-serif;
+}
+
+.outfit-family{
+    font-family: "Outfit", sans-serif;
+}
+
+.circular-family{
+    font-family: "Outfit", sans-serif;
+}
+
