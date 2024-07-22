@@ -54,6 +54,23 @@ background-position: center;
     opacity: var(--swiper-pagination-bullet-opacity, 1);
     background: #F08E1E;
 }
+
+
+.swiper-prev-btn,
+.swiper-next-btn {
+  background-color: #F08E1E;
+  color: #fff;
+  padding: 10px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  text-align: center;
+}
+
+.swiper-prev-btn:hover,
+.swiper-next-btn:hover {
+  background-color: #f58505;
+}
 /* //payment form radio button  */
 input[type="radio"] {
     appearance: none;

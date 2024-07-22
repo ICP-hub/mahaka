@@ -8,11 +8,14 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 // Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/pagination';
-
+import 'swiper/css/navigation';
 
 // import required modules
-import { Autoplay, Pagination } from 'swiper/modules';
+import { Navigation, Autoplay, Mousewheel } from 'swiper/modules';
+// import 'swiper/swiper-bundle.min.css';
+// import 'swiper/swiper.min.css';
 import { GoArrowUpRight } from "react-icons/go";
+import { MdArrowForwardIos,MdArrowBackIos } from "react-icons/md";
 import MoreEventCard from "../Components/MoreEventCard";
 import { Link } from "react-router-dom";
 
@@ -61,6 +64,9 @@ export default function SingleEvent() {
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   };
+
+  const navigationPrevRef = useRef(null);
+    const navigationNextRef = useRef(null);
   return (
     <>
 
@@ -196,7 +202,38 @@ export default function SingleEvent() {
 
    
         <div className="max-w-7xl mx-auto ">
-        <Swiper
+        
+            <Swiper
+                  spaceBetween={40}
+                  slidesPerView={1}
+                  breakpoints={{
+                    640: {
+                      slidesPerView: 1,
+                    },
+                    768: {
+                      slidesPerView: 1,
+                    },
+                    1024: {
+                      slidesPerView: 2,
+                    },
+                  }}
+                  // autoplay={{
+                  //   delay: 2000,
+                  //   disableOnInteraction: false,
+                  // }}
+                  // mousewheel={true}
+                  modules={[Navigation]}
+                navigation={{
+                    prevEl: navigationPrevRef.current,
+                    nextEl: navigationNextRef.current,
+                }}
+                onBeforeInit={(swiper) => {
+                    swiper.params.navigation.prevEl = navigationPrevRef.current;
+                    swiper.params.navigation.nextEl = navigationNextRef.current;
+                }}
+                className="mySwiper px-4 sm:px-6 lg:px-8 mx-auto"
+            >
+        {/* <Swiper
         spaceBetween={40}
         slidesPerView={1}
         breakpoints={{
@@ -217,9 +254,16 @@ export default function SingleEvent() {
         pagination={{
           clickable: true,
         }}
-        modules={[ Autoplay,Pagination]}
+        navigation={true}
+        modules={[ Autoplay,Pagination, Navigation]}
         className="mySwiper px-4 sm:px-6 lg:px-8 mx-auto"
-      >
+      > */}
+        <SwiperSlide>
+        <MoreEventCard color="#E2AF4E" image={Frame15} />
+        </SwiperSlide>
+        <SwiperSlide>
+        <MoreEventCard color="#FF5733" image={Frame15} />
+        </SwiperSlide>
         <SwiperSlide>
         <MoreEventCard color="#E2AF4E" image={Frame15} />
         </SwiperSlide>
@@ -227,6 +271,11 @@ export default function SingleEvent() {
         <MoreEventCard color="#FF5733" image={Frame15} />
         </SwiperSlide>
          </Swiper>
+         </div >
+         <div className="flex gap-5 justify-center items-center">
+          <div ref={navigationPrevRef} className="swiper-prev-btn cursor-pointer"><MdArrowBackIos /></div>
+         <div ref={navigationNextRef} className="swiper-next-btn cursor-pointer"><MdArrowForwardIos />
+         </div>
          </div>
       </div>
       

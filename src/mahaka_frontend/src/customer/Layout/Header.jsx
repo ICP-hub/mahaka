@@ -45,7 +45,7 @@ const [isAuthenticated, setisAuthenticated] = useState(false)
       <nav className="bg-[#124076]  h-20  lg:flex lg:justify-center lg:items-center sticky top-0 z-9999">
       {/* Desktop navbar start  */}
         <div className="hidden container lg:flex space-x-10  items-center justify-center">
-          <div className="text-white text-2xl logo font-bold">LOGO</div>
+          <h1 className="text-white text-2xl logo font-bold"><Link to='/'>LOGO</Link></h1>
           {/* <div className="hidden md:flex space-x-8  items-center justify-center"> */}
           <form class="flex items-center max-w-lg mx-auto ">
             <div class="relative w-full">
