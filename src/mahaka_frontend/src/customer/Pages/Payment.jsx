@@ -78,6 +78,8 @@ const PaymentComponent = () => {
           </div>
         </div>
       </div>
+     
+
     </div>
   );
 };
