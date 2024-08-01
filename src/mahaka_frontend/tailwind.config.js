@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 const defaultTheme = require("tailwindcss/defaultTheme");
-export default {
+
+module.exports = {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     fontSize: {
@@ -109,17 +110,13 @@ export default {
         30: "7.5rem",
         50: "12.5rem",
         90: "22.5rem",
-      },
-      extendedSpacing: {
-        // Fractional values
+        // Consolidate extended spacing here
         "1/2": "50%",
         "1/3": "33.333333%",
         "2/3": "66.666667%",
         "1/4": "25%",
         "2/4": "50%",
         "3/4": "75%",
-
-        // Bigger values
         100: "25rem",
         120: "30rem",
         128: "32rem",

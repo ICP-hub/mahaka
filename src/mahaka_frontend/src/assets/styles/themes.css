@@ -2,8 +2,8 @@
 /* light theme */
 body.light,
 body .light {
-  --primary: #7c3aed;
-  --secondary: #ed3a51;
+  --primary: #124076;
+  --secondary: #f08e1e;
   --accent: #fbfbfb;
   --warn: #eded3a;
   --error: #ed3a3a;

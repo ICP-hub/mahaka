@@ -1,17 +1,13 @@
 import React from "react";
-import useTheme from "./common/hooks/ThemeSwitcher";
-import Home from "./customer/Pages/Home";
-import { BrowserRouter as Router,Routes,Route} from 'react-router-dom';
-import Master from "./customer/Layout/Master";
-import SingleEvent from "./customer/Pages/SingleEvent";
-import PaymentComponent from "./customer/Pages/Payment";
+import { RouterProvider } from "react-router-dom";
+import appRoutes from "./routes/app.routing";
 
 function App() {
   // const { theme, toggleTheme } = useTheme();
 
   return (
-    <>
-    {/* <div className="p-4">
+    <div className="light">
+      {/* <div className="p-4">
       <div className="bg-foreground p-4 rounded-2xl">I am {theme} theme.</div>
       <button
         onClick={toggleTheme}
@@ -20,16 +16,8 @@ function App() {
         Toggle Theme
       </button>
     </div>     */}
-    <Router>
-        <Routes>
-          <Route path="/"element={<Master/>}>
-          <Route path="/"element={<Home/>}/>
-          <Route path="/single-event"element={<SingleEvent/>}/>
-          <Route path="/payment"element={<PaymentComponent/>}/>
-          </Route>
-          </Routes>
-    </Router>
-    </>
+      <RouterProvider router={appRoutes} />
+    </div>
   );
 }
 

@@ -1,64 +1,66 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
 
-.logo{
-    font-family: "Outfit", sans-serif;
+.logo {
+  font-family: "Outfit", sans-serif;
 }
-.crowsel{
-    background-image: url(/src/assets/images/hero.jpeg);
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    
-}
-
-.inside-crousel{
-    background: linear-gradient(to right, #124076, transparent);
-    width: 100%;
-    height: 100%;
+.crowsel {
+  background-image: url(/src/assets/images/hero.jpeg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
+.inside-crousel {
+  background: linear-gradient(to right, #124076, transparent);
+  width: 100%;
+  height: 100%;
+}
 
-
-.maskgroup{
-background-image: url(../../assets/images/MaskGroup.png);
-background-size: cover;
-background-position: center;
+.maskgroup {
+  background-image: url(../../assets/images/MaskGroup.png);
+  background-size: cover;
+  background-position: center;
 }
 
 .gradienttext {
-    background: linear-gradient(to right, #ABAFBA 33.33%, #DDE0ED 66.66%, #FFFFFF 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    color: transparent;
-  }
-  
-  .overlay-gradient {
-    background: linear-gradient(to top, rgb(24 23 23 / 97%), rgba(0, 0, 0, 0));
-  }
-
-
-  /* swiper custom button  */
-  .swiper-button-prev, .swiper-button-next {
-    background-color: #f97316;
-    color: white;
-    padding: 10px;
-    border-radius: 50%;
+  background: linear-gradient(
+    to right,
+    #abafba 33.33%,
+    #dde0ed 66.66%,
+    #ffffff 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
 }
 
-.swiper-button-prev:hover, .swiper-button-next:hover {
-    background-color: #fb923c; 
+.overlay-gradient {
+  background: linear-gradient(to top, rgb(24 23 23 / 97%), rgba(0, 0, 0, 0));
+}
+
+/* swiper custom button  */
+.swiper-button-prev,
+.swiper-button-next {
+  background-color: #f97316;
+  color: white;
+  padding: 10px;
+  border-radius: 50%;
+}
+
+.swiper-button-prev:hover,
+.swiper-button-next:hover {
+  background-color: #fb923c;
 }
 
 .swiper-pagination-bullet-active {
-    opacity: var(--swiper-pagination-bullet-opacity, 1);
-    background: #F08E1E;
+  opacity: var(--swiper-pagination-bullet-opacity, 1);
+  background: #f08e1e;
 }
-
 
 .swiper-prev-btn,
 .swiper-next-btn {
-  background-color: #F08E1E;
+  background-color: #f08e1e;
   color: #fff;
   padding: 10px 10px;
   border-radius: 999px;
@@ -73,52 +75,68 @@ background-position: center;
 }
 /* //payment form radio button  */
 input[type="radio"] {
-    appearance: none;
-    width: 1rem;
-    height: 1rem;
-    border: 2px solid #ddd;
-    border-radius: 50%;
-    outline: none;
-    cursor: pointer;
-    position: relative;
-  }
-  
-  input[type="radio"]:checked {
-    border-color: #f97316; 
-  }
-  
-  input[type="radio"]:checked::before {
-    content: '';
-    display: block;
-    width: 50%;
-    height: 50%;
-    background-color: #f97316;
-    border-radius: 50%;
-    position: absolute;
-    top: 25%;
-    left: 25%;
-  }
-  
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+}
 
-  /*navlink hover  styles.css */
+input[type="radio"]:checked {
+  border-color: #f97316;
+}
+
+input[type="radio"]:checked::before {
+  content: "";
+  display: block;
+  width: 50%;
+  height: 50%;
+  background-color: #f97316;
+  border-radius: 50%;
+  position: absolute;
+  top: 25%;
+  left: 25%;
+}
+
+/*navlink hover  styles.css */
 .hover-underline-animation {
-    position: relative;
-    display: inline-block;
-  }
-  
-  .hover-underline-animation::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 2px;
-    display: block;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #F08E1E;
-    transition: width 0.3s;
-  }
-  
-  .hover-underline-animation:hover::after {
-    width: 100%;
-  }
-  
+  position: relative;
+  display: inline-block;
+}
+
+.hover-underline-animation::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  display: block;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #f08e1e;
+  transition: width 0.3s;
+}
+
+.hover-underline-animation:hover::after {
+  width: 100%;
+}
+
+.user_header {
+  background: #124076;
+  color: white;
+  min-height: 80px;
+  max-height: 80px;
+  display: flex;
+  align-items: center;
+  top: 0;
+  position: sticky;
+}
+
+.user_nav_vertical {
+  position: fixed;
+  top: 80px;
+  left: 0;
+  right: 0;
+}
