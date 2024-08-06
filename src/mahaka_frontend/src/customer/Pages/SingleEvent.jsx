@@ -14,6 +14,9 @@ import { GoArrowUpRight } from "react-icons/go";
 import MoreEventCard from "../Components/MoreEventCard";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import ModalPopup from "../../common/ModalPopup";
+import DatePicker from "../../common/DatePicker";
+import VisitorPicker from "../Components/single-event/VisitorPicker";
 
 const ticketData = [
   {
@@ -59,12 +62,41 @@ const ticketData = [
 ];
 export default function SingleEvent() {
   const [activeTab, setActiveTab] = useState("profile");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { ModalOne } = ModalPopup();
+
+  const handleModalOpen = () => setIsModalOpen(true);
+  const handleModalClose = () => setIsModalOpen(false);
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   };
+
   return (
     <>
+      <div className="z-999">
+        <ModalOne open={isModalOpen} setOpen={setIsModalOpen}>
+          <div className="w-full flex flex-col h-full">
+            <h1 className="text-2xl font-medium flex w-full items-center justify-center uppercase py-4">
+              Main Gate Pass
+            </h1>
+            <div className="flex w-full bg-white rounded-b-3xl">
+              <div className="py-4 space-y-12 w-full h-full lg:mx-80">
+                <DatePicker />
+                <VisitorPicker />
+              </div>
+            </div>
+            <Link
+              to="/payment"
+              className="flex w-full items-center justify-center mt-auto mb-12"
+            >
+              <span className="font-medium px-12 py-2 rounded-md bg-secondary text-white text-lg">
+                Add to cart
+              </span>
+            </Link>
+          </div>
+        </ModalOne>
+      </div>
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-black pb-10">Event Name</h1>
@@ -140,7 +172,11 @@ export default function SingleEvent() {
                       </p>
                       <div>
                         {ticketData.map((ticket, index) => (
-                          <Link to="/payment">
+                          <div
+                            key={index}
+                            className="cursor-pointer"
+                            onClick={handleModalOpen}
+                          >
                             <Ticket
                               key={index}
                               type={ticket.type}
@@ -151,7 +187,7 @@ export default function SingleEvent() {
                               availability={ticket.availability}
                               highlightClass={ticket.highlightClass}
                             />
-                          </Link>
+                          </div>
                         ))}
                       </div>
                     </motion.div>
