@@ -96,15 +96,28 @@ module {
     data: Text;
   };
 
+  public type nft_type = {
+    #Venue;
+    #Event;
+  };
+
+  public type ticket_type = {
+    #SinglePass;
+    #VipPass;
+    #GroupPass;
+  };
+
+  public type ticket_details = {
+    ticket_type : ticket_type;
+    price : Nat;
+  };
   public type Nft = {
     owner: Principal;
+    nft_type : nft_type;
     id: TokenId;
     logo : LogoResult;
     metadata: MetadataDesc;
-    locked: Bool;
-    forsale: Bool;
-    listed : Bool;
-    priceinusd : Float;
+    ticket_details : ticket_details;
   };
 
   public type CollectionDetials = {

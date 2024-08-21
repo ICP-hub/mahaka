@@ -11,6 +11,11 @@ module {
         #GroupTicket;
     };
 
+    public type venueCollectionParams = {
+        custodian : Principal;
+        collection_args : Types.Dip721NonFungibleToken;
+    };
+
     public type eventDetails = {
         StartDate : Text;
         StartTime : Time.Time;

@@ -92,11 +92,12 @@ shared actor class Dip721NFT(custodian: Principal, init : Types.Dip721NonFungibl
               let update : Types.Nft = {
                 owner = to;
                 id = item.id;
+                nft_type = item.nft_type;
                 metadata = token.metadata;
                 locked = true;
                 forsale = false;
                 listed = true;
-                priceinusd = item.priceinusd;
+                ticket_details = item.ticket_details;
                 logo = item.logo;
               };
               return update;
@@ -215,7 +216,7 @@ shared actor class Dip721NFT(custodian: Principal, init : Types.Dip721NonFungibl
     return List.toArray(nfts);
   };
 
-  public shared func mintDip721(to: Principal, metadata: Types.MetadataDesc , priceinusd : Float, logo : Types.LogoResult) : async Types.MintReceipt {
+  public shared func mintDip721(to: Principal, metadata: Types.MetadataDesc ,ticket_details : Types.ticket_details, logo : Types.LogoResult , nft_type : Types.nft_type) : async Types.MintReceipt {
     if (not List.some(custodians, func (custodian : Principal) : Bool { custodian == to })) {
       return #Err(#Unauthorized);
     };
@@ -224,11 +225,12 @@ shared actor class Dip721NFT(custodian: Principal, init : Types.Dip721NonFungibl
     let nft : Types.Nft = {
       owner = to;
       id = newId;
+      nft_type = nft_type;
       metadata = metadata;
       locked = true;
       forsale = false;
       listed = true;
-      priceinusd = priceinusd;
+      ticket_details = ticket_details;
       logo = logo;
     };
     nfts := List.push(nft, nfts);
@@ -237,79 +239,6 @@ shared actor class Dip721NFT(custodian: Principal, init : Types.Dip721NonFungibl
       token_id = newId;
       id = transactionId;
     });
-  };
-
-
-  public shared ({caller}) func lockDip721(token_id: Types.TokenId) : async Result.Result<Types.Locktoken,Types.LockTokenError> {
-    let item = List.find(nfts, func(token: Types.Nft) : Bool { token.id == token_id });
-    switch (item) {
-      case null {
-        return #err(#InvalidTokenId);
-      };
-      case (?token) {
-        if (caller != token.owner) {
-          return #err(#Unauthorized);
-        } else if (token.locked) {
-          return #err(#AlreadyLocked);
-        } else {
-          nfts := List.map(nfts, func (item : Types.Nft) : Types.Nft {
-            if (item.id == token.id) {
-              let update : Types.Nft = {
-                owner = item.owner;
-                id = item.id;
-                metadata = item.metadata;
-                locked = true;
-                forsale = item.forsale;
-                listed = item.listed;
-                priceinusd = item.priceinusd;
-                logo = item.logo;
-              };
-              return update;
-            } else {
-              return item;
-            };
-          });
-          transactionId += 1;
-          return #ok(#LockedSuccessfully);
-        };
-      };
-    };
-  };
-
-  public shared ({caller}) func unlockDip721(token_id: Types.TokenId) : async Result.Result<Types.Unlocktoken,Types.UnlockTokenError> {
-    let item = List.find(nfts, func(token: Types.Nft) : Bool { token.id == token_id });
-    switch (item) {
-      case null {
-        return #err(#InvalidTokenId);
-      };
-      case (?token) {
-        if (caller != token.owner) {
-          return #err(#Unauthorized);
-        } else if (not token.locked) {
-          return #err(#AlreadyUnlocked);
-        } else {
-          nfts := List.map(nfts, func (item : Types.Nft) : Types.Nft {
-            if (item.id == token.id) {
-              let update : Types.Nft = {
-                owner = item.owner;
-                id = item.id;
-                metadata = item.metadata;
-                locked = false;
-                forsale = item.forsale;
-                listed = item.listed;
-                priceinusd = item.priceinusd;
-                logo = item.logo;
-              };
-              return update;
-            } else {
-              return item;
-            };
-          });
-          transactionId += 1;
-          return #ok(#UnlockedSuccessfully);
-        };
-      };
-    };
   };
 
  public func wallet_receive() : async { accepted: Nat64 } {
