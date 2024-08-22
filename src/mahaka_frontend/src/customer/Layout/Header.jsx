@@ -5,6 +5,8 @@ import { FaUser } from "react-icons/fa";
 import ProfileCard from "../Components/ProfileCard";
 import { AnimatePresence, motion } from "framer-motion";
 import { HiMagnifyingGlass, HiMiniBars3 } from "react-icons/hi2";
+import { useDispatch, useSelector } from "react-redux";
+import { nfidLogin, plugLogin } from "../../redux/reducers/auth/authReducer";
 
 const NavLinks = [
   { title: "ABOUT MAHAKA" },
@@ -142,8 +144,22 @@ const NavVertical = ({ isNavOpen }) => {
 };
 
 const ConnectWalletBtn = () => {
+  const dispatch = useDispatch();
+  const loginData = useSelector((state) => state.auth);
+
+  // Check if login with plug then fix refresh issue
+  useEffect(() => {
+    const isLoggedIn = sessionStorage.getItem("isPlugLogged");
+    if (isLoggedIn) {
+      dispatch(plugLogin());
+    }
+  }, []);
+
   return (
-    <button className="p-4 bg-secondary text-white font-medium rounded-lg hover:bg-orange-600 min-w-max">
+    <button
+      className="p-4 bg-secondary text-white font-medium rounded-lg hover:bg-orange-600 min-w-max"
+      onClick={() => dispatch(plugLogin())}
+    >
       Connect Wallet
     </button>
   );
