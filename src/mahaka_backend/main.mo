@@ -10,6 +10,7 @@ import StableTrieMap "mo:stable-trie/Map";
 import Cycles "mo:base/ExperimentalCycles";
 import Nat64 "mo:base/Nat64";
 import Region "mo:base/Region";
+import Utils "./Utils";
 
 actor {
      public type Index = Nat64;
@@ -155,6 +156,30 @@ actor {
           };
      };
 
+     public shared func getAllVenues(chunkSize : Nat , pageNo : Nat) : async {data : [Types.Venue] ; current_page : Nat ; Total_pages : Nat} {
+          var venues = List.nil<Types.Venue>();
+          for ((venue_id, venue_index) in _venueMap.entries()) {
+               let venue_blob = await stable_get(venue_index, Venue_state);
+               let venue : ?Types.Venue = from_candid(venue_blob);
+               switch (venue) {
+                    case null {
+                         throw Error.reject("Venue not found");
+                    };
+                    case (?v) {
+                         venues := List.push(v,venues);
+                    };
+               };
+          };
+          let index_pages = Utils.paginate<Types.Venue>(List.toArray(venues), chunkSize);
+          if (index_pages.size() < pageNo) {
+            throw Error.reject("Page not found");
+          };
+          if (index_pages.size() == 0) {
+            throw Error.reject("No products found");
+          };
+          let pages_data = index_pages[pageNo];
+          return {data = pages_data; current_page = pageNo + 1 ; Total_pages = index_pages.size()};
+     };
 
 
 }
