@@ -91,7 +91,7 @@ export default function SingleEvent() {
               className="flex w-full items-center justify-center mt-auto mb-12"
             >
               <span className="font-medium px-12 py-2 rounded-md bg-secondary text-white text-lg">
-                Add to cart
+                Proceed to checkout
               </span>
             </Link>
           </div>
