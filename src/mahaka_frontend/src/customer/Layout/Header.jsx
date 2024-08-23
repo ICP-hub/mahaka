@@ -7,6 +7,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { HiMagnifyingGlass, HiMiniBars3 } from "react-icons/hi2";
 import { useDispatch, useSelector } from "react-redux";
 import { nfidLogin, plugLogin } from "../../redux/reducers/auth/authReducer";
+import {
+  deleteVenue,
+  getAllVenues,
+  getVenue,
+} from "../../redux/reducers/apiReducers/venueApiReducer";
 
 const NavLinks = [
   { title: "ABOUT MAHAKA" },
@@ -145,7 +150,31 @@ const NavVertical = ({ isNavOpen }) => {
 
 const ConnectWalletBtn = () => {
   const dispatch = useDispatch();
-  const loginData = useSelector((state) => state.auth);
+  const { backend } = useSelector((state) => state.auth);
+
+  const states = useSelector((state) => console.log("States are ", state));
+
+  /******************* This is for demo purpose only */
+  const handleDeleteVenue = () => {
+    dispatch(
+      deleteVenue({
+        backend: backend,
+        venueId: "57b4zy-br5f7-7uaaa-aaaaa-qaaca-cai",
+      })
+    );
+  };
+
+  useEffect(() => {
+    dispatch(getAllVenues({ backend: backend, pageLimit: 100, currPage: 0 }));
+    dispatch(
+      getVenue({
+        backend: backend,
+        venueId: "57b4zy-br5f7-7uaaa-aaaaa-qaaca-cai",
+      })
+    );
+  }, []);
+
+  /***************************** */
 
   // Check if login with plug then fix refresh issue
   useEffect(() => {
@@ -156,12 +185,15 @@ const ConnectWalletBtn = () => {
   }, []);
 
   return (
-    <button
-      className="p-4 bg-secondary text-white font-medium rounded-lg hover:bg-orange-600 min-w-max"
-      onClick={() => dispatch(plugLogin())}
-    >
-      Connect Wallet
-    </button>
+    <>
+      <button
+        className="p-4 bg-secondary text-white font-medium rounded-lg hover:bg-orange-600 min-w-max"
+        onClick={() => dispatch(plugLogin())}
+      >
+        Connect Wallet
+      </button>
+      <button onClick={handleDeleteVenue}>Delete venue</button>
+    </>
   );
 };
 
