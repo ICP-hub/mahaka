@@ -144,39 +144,48 @@ export default function Home() {
 
 {/* if length equals 5 or more than equal to 7 */}
           {/* First Row */}
-          {(venues.length === 5 || venues.length >= 7) && (
+          {(venues.length === 5 || venues.length === 7) && (
             <>
+              {/* First Row */}
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-
-                {/* first row- 1st venue */}
-                <div className="md:col-span-3 flex l shadow-lg rounded-2x" style={{ height: layoutConfigs[0].height }}>
+                <div className="md:col-span-3 flex shadow-lg rounded-2xl" style={{ height: layoutConfigs[0].height }}>
                   <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
                 </div>
-                {/* first row- 2nd venue */}
-                <div className="md:col-span-2 flex l shadow-lg rounded-2x" style={{ height: layoutConfigs[0].height }}>
+                <div className="md:col-span-2 flex shadow-lg rounded-2xl" style={{ height: layoutConfigs[0].height }}>
                   <VenueCard venue={venues[1]} layout={layoutConfigs[2]} />
                 </div>
-
               </div>
-
+          
               {/* Second Row */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-[33px] mb-8">
                 {venues.slice(2, 5).map((venue, index) => (
-                  <div className="col-span-1 l shadow-lg rounded-2x" style={{ height: layoutConfigs[4].height }} key={venue.id}>
+                  <div className="col-span-1 shadow-lg rounded-2xl" style={{ height: layoutConfigs[4].height }} key={venue.id}>
                     <VenueCard venue={venue} layout={layoutConfigs[index + 2]} />
                   </div>
                 ))}
               </div>
-
+          
               {/* Third Row */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 {venues.slice(5, 7).map((venue, index) => (
-                  <div className="col-span-1 l shadow-lg rounded-2x" style={{ height: layoutConfigs[4].height }} key={venue.id}>
+                  <div className="col-span-1 shadow-lg rounded-2xl" style={{ height: layoutConfigs[4].height }} key={venue.id}>
                     <VenueCard venue={venue} layout={layoutConfigs[index + 5]} />
                   </div>
                 ))}
               </div>
+          
+              {/* Additional Rows for Remaining Venues */}
+              {venues.length > 7 && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-[33px]">
+                  {venues.slice(7).map((venue, index) => (
+                    <div className="col-span-1 shadow-lg rounded-2xl mb-8" style={{ height: layoutConfigs[4].height }} key={venue.id}>
+                      <VenueCard venue={venue} layout={layoutConfigs[index % 6 + 1]} />
+                    </div>
+                  ))}
+                </div>
+              )}
             </>
+        
           )}
         </div>
 
