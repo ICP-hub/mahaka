@@ -66,6 +66,15 @@ export default function Home() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-5xl font-bold text-center mb-8">Our Venues</h2>
+          
+{/* if length equals 1 */}
+          {venues.length === 1 && (
+            <div className="flex justify-center">
+              <div className="w-full max-w-2xl shadow-lg rounded-2xl" style={{ height: layoutConfigs[0].height }}>
+                <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
+              </div>
+            </div>
+          )}
 
 {/* if length equals 2 */}
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
