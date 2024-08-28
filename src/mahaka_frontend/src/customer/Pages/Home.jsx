@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import HeroSider from "../Components/LandingPageComponents/HeroSider";
 import venueImage from "../../assets/images/venue2.png";
 import venueImage1 from "../../assets/images/venue1.png";
@@ -20,222 +20,186 @@ import { GoArrowUpRight } from "react-icons/go";
 import OngoingSlider from "../../customer/Components/LandingPageComponents/OngoingSlider";
 import TestimonialCarousel from "../../customer/Components/LandingPageComponents/Testimonial";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+
+const VenueCard = ({ venue, layout }) => (
+  <Link
+    to={`/single-event/${venue.id}`}
+    className={`rounded-lg overflow-hidden flex text-white ${layout.flexDirection} ${layout.bgColor}`}
+  >
+    <div className={`pt-6 pb-6 pl-6 ${layout.textArea}`}>
+      <h3 className="text-3xl font-black mb-[6px]">{venue.Title}</h3>
+      <p className="mb-[6px] text-[14px] font-normal">{venue.Description}</p>
+      <p className="text-2xl font-black">Rp {venue.price}/-</p>
+      <div className="mt-4">
+        <GoArrowUpRight className="bg-white w-8 h-8 text-[#E2AF4E] rounded-full p-2" />
+      </div>
+    </div>
+    <div className={layout.imageArea}>
+      <img
+        src={Frame10}
+        alt={venue.Title}
+        className="object-cover object-center w-full h-full"
+      />
+    </div>
+  </Link>
+);
 
 export default function Home() {
+  const { venues } = useSelector((state) => state.venues);
+
+  const layoutConfigs = [
+    { flexDirection: "flex-row", bgColor: "bg-[#E2AF4E]", textArea: "w-1/3", imageArea: "w-2/3", height: "545px", },
+    { flexDirection: "flex-row", bgColor: "bg-[#41B2A7]", textArea: "w-2/5", imageArea: "w-3/5", height: "100%" },
+    { flexDirection: "flex-col", bgColor: "bg-[#41B2A7]", textArea: "w-full", imageArea: "w-full", height: "calc(100% - 545px)", },
+    { flexDirection: "flex-col-reverse", bgColor: "bg-[#16B5E3]", textArea: "w-full", imageArea: "w-full", height: "100%", },
+    { flexDirection: "flex-col", bgColor: "bg-[#E2AF4E]", textArea: "w-full", imageArea: "w-full", height: "100%", },
+    { flexDirection: "flex-row", bgColor: "bg-[#E2AF4E]", textArea: "w-full", imageArea: "w-full", height: "100%", },
+    { flexDirection: "flex-row", bgColor: "bg-[#16B5E3]", textArea: "w-full", imageArea: "w-full", height: "100%", },
+  ];
+
   return (
     <>
-      {/* Hero section slider start  */}
       <HeroSider />
-      {/* Hero section slider start  */}
       <section className="py-12">
-        {/* our venues section  start*/}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
-          <h2 className="text-7xl font-black text-center mb-8">Our Venues</h2>
-          <div className="flex flex-col lg:flex-row   gap-4">
-            {/* left card  start*/}
-            <Link to="/single-event">
-              <div className="lg:max-w-[756px] lg:max-h-[545px] w-full shadow-lg rounded-2xl overflow-hidden  flex">
-                <div className="pr-6  bg-[#E2AF4E] text-white">
-                  <div className="lg:h-[205.65px] lg:w-[250.78px] w-full pt-10 pl-7">
-                    <h3 className="text-3xl font-black  mb-2">
-                      Zoo Theme Venue
-                    </h3>
-                    <p className="mb-4 text-[14px] font-normal">
-                      Lorem ipsum dolor sit amet consectetur. Tridunt sit
-                      molestie ac faucibus quis sed nullam vel.
-                    </p>
-                    <p className="text-2xl  font-black">Rp 4,999/-</p>
-                    <div href="#" className="pt-6 ">
-                      <GoArrowUpRight className="bg-white w-[30px] h-[30px] text-[#E2AF4E] rounded-full" />
-                    </div>
-                  </div>
-                </div>
-                <div className="lg:w-[422px] lg:h-[545px] w-full h-full">
-                  <img
-                    src={venueImage}
-                    alt="image"
-                    className="object-cover object-center h-[100%]"
-                  />
-                </div>
+        {/* -------------------------------------venues section start------------------------------ */}
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-5xl font-bold text-center mb-8">Our Venues</h2>
+          
+{/* if length equals 1 */}
+          {venues.length === 1 && (
+            <div className="flex justify-center">
+              <div className="w-full max-w-2xl shadow-lg rounded-2xl" style={{ height: layoutConfigs[0].height }}>
+                <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
               </div>
-            </Link>
-            {/* right card start  */}
-            <Link to="/single-event">
-              <div className="lg:max-w-[492px] lg:max-h-[544px] w-full shadow-lg rounded-2xl overflow-hidden  flex flex-col">
-                <div className="  bg-[#41B2A7] text-white">
-                  <div className=" lg:w-[250.78px] w-full pt-10 pl-6">
-                    <h3 className="text-3xl font-black  mb-2">
-                      Zoo Theme Venue
-                    </h3>
-                    <p className="mb-4 text-[14px] font-normal">
-                      Lorem ipsum dolor sit amet consectetur. Tridunt sit
-                      molestie ac faucibus quis sed nullam vel.
-                    </p>
-                    <p className="text-2xl  font-black">Rp 4,999/-</p>
-                    <div href="#" className="py-6 ">
-                      <GoArrowUpRight className="bg-white w-[30px] h-[30px] text-[#E2AF4E] rounded-full" />
-                    </div>
-                  </div>
+            </div>
+          )}
+
+{/* if length equals 2 */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+            {venues.length === 2 && (
+              <>
+                {/* first row- 1st venue */}
+                <div className="md:col-span-3 flex l shadow-lg rounded-2x" style={{ height: layoutConfigs[0].height }}>
+                  <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
                 </div>
-                <div className="w-full h-full ">
-                  <img
-                    src={venueImage1}
-                    alt="image"
-                    className="object-cover object-center h-[100%]"
-                  />
+
+                {/* first row- 2nd venue */}
+                <div className="md:col-span-2 flex l shadow-lg rounded-2x" style={{ height: layoutConfigs[0].height }}>
+                  <VenueCard venue={venues[1]} layout={layoutConfigs[2]} />
                 </div>
-              </div>
-            </Link>
+              </>
+            )}
           </div>
+
+{/* if length equals 3 */}
+          {venues.length === 3 && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-[33px] mb-8">
+              {venues.map((venue, index) => (
+                <div className="col-span-1 shadow-lg rounded-2xl" style={{ height: layoutConfigs[4].height }} key={venue.id}>
+                  <VenueCard venue={venue} layout={layoutConfigs[index + 2]} />
+                </div>
+              ))}
+            </div>
+          )}
+
+{/* if length equals 4 */}
+          {venues.length === 4 && (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                {venues.slice(0, 2).map((venue, index) => (
+                  <div className="col-span-1 shadow-lg rounded-2xl" key={venue.id}>
+                    <VenueCard venue={venue} layout={layoutConfigs[index +3]} />
+                  </div>
+                ))}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                {venues.slice(2, 4).map((venue, index) => (
+                  <div className="col-span-1 shadow-lg rounded-2xl" key={venue.id}>
+                    <VenueCard venue={venue} layout={layoutConfigs[index + 5]} />
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+{/* if length equals 6 */}
+          {venues.length === 6 && (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                {venues.slice(0, 2).map((venue, index) => (
+                  <div className="col-span-1 shadow-lg rounded-2xl" key={venue.id}>
+                    <VenueCard venue={venue} layout={layoutConfigs[index+5]} />
+                  </div>
+                ))}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                {venues.slice(2, 4).map((venue, index) => (
+                  <div className="col-span-1 shadow-lg rounded-2xl" key={venue.id}>
+                    <VenueCard venue={venue} layout={layoutConfigs[index + 2]} />
+                  </div>
+                ))}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                {venues.slice(4, 6).map((venue, index) => (
+                  <div className="col-span-1 shadow-lg rounded-2xl" key={venue.id}>
+                    <VenueCard venue={venue} layout={layoutConfigs[index + 5]} />
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+{/* if length equals 5 or more than equal to 7 */}
+          {/* First Row */}
+          {(venues.length === 5 || venues.length === 7) && (
+            <>
+              {/* First Row */}
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+                <div className="md:col-span-3 flex shadow-lg rounded-2xl" style={{ height: layoutConfigs[0].height }}>
+                  <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
+                </div>
+                <div className="md:col-span-2 flex shadow-lg rounded-2xl" style={{ height: layoutConfigs[0].height }}>
+                  <VenueCard venue={venues[1]} layout={layoutConfigs[2]} />
+                </div>
+              </div>
+          
+              {/* Second Row */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-[33px] mb-8">
+                {venues.slice(2, 5).map((venue, index) => (
+                  <div className="col-span-1 shadow-lg rounded-2xl" style={{ height: layoutConfigs[4].height }} key={venue.id}>
+                    <VenueCard venue={venue} layout={layoutConfigs[index + 2]} />
+                  </div>
+                ))}
+              </div>
+          
+              {/* Third Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                {venues.slice(5, 7).map((venue, index) => (
+                  <div className="col-span-1 shadow-lg rounded-2xl" style={{ height: layoutConfigs[4].height }} key={venue.id}>
+                    <VenueCard venue={venue} layout={layoutConfigs[index + 5]} />
+                  </div>
+                ))}
+              </div>
+          
+              {/* Additional Rows for Remaining Venues */}
+              {venues.length > 7 && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-[33px]">
+                  {venues.slice(7).map((venue, index) => (
+                    <div className="col-span-1 shadow-lg rounded-2xl mb-8" style={{ height: layoutConfigs[4].height }} key={venue.id}>
+                      <VenueCard venue={venue} layout={layoutConfigs[index % 6 + 1]} />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+        
+          )}
         </div>
-        {/* our venues section  end*/}
-        {/* 3 cards section start */}
-        <div className="max-w-7xl px-4 sm:px-6 lg:px-8  mx-auto mt-12">
-          <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-[33px] justify-center items-center">
-            {/* card 1 */}
-            <Link to="/single-event">
-              <div className=" shadow-lg rounded-2xl overflow-hidden  flex flex-col">
-                <div className="  bg-[#41B2A7] text-white">
-                  <div className=" pt-10 pl-6">
-                    <h3 className="text-3xl font-black  mb-2">
-                      Zoo Theme Venue
-                    </h3>
-                    <p className="mb-4 text-[14px] font-normal">
-                      Lorem ipsum dolor sit amet consectetur. Tridunt sit
-                      molestie ac faucibus quis sed nullam vel.
-                    </p>
-                    <p className="text-2xl  font-black">Rp 4,999/-</p>
-                    <div href="#" className="py-6 ">
-                      <GoArrowUpRight className="bg-white w-[30px] h-[30px] text-[#E2AF4E] rounded-full" />
-                    </div>
-                  </div>
-                </div>
-                <div className="w-full h-full ">
-                  <img
-                    src={Frame10}
-                    alt="image"
-                    className="object-cover object-center h-[100%]"
-                  />
-                </div>
-              </div>
-            </Link>
-            {/* card 2 */}
-            <Link to="/single-event">
-              <div className="shadow-lg rounded-2xl overflow-hidden  flex flex-col">
-                <div className="w-full h-full ">
-                  <img
-                    src={Frame11}
-                    alt="image"
-                    className="object-cover object-center h-[100%]"
-                  />
-                </div>
-                <div className="  bg-[#16B5E3] text-white">
-                  <div className="  pt-6 pb-6 pl-6">
-                    <h3 className="text-3xl font-black  mb-[6px]">
-                      Zoo Theme Venue
-                    </h3>
-                    <p className="mb-[6px] text-[14px] font-normal">
-                      Lorem ipsum dolor sit amet consectetur. Tridunt sit
-                      molestie ac faucibus quis sed nullam vel.
-                    </p>
-                    <p className="text-2xl  font-black">Rp 4,999/-</p>
-                    <div className="py-6">
-                      <GoArrowUpRight className="bg-white w-[30px] h-[30px] text-[#E2AF4E] rounded-full" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Link>
-            {/* card 3 */}
-            <Link to="/single-event">
-              <div className=" shadow-lg rounded-2xl overflow-hidden  flex flex-col">
-                <div className="  bg-[#E2AF4E] text-white">
-                  <div className=" pt-10 pl-6">
-                    <h3 className="text-3xl font-black  mb-2">
-                      Zoo Theme Venue
-                    </h3>
-                    <p className="mb-4 text-[14px] font-normal">
-                      Lorem ipsum dolor sit amet consectetur. Tridunt sit
-                      molestie ac faucibus quis sed nullam vel.
-                    </p>
-                    <p className="text-2xl  font-black">Rp 4,999/-</p>
-                    <div href="#" className="py-6 ">
-                      <GoArrowUpRight className="bg-white w-[30px] h-[30px] text-[#E2AF4E] rounded-full" />
-                    </div>
-                  </div>
-                </div>
-                <div className="w-full h-full ">
-                  <img
-                    src={Frame12}
-                    alt="image"
-                    className="object-cover object-center h-[100%]"
-                  />
-                </div>
-              </div>
-            </Link>
-          </div>
-        </div>
-        {/* 3 cards section start */}
-        {/*2 cards section  start*/}
-        <div className="py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-8">
-            {/* card 1 */}
-            <Link to="/single-event">
-              <div className="shadow-lg  rounded-2xl overflow-hidden  flex ">
-                <div className="pr-6 w-1/2  bg-[#E2AF4E] text-white">
-                  <div className=" pt-10 pl-7">
-                    <h3 className="text-3xl font-black  mb-2">
-                      Zoo Theme Venue
-                    </h3>
-                    <p className="mb-4 text-[14px] font-normal">
-                      Lorem ipsum dolor sit amet consectetur. Tridunt sit
-                      molestie ac faucibus quis sed nullam vel.
-                    </p>
-                    <p className="text-2xl  font-black">Rp 4,999/-</p>
-                    <div href="#" className="py-6 ">
-                      <GoArrowUpRight className="bg-white w-[30px] h-[30px] text-[#E2AF4E] rounded-full" />
-                    </div>
-                  </div>
-                </div>
-                <div className=" w-1/2 h-full">
-                  <img
-                    src={fram2}
-                    alt="image"
-                    className="object-cover object-center h-[100%]"
-                  />
-                </div>
-              </div>
-            </Link>
-            {/* card 1 */}
-            <Link to="/single-event">
-              <div className="shadow-lg rounded-2xl overflow-hidden  flex">
-                <div className="pr-6 w-1/2 bg-[#E2AF4E] text-white">
-                  <div className=" pt-10 pl-7">
-                    <h3 className="text-3xl font-black  mb-2">
-                      Zoo Theme Venue
-                    </h3>
-                    <p className="mb-4 text-[14px] font-normal">
-                      Lorem ipsum dolor sit amet consectetur. Tridunt sit
-                      molestie ac faucibus quis sed nullam vel.
-                    </p>
-                    <p className="text-2xl  font-black">Rp 4,999/-</p>
-                    <div href="#" className="py-6 ">
-                      <GoArrowUpRight className="bg-white w-[30px] h-[30px] text-[#E2AF4E] rounded-full" />
-                    </div>
-                  </div>
-                </div>
-                <div className=" w-1/2 h-full">
-                  <img
-                    src={fram1}
-                    alt="image"
-                    className="object-cover object-center h-[100%]"
-                  />
-                </div>
-              </div>
-            </Link>
-          </div>
-        </div>
-        {/*2 cards section  end*/}
+
+        {/* --------------------------------venues section end-------------------------------- */}
+
         {/* third party BANNER section start*/}
         <div className="my-12">
           <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
@@ -331,42 +295,42 @@ export default function Home() {
             <div className="overflow-hidden">
               <div className="rounded-2xl w-full h-full">
                 <img src={Frame7} alt="" className="object-cover " />
-              </div>
-              <div className=" pt-7">
-                <h1 className="text-3xl font-black">Jungle Safari</h1>
-                <p className="text-base font-normal">
-                  Explore our lush habitats, meet exotic creatures, and create
-                  unforgettable memories. Whether you're planning a family
-                  adventure, a school trip, or a solo
-                </p>
+                <div className=" pt-7">
+                  <h1 className="text-3xl font-black">Jungle Safari</h1>
+                  <p className="text-base font-normal">
+                    Explore our lush habitats, meet exotic creatures, and create
+                    unforgettable memories. Whether you're planning a family
+                    adventure, a school trip, or a solo
+                  </p>
+                </div>
               </div>
             </div>
             {/* Second card  start*/}
             <div className="overflow-hidden">
               <div className="rounded-2xl w-full h-full">
                 <img src={Frame8} alt="" className="object-cover " />
-              </div>
-              <div className="pt-7">
-                <h1 className="text-3xl font-black">Jungle Safari</h1>
-                <p className="text-base font-normal">
-                  Explore our lush habitats, meet exotic creatures, and create
-                  unforgettable memories. Whether you're planning a family
-                  adventure, a school trip, or a solo
-                </p>
+                <div className="pt-7">
+                  <h1 className="text-3xl font-black">Jungle Safari</h1>
+                  <p className="text-base font-normal">
+                    Explore our lush habitats, meet exotic creatures, and create
+                    unforgettable memories. Whether you're planning a family
+                    adventure, a school trip, or a solo
+                  </p>
+                </div>
               </div>
             </div>
             {/* 3rd Card start  */}
             <div className="overflow-hidden">
               <div className="rounded-2xl w-full h-full">
                 <img src={Frame9} alt="" className="object-cover " />
-              </div>
-              <div className="pt-7">
-                <h1 className="text-3xl font-black">Jungle Safari</h1>
-                <p className="text-base font-normal">
-                  Explore our lush habitats, meet exotic creatures, and create
-                  unforgettable memories. Whether you're planning a family
-                  adventure, a school trip, or a solo
-                </p>
+                <div className="pt-7">
+                  <h1 className="text-3xl font-black">Jungle Safari</h1>
+                  <p className="text-base font-normal">
+                    Explore our lush habitats, meet exotic creatures, and create
+                    unforgettable memories. Whether you're planning a family
+                    adventure, a school trip, or a solo
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -384,7 +348,7 @@ export default function Home() {
           <TestimonialCarousel />
         </div>
         {/* Testimonial End  */}
-      </section>
+      </section >
     </>
   );
 }

@@ -172,6 +172,12 @@ const ConnectWalletBtn = () => {
 
   useEffect(() => {
     dispatch(getAllVenues({ backend: backend, pageLimit: 100, currPage: 0 }));
+    // dispatch(
+    //   getVenue({
+    //     backend: backend,
+    //     venueId: "57b4zy-br5f7-7uaaa-aaaaa-qaaca-cai",
+    //   })
+    // );
   }, []);
 
   /***************************** */
