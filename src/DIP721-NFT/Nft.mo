@@ -241,7 +241,7 @@ shared actor class Dip721NFT(custodian: Principal, init : Types.Dip721NonFungibl
     let accepted = 
         if (amount <= limit) amount
         else limit;
-    let deposit = Cycles.accept(accepted);
+    let deposit = Cycles.accept<system>(accepted);
     assert (deposit == accepted);
     balance += accepted;
     { accepted = Nat64.fromNat(accepted) };
