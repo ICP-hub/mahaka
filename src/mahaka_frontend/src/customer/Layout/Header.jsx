@@ -6,7 +6,11 @@ import ProfileCard from "../Components/ProfileCard";
 import { AnimatePresence, motion } from "framer-motion";
 import { HiMagnifyingGlass, HiMiniBars3 } from "react-icons/hi2";
 import { useDispatch, useSelector } from "react-redux";
-import { nfidLogin, plugLogin } from "../../redux/reducers/auth/authReducer";
+import {
+  logout,
+  nfidLogin,
+  plugLogin,
+} from "../../redux/reducers/auth/authReducer";
 import {
   deleteVenue,
   getAllVenues,
@@ -150,7 +154,9 @@ const NavVertical = ({ isNavOpen }) => {
 
 const ConnectWalletBtn = () => {
   const dispatch = useDispatch();
-  const { backend } = useSelector((state) => state.auth);
+  const { backend, principal, isConnected } = useSelector(
+    (state) => state.auth
+  );
 
   const states = useSelector((state) => console.log("States are ", state));
 
@@ -166,12 +172,6 @@ const ConnectWalletBtn = () => {
 
   useEffect(() => {
     dispatch(getAllVenues({ backend: backend, pageLimit: 100, currPage: 0 }));
-    dispatch(
-      getVenue({
-        backend: backend,
-        venueId: "57b4zy-br5f7-7uaaa-aaaaa-qaaca-cai",
-      })
-    );
   }, []);
 
   /***************************** */
@@ -186,15 +186,30 @@ const ConnectWalletBtn = () => {
 
   return (
     <>
-      <button
-        className="p-4 bg-secondary text-white font-medium rounded-lg hover:bg-orange-600 min-w-max"
-        onClick={() => dispatch(plugLogin())}
-      >
-        Connect Wallet
-      </button>
-      <button onClick={handleDeleteVenue}>Delete venue</button>
+      {isConnected ? (
+        <div className="flex gap-4 md:fixed md:bg-white p-4 rounded-lg md:shadow-lg md:text-black text-white md:top-20">
+          <h4 className="text-2xl font-semibold">{principal}</h4>
+          <button
+            className="px-4 py-2 bg-gray-800 text-white rounded-lg"
+            onClick={() => dispatch(logout())}
+          >
+            Disconnect
+          </button>
+        </div>
+      ) : (
+        <button
+          className="p-4 bg-secondary text-white font-medium rounded-lg hover:bg-orange-600 min-w-max"
+          onClick={() => dispatch(plugLogin())}
+        >
+          Connect Wallet
+        </button>
+      )}
     </>
   );
+};
+
+const LoginModal = () => {
+  return <div>Login Modal</div>;
 };
 
 // export default function Header() {
