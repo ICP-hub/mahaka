@@ -36,14 +36,25 @@ actor {
         var elems_count : Nat64 = 0;
     };
 
+     var _EventsMap = TrieMap.TrieMap<Principal, Index>(Principal.equal,Principal.hash);
+     private stable var _stableEventsArray :[(Principal,Index)] = [];
+
+     stable var Events_state = {
+        bytes = Region.new();
+        var bytes_count : Nat64 = 0;
+        elems = Region.new ();
+        var elems_count : Nat64 = 0;
+     };
+
+     private stable var _eventList : List.List<(Types.venueId, List.List<Types.completeEvent>)> = List.nil<(Types.venueId, List.List<Types.completeEvent>)>();
     // ---------------------------------------------------------------------------------------------------------------------------------
-    func regionEnsureSizeBytes(r : Region, new_byte_count : Nat64) {
+     func regionEnsureSizeBytes(r : Region, new_byte_count : Nat64) {
         let pages = Region.size(r);
         if (new_byte_count > pages << 16) {
         let new_pages = ((new_byte_count + ((1 << 16) - 1)) / (1 << 16)) - pages;
         assert Region.grow(r, new_pages) == pages
         }
-    };
+     };
 
     let elem_size = 16 : Nat64;
 
@@ -181,5 +192,32 @@ actor {
           return {data = pages_data; current_page = pageNo + 1 ; Total_pages = index_pages.size()};
      };
 
+     public shared ({caller})  func createEvent( venueId : Types.venueId, Event : Types.Events, eCollection : Types.eventCollectionParams) : async Text {
+          let _venue_details = await getVenue(venueId);
+          // switch (_venue_details){
+          //      case (Principal,Value) {
+          //           let new_obj = 
+          //      };
+          // };
+          let eventCollection = await NFTactor.Dip721NFT(caller, eCollection.collection_args);
+          let _event : Types.completeEvent = {
+               Description = Event.Description;
+               Details = Event.Details;
+               GroupTicket = Event.GroupTicket;
+               SingleTicket = Event.SingleTicket;
+               Title = Event.Title;
+               VipTicket = Event.VipTicket;
+               event_collectionid = await eventCollection.getCanisterId();
+          };
+          let Events : Types.Events_data = {
+               Events = List.push(_event, List.nil<Types.completeEvent>()); 
+          };
+          let event_blob = to_candid(Events);
+          let Event_index = await stable_add(event_blob, Events_state);
+          _EventsMap.put(Principal.fromText(venueId), Event_index);
+          // List.push((),_eventList);
+          return "Event created";
+     };
 
 }
+

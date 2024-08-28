@@ -5,6 +5,8 @@ import List "mo:base/List";
 import Types "../DIP721-NFT/Types";
 module {
 
+    public type venueId = Text;
+
     public type Ticket = {
         #SinglePass;
         #VipPass;
@@ -30,7 +32,15 @@ module {
         Details : eventDetails;
         SingleTicket : Nat;
         VipTicket : Nat;
-        GroupTicket : Nat; 
+        GroupTicket : Nat;
+    };
+
+    public type completeEvent = Events and {
+        event_collectionid : Principal;
+    };
+
+    public type eventCollectionParams = {
+        collection_args : Types.Dip721NonFungibleToken;
     };
 
     public type venueDetails = {
@@ -50,5 +60,9 @@ module {
         capacity : Nat;
         Collection_id : Principal;
 
+    };
+
+    public type Events_data = {
+        Events : List.List<completeEvent>;
     };
 }
