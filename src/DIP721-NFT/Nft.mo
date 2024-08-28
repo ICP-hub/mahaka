@@ -21,7 +21,6 @@ shared actor class Dip721NFT(custodian: Principal, init : Types.Dip721NonFungibl
   stable var banner : Types.LogoResult = init.banner;
   stable var description : Text = init.description;
   stable var created_at : Time.Time = init.created_at;
-  stable var featured : Bool = init.featured;
   private stable var capacity = 1000000000000000000;
   private stable var balance = Cycles.balance();
 
@@ -92,7 +91,6 @@ shared actor class Dip721NFT(custodian: Principal, init : Types.Dip721NonFungibl
               let update : Types.Nft = {
                 owner = to;
                 id = item.id;
-                nft_type = item.nft_type;
                 metadata = token.metadata;
                 locked = true;
                 forsale = false;
@@ -146,20 +144,16 @@ shared actor class Dip721NFT(custodian: Principal, init : Types.Dip721NonFungibl
     return created_at;
   };
 
-  public query func featuredDip721() : async Bool {
-    return featured;
-  };
-
   public query func getDIP721details() : async Types.Dip721NonFungibleToken {
     return {
       logo = logo;
+      collection_type = init.collection_type;
       name = name;
       symbol = symbol;
       maxLimit = maxLimit;
       banner = banner;
       description = description;
       created_at = created_at;
-      featured = featured;
     };
   };
 
@@ -247,7 +241,7 @@ shared actor class Dip721NFT(custodian: Principal, init : Types.Dip721NonFungibl
     let accepted = 
         if (amount <= limit) amount
         else limit;
-    let deposit = Cycles.accept(accepted);
+    let deposit = Cycles.accept<system>(accepted);
     assert (deposit == accepted);
     balance += accepted;
     { accepted = Nat64.fromNat(accepted) };

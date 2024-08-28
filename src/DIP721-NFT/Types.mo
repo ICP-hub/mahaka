@@ -9,6 +9,8 @@ import Result "mo:base/Result";
 import Time "mo:base/Time";
 
 module {
+  
+
   public type Dip721NonFungibleToken = {
     logo: LogoResult;
     banner: LogoResult;
@@ -17,7 +19,7 @@ module {
     name: Text;
     symbol: Text;
     maxLimit : Nat16;
-    featured: Bool;
+    collection_type : nft_type;
   };
 
   public type Value = { #Nat : Nat; #Int : Int; #Blob : Blob; #Text : Text };
@@ -113,7 +115,6 @@ module {
   };
   public type Nft = {
     owner: Principal;
-    nft_type : nft_type;
     id: TokenId;
     logo : LogoResult;
     metadata: MetadataDesc;
