@@ -203,7 +203,9 @@ actor {
           //           let new_obj = 
           //      };
           // };
+          Cycles.add<system>(500_500_000_000);
           let eventCollection = await NFTactor.Dip721NFT(caller, eCollection.collection_args);
+          ignore await eventCollection.wallet_receive();
           let _event : Types.completeEvent = {
                Description = Event.Description;
                Details = Event.Details;
@@ -257,11 +259,13 @@ actor {
           }; 
      };
 
-     // public shared ({caller}) func DeleteEvent (venue_id : Types.venueId, event_canisterId : Principal) 
+     // public shared ({caller}) func DeleteEvent (venue_id : Types.venueId, event_canisterId : Principal) : async {
+     //      return 
+     // };
 
-     /********************************************************
-     *                   User CRUD                           *
-     ********************************************************/
+     /*********************************************************/
+     /*                   User CRUD                           */
+     /*********************************************************/
 
     public shared ({ caller }) func updateUser(email : Text, firstName : Text, lastName : Text) : async Result.Result<(Types.User, Types.Index), Types.UpdateUserError> {
         /*  if (Principal.isAnonymous(msg.caller)) {
@@ -373,6 +377,8 @@ actor {
         };
 
         return { data = List.toArray(user_list); current_page = PageNo + 1; total_pages = index_pages.size(); };
+
+
     };
 
 }
