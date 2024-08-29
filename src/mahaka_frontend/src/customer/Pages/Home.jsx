@@ -23,25 +23,28 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const VenueCard = ({ venue, layout }) => (
-  <Link
-    to={`/single-event/${venue.id}`}
-    className={`rounded-lg overflow-hidden flex text-white ${layout.flexDirection} ${layout.bgColor}`}
-  >
-    <div className={`pt-6 pb-6 pl-6 ${layout.textArea}`}>
-      <h3 className="text-3xl font-black mb-[6px]">{venue.Title}</h3>
-      <p className="mb-[6px] text-[14px] font-normal">{venue.Description}</p>
-      <p className="text-2xl font-black">Rp {venue.price}/-</p>
-      <div className="mt-4">
-        <GoArrowUpRight className="bg-white w-8 h-8 text-[#E2AF4E] rounded-full p-2" />
+  <Link to={`/single-event/${venue.id}`} className={`shadow-lg rounded-2xl overflow-hidden flex ${layout.flexDirection} ${layout.height}`}>
+    <div className={`${layout.bgColor} text-white ${layout.textArea}`}>
+      <div className={`${layout.padding} h-full flex flex-col justify-between`}>
+        <div>
+          <h3 className="text-3xl font-black mb-2">{venue.Title}</h3>
+          <p className="mb-4 text-[14px] font-normal">{venue.Description}</p>
+          <p className="text-2xl font-black">Rp {venue.price}/-</p>
+        </div>
+        <div className={`${layout.iconPadding}`}>
+          <GoArrowUpRight className="bg-white w-[30px] h-[30px] text-[#E2AF4E] rounded-full p-1" />
+        </div>
       </div>
     </div>
-    <div className={layout.imageArea}>
-      <img
-        src={Frame10}
-        alt={venue.Title}
-        className="object-cover object-center w-full h-full"
-      />
-    </div>
+    {layout.imageArea && (
+      <div className={layout.imageArea}>
+        <img
+          src={Frame10}
+          alt={venue.Title}
+          className="object-cover object-center h-full w-full"
+        />
+      </div>
+    )}
   </Link>
 );
 
@@ -49,13 +52,13 @@ export default function Home() {
   const { venues } = useSelector((state) => state.venues);
 
   const layoutConfigs = [
-    { flexDirection: "flex-row", bgColor: "bg-[#E2AF4E]", textArea: "w-1/3", imageArea: "w-2/3", height: "545px", },
-    { flexDirection: "flex-row", bgColor: "bg-[#41B2A7]", textArea: "w-2/5", imageArea: "w-3/5", height: "100%" },
-    { flexDirection: "flex-col", bgColor: "bg-[#41B2A7]", textArea: "w-full", imageArea: "w-full", height: "calc(100% - 545px)", },
-    { flexDirection: "flex-col-reverse", bgColor: "bg-[#16B5E3]", textArea: "w-full", imageArea: "w-full", height: "100%", },
-    { flexDirection: "flex-col", bgColor: "bg-[#E2AF4E]", textArea: "w-full", imageArea: "w-full", height: "100%", },
-    { flexDirection: "flex-row", bgColor: "bg-[#E2AF4E]", textArea: "w-full", imageArea: "w-full", height: "100%", },
-    { flexDirection: "flex-row", bgColor: "bg-[#16B5E3]", textArea: "w-full", imageArea: "w-full", height: "100%", },
+    { flexDirection: "flex-row", bgColor: "bg-[#E2AF4E]", textArea: "w-1/3", imageArea: "w-2/3", height: "h-[545px]", padding: "p-6", iconPadding: "mt-4" },
+    { flexDirection: "flex-col", bgColor: "bg-[#41B2A7]", textArea: "h-1/2", imageArea: "h-1/2", height: "h-[545px]", padding: "p-6", iconPadding: "mt-4" },
+    { flexDirection: "flex-col", bgColor: "bg-[#41B2A7]", textArea: "h-1/2", imageArea: "h-1/2", height: "h-full", padding: "p-6", iconPadding: "mt-4" },
+    { flexDirection: "flex-col-reverse", bgColor: "bg-[#16B5E3]", textArea: "h-2/5", imageArea: "h-3/5", height: "h-full", padding: "p-6", iconPadding: "mt-4" },
+    { flexDirection: "flex-col", bgColor: "bg-[#E2AF4E]", textArea: "h-1/2", imageArea: "h-1/2", height: "h-full", padding: "p-6", iconPadding: "mt-4" },
+    { flexDirection: "flex-row", bgColor: "bg-[#E2AF4E]", textArea: "w-1/2", imageArea: "w-1/2", height: "h-[300px]", padding: "p-6", iconPadding: "mt-4" },
+    { flexDirection: "flex-row", bgColor: "bg-[#16B5E3]", textArea: "w-1/2", imageArea: "w-1/2", height: "h-[300px]", padding: "p-6", iconPadding: "mt-4" },
   ];
 
   return (
@@ -66,36 +69,35 @@ export default function Home() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-5xl font-bold text-center mb-8">Our Venues</h2>
-          
+
 {/* if length equals 1 */}
           {venues.length === 1 && (
             <div className="flex justify-center">
-              <div className="w-full max-w-2xl shadow-lg rounded-2xl" style={{ height: layoutConfigs[0].height }}>
+              <div className="w-full max-w-4xl shadow-lg rounded-2xl flex flex-col overflow-hidden">
                 <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
               </div>
             </div>
           )}
 
+
 {/* if length equals 2 */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-            {venues.length === 2 && (
-              <>
-                {/* first row- 1st venue */}
-                <div className="md:col-span-3 flex l shadow-lg rounded-2x" style={{ height: layoutConfigs[0].height }}>
+          {venues.length === 2 && (
+            <>
+              <div className="flex flex-col lg:flex-row gap-4 mb-12">
+                <div className="lg:w-[60%]">
                   <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
                 </div>
-
-                {/* first row- 2nd venue */}
-                <div className="md:col-span-2 flex l shadow-lg rounded-2x" style={{ height: layoutConfigs[0].height }}>
-                  <VenueCard venue={venues[1]} layout={layoutConfigs[2]} />
+                <div className="lg:w-[40%]">
+                  <VenueCard venue={venues[1]} layout={layoutConfigs[1]} />
                 </div>
-              </>
-            )}
-          </div>
+              </div>
+            </>
+          )}
+          {/* </div> */}
 
 {/* if length equals 3 */}
           {venues.length === 3 && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-[33px] mb-8">
+            <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-[33px] mb-12">
               {venues.map((venue, index) => (
                 <div className="col-span-1 shadow-lg rounded-2xl" style={{ height: layoutConfigs[4].height }} key={venue.id}>
                   <VenueCard venue={venue} layout={layoutConfigs[index + 2]} />
@@ -107,19 +109,22 @@ export default function Home() {
 {/* if length equals 4 */}
           {venues.length === 4 && (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                {venues.slice(0, 2).map((venue, index) => (
-                  <div className="col-span-1 shadow-lg rounded-2xl" key={venue.id}>
-                    <VenueCard venue={venue} layout={layoutConfigs[index +3]} />
-                  </div>
-                ))}
+              <div className="flex flex-col lg:flex-row gap-4 mb-12">
+                <div className="lg:w-[60%]">
+                  <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
+                </div>
+                <div className="lg:w-[40%]">
+                  <VenueCard venue={venues[1]} layout={layoutConfigs[1]} />
+                </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                {venues.slice(2, 4).map((venue, index) => (
-                  <div className="col-span-1 shadow-lg rounded-2xl" key={venue.id}>
-                    <VenueCard venue={venue} layout={layoutConfigs[index + 5]} />
-                  </div>
-                ))}
+                <div className="col-span-1 shadow-lg rounded-2xl" >
+                  <VenueCard venue={venues[2]} layout={layoutConfigs[6]} />
+                </div>
+                <div className="col-span-1 shadow-lg rounded-2xl" >
+                  <VenueCard venue={venues[3]} layout={layoutConfigs[5]} />
+                </div>
+
               </div>
             </>
           )}
@@ -128,25 +133,32 @@ export default function Home() {
           {venues.length === 6 && (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                {venues.slice(0, 2).map((venue, index) => (
-                  <div className="col-span-1 shadow-lg rounded-2xl" key={venue.id}>
-                    <VenueCard venue={venue} layout={layoutConfigs[index+5]} />
-                  </div>
-                ))}
+                <div className="col-span-1 shadow-lg rounded-2xl" >
+                  <VenueCard venue={venues[2]} layout={layoutConfigs[6]} />
+                </div>
+                <div className="col-span-1 shadow-lg rounded-2xl" >
+                  <VenueCard venue={venues[3]} layout={layoutConfigs[5]} />
+                </div>
+
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                {venues.slice(2, 4).map((venue, index) => (
-                  <div className="col-span-1 shadow-lg rounded-2xl" key={venue.id}>
-                    <VenueCard venue={venue} layout={layoutConfigs[index + 2]} />
-                  </div>
-                ))}
+
+              <div className="flex flex-col lg:flex-row gap-4 mb-12">
+                <div className="lg:w-[60%]">
+                  <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
+                </div>
+                <div className="lg:w-[40%]">
+                  <VenueCard venue={venues[1]} layout={layoutConfigs[1]} />
+                </div>
               </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                {venues.slice(4, 6).map((venue, index) => (
-                  <div className="col-span-1 shadow-lg rounded-2xl" key={venue.id}>
-                    <VenueCard venue={venue} layout={layoutConfigs[index + 5]} />
-                  </div>
-                ))}
+                <div className="col-span-1 shadow-lg rounded-2xl" >
+                  <VenueCard venue={venues[2]} layout={layoutConfigs[6]} />
+                </div>
+                <div className="col-span-1 shadow-lg rounded-2xl" >
+                  <VenueCard venue={venues[3]} layout={layoutConfigs[5]} />
+                </div>
+
               </div>
             </>
           )}
@@ -156,15 +168,15 @@ export default function Home() {
           {(venues.length === 5 || venues.length === 7) && (
             <>
               {/* First Row */}
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-                <div className="md:col-span-3 flex shadow-lg rounded-2xl" style={{ height: layoutConfigs[0].height }}>
+              <div className="flex flex-col lg:flex-row gap-4 mb-12">
+                <div className="lg:w-[60%]">
                   <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
                 </div>
-                <div className="md:col-span-2 flex shadow-lg rounded-2xl" style={{ height: layoutConfigs[0].height }}>
-                  <VenueCard venue={venues[1]} layout={layoutConfigs[2]} />
+                <div className="lg:w-[40%]">
+                  <VenueCard venue={venues[1]} layout={layoutConfigs[1]} />
                 </div>
               </div>
-          
+
               {/* Second Row */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-[33px] mb-8">
                 {venues.slice(2, 5).map((venue, index) => (
@@ -173,7 +185,7 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-          
+
               {/* Third Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 {venues.slice(5, 7).map((venue, index) => (
@@ -182,7 +194,7 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-          
+
               {/* Additional Rows for Remaining Venues */}
               {venues.length > 7 && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-[33px]">
@@ -194,7 +206,7 @@ export default function Home() {
                 </div>
               )}
             </>
-        
+
           )}
         </div>
 
