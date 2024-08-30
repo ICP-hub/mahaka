@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./reducers/auth/authReducer";
 import venueApiReducer from "./reducers/apiReducers/venueApiReducer";
+import userApiReducer from "./reducers/apiReducers/userApiReducer";
 
 const store = configureStore({
   reducer: {
     auth: authReducer,
     venues: venueApiReducer,
+    users: userApiReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

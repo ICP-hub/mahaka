@@ -1,6 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
 
 export default function Footer() {
+  const dispatch = useDispatch();
+  const { backend } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    dispatch(getAllVenues({ backend: backend, pageLimit: 100, currPage: 0 }));
+  }, []);
+
   const currentYear = new Date().getFullYear();
   const address = "345 Faulconer Drive, Suite 4 • Charlottesville, CA, 12345";
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(

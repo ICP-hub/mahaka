@@ -1,18 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { updateUser } from "../../../redux/reducers/apiReducers/userApiReducer";
 
-function EditProfileForm() {
+function EditProfileForm({ setIsModalOpen }) {
+  const dispatch = useDispatch();
+  const { backend } = useSelector((state) => state.auth);
+  const { currentUser, userLoading } = useSelector((state) => state.users);
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [profileImage, setProfileImage] = useState(null);
 
+  useEffect(() => {
+    if (currentUser) {
+      setFirstName(currentUser.firstName || "");
+      setLastName(currentUser.lastName || "");
+      setEmail(currentUser.email || "");
+    }
+  }, [currentUser]);
+
   const handleImageUpload = (e) => {
     setProfileImage(e.target.files[0]);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission
+    const updatedData = {
+      email,
+      firstName,
+      lastName,
+      // Add profile image if needed
+    };
+    // console.log("Updating data:", updatedData);
+    dispatch(
+      updateUser({
+        backend: backend,
+        user: updatedData,
+        setIsModalOpen: setIsModalOpen,
+      })
+    );
   };
 
   return (
@@ -81,9 +108,12 @@ function EditProfileForm() {
         <div>
           <button
             type="submit"
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+            disabled={userLoading}
+            className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+              userLoading ? "bg-gray-400" : "bg-secondary hover:bg-orange-600"
+            }`}
           >
-            Save Changes
+            {userLoading ? "Updating user..." : "Save Changes"}
           </button>
         </div>
       </form>

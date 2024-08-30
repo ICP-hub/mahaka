@@ -10,7 +10,7 @@ export const customerRouting = [
     element: <Master />,
     children: [
       { index: true, element: <Home /> },
-      { path: "single-event", element: <SingleEvent /> },
+      { path: "venues/:id", element: <SingleEvent /> },
       { path: "payment", element: <PaymentComponent /> },
       { path: "user-profile", element: <UserProfile /> },
     ],
