@@ -1,9 +1,7 @@
 import React from "react";
-<<<<<<< HEAD
 import { RouterProvider } from "react-router-dom";
 import appRoutes from "./routes/app.routing";
 // import Table from "./customer/Components/LandingPageComponents/Table";
-
 
 function App() {
   // const { theme, toggleTheme } = useTheme();
@@ -13,27 +11,20 @@ function App() {
   //   { eventName: 'Halloween Retreat', startingDate: '29 October 24', endingDate: '1 November 24', time: '11:00 am - 8:00 pm', orders: '1,000', status: 'Ongoing', tickets: 'Sold out' },
   //   { eventName: 'Halloween Retreat', startingDate: '29 October 24', endingDate: '1 November 24', time: '11:00 am - 8:00 pm', orders: '1,000', status: 'Starting in 2 months', tickets: 'Open' },
   //   { eventName: 'Halloween Retreat', startingDate: '29 October 24', endingDate: '1 November 24', time: '11:00 am - 8:00 pm', orders: '1,000', status: 'Starting in 2 months', tickets: '3 left' },
-  //   { eventName: 'Halloween Retreat', startingDate: '29 October 24', endingDate: '1 November 24', time: '11:00 am - 8:00 pm', orders: '1,000', status: 'Finished', tickets: 'Sold out' }, 
+  //   { eventName: 'Halloween Retreat', startingDate: '29 October 24', endingDate: '1 November 24', time: '11:00 am - 8:00 pm', orders: '1,000', status: 'Finished', tickets: 'Sold out' },
   //   { eventName: 'Halloween Retreat', startingDate: '29 October 24', endingDate: '1 November 24', time: '11:00 am - 8:00 pm', orders: '1,000', status: 'Starting in 2 months', tickets: 'Open' },
   //   { eventName: 'Halloween Retreat', startingDate: '29 October 24', endingDate: '1 November 24', time: '11:00 am - 8:00 pm', orders: '1,000', status: 'Starting in 2 months', tickets: '3 left' },
-  //   { eventName: 'Halloween Retreat', startingDate: '29 October 24', endingDate: '1 November 24', time: '11:00 am - 8:00 pm', orders: '1,000', status: 'Finished', tickets: 'Sold out' }, 
+  //   { eventName: 'Halloween Retreat', startingDate: '29 October 24', endingDate: '1 November 24', time: '11:00 am - 8:00 pm', orders: '1,000', status: 'Finished', tickets: 'Sold out' },
   //   { eventName: 'Halloween Retreat', startingDate: '29 October 24', endingDate: '1 November 24', time: '11:00 am - 8:00 pm', orders: '1,000', status: 'Starting in 2 months', tickets: 'Open' },
   //   { eventName: 'Halloween Retreat', startingDate: '29 October 24', endingDate: '1 November 24', time: '11:00 am - 8:00 pm', orders: '1,000', status: 'Starting in 2 months', tickets: '3 left' },
-  //   { eventName: 'Halloween Retreat', startingDate: '29 October 24', endingDate: '1 November 24', time: '11:00 am - 8:00 pm', orders: '1,000', status: 'Ongoing', tickets: 'Sold out' }, 
+  //   { eventName: 'Halloween Retreat', startingDate: '29 October 24', endingDate: '1 November 24', time: '11:00 am - 8:00 pm', orders: '1,000', status: 'Ongoing', tickets: 'Sold out' },
   //   { eventName: 'Halloween Retreat', startingDate: '29 October 24', endingDate: '1 November 24', time: '11:00 am - 8:00 pm', orders: '1,000', status: 'Starting in 2 months', tickets: 'Open' },
   //   // ...more data
   // ];
-=======
-import useTheme from "./common/hooks/ThemeSwitcher";
-
-function App() {
-  const { theme, toggleTheme } = useTheme();
->>>>>>> 6f69fde (testing_1)
 
   return (
     <div className="light">
-      
-       {/* <div className="p-4">
+      {/* <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Event Table</h1>
       <Table data={data} />
     </div> */}
