@@ -15,7 +15,7 @@ const useLogin = () => {
 
   const loginWithPlug = () => {
     dispatch(plugLogin());
-    navigate("/user-profile");
+    // navigate("/user-profile");
   };
 
   return { loginWithPlug };

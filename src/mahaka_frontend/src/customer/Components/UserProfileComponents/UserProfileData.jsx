@@ -9,7 +9,7 @@ const UserProfileData = () => {
   const dispatch = useDispatch();
   const logoutAndRedirect = useLogout();
   const { currentUser, userLoading } = useSelector((state) => state.users);
-  const { backend } = useSelector((state) => state.auth);
+  const { backend, principal } = useSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(getUserDetailsByCaller({ backend: backend }));
@@ -67,9 +67,7 @@ const UserProfileData = () => {
           <label className="block text-gray-700 font-semibold w-32">
             Principal ID
           </label>
-          <p className="font-semibold break-all">
-            {currentUser && currentUser.id.toText()}
-          </p>
+          <p className="font-semibold break-all">{principal}</p>
         </div>
       </div>
     </div>
