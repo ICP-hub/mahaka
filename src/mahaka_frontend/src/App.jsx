@@ -1,4 +1,5 @@
 import React from "react";
+<<<<<<< HEAD
 import { RouterProvider } from "react-router-dom";
 import appRoutes from "./routes/app.routing";
 // import Table from "./customer/Components/LandingPageComponents/Table";
@@ -22,6 +23,12 @@ function App() {
   //   { eventName: 'Halloween Retreat', startingDate: '29 October 24', endingDate: '1 November 24', time: '11:00 am - 8:00 pm', orders: '1,000', status: 'Starting in 2 months', tickets: 'Open' },
   //   // ...more data
   // ];
+=======
+import useTheme from "./common/hooks/ThemeSwitcher";
+
+function App() {
+  const { theme, toggleTheme } = useTheme();
+>>>>>>> 6f69fde (testing_1)
 
   return (
     <div className="light">
