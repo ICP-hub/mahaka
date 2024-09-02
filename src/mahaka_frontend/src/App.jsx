@@ -1,59 +1,50 @@
 import React from "react";
 import { RouterProvider } from "react-router-dom";
 import appRoutes from "./routes/app.routing";
-import { useSelector } from "react-redux";
+// import { useDispatch, useSelector } from 'react-redux';
+// import { createVenue } from '../src/redux/reducers/apiReducers/venueApiReducer';
 
 function App() {
-  // const { theme, toggleTheme } = useTheme();
+  // const dispatch = useDispatch();
+  // const { backend } = useSelector(state => state.auth);
 
-  const { backend } = useSelector((state) => state.auth);
-
-  // const createEventHandler = async () => {
-  //   try {
-  //     const response = await backend.createEvent(
-  //       "testing-br5f7-7uaaa-aaaaa-qaaca-cai",
-  //       {
-  //         Description: "tseting",
-  //         GroupTicket: 20,
-  //         Details: {
-  //           StartDate: "2024-09-01",
-  //           StartTime: 14,
-  //           Location: "Example Location",
-  //           EndDate: "2024-09-01",
-  //           EndTime: 1,
-  //         },
-  //         SingleTicket: 50,
-  //         Title: "testing",
-  //         VipTicket: 50,
+  // const handleCreateVenue = () => {
+  //   dispatch(createVenue({
+  //     backend,
+  //     collectionArgs: {
+  //       maxLimit: 100,
+  //       logo: {
+  //         data: "example data",
+  //         logo_type: "image"
   //       },
-  //       {
-  //         collection_args: {
-  //           maxLimit: 1000,
-  //           logo: {
-  //             data: "example data",
-  //             logo_type: "image/png",
-  //           },
-  //           name: "Event Collection Name",
-  //           banner: {
-  //             data: "example data",
-  //             logo_type: "image",
-  //           },
-  //           description: "This is a description",
-  //           created_at: 1234,
-  //           collection_type: { Event: null },
-  //           symbol: "symbol",
-  //         },
-  //       }
-  //     );
-
-  //     console.log("create event result", response);
-  //   } catch (err) {
-  //     console.error("Error in create event", err);
-  //   }
+  //       name: "Venue Name",
+  //       banner: {
+  //         data: "example data",
+  //         logo_type: "image"
+  //       },
+  //       description: "description of the venue.",
+  //       created_at: 123456,
+  //       symbol: "venue_symbol"
+  //     },
+  //     custodian: "2vxsx-fae",
+  //     title: "Venue Title",
+  //     capacity: 500,
+  //     details: {
+  //       StartDate: "2024-09-01",
+  //       StartTime: 14,
+  //       Location: "Example Location",
+  //       EndDate: "2024-09-01", 
+  //       EndTime: 16,
+  //     },
+  //     description: "description of the venue"
+  //   }));
   // };
+
+  // const { theme, toggleTheme } = useTheme();
 
   return (
     <div className="light">
+      {/* <button onClick={handleCreateVenue}>Create Venue</button> */}
       {/* <div className="p-4">
       <div className="bg-foreground p-4 rounded-2xl">I am {theme} theme.</div>
       <button
@@ -63,7 +54,7 @@ function App() {
         Toggle Theme
       </button>
     </div>     */}
-      <RouterProvider router={appRoutes} />
+      <RouterProvider router={appRoutes} /> 
     </div>
   );
 }

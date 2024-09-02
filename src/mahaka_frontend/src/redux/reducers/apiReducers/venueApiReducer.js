@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { Principal } from "@dfinity/principal";
 
 // initial states
 const initialState = {
@@ -41,10 +42,31 @@ export const updateVenue = createAsyncThunk(
   async (venue) => {}
 );
 
-// CreateVenue : Fix later
+//Create Venue
 export const createVenue = createAsyncThunk(
   "venues/createVenue",
-  async (venue) => {}
+  async ({ backend, collectionArgs, custodian, title, capacity, details, description}) => {
+      const response = await backend.createVenue(
+        {
+          collection_args: {
+            maxLimit: collectionArgs.maxLimit,
+            logo: collectionArgs.logo,
+            name: collectionArgs.name,
+            banner: collectionArgs.banner,
+            description: collectionArgs.description,
+            created_at: collectionArgs.created_at,
+            collection_type: { Venue: null },
+            symbol: collectionArgs.symbol
+          },
+          custodian: Principal.fromText(custodian),
+        },
+        title,
+        capacity,
+        details,
+        description
+      );
+      return response;
+  }
 );
 
 // Create slice
@@ -91,7 +113,7 @@ const venueSlice = createSlice({
       .addCase(deleteVenue.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
-      });
+      })
 
     // Fix later : create and update
     //   .addCase(updateVenue.pending, (state) => {
@@ -108,18 +130,19 @@ const venueSlice = createSlice({
     //     state.loading = false;
     //     state.error = action.error.message;
     //   })
-    //   .addCase(createVenue.pending, (state) => {
-    //     state.loading = true;
-    //   })
-    //   .addCase(createVenue.fulfilled, (state, action) => {
-    //     state.loading = false;
-    //     state.venues.push(action.payload);
-    //     state.error = null;
-    //   })
-    //   .addCase(createVenue.rejected, (state, action) => {
-    //     state.loading = false;
-    //     state.error = action.error.message;
-    //   });
+    .addCase(createVenue.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    })
+    .addCase(createVenue.fulfilled, (state, action) => {
+      state.loading = false;
+      state.venues.push(action.payload);
+      state.error = null;
+    })
+    .addCase(createVenue.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message;
+    });
   },
 });
 

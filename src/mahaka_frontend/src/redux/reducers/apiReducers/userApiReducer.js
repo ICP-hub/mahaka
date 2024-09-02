@@ -6,6 +6,8 @@ const initialState = {
   currentUser: null,
   userLoading: true,
   error: null,
+  currentPage: 1,
+  totalPages: 1,
 };
 
 // Async operations
@@ -29,7 +31,7 @@ export const listUsers = createAsyncThunk(
   "users/listUsers",
   async ({ backend, pageLimit, currPage }) => {
     const response = await backend.listUsers(pageLimit, currPage);
-    return response.data;
+    return response;
   }
 );
 
@@ -82,7 +84,9 @@ const userSlice = createSlice({
       })
       .addCase(listUsers.fulfilled, (state, action) => {
         state.userLoading = false;
-        state.users = action.payload;
+        state.users = action.payload.data; 
+        state.currentPage = action.payload.current_page;
+        state.totalPages = action.payload.total_pages;
         state.error = null;
       })
       .addCase(listUsers.rejected, (state, action) => {
