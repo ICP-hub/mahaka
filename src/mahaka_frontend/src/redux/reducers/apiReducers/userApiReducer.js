@@ -29,7 +29,7 @@ export const listUsers = createAsyncThunk(
   "users/listUsers",
   async ({ backend, pageLimit, currPage }) => {
     const response = await backend.listUsers(pageLimit, currPage);
-    return response.data;
+    return response;
   }
 );
 

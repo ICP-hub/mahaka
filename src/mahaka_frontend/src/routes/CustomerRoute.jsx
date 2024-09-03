@@ -4,7 +4,7 @@ import PaymentComponent from "../customer/Pages/Payment";
 import SingleEvent from "../customer/Pages/SingleEvent";
 import UserProfile from "../customer/Pages/UserProfile";
 
-export const customerRouting = [
+export const customerRoutes = [
   {
     path: "/",
     element: <Master />,

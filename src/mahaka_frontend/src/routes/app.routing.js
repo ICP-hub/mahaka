@@ -1,6 +1,10 @@
 import { createBrowserRouter } from "react-router-dom";
-import { customerRouting } from "./CustomerRoute";
+import { customerRoutes } from "./CustomerRoute";
+import { adminRoutes } from "./AdminRoute";
 
-const appRoutes = createBrowserRouter(customerRouting);
+// Merge all routes
+const combinedRoutes = [...adminRoutes, ...customerRoutes];
+
+const appRoutes = createBrowserRouter(combinedRoutes);
 
 export default appRoutes;
