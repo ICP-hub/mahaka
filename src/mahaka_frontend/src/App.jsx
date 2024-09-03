@@ -1,60 +1,120 @@
 import React from "react";
 import { RouterProvider } from "react-router-dom";
 import appRoutes from "./routes/app.routing";
-import { useSelector } from "react-redux";
+// import { useSelector, useDispatch } from "react-redux";
+// import { Principal } from "@dfinity/principal";
+// import { createEvent, getAllEventsByVenue } from "../src/redux/reducers/apiReducers/eventApiReducer";
 
 function App() {
-  // const { theme, toggleTheme } = useTheme();
-
-  const { backend } = useSelector((state) => state.auth);
+  // const dispatch = useDispatch();
+  // const { backend } = useSelector((state) => state.auth);
 
   // const createEventHandler = async () => {
-  //   try {
-  //     const response = await backend.createEvent(
-  //       "testing-br5f7-7uaaa-aaaaa-qaaca-cai",
-  //       {
-  //         Description: "tseting",
-  //         GroupTicket: 20,
-  //         Details: {
-  //           StartDate: "2024-09-01",
-  //           StartTime: 14,
-  //           Location: "Example Location",
-  //           EndDate: "2024-09-01",
-  //           EndTime: 1,
+  //    dispatch(createEvent({
+  //         backend,
+  //         venueId: "Venue Title-br5f7-7uaaa-aaaaa-qaaca-cai",
+  //         Event: {
+  //           Description: "testing",
+  //           GroupTicket: 20,
+  //           Details: {
+  //             StartDate: "2024-09-01",
+  //             StartTime: 14,
+  //             Location: "Example Location",
+  //             EndDate: "2024-09-01",
+  //             EndTime: 1,
+  //           },
+  //           SingleTicket: 50,
+  //           Title: "testing",
+  //           VipTicket: 50,
   //         },
-  //         SingleTicket: 50,
-  //         Title: "testing",
-  //         VipTicket: 50,
-  //       },
+  //         eCollection: {
+  //           collection_args: {
+  //             maxLimit: 1000,
+  //             logo: {
+  //               data: "example data",
+  //               logo_type: "image/png",
+  //             },
+  //             name: "Event Collection Name",
+  //             banner: {
+  //               data: "example data",
+  //               logo_type: "image",
+  //             },
+  //             description: "This is a description",
+  //             created_at: 1234,
+  //             collection_type: { Event: null },
+  //             symbol: "symbol",
+  //           },
+  //         },
+  //       })
+  //     );
+  //     console.log("Event created successfully");
+  // };
+
+  // const fetchEventsHandler = async () => {
+  //   dispatch(getAllEventsByVenue({
+  //         backend,
+  //         chunkSize: 10,
+  //         pageNo: 1, 
+  //         venueId: "Venue Title-br5f7-7uaaa-aaaaa-qaaca-cai", 
+  //       })
+  //     );
+  //     console.log("Events fetched successfully");
+   
+  // };
+
+  // const createVenueHandler = async () => {
+  //   try {
+  //     const response = await backend.createVenue(
   //       {
   //         collection_args: {
-  //           maxLimit: 1000,
+  //           maxLimit: 100,
   //           logo: {
   //             data: "example data",
-  //             logo_type: "image/png",
+  //             logo_type: "image",
   //           },
-  //           name: "Event Collection Name",
+  //           name: "Venue Name",
   //           banner: {
   //             data: "example data",
   //             logo_type: "image",
   //           },
-  //           description: "This is a description",
-  //           created_at: 1234,
-  //           collection_type: { Event: null },
-  //           symbol: "symbol",
+  //           description: "description of the venue.",
+  //           created_at: 123456,
+  //           collection_type: { Venue: null },
+  //           symbol: "venue_symbol",
   //         },
-  //       }
+  //         custodian: Principal.fromText("2vxsx-fae"),
+  //       },
+  //       "Venue Title",
+  //       500,
+  //       {
+  //         StartDate: "2024-09-01",
+  //         StartTime: 14,
+  //         Location: "Example Location",
+  //         EndDate: "2024-09-01",
+  //         EndTime: 16,
+  //       },
+  //       "description of the venue"
   //     );
 
-  //     console.log("create event result", response);
+  //     console.log("create venue result", response);
   //   } catch (err) {
-  //     console.error("Error in create event", err);
+  //     console.error("Error in create venue", err);
   //   }
   // };
 
+    // const { theme, toggleTheme } = useTheme();
   return (
     <div className="light">
-      {/* <div className="p-4">
+      {/* <button className="px-2 py-1 border rounded mr-2" onClick={createEventHandler}>
+        Create Event
+      </button>
+      <button className="px-2 py-1 border rounded mr-2" onClick={createVenueHandler}>
+        Create Venue
+      </button>
+      <button className="px-2 py-1 border rounded" onClick={fetchEventsHandler}>
+        Fetch Events
+      </button> */}
+ {/* <div className="p-4">
       <div className="bg-foreground p-4 rounded-2xl">I am {theme} theme.</div>
       <button
         onClick={toggleTheme}
