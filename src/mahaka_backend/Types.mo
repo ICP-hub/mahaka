@@ -31,9 +31,9 @@ module {
         Title : Text;
         Description : Text;
         Details : eventDetails;
-        SingleTicket : Nat;
-        VipTicket : Nat;
-        GroupTicket : Nat;
+        sTicket_limit : Nat;
+        vTicket_limit : Nat;
+        gTicket_limit : Nat;
     };
 
     public type completeEvent = Events and {
@@ -60,7 +60,6 @@ module {
         Events : List.List<Events>;
         capacity : Nat;
         Collection_id : Principal;
-
     };
 
     public type Events_data = {

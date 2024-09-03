@@ -99,13 +99,12 @@ actor {
 //     --------------------------------------------------------------------------------------------------------------------
 
      
-     public shared ({caller}) func createVenue(collection_details : Types.venueCollectionParams, _title : Text,_capacity : Nat, _details : Types.venueDetails , _description : Text) : async (id : Text,  venue :Types.Venue) {
-          let id = caller;
+     public shared  func createVenue(collection_details : Types.venueCollectionParams, _title : Text,_capacity : Nat, _details : Types.venueDetails , _description : Text) : async (id : Text,  venue :Types.Venue) {
           Cycles.add<system>(500_500_000_000);
           let venueCollection = await NFTactor.Dip721NFT(collection_details.custodian, collection_details.collection_args);
           ignore await venueCollection.wallet_receive();
           let venueCollectionId = await venueCollection.getCanisterId();
-          let venue_id =  _title # "-" # Principal.toText(venueCollectionId) ;
+          let venue_id =  _title # "#" # Principal.toText(venueCollectionId) ;
           let Venue : Types.Venue = {
                Collection_id : Principal = venueCollectionId;
                Description : Text = _description;
@@ -142,13 +141,27 @@ actor {
           };
      };
 
-     public shared ({caller}) func updateVenue( Venue_id : Text , Venue : Types.Venue) : async (Principal, Types.Venue) {
-          let id = caller;
+     public shared ({caller}) func updateVenue( Venue_id : Text, events : [Types.Events] ,  Title : Text,
+        Description : Text,
+        Details : Types.venueDetails,
+        capacity : Nat
+        ) : async (Principal, Types.Venue) {
+          
           switch(_venueMap.get(Venue_id)){
                case null {
                     throw Error.reject("Venue not found");
                };
                case (?v){
+                    let collection_id = await Utils.extractCanisterId(Venue_id);
+                    let Venue : Types.Venue = {
+                         id = Venue_id;
+                         Title = Title;
+                         Description : Text;
+                         Details = Details;
+                         Events = List.fromArray(events);
+                         capacity = capacity;
+                         Collection_id = Principal.fromText(collection_id);
+                    };
                     let venue_blob = to_candid(Venue);
                     let Venue_index = await update_stable(v, venue_blob, Venue_state);
                     _venueMap.put(Venue_id, Venue_index);
@@ -163,6 +176,7 @@ actor {
                     throw Error.reject("Venue not found");
                };
                case (?v){
+                    
                     let venue_blob = await stable_get(v, Venue_state);
                     let venue : ?Types.Venue = from_candid(venue_blob);
                     _venueMap.delete(Venue_id);
@@ -209,10 +223,10 @@ actor {
           let _event : Types.completeEvent = {
                Description = Event.Description;
                Details = Event.Details;
-               GroupTicket = Event.GroupTicket;
-               SingleTicket = Event.SingleTicket;
+               gTicket_limit = Event.gTicket_limit;
+               sTicket_limit = Event.sTicket_limit;
                Title = Event.Title;
-               VipTicket = Event.VipTicket;
+               vTicket_limit = Event.vTicket_limit;
                event_collectionid = await eventCollection.getCanisterId();
           };
           let Events : Types.Events_data = {
@@ -378,8 +392,8 @@ actor {
 
         return { data = List.toArray(user_list); current_page = PageNo + 1; total_pages = index_pages.size(); };
 
-
     };
+
 
 }
 
