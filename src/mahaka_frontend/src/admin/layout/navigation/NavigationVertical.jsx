@@ -1,4 +1,7 @@
 import { motion } from "framer-motion";
+import LogoSection from "../../components/navigation/LogoSection";
+import ProfileSection from "../../components/navigation/ProfileSection";
+import MenuSection from "../../components/navigation/MenuSection";
 
 const NavigationVertical = ({ navigationState }) => {
   // Animation Variants for navigation
@@ -20,7 +23,9 @@ const NavigationVertical = ({ navigationState }) => {
       animate={navigationState.isOpen ? "open" : "closed"}
       className="min-w-64 max-w-64 bg-primary border-border border-r z-[200] fixed md:sticky h-full"
     >
-      Navigation vertical
+      <LogoSection />
+      <ProfileSection />
+      <MenuSection />
     </motion.div>
   );
 };
