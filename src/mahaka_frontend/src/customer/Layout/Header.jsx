@@ -147,8 +147,6 @@ const ConnectWalletBtn = () => {
   const { isConnected } = useSelector((state) => state.auth);
   const { loginWithPlug } = useLogin();
 
-  const states = useSelector((state) => console.log("States are ", state));
-
   if (isConnected)
     return (
       <Link

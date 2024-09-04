@@ -1,13 +1,29 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { RouterProvider } from "react-router-dom";
 import appRoutes from "./routes/app.routing";
-// import { useSelector, useDispatch } from "react-redux";
-// import { Principal } from "@dfinity/principal";
-// import { createEvent, getAllEventsByVenue } from "../src/redux/reducers/apiReducers/eventApiReducer";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllVenues } from "./redux/reducers/apiReducers/venueApiReducer";
+import { plugLogin } from "./redux/reducers/auth/authReducer";
 
 function App() {
-  // const dispatch = useDispatch();
-  // const { backend } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const { backend } = useSelector((state) => state.auth);
+
+  const states = useSelector((state) => console.log("States are ", state));
+
+  /* ----------------------------------------------------------------------------------------------------- */
+  /*  @ Effects : common dispatches.
+  /* ----------------------------------------------------------------------------------------------------- */
+  useEffect(() => {
+    dispatch(getAllVenues({ backend: backend, pageLimit: 100, currPage: 0 }));
+  }, []);
+  // Refresh user login
+  useEffect(() => {
+    const isLoggedIn = sessionStorage.getItem("isPlugLogged");
+    if (isLoggedIn) {
+      dispatch(plugLogin());
+    }
+  }, [dispatch]);
 
   // const createEventHandler = async () => {
   //    dispatch(createEvent({
@@ -54,12 +70,12 @@ function App() {
   //   dispatch(getAllEventsByVenue({
   //         backend,
   //         chunkSize: 10,
-  //         pageNo: 1, 
-  //         venueId: "Venue Title-br5f7-7uaaa-aaaaa-qaaca-cai", 
+  //         pageNo: 1,
+  //         venueId: "Venue Title-br5f7-7uaaa-aaaaa-qaaca-cai",
   //       })
   //     );
   //     console.log("Events fetched successfully");
-   
+
   // };
 
   // const createVenueHandler = async () => {
@@ -102,19 +118,10 @@ function App() {
   //   }
   // };
 
-    // const { theme, toggleTheme } = useTheme();
+  // const { theme, toggleTheme } = useTheme();
   return (
     <div className="light">
-      {/* <button className="px-2 py-1 border rounded mr-2" onClick={createEventHandler}>
-        Create Event
-      </button>
-      <button className="px-2 py-1 border rounded mr-2" onClick={createVenueHandler}>
-        Create Venue
-      </button>
-      <button className="px-2 py-1 border rounded" onClick={fetchEventsHandler}>
-        Fetch Events
-      </button> */}
- {/* <div className="p-4">
+      {/* <div className="p-4">
       <div className="bg-foreground p-4 rounded-2xl">I am {theme} theme.</div>
       <button
         onClick={toggleTheme}
