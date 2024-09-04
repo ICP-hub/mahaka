@@ -1,5 +1,6 @@
 import List "mo:base/List";
 import Iter "mo:base/Iter";
+import Text "mo:base/Text";
 
 module {
     public func paginate<V>(array : [V], chunkSize : Nat) : [[V]] {
@@ -17,4 +18,18 @@ module {
         };
       List.toArray(List.reverse(paginationArray));
     };
+
+  public func extractCanisterId(t : Text) : async Text {
+    // Define the delimiter pattern for splitting the text
+    let delimiter : Text.Pattern = #char '#';
+
+    // Use Text.split to split the input text by the delimiter '#'
+    let parts = Text.split(t, delimiter);
+
+    // Fetch the next element after the first split to get the canister ID
+    switch (parts.next(), parts.next()) {
+        case (_, ?canisterId) { return canisterId };  // Return the second part as canister ID
+        case _ { return "Invalid Venue Id" };  // Return null if no canister ID found
+    }
+  };
 }
