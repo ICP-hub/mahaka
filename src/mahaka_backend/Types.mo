@@ -8,12 +8,22 @@ module {
 
     public type venueId = Text;
 
-    public type Ticket = {
-        #SinglePass;
-        #VipPass;
-        #GroupTicket;
+    public type MetadataDesc = [Types.MetadataPart];
+
+    public type LogoResult = {
+        logo_type: Text;
+        data: Text;
     };
 
+    public type nft_type = {
+        #Venue;
+        #Event;
+    };
+
+    public type ticket_info = {
+        ticket_type : Types.ticket_type;
+        price : Nat;
+    };
     public type venueCollectionParams = {
         custodian : Principal;
         collection_args : Types.Dip721NonFungibleToken;
@@ -28,6 +38,7 @@ module {
     };
 
     public type Events = {
+        id : Text;
         Title : Text;
         Description : Text;
         Details : eventDetails;
