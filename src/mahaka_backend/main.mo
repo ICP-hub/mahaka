@@ -15,7 +15,8 @@ import Iter "mo:base/Iter";
 import Debug "mo:base/Debug";
 import Uuid "mo:uuid/UUID";
 import Utils "./Utils";
-actor {
+import nftTypes "../DIP721-NFT/Types";
+actor mahaka {
 
 
      var _venueMap = TrieMap.TrieMap<Text, Types.Index>(Text.equal,Text.hash);
@@ -78,7 +79,7 @@ actor {
         state.bytes_count += Nat64.fromNat(blob.size());
 
         regionEnsureSizeBytes(state.bytes, state.bytes_count);
-        Region.storeBlob(state.bytes, elem_pos, blob);
+        Region.storeBlob(state.bytes, elem_pos, blob  );
 
         regionEnsureSizeBytes(state.elems, state.elems_count * elem_size);
         Region.storeNat64(state.elems, elem_i * elem_size + 0, elem_pos);
@@ -99,10 +100,14 @@ actor {
 //     --------------------------------------------------------------------------------------------------------------------
 
      
-     public shared  func createVenue(collection_details : Types.venueCollectionParams, _title : Text,_capacity : Nat, _details : Types.venueDetails , _description : Text) : async (id : Text,  venue :Types.Venue) {
+     public shared ({caller = user}) func createVenue(collection_details : Types.venueCollectionParams, _title : Text,_capacity : Nat, _details : Types.venueDetails , _description : Text) : async (id : Text,  venue :Types.Venue) {
           Cycles.add<system>(500_500_000_000);
-          let venueCollection = await NFTactor.Dip721NFT(collection_details.custodian, collection_details.collection_args);
+          let venueCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), collection_details.collection_args);
           ignore await venueCollection.wallet_receive();
+          let new_custodian = await venueCollection.addcustodians(user);
+          Debug.print(" New added custodian is : " # debug_show (new_custodian));
+          let nftcustodians = await venueCollection.showcustodians();
+          Debug.print("These are the list of current custodians : " #debug_show (nftcustodians));
           let venueCollectionId = await venueCollection.getCanisterId();
           let venue_id =  _title # "#" # Principal.toText(venueCollectionId) ;
           let Venue : Types.Venue = {
@@ -210,7 +215,7 @@ actor {
           return {data = pages_data; current_page = pageNo + 1 ; Total_pages = index_pages.size()};
      };
 
-     public shared ({caller})  func createEvent( venueId : Types.venueId, Event : Types.Events, eCollection : Types.eventCollectionParams) : async Text {
+     public shared ({caller = user})  func createEvent( venueId : Types.venueId, Event : Types.Events, eCollection : Types.eventCollectionParams) : async Text {
           let _venue_details = await getVenue(venueId);
           // switch (_venue_details){
           //      case (Principal,Value) {
@@ -218,9 +223,16 @@ actor {
           //      };
           // };
           Cycles.add<system>(500_500_000_000);
-          let eventCollection = await NFTactor.Dip721NFT(caller, eCollection.collection_args);
+          let eventCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), eCollection.collection_args);
+          let new_custodian = await eventCollection.addcustodians(user);
+          Debug.print(" New added custodian is : " # debug_show (new_custodian));
+          let nftcustodians = await eventCollection.showcustodians();
+          Debug.print("These are the list of current custodians : " #debug_show (nftcustodians));
           ignore await eventCollection.wallet_receive();
+          let venueCollectionId = await eventCollection.getCanisterId();
+          let eventId =  Event.Title # "#" # Principal.toText(venueCollectionId) ;
           let _event : Types.completeEvent = {
+               id = eventId;
                Description = Event.Description;
                Details = Event.Details;
                gTicket_limit = Event.gTicket_limit;
@@ -252,7 +264,6 @@ actor {
                          case null {
                               throw (Error.reject("No object found in the memory"));
                          };
-
                          case (?v){
                               let events_list = v;
                               let index_pages = Utils.paginate<Types.completeEvent>(List.toArray(events_list.Events), chunkSize);
@@ -264,14 +275,69 @@ actor {
                               };
                               let pages_data = index_pages[pageNo];
                               return {data = pages_data; current_page = pageNo + 1 ; Total_pages = index_pages.size()};
-
                          };
                     };
-
                };
-
           }; 
      };
+
+
+     /*********************************************************/
+     /*                   Tickets Handlig                     */
+     /*********************************************************/
+
+    
+     public shared ({caller}) func buyVenueTicket(venueId : Types.venueId, _ticket_type : Types.ticket_info, _metadata : nftTypes.MetadataDesc ) : async nftTypes.MintReceipt {
+          let collection_id = await Utils.extractCanisterId(venueId);
+          let collection_actor = actor (collection_id) : actor {
+               logoDip721 : () -> async Types.LogoResult;
+               mintDip721 : (to : Principal, metadata : Types.MetadataDesc ,ticket_details : nftTypes.ticket_type, logo : Types.LogoResult) -> async nftTypes.MintReceipt;
+          };
+          let _logo = await collection_actor.logoDip721();
+          let _ticket = await collection_actor.mintDip721(caller,_metadata,_ticket_type.ticket_type,_logo);
+     
+          return _ticket;
+     };
+
+     public shared ({caller}) func buyEventTicket(_venueId : Text,_eventId : Text, _ticket_type : Types.ticket_info, _metadata : nftTypes.MetadataDesc) : async nftTypes.MintReceipt {
+          switch(_EventsMap.get(_venueId)){
+               case null {
+                    throw(Error.reject("No venue dound for the events"));
+               };
+               case (?Event_index){
+                    let event_blob = await stable_get(Event_index,Events_state);
+                    let event_object :?Types.Events_data = from_candid(event_blob);
+                    switch(event_object){
+                         case null {
+                              throw(Error.reject("No object found for this blob in the memory"));
+                         };
+
+                         case (?e){
+                              let events_list = e.Events;
+                              let event = List.find<Types.completeEvent>(
+                                   events_list,
+                                   func x {x.id == _eventId}
+                              );
+                              switch (event){
+                                   case null (
+                                        throw (Error.reject("No Event found")) 
+                                   );
+                                   case (?_event){
+                                        let collection_actor = actor (Principal.toText(_event.event_collectionid)) : actor {
+                                        logoDip721 : () -> async Types.LogoResult;
+                                        mintDip721 : (to : Principal, metadata : Types.MetadataDesc ,ticket_details : nftTypes.ticket_type, logo : Types.LogoResult) -> async nftTypes.MintReceipt;                                        
+                                        };
+                                        let _logo = await collection_actor.logoDip721();
+                                        let _ticket = await collection_actor.mintDip721(caller,_metadata,_ticket_type.ticket_type,_logo);
+                                        return _ticket;
+                                   };
+                              };                           
+                         };
+                    };
+               };
+          };
+     };
+
 
      // public shared ({caller}) func DeleteEvent (venue_id : Types.venueId, event_canisterId : Principal) : async {
      //      return 

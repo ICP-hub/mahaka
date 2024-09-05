@@ -118,7 +118,8 @@ module {
     id: TokenId;
     logo : LogoResult;
     metadata: MetadataDesc;
-    ticket_details : ticket_details;
+    ticket_type : ticket_type;
+    nft_type : nft_type;
   };
 
   public type CollectionDetials = {
