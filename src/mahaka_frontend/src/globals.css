@@ -9,11 +9,6 @@
   padding: 0px;
   margin: 0px;
 }
-/* Global  background */
-body {
-  background-color: #ffffff;
-}
-
 /*  all images are responsive */
 img {
   max-width: 100%;

@@ -120,7 +120,7 @@ function App() {
 
   // const { theme, toggleTheme } = useTheme();
   return (
-    <div className="light">
+    <div className="light bg-background">
       {/* <div className="p-4">
       <div className="bg-foreground p-4 rounded-2xl">I am {theme} theme.</div>
       <button

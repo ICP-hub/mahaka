@@ -46,3 +46,7 @@
   overflow: visible;
   border-radius: 50%;
 }
+
+.custom-grid {
+  @apply grid grid-cols-[48px_112px_auto_40px] sm:grid-cols-[48px_112px_172px_112px_auto_48px] md:grid-cols-[48px_112px_172px_112px_auto_48px] lg:grid-cols-[48px_112px_auto_112px_112px_112px_112px_72px];
+}

@@ -3,11 +3,19 @@ import AppBar from "./navigation/AppBar";
 import NavigationVertical from "./navigation/NavigationVertical";
 import ScreenOverlayBlur from "../../common/ScreenOverlay";
 import useNavigationControl from "../../common/hooks/useNavigationControl";
+import { useState, useEffect } from "react";
 
 const AdminLayout = () => {
   const { state, toggleNavigation } = useNavigationControl();
 
-  // Navbar close on overlay click
+  // Initialize `selected` state from localStorage or default to 'light'
+  const [selected, setSelected] = useState(
+    () => localStorage.getItem("theme") || "light"
+  );
+
+  // Save theme to localStorage whenever `selected` changes
+  useEffect(() => localStorage.setItem("theme", selected), [selected]);
+
   const handleNavigationOnSmallScreen = () => {
     if (state.isOpen) {
       toggleNavigation(false);
@@ -19,11 +27,15 @@ const AdminLayout = () => {
       {state.isOpen && (
         <ScreenOverlayBlur onOverlayClicked={handleNavigationOnSmallScreen} />
       )}
-      <div className="layout">
-        <div className="min-h-screen">
+      <div className={`layout ${selected}`}>
+        <div className="min-h-screen text-text">
           <NavigationVertical navigationState={state} />
           <div className="flex w-full min-w-0 flex-auto flex-col">
-            <AppBar toggleNavigation={toggleNavigation} />
+            <AppBar
+              toggleNavigation={toggleNavigation}
+              selected={selected}
+              setSelected={setSelected}
+            />
             <Outlet />
           </div>
         </div>

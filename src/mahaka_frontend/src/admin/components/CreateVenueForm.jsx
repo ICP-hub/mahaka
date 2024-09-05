@@ -100,7 +100,7 @@ const CreateVenueForm = () => {
       <form className="space-y-2" onSubmit={handleVenueSubmit}>
         <div className="flex flex-col flex-auto gap-1">
           <label className="font-semibold">Venue Name</label>
-          <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600">
+          <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border ">
             <input
               type="text"
               name="name"
@@ -108,21 +108,21 @@ const CreateVenueForm = () => {
               onChange={(e) =>
                 handleNestedInputChange(e, "collection_args", "name")
               }
-              className="my-3 outline-none w-full bg-none"
+              className="my-3 outline-none w-full bg-transparent"
               required
             />
           </div>
         </div>
         <div className="flex flex-col flex-auto gap-1">
           <label className="font-semibold">Description</label>
-          <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600">
+          <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <textarea
               name="description"
               value={venueData.collection_args.description}
               onChange={(e) =>
                 handleNestedInputChange(e, "collection_args", "description")
               }
-              className="my-3 outline-none w-full bg-none"
+              className="my-3 outline-none w-full bg-transparent"
               required
             />
           </div>
@@ -130,7 +130,7 @@ const CreateVenueForm = () => {
         <div className="flex space-x-4">
           <div className="w-1/2 flex flex-col flex-auto gap-1">
             <label className="font-semibold">Start Date</label>
-            <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600">
+            <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
               <input
                 type="date"
                 name="StartDate"
@@ -138,14 +138,14 @@ const CreateVenueForm = () => {
                 onChange={(e) =>
                   handleNestedInputChange(e, "eventDetails", "StartDate")
                 }
-                className="my-3 outline-none w-full bg-none"
+                className="my-3 outline-none w-full bg-transparent"
                 required
               />
             </div>
           </div>
           <div className="w-1/2 flex flex-col flex-auto gap-1">
             <label className="font-semibold">End Date</label>
-            <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600">
+            <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
               <input
                 type="date"
                 name="EndDate"
@@ -153,7 +153,7 @@ const CreateVenueForm = () => {
                 onChange={(e) =>
                   handleNestedInputChange(e, "eventDetails", "EndDate")
                 }
-                className="my-3 outline-none w-full bg-none"
+                className="my-3 outline-none w-full bg-transparent"
                 required
               />
             </div>
@@ -162,7 +162,7 @@ const CreateVenueForm = () => {
         <div className="flex space-x-4">
           <div className="w-1/2 flex flex-col flex-auto gap-1">
             <label className="font-semibold">Start Time</label>
-            <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600">
+            <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
               <input
                 type="time"
                 name="StartTime"
@@ -170,14 +170,14 @@ const CreateVenueForm = () => {
                 onChange={(e) =>
                   handleNestedInputChange(e, "eventDetails", "StartTime")
                 }
-                className="my-3 outline-none w-full bg-none"
+                className="my-3 outline-none w-full bg-transparent"
                 required
               />
             </div>
           </div>
           <div className="w-1/2 flex flex-col flex-auto gap-1">
             <label className="font-semibold">End Time</label>
-            <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600">
+            <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
               <input
                 type="time"
                 name="EndTime"
@@ -185,7 +185,7 @@ const CreateVenueForm = () => {
                 onChange={(e) =>
                   handleNestedInputChange(e, "eventDetails", "EndTime")
                 }
-                className="my-3 outline-none w-full bg-none"
+                className="my-3 outline-none w-full bg-transparent"
                 required
               />
             </div>
@@ -193,7 +193,7 @@ const CreateVenueForm = () => {
         </div>
         <div className="flex flex-col flex-auto gap-1">
           <label className="font-semibold">Location</label>
-          <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600">
+          <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               type="text"
               name="Location"
@@ -201,33 +201,33 @@ const CreateVenueForm = () => {
               onChange={(e) =>
                 handleNestedInputChange(e, "eventDetails", "Location")
               }
-              className="my-3 outline-none w-full bg-none"
+              className="my-3 outline-none w-full bg-transparent"
               required
             />
           </div>
         </div>
         <div className="flex flex-col flex-auto gap-1">
           <label className="font-semibold">Title</label>
-          <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600">
+          <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               type="text"
               name="title"
               value={venueData.title}
               onChange={handleInputChange}
-              className="my-3 outline-none w-full bg-none"
+              className="my-3 outline-none w-full bg-transparent"
               required
             />
           </div>
         </div>
         <div className="flex flex-col flex-auto gap-1">
           <label className="font-semibold">Maximum number of people</label>
-          <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600">
+          <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               type="number"
               name="capacity"
               value={venueData.capacity}
               onChange={handleInputChange}
-              className="my-3 outline-none w-full bg-none"
+              className="my-3 outline-none w-full bg-transparent"
               required
             />
           </div>
@@ -244,7 +244,7 @@ const CreateVenueForm = () => {
             />
             <label
               htmlFor="upload-image"
-              className="cursor-pointer bg-gray-100 py-2 px-4 rounded-md border border-border"
+              className="cursor-pointer bg-card text-text py-2 px-4 rounded-md border border-border"
             >
               Upload Banner
             </label>
