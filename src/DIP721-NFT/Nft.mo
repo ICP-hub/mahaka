@@ -20,6 +20,7 @@ shared actor class Dip721NFT(custodian: Principal, init : Types.Dip721NonFungibl
   stable var maxLimit : Nat16 = init.maxLimit;
   stable var banner : Types.LogoResult = init.banner;
   stable var description : Text = init.description;
+  stable var nft_type = init.collection_type;
   stable var created_at : Time.Time = init.created_at;
   private stable var capacity = 1000000000000000000;
   private stable var balance = Cycles.balance();
@@ -94,8 +95,9 @@ shared actor class Dip721NFT(custodian: Principal, init : Types.Dip721NonFungibl
                 metadata = token.metadata;
                 locked = true;
                 forsale = false;
+                nft_type = nft_type;
                 listed = true;
-                ticket_details = item.ticket_details;
+                ticket_type = item.ticket_type;
                 logo = item.logo;
               };
               return update;
@@ -210,7 +212,7 @@ shared actor class Dip721NFT(custodian: Principal, init : Types.Dip721NonFungibl
     return List.toArray(nfts);
   };
 
-  public shared func mintDip721(to: Principal, metadata: Types.MetadataDesc ,ticket_details : Types.ticket_details, logo : Types.LogoResult , nft_type : Types.nft_type) : async Types.MintReceipt {
+  public shared func mintDip721(to: Principal, metadata: Types.MetadataDesc ,ticket_details : Types.ticket_type, logo : Types.LogoResult) : async Types.MintReceipt {
     if (not List.some(custodians, func (custodian : Principal) : Bool { custodian == to })) {
       return #Err(#Unauthorized);
     };
@@ -224,7 +226,7 @@ shared actor class Dip721NFT(custodian: Principal, init : Types.Dip721NonFungibl
       locked = true;
       forsale = false;
       listed = true;
-      ticket_details = ticket_details;
+      ticket_type = ticket_details;
       logo = logo;
     };
     nfts := List.push(nft, nfts);
