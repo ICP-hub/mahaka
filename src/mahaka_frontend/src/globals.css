@@ -1,4 +1,5 @@
 /* import index.css */
+@import "@/assets/styles/tailwind.css";
 @import "./index.css";
 /* //outfit */
 @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
@@ -8,6 +9,10 @@
   box-sizing: border-box;
   padding: 0px;
   margin: 0px;
+}
+
+body {
+  overflow: hidden;
 }
 /*  all images are responsive */
 img {

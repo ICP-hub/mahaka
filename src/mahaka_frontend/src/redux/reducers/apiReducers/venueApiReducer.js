@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
+import notificationManager from "../../../common/utils/notificationManager";
 
 // initial states
 const initialState = {
@@ -45,27 +46,35 @@ export const updateVenue = createAsyncThunk(
 //Create Venue
 export const createVenue = createAsyncThunk(
   "venues/createVenue",
-  async ({ backend, collectionArgs, custodian, title, capacity, details, description}) => {
-      const response = await backend.createVenue(
-        {
-          collection_args: {
-            maxLimit: collectionArgs.maxLimit,
-            logo: collectionArgs.logo,
-            name: collectionArgs.name,
-            banner: collectionArgs.banner,
-            description: collectionArgs.description,
-            created_at: collectionArgs.created_at,
-            collection_type: { Venue: null },
-            symbol: collectionArgs.symbol
-          },
-          custodian: Principal.fromText(custodian),
+  async ({
+    backend,
+    collectionArgs,
+    custodian,
+    title,
+    capacity,
+    details,
+    description,
+  }) => {
+    const response = await backend.createVenue(
+      {
+        collection_args: {
+          maxLimit: collectionArgs.maxLimit,
+          logo: collectionArgs.logo,
+          name: collectionArgs.name,
+          banner: collectionArgs.banner,
+          description: collectionArgs.description,
+          created_at: collectionArgs.created_at,
+          collection_type: { Venue: null },
+          symbol: collectionArgs.symbol,
         },
-        title,
-        capacity,
-        details,
-        description
-      );
-      return response;
+        custodian: Principal.fromText(custodian),
+      },
+      title,
+      capacity,
+      details,
+      description
+    );
+    return response;
   }
 );
 
@@ -115,34 +124,35 @@ const venueSlice = createSlice({
         state.error = action.error.message;
       })
 
-    // Fix later : create and update
-    //   .addCase(updateVenue.pending, (state) => {
-    //     state.loading = true;
-    //   })
-    //   .addCase(updateVenue.fulfilled, (state, action) => {
-    //     state.loading = false;
-    //     state.venues = state.venues.map((venue) =>
-    //       venue.id === action.payload.id ? action.payload : venue
-    //     );
-    //     state.error = null;
-    //   })
-    //   .addCase(updateVenue.rejected, (state, action) => {
-    //     state.loading = false;
-    //     state.error = action.error.message;
-    //   })
-    .addCase(createVenue.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
-    .addCase(createVenue.fulfilled, (state, action) => {
-      state.loading = false;
-      state.venues.push(action.payload);
-      state.error = null;
-    })
-    .addCase(createVenue.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.error.message;
-    });
+      // Fix later : create and update
+      //   .addCase(updateVenue.pending, (state) => {
+      //     state.loading = true;
+      //   })
+      //   .addCase(updateVenue.fulfilled, (state, action) => {
+      //     state.loading = false;
+      //     state.venues = state.venues.map((venue) =>
+      //       venue.id === action.payload.id ? action.payload : venue
+      //     );
+      //     state.error = null;
+      //   })
+      //   .addCase(updateVenue.rejected, (state, action) => {
+      //     state.loading = false;
+      //     state.error = action.error.message;
+      //   })
+      .addCase(createVenue.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createVenue.fulfilled, (state, action) => {
+        state.loading = false;
+        state.venues.push(action.payload[1]);
+        state.error = null;
+        notificationManager.success("Venue created successfully");
+      })
+      .addCase(createVenue.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
   },
 });
 

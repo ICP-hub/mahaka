@@ -27,7 +27,7 @@ const ModalOverlay = ({ isOpen, setIsOpen, title, children }) => {
                 <MdClose size={16} />
               </button>
             </div>
-            <div className="relative z-10 p-6 max-h-[90vh] md:max-h-[80vh] overflow-y-auto ">
+            <div className="relative z-10 p-6 max-h-[90vh] md:max-h-[80vh] overflow-y-auto custom-scroll">
               {children}
             </div>
           </motion.div>

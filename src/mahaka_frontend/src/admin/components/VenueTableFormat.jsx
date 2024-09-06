@@ -15,10 +15,10 @@ const VenueTableFormat = () => {
   };
 
   return (
-    <div className="flex flex-auto overflow-hidden">
-      <div className="flex flex-auto flex-col overflow-hidden sm:mb-18 sm:overflow-y-auto">
-        <div className="overflow-x-auto no-scrollbar">
-          <div className="custom-grid text-secondary sticky top-0 z-10 gap-4 bg-gray-50 px-6 py-4 text-md font-semibold shadow dark:bg-black dark:bg-opacity-5 md:px-8">
+    <div className="flex flex-auto overflow-hidden font-medium flex-col">
+      <div className="flex flex-auto flex-col overflow-hidden">
+        <div className="grid">
+          <div className="custom-grid text-secondary sticky top-0 z-10 gap-4 bg-gray-50 px-6 py-4 text-md font-semibold shadow dark:bg-gray-900 md:px-8">
             <div></div>
             <div>Venue name</div>
             <div className="hidden sm:block">Description</div>
@@ -30,14 +30,6 @@ const VenueTableFormat = () => {
               Details
             </div>
           </div>
-          {/* {venues.map((venue, index) => (
-            <VenueTableData
-              key={index}
-              venue={venue}
-              isExpanded={expandedVenue === index}
-              onToggleDetail={() => handleToggleDetail(index)}
-            />
-          ))} */}
           {loading ? (
             <VenueTableLoader />
           ) : !loading && venues.length > 0 ? (
@@ -50,12 +42,13 @@ const VenueTableFormat = () => {
               />
             ))
           ) : (
-            <div className="bg-card h-full flex items-center justify-center text-text text-7xl font-black">
+            <div className="bg-card h-60 flex items-center justify-center text-text text-7xl font-black">
               No Venue found!
             </div>
           )}
         </div>
       </div>
+      {/* <Paginator /> */}
     </div>
   );
 };
@@ -96,16 +89,7 @@ const VenueTableData = ({ venue, isExpanded, onToggleDetail }) => {
 };
 
 const DetailCard = () => {
-  return (
-    <motion.div
-      initial={{ height: 0 }}
-      animate={{ height: "100%" }}
-      exit={{ height: 0 }}
-      className="text-text"
-    >
-      DetailCard
-    </motion.div>
-  );
+  return <motion.div className="text-text h-80">DetailCard</motion.div>;
 };
 
 // Loader
@@ -140,6 +124,10 @@ const VenueTableLoader = () => {
       </div>
     </div>
   );
+};
+
+const Paginator = () => {
+  return <div className="text-text">paginator</div>;
 };
 
 export default VenueTableFormat;

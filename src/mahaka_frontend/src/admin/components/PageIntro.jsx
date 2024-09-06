@@ -18,7 +18,7 @@ const PageIntro = ({ title, count, actionOnButton, isLoading }) => {
             Loading...
           </span>
         ) : (
-          <div className="text-secondary ml-0.5 font-medium">
+          <div className="text-secondary ml-0.5 font-semibold">
             {count} {count > 1 ? `${title}s` : title}
           </div>
         )}
@@ -36,8 +36,10 @@ const PageIntro = ({ title, count, actionOnButton, isLoading }) => {
           <motion.button
             initial="initial"
             whileHover="hover"
-            className="ml-4 py-3 px-4 min-w-max border flex gap-1 items-center justify-center bg-secondary h-full text-white font-medium rounded-full hover:bg-orange-600"
-            onClick={actionOnButton}
+            className={`ml-4 py-3 px-4 min-w-max border border-border flex gap-1 items-center justify-center ${
+              isLoading ? "bg-gray-400" : "bg-secondary hover:bg-orange-600"
+            } h-full text-white font-medium rounded-full`}
+            onClick={isLoading ? null : actionOnButton}
           >
             <motion.div variants={animVar}>
               <HiOutlinePlus color="white" strokeWidth={3} size={12} />

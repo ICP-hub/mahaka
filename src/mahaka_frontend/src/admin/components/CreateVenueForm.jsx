@@ -5,6 +5,7 @@ import { createVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
 const CreateVenueForm = () => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.auth);
+  const { loading } = useSelector((state) => state.venues);
   const [venueData, setVenueData] = useState({
     collection_args: {
       maxLimit: 100,
@@ -97,7 +98,7 @@ const CreateVenueForm = () => {
 
   return (
     <>
-      <form className="space-y-2" onSubmit={handleVenueSubmit}>
+      <form className="space-y-2">
         <div className="flex flex-col flex-auto gap-1">
           <label className="font-semibold">Venue Name</label>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border ">
@@ -263,9 +264,12 @@ const CreateVenueForm = () => {
         <div className="flex justify-center">
           <button
             type="submit"
-            className="bg-orange-500 text-white py-2 px-4 rounded"
+            className={`text-white py-2 px-4 rounded ${
+              loading ? "bg-gray-400" : "bg-secondary"
+            }`}
+            onClick={loading ? null : handleVenueSubmit}
           >
-            Create Venue
+            {loading ? "Creating..." : "Create Venue"}
           </button>
         </div>
       </form>

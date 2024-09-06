@@ -30,7 +30,7 @@ const AdminLayout = () => {
       <div className={`layout ${selected}`}>
         <div className="min-h-screen text-text">
           <NavigationVertical navigationState={state} />
-          <div className="flex w-full min-w-0 flex-auto flex-col">
+          <div className="flex w-full min-w-0 flex-auto flex-col overflow-y-auto h-screen custom-scroll">
             <AppBar
               toggleNavigation={toggleNavigation}
               selected={selected}
