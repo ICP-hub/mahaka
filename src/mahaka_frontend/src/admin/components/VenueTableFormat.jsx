@@ -15,8 +15,8 @@ const VenueTableFormat = () => {
   };
 
   return (
-    <div className="flex flex-auto overflow-hidden font-medium flex-col">
-      <div className="flex flex-auto flex-col overflow-hidden">
+    <div className="flex flex-auto overflow-hidden font-medium">
+      <div className="flex flex-auto flex-col overflow-hidden sm:overflow-y-scroll custom-scroll">
         <div className="grid">
           <div className="custom-grid text-secondary sticky top-0 z-10 gap-4 bg-gray-50 px-6 py-4 text-md font-semibold shadow dark:bg-gray-900 md:px-8">
             <div></div>
@@ -31,7 +31,12 @@ const VenueTableFormat = () => {
             </div>
           </div>
           {loading ? (
-            <VenueTableLoader />
+            <>
+              <VenueTableLoader />
+              <VenueTableLoader />
+              <VenueTableLoader />
+              <VenueTableLoader />
+            </>
           ) : !loading && venues.length > 0 ? (
             venues.map((venue, index) => (
               <VenueTableData
@@ -48,13 +53,11 @@ const VenueTableFormat = () => {
           )}
         </div>
       </div>
-      {/* <Paginator /> */}
     </div>
   );
 };
 
 const VenueTableData = ({ venue, isExpanded, onToggleDetail }) => {
-  console.log(venue);
   return (
     <>
       <div className="custom-grid items-center gap-4 border-b px-6 py-3 md:px-8 text-text bg-card border-border">
@@ -83,13 +86,86 @@ const VenueTableData = ({ venue, isExpanded, onToggleDetail }) => {
           />
         </div>
       </div>
-      {isExpanded && <DetailCard />}
+      <AnimatePresence>
+        {isExpanded && <DetailCard venue={venue} />}
+      </AnimatePresence>
     </>
   );
 };
 
-const DetailCard = () => {
-  return <motion.div className="text-text h-80">DetailCard</motion.div>;
+const DetailCard = ({ venue }) => {
+  return (
+    <motion.div
+      initial={{ height: 0 }}
+      animate={{ height: "auto" }}
+      exit={{ height: 0, opacity: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="text-text flex flex-col p-8 sm:flex-row">
+        <div className="mb-8 flex flex-col items-center sm:mb-0 sm:items-start">
+          <div className="h-44 w-32 overflow-hidden rounded border border-border">
+            <img
+              src={VenueDemoImg}
+              alt="venue_img_detail"
+              className="h-full w-full object-cover"
+            />
+          </div>
+        </div>
+        <div className="flex flex-auto flex-wrap font-medium">
+          <div className="flex w-full flex-col sm:pl-8 space-y-4">
+            <div className="flex flex-col">
+              <div className="text-xl text-secondary">Venue name</div>
+              <div className="">{venue.Title}</div>
+            </div>
+            <div className="flex flex-col">
+              <div className="text-xl text-secondary">Venue Description</div>
+              <div className="">{venue.Description}</div>
+            </div>
+            <div className="flex w-full flex-col lg:flex-row">
+              <div className="flex flex-col">
+                <div className="text-xl text-secondary">Starting Date</div>
+                <div className="">{venue.Details.StartDate}</div>
+              </div>
+              <div className="flex flex-col lg:ml-auto">
+                <div className="text-xl text-secondary">Ending Date</div>
+                <div className="">{venue.Details.EndDate}</div>
+              </div>
+            </div>
+            <div className="flex w-full flex-col lg:flex-row">
+              <div className="flex flex-col">
+                <div className="text-xl text-secondary">Starting Time</div>
+                <div className="">{venue.Details.StartTime}</div>
+              </div>
+              <div className="flex flex-col lg:ml-auto">
+                <div className="text-xl text-secondary">Ending Time</div>
+                <div className="">{venue.Details.EndTime}</div>
+              </div>
+            </div>
+            <div className="flex flex-col">
+              <div className="text-xl text-secondary">Venue Id</div>
+              <div className="">{venue.id}</div>
+            </div>
+            <div className="flex flex-col">
+              <div className="text-xl text-secondary">
+                Max. number of people allowed
+              </div>
+              <div className="">{venue.capacity}</div>
+            </div>
+            <div className="flex flex-col">
+              <div className="text-xl text-secondary">Venue Events</div>
+              <div className="">
+                {venue.Events.length > 0 ? (
+                  <div>events map</div>
+                ) : (
+                  <div>No Events available for this venue!</div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
 };
 
 // Loader
@@ -124,10 +200,6 @@ const VenueTableLoader = () => {
       </div>
     </div>
   );
-};
-
-const Paginator = () => {
-  return <div className="text-text">paginator</div>;
 };
 
 export default VenueTableFormat;

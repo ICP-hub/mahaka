@@ -12,7 +12,7 @@ const VenueManger = () => {
   const { venues, loading } = useSelector((state) => state.venues);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col sm:overflow-hidden">
       <PageIntro
         title="Venue"
         count={venues.length}

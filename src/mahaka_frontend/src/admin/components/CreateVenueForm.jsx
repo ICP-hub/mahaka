@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
+import flatpickr from "flatpickr";
+import { FcAlarmClock, FcCalendar } from "react-icons/fc";
 
 const CreateVenueForm = () => {
   const dispatch = useDispatch();
@@ -36,6 +38,99 @@ const CreateVenueForm = () => {
   });
 
   const [bannerPreview, setBannerPreview] = useState("");
+  const [startDate, setStartDate] = useState("");
+
+  // Refs for Flatpickr
+  const startDateRef = useRef(null);
+  const endDateRef = useRef(null);
+  const startTimeRef = useRef(null);
+  const endTimeRef = useRef(null);
+
+  useEffect(() => {
+    // Initialize Flatpickr for start date
+    const formatDate = (date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
+    const startDatePicker = flatpickr(startDateRef.current, {
+      dateFormat: "Y-m-d",
+      onChange: (selectedDates) => {
+        const newStartDate = selectedDates[0]
+          ? formatDate(selectedDates[0], "yyyy-MM-dd")
+          : "";
+        setStartDate(newStartDate);
+        setVenueData((prevState) => ({
+          ...prevState,
+          eventDetails: {
+            ...prevState.eventDetails,
+            StartDate: newStartDate,
+          },
+        }));
+        // Update end date picker to disable dates before the new start date
+        if (endDateRef.current) {
+          endDatePicker.set("minDate", newStartDate);
+        }
+      },
+    });
+
+    // Initialize Flatpickr for end date
+    const endDatePicker = flatpickr(endDateRef.current, {
+      dateFormat: "Y-m-d",
+      minDate: startDate, // Set minimum date for end date
+      onChange: (selectedDates) => {
+        const newEndDate = selectedDates[0] ? formatDate(selectedDates[0]) : "";
+        setVenueData((prevState) => ({
+          ...prevState,
+          eventDetails: {
+            ...prevState.eventDetails,
+            EndDate: newEndDate,
+          },
+        }));
+      },
+    });
+
+    // Initialize Flatpickr for times
+    flatpickr(startTimeRef.current, {
+      enableTime: true,
+      noCalendar: true,
+      dateFormat: "H:i",
+      onChange: (selectedDates) => {
+        setVenueData((prevState) => ({
+          ...prevState,
+          eventDetails: {
+            ...prevState.eventDetails,
+            StartTime: selectedDates[0]
+              ? selectedDates[0].toTimeString().split(" ")[0]
+              : "",
+          },
+        }));
+      },
+    });
+
+    flatpickr(endTimeRef.current, {
+      enableTime: true,
+      noCalendar: true,
+      dateFormat: "H:i",
+      onChange: (selectedDates) => {
+        setVenueData((prevState) => ({
+          ...prevState,
+          eventDetails: {
+            ...prevState.eventDetails,
+            EndTime: selectedDates[0]
+              ? selectedDates[0].toTimeString().split(" ")[0]
+              : "",
+          },
+        }));
+      },
+    });
+
+    return () => {
+      startDatePicker.destroy();
+      endDatePicker.destroy();
+    };
+  }, [startDate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -83,6 +178,7 @@ const CreateVenueForm = () => {
   // Handler form submit
   const handleVenueSubmit = (e) => {
     e.preventDefault();
+    // console.log(venueData);
     dispatch(
       createVenue({
         backend,
@@ -91,14 +187,14 @@ const CreateVenueForm = () => {
         title: venueData.title,
         capacity: parseInt(venueData.capacity),
         details: { ...venueData.eventDetails, StartTime: 4, EndTime: 6 },
-        description: "description of the venue",
+        description: venueData.collection_args.description,
       })
     );
   };
 
   return (
     <>
-      <form className="space-y-2">
+      <form className="space-y-2" onSubmit={loading ? null : handleVenueSubmit}>
         <div className="flex flex-col flex-auto gap-1">
           <label className="font-semibold">Venue Name</label>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border ">
@@ -116,14 +212,14 @@ const CreateVenueForm = () => {
         </div>
         <div className="flex flex-col flex-auto gap-1">
           <label className="font-semibold">Description</label>
-          <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+          <div className="border border-border rounded-lg pl-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <textarea
               name="description"
               value={venueData.collection_args.description}
               onChange={(e) =>
                 handleNestedInputChange(e, "collection_args", "description")
               }
-              className="my-3 outline-none w-full bg-transparent"
+              className="mt-3 outline-none w-full bg-transparent"
               required
             />
           </div>
@@ -131,64 +227,44 @@ const CreateVenueForm = () => {
         <div className="flex space-x-4">
           <div className="w-1/2 flex flex-col flex-auto gap-1">
             <label className="font-semibold">Start Date</label>
-            <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+            <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
               <input
-                type="date"
-                name="StartDate"
-                value={venueData.eventDetails.StartDate}
-                onChange={(e) =>
-                  handleNestedInputChange(e, "eventDetails", "StartDate")
-                }
+                ref={startDateRef}
                 className="my-3 outline-none w-full bg-transparent"
-                required
               />
+              <FcCalendar size={24} />
             </div>
           </div>
           <div className="w-1/2 flex flex-col flex-auto gap-1">
             <label className="font-semibold">End Date</label>
-            <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+            <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
               <input
-                type="date"
-                name="EndDate"
-                value={venueData.eventDetails.EndDate}
-                onChange={(e) =>
-                  handleNestedInputChange(e, "eventDetails", "EndDate")
-                }
+                ref={endDateRef}
                 className="my-3 outline-none w-full bg-transparent"
-                required
               />
+              <FcCalendar size={24} />
             </div>
           </div>
         </div>
         <div className="flex space-x-4">
           <div className="w-1/2 flex flex-col flex-auto gap-1">
             <label className="font-semibold">Start Time</label>
-            <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+            <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
               <input
-                type="time"
-                name="StartTime"
-                value={venueData.eventDetails.StartTime}
-                onChange={(e) =>
-                  handleNestedInputChange(e, "eventDetails", "StartTime")
-                }
+                ref={startTimeRef}
                 className="my-3 outline-none w-full bg-transparent"
-                required
               />
+              <FcAlarmClock size={24} />
             </div>
           </div>
           <div className="w-1/2 flex flex-col flex-auto gap-1">
             <label className="font-semibold">End Time</label>
-            <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+            <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
               <input
-                type="time"
-                name="EndTime"
-                value={venueData.eventDetails.EndTime}
-                onChange={(e) =>
-                  handleNestedInputChange(e, "eventDetails", "EndTime")
-                }
+                ref={endTimeRef}
                 className="my-3 outline-none w-full bg-transparent"
-                required
               />
+              <FcAlarmClock size={24} />
             </div>
           </div>
         </div>
@@ -249,9 +325,6 @@ const CreateVenueForm = () => {
             >
               Upload Banner
             </label>
-            <p className="text-sm text-gray-500 mt-2">
-              JPEG, PNG less than 5MB
-            </p>
             {bannerPreview && (
               <img
                 src={bannerPreview}
@@ -267,7 +340,6 @@ const CreateVenueForm = () => {
             className={`text-white py-2 px-4 rounded ${
               loading ? "bg-gray-400" : "bg-secondary"
             }`}
-            onClick={loading ? null : handleVenueSubmit}
           >
             {loading ? "Creating..." : "Create Venue"}
           </button>

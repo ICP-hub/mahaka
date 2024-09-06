@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllVenues } from "./redux/reducers/apiReducers/venueApiReducer";
 import { plugLogin } from "./redux/reducers/auth/authReducer";
 import NotificationToast from "./common/NotificationToast";
+import "flatpickr/dist/flatpickr.min.css";
 
 function App() {
   const dispatch = useDispatch();

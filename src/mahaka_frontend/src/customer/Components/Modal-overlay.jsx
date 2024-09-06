@@ -19,10 +19,8 @@ const ModalOverlay = ({ isOpen, setIsOpen, title, children }) => {
             onClick={(e) => e.stopPropagation()}
             className="md:rounded-2xl w-full max-w-xl cursor-default relative overflow-hidden bg-card shadow-lg text-text"
           >
-            <div className="flex justify-between px-8 py-4 items-center bg-secondary text-white">
-              <h3 className="text-xl font-semibold text-center flex-1">
-                {title}
-              </h3>
+            <div className="flex justify-between px-6 py-4 items-center text-secondary border-b border-border">
+              <h3 className="text-xl font-semibold">{title}</h3>
               <button onClick={() => setIsOpen(false)} className="ml-4">
                 <MdClose size={16} />
               </button>
