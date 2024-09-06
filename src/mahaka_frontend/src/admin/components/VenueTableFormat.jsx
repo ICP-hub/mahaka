@@ -149,7 +149,7 @@ const DetailCard = ({ venue }) => {
               <div className="text-xl text-secondary">
                 Max. number of people allowed
               </div>
-              <div className="">{venue.capacity}</div>
+              <div className="">{parseInt(venue.capacity)}</div>
             </div>
             <div className="flex flex-col">
               <div className="text-xl text-secondary">Venue Events</div>
@@ -160,6 +160,11 @@ const DetailCard = ({ venue }) => {
                   <div>No Events available for this venue!</div>
                 )}
               </div>
+            </div>
+            <div>
+              <button className="px-4 py-2 rounded-full bg-secondary font-medium hover:bg-orange-600">
+                Update Venue
+              </button>
             </div>
           </div>
         </div>
