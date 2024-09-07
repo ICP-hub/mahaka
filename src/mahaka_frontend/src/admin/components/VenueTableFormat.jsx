@@ -4,6 +4,10 @@ import { formatDate } from "../../common/utils/dateFormater";
 import { useState } from "react";
 import { MdExpandMore } from "react-icons/md";
 import { AnimatePresence, motion } from "framer-motion";
+import {
+  createStaggerContainer,
+  createStaggerVariant,
+} from "../../common/animationVariants";
 
 const VenueTableFormat = () => {
   const { venues, loading } = useSelector((state) => state.venues);
@@ -13,6 +17,9 @@ const VenueTableFormat = () => {
   const handleToggleDetail = (venueId) => {
     setExpandedVenue(expandedVenue === venueId ? null : venueId);
   };
+
+  const staggerContainer = createStaggerContainer(0.4);
+  const staggerItem = createStaggerVariant(0.4);
 
   return (
     <div className="flex flex-auto overflow-hidden font-medium">
@@ -38,14 +45,22 @@ const VenueTableFormat = () => {
               <VenueTableLoader />
             </>
           ) : !loading && venues.length > 0 ? (
-            venues.map((venue, index) => (
-              <VenueTableData
-                key={index}
-                venue={venue}
-                isExpanded={expandedVenue === index}
-                onToggleDetail={() => handleToggleDetail(index)}
-              />
-            ))
+            <motion.div
+              variants={staggerContainer}
+              initial="hidden"
+              animate="show"
+            >
+              {venues.map((venue, index) => (
+                <motion.div key={index} variants={staggerItem}>
+                  <VenueTableData
+                    key={index}
+                    venue={venue}
+                    isExpanded={expandedVenue === index}
+                    onToggleDetail={() => handleToggleDetail(index)}
+                  />
+                </motion.div>
+              ))}
+            </motion.div>
           ) : (
             <div className="bg-card h-60 flex items-center justify-center text-text text-7xl font-black">
               No Venue found!
@@ -100,6 +115,7 @@ const DetailCard = ({ venue }) => {
       animate={{ height: "auto" }}
       exit={{ height: 0, opacity: 0 }}
       transition={{ duration: 0.5 }}
+      className="border-b border-border"
     >
       <div className="text-text flex flex-col p-8 sm:flex-row">
         <div className="mb-8 flex flex-col items-center sm:mb-0 sm:items-start">
@@ -162,7 +178,7 @@ const DetailCard = ({ venue }) => {
               </div>
             </div>
             <div>
-              <button className="px-4 py-2 rounded-full bg-secondary font-medium hover:bg-orange-600">
+              <button className="px-4 py-2 rounded-full bg-secondary font-medium hover:bg-orange-600 text-white">
                 Update Venue
               </button>
             </div>

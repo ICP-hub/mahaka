@@ -215,6 +215,7 @@ const CreateVenueForm = () => {
           <div className="border border-border rounded-lg pl-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <textarea
               name="description"
+              rows={5}
               value={venueData.collection_args.description}
               onChange={(e) =>
                 handleNestedInputChange(e, "collection_args", "description")
