@@ -44,7 +44,7 @@ const PageIntro = ({ title, count, actionOnButton, isLoading }) => {
             <motion.div variants={animVar}>
               <HiOutlinePlus color="white" strokeWidth={3} size={12} />
             </motion.div>
-            <span>New Venue</span>
+            <span>New {title}</span>
           </motion.button>
         </div>
       </div>
