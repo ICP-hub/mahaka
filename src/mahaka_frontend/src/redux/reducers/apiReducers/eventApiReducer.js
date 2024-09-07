@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import notificationManager from "../../../common/utils/notificationManager";
 
 // Initial state
 const initialState = {
@@ -10,23 +11,22 @@ const initialState = {
   totalPages: 1,
 };
 
-
 // creating an event
 export const createEvent = createAsyncThunk(
   "events/createEvent",
-  async ({ backend, venueId, Event, eCollection }) => {
-      const response = await backend.createEvent(venueId, Event, eCollection);
-      return response;
+  async ({ backend, text, record, collection_args }) => {
+    const response = await backend.createEvent(text, record, collection_args);
+    return response;
   }
 );
 
 // getting all events by venue
 export const getAllEventsByVenue = createAsyncThunk(
   "events/getAllEventsByVenue",
-  async ({ backend, chunkSize, pageNo, venueId }) => {  
-      const response = await backend.getallEventsbyVenue(chunkSize, pageNo, venueId);
-      return response;
-    } 
+  async ({ backend, chunkSize, pageNo, venueId }) => {
+    const response = await backend.getallEventsbyVenue(chunkSize, pageNo, venueId);
+    return response;
+  }
 );
 
 // Create slice
@@ -44,12 +44,12 @@ const eventSlice = createSlice({
         state.eventsLoading = false;
         state.currentEvent = action.payload;
         state.error = null;
+        notificationManager.success("Event created successfully");
       })
       .addCase(createEvent.rejected, (state, action) => {
         state.eventsLoading = false;
         state.error = action.error.message;
       })
-      
       .addCase(getAllEventsByVenue.pending, (state) => {
         state.eventsLoading = true;
       })
