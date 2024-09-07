@@ -17,7 +17,7 @@ export const adminRoutes = [
       // { path: "events", element: <EventManager /> },
       { path: "venues", element: <VenueManger /> },
       {
-        path: "venues/venue/:id",
+        path: "venues/venue/:title/:id",
         element: <VenueDetailPage />,
       },
     ],
