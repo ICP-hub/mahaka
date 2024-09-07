@@ -8,6 +8,8 @@ import {
   createStaggerContainer,
   createStaggerVariant,
 } from "../../common/animationVariants";
+import { HiOutlineDotsHorizontal } from "react-icons/hi";
+import { Link } from "react-router-dom";
 
 const VenueTableFormat = () => {
   const { venues, loading } = useSelector((state) => state.venues);
@@ -100,15 +102,15 @@ const VenueTableData = ({ venue }) => {
         </div>
         <div className="hidden lg:block">Time</div>
         <div className="truncate">{venue.Details.Location}</div>
-        <div
-          className="cursor-pointer flex w-full items-center justify-center"
-          onClick={onToggleDetail}
+        <Link
+          to={`venue/${venue.id}`}
+          className="flex w-full items-center justify-center"
         >
-          <MdExpandMore
+          <HiOutlineDotsHorizontal
             size={24}
             // className={`${isExpanded ? "text-secondary" : "text-icon"}`}
           />
-        </div>
+        </Link>
       </div>
       {/* <AnimatePresence>
         {isExpanded && <DetailCard venue={venue} />}

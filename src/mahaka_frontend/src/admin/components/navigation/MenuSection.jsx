@@ -10,7 +10,7 @@ const MenuSection = () => {
       label: "Analytics",
       icon: <MdInsertChartOutlined size={24} />,
     },
-    { path: "/admin/events", label: "Events", icon: <MdEventNote size={24} /> },
+    // { path: "/admin/events", label: "Events", icon: <MdEventNote size={24} /> },
     { path: "/admin/venues", label: "Venues", icon: <MdMap size={24} /> },
   ];
 
