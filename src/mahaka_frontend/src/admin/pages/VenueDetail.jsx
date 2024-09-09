@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getVenue } from '../../redux/reducers/apiReducers/venueApiReducer';
 import { formatDate } from '../../common/utils/dateFormater';
 import VenueDemoImg from "@/assets/images/Frame10.png";
+import ModalOverlay from "../../customer/Components/Modal-overlay";
+import UpdateVenueForm from "../components/UpdateVenueForm";
 
 const formatTime = (time) => {
   if (typeof time === 'bigint') {
@@ -26,6 +28,8 @@ const VenueDetailPage = () => {
   const { currentVenue, loading, error } = useSelector((state) => state.venues);
   const { backend } = useSelector((state) => state.auth);
   const [localError, setLocalError] = useState(null);
+
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
 
   useEffect(() => {
     if (!id) {
@@ -97,6 +101,7 @@ const VenueDetailPage = () => {
           </div>
           <button
             className="px-4 py-2 mt-2 bg-orange-500 text-white rounded-full hover:bg-orange-600"
+            onClick={() => setIsUpdateModalOpen(true)}
           >
             Update Venue
           </button>
@@ -125,7 +130,6 @@ const VenueDetailPage = () => {
         ) : (
           <div>
             <p>No events available for this venue.</p>
-            
           </div>
         )}
       </div>
@@ -138,9 +142,19 @@ const VenueDetailPage = () => {
           Back to Venues
         </button>
       </div>
+
+      {/* Modal for updating the venue */}
+      {isUpdateModalOpen && (
+        <ModalOverlay
+          isOpen={isUpdateModalOpen}
+          setIsOpen={setIsUpdateModalOpen}
+          title="Update Venue"
+        >
+          <UpdateVenueForm venue={venue} setIsModalOpen={setIsUpdateModalOpen} />
+        </ModalOverlay>
+      )}
     </div>
   );
 };
 
 export default VenueDetailPage;
-
