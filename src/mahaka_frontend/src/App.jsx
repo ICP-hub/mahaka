@@ -6,6 +6,7 @@ import { getAllVenues } from "./redux/reducers/apiReducers/venueApiReducer";
 import { plugLogin } from "./redux/reducers/auth/authReducer";
 import NotificationToast from "./common/NotificationToast";
 import "flatpickr/dist/flatpickr.min.css";
+// import { updateVenue } from "./redux/reducers/apiReducers/venueApiReducer";
 
 function App() {
   const dispatch = useDispatch();
@@ -65,18 +66,61 @@ function App() {
   //         },
   //       }
   //     );
-  
+
   //     console.log("create event result", response);
   //   } catch (err) {
   //     console.error("Error in create event", err);
   //   }
   // };
-  
-  
+
+  // const updateVenueHandler = async () => {
+  //   try {
+  //     const response = dispatch(updateVenue({
+  //       backend,
+  //       venueId: "qwertyu#b77ix-eeaaa-aaaaa-qaada-cai",
+  //       events: [
+  //         {
+  //           id: "Event ID",
+  //           sTicket_limit: 20,
+  //           Description: "Event Description",
+  //           Details: {
+  //             StartDate: "2024-09-01",
+  //             StartTime: 14,
+  //             Location: "Updated Location",
+  //             EndDate: "2024-09-01",
+  //             EndTime: 16,
+  //           },
+  //           Title: "Updated Event Title",
+  //           gTicket_limit: 30,
+  //           vTicket_limit: 10,
+  //         },
+  //       ],
+  //       title: "Updated Venue Title",
+  //       description: "Updated venue description",
+  //       details: {
+  //         StartDate: "2024-09-01",
+  //         StartTime: 14,
+  //         Location: "Updated Venue Location",
+  //         EndDate: "2024-09-01",
+  //         EndTime: 16,
+  //       },
+  //       capacity: 500
+  //     }));
+
+
+  //     console.log("Update venue result", response);
+  //   } catch (err) {
+  //     console.error("Error in updating venue", err);
+  //   }
+  // };
+
 
   return (
     <div className="light bg-background">
-       {/* <button className="px-2 py-1 border rounded mr-2" onClick={createEventHandler}>
+      {/* <button className="px-2 py-1 border rounded" onClick={updateVenueHandler}>
+        Update Venue
+      </button> */}
+      {/* <button className="px-2 py-1 border rounded mr-2" onClick={createEventHandler}>
         Create Event
       </button> */}
       {/* <div className="p-4">

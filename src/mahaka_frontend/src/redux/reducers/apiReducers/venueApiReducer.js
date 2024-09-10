@@ -37,10 +37,20 @@ export const deleteVenue = createAsyncThunk(
   }
 );
 
-// UpdateVenue : Fix later : depend on object
+// UpdateVenue 
 export const updateVenue = createAsyncThunk(
   "venues/updateVenue",
-  async (venue) => {}
+  async ({ backend, venueId, events, title, description, details, capacity }) => {
+    const response = await backend.updateVenue(
+      venueId,
+      events,
+      title,
+      description,
+      details,
+      capacity
+    );
+    return response;
+  }
 );
 
 //Create Venue
@@ -125,20 +135,26 @@ const venueSlice = createSlice({
       })
 
       // Fix later : create and update
-      //   .addCase(updateVenue.pending, (state) => {
-      //     state.loading = true;
-      //   })
-      //   .addCase(updateVenue.fulfilled, (state, action) => {
-      //     state.loading = false;
-      //     state.venues = state.venues.map((venue) =>
-      //       venue.id === action.payload.id ? action.payload : venue
-      //     );
-      //     state.error = null;
-      //   })
-      //   .addCase(updateVenue.rejected, (state, action) => {
-      //     state.loading = false;
-      //     state.error = action.error.message;
-      //   })
+      .addCase(updateVenue.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateVenue.fulfilled, (state, action) => {
+        state.loading = false;
+        const updatedVenue = action.payload;
+        state.venues = state.venues.map((venue) =>
+          venue.id === updatedVenue.id ? updatedVenue : venue
+        );
+        if (state.currentVenue && state.currentVenue.id === updatedVenue.id) {
+          state.currentVenue = updatedVenue;
+        }
+        state.error = null;
+        notificationManager.success("Venue updated successfully");
+      })
+      .addCase(updateVenue.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+        notificationManager.error("Failed to update venue");
+      })
       .addCase(createVenue.pending, (state) => {
         state.loading = true;
         state.error = null;
