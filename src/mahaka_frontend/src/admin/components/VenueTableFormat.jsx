@@ -11,7 +11,8 @@ import {
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { Link } from "react-router-dom";
 
-const VenueTableFormat = () => {
+const VenueTableFormat = ({filteredVenues}) => {
+  console.log(filteredVenues)
   const { venues, loading } = useSelector((state) => state.venues);
   // const [expandedVenue, setExpandedVenue] = useState(null);
 
@@ -52,7 +53,7 @@ const VenueTableFormat = () => {
               initial="hidden"
               animate="show"
             >
-              {venues.map((venue, index) => (
+              {filteredVenues.map((venue, index) => (
                 <motion.div key={index} variants={staggerItem}>
                   <VenueTableData
                     key={index}

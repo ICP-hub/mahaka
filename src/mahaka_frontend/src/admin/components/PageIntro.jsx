@@ -1,7 +1,7 @@
 import { HiOutlineMagnifyingGlass, HiOutlinePlus } from "react-icons/hi2";
 import { motion } from "framer-motion";
 
-const PageIntro = ({ title, count, actionOnButton, isLoading }) => {
+const PageIntro = ({ title, count, actionOnButton, isLoading, searchInput, setSearchInput }) => {
   const animVar = {
     initial: { rotate: 0 },
     hover: { rotate: 90, transition: { duration: 0.2 } },
@@ -30,6 +30,8 @@ const PageIntro = ({ title, count, actionOnButton, isLoading }) => {
                 type="text"
                 className="w-full my-3 outline-none bg-transparent"
                 placeholder={`Search ${title}...`}
+                search = {searchInput}
+                onChange = {(e)=>setSearchInput(e.target.value)}
               />
             </div>
           </div>
