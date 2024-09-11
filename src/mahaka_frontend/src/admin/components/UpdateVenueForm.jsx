@@ -110,7 +110,7 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const venueId = venue.id; // Assuming venue.id is the ID you need
+        const venueId = venue.id; 
 
         dispatch(updateVenue({
             backend,
