@@ -221,7 +221,7 @@ actor mahaka {
           return {data = pages_data; current_page = pageNo + 1 ; Total_pages = index_pages.size()};
      };
 
-     public shared ({caller = user})  func createEvent( venueId : Types.venueId, Event : Types.Events, eCollection : Types.eventCollectionParams) : async Text {
+     public shared ({caller = user})  func createEvent( venueId : Types.venueId, Event : Types.Events, eCollection : Types.eventCollectionParams) : async  Types.completeEvent {
           let _venue_details = await getVenue(venueId);
           // switch (_venue_details){
           //      case (Principal,Value) {
@@ -256,7 +256,7 @@ actor mahaka {
           let Event_index = await stable_add(event_blob, Events_state);
           _EventsMap.put(venueId, Event_index);
           // List.push((),_eventList);
-          return "Event created";
+          return _event;
      };
 
      public shared ({caller}) func getallEventsbyVenue(chunkSize : Nat , pageNo : Nat, venueId : Types.venueId) : async {data : [Types.completeEvent] ; current_page : Nat ; Total_pages : Nat} {
