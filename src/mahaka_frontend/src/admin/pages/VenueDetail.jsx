@@ -6,6 +6,7 @@ import { formatDate } from '../../common/utils/dateFormater';
 import VenueDemoImg from "@/assets/images/Frame10.png";
 import ModalOverlay from "../../customer/Components/Modal-overlay";
 import UpdateVenueForm from "../components/UpdateVenueForm";
+import CreateEventForm from '../components/CreateEventForm';
 
 const formatTime = (time) => {
   if (typeof time === 'bigint') {
@@ -30,6 +31,7 @@ const VenueDetailPage = () => {
   const [localError, setLocalError] = useState(null);
 
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isEventModalOpen, setIsEventModalOpen] = useState(false);  // New state for event modal
 
   useEffect(() => {
     if (!id) {
@@ -79,81 +81,110 @@ const VenueDetailPage = () => {
   }
 
   return (
-    <div className="p-6 tracking-wide">
-      <div className="flex flex-col md:flex-row items-start md:items-center mb-6 ">
-        <div className="w-full md:w-1/2 h-64 bg-gray-200 mb-4 md:mb-0 rounded-lg shadow-lg">
-          <img
-            src={VenueDemoImg}
-            alt="Venue Banner"
-            className="w-full h-full object-cover rounded-lg"
-          />
-        </div>
-        <div className="w-full md:w-1/2 md:pl-8">
-          <h1 className="text-5xl font-bold mb-4">{venue.Title}</h1>
-          <div className="mb-2 leading-relaxed">
-            <p className="text-lg"><strong>📅 </strong>{formatDate(venue.Details.StartDate)} - {formatDate(venue.Details.EndDate)}</p>
-          </div>
-          <div className="mb-2 leading-relaxed">
-            <p className="text-lg"><strong>🕒 </strong>{formatTime(venue.Details.StartTime)} - {formatTime(venue.Details.EndTime)}</p>
-          </div>
-          <div className="mb-2 leading-relaxed">
-            <p className="text-lg"><strong>Location:</strong> {venue.Details.Location}</p>
-          </div>
+    <>
+      <div className="p-5 tracking-wide">
+        <div className="flex justify-left mb-2">
           <button
-            className="px-4 py-2 mt-2 bg-orange-500 text-white rounded-full hover:bg-orange-600"
-            onClick={() => setIsUpdateModalOpen(true)}
+            className="px-4 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600"
+            onClick={() => navigate('/admin/venues')}
           >
-            Update Venue
+            <i className="fa-solid fa-arrow-left"></i>
           </button>
         </div>
-      </div>
-      <hr className="border-gray-300 my-6" />
-
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Description</h2>
-        <p>{venue.Description}</p>
-      </div>
-
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Capacity</h2>
-        <p>{venue.capacity ? venue.capacity.toString() : 'Capacity information not available.'}</p>
-      </div>
-
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Events</h2>
-        {venue.Events && venue.Events.length > 0 ? (
-          <ul>
-            {venue.Events.map((event, index) => (
-              <li key={index} className="hover:underline">{event.Title}</li>
-            ))}
-          </ul>
-        ) : (
-          <div>
-            <p>No events available for this venue.</p>
+        <div className="flex flex-col md:flex-row items-start md:items-center mb-6 ">
+          <div className="w-full md:w-1/2 h-64 bg-gray-200 mb-4 md:mb-0 rounded-lg shadow-lg">
+            <img
+              src={VenueDemoImg}
+              alt="Venue Banner"
+              className="w-full h-full object-cover rounded-lg"
+            />
           </div>
+          <div className="w-full md:w-1/2 md:pl-8">
+            <h1 className="text-5xl font-bold mb-4">{venue.Title}</h1>
+            <div className="mb-2 leading-relaxed">
+              <p className="text-lg">
+                <strong>📅 </strong>{formatDate(venue.Details.StartDate)} - {formatDate(venue.Details.EndDate)}
+              </p>
+            </div>
+            <div className="mb-2 leading-relaxed">
+              <p className="text-lg"><strong>🕒 </strong>{formatTime(venue.Details.StartTime)} - {formatTime(venue.Details.EndTime)}</p>
+            </div>
+            <div className="mb-2 leading-relaxed">
+              <p className="text-lg"><strong>Location:</strong> {venue.Details.Location}</p>
+            </div>
+            <button
+              className="px-4 py-2 mt-2 bg-orange-500 text-white rounded-full hover:bg-orange-600"
+              onClick={() => setIsUpdateModalOpen(true)}
+            >
+              Update Venue
+            </button>
+          </div>
+        </div>
+        <hr className="border-gray-300 my-6" />
+
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold mb-2">Description</h2>
+          <p>{venue.Description}</p>
+        </div>
+
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold mb-2">Capacity</h2>
+          <p>{venue.capacity ? venue.capacity.toString() : 'Capacity information not available.'}</p>
+        </div>
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold mb-2">Venue ID</h2>
+          <p>{venue.id}</p>
+        </div>
+
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold mb-2">Events</h2>
+          {venue.Events && venue.Events.length > 0 ? (
+            <ul>
+              {venue.Events.map((event, index) => (
+                <li key={index} className="hover:underline">{event.Title}</li>
+              ))}
+            </ul>
+          ) : (
+            <div>
+              <button
+                className="px-4 py-2 bg-indigo-700 text-white rounded hover:bg-indigo-800"
+                onClick={() => setIsEventModalOpen(true)}
+              >
+                Create Event
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Modal for updating the venue */}
+        {isUpdateModalOpen && (
+          <ModalOverlay
+            isOpen={isUpdateModalOpen}
+            setIsOpen={setIsUpdateModalOpen}
+            title="Update Venue"
+          >
+            <UpdateVenueForm venue={venue} setIsModalOpen={setIsUpdateModalOpen} />
+          </ModalOverlay>
         )}
-      </div>
 
-      <div className="flex justify-end">
-        <button
-          className="px-4 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600"
-          onClick={() => navigate('/admin/venues')}
-        >
-          Back to Venues
-        </button>
-      </div>
+        {/* Modal for creating an event */}
+      
+{isEventModalOpen && (
+  <ModalOverlay
+    isOpen={isEventModalOpen}
+    setIsOpen={setIsEventModalOpen}
+    title="Create Event"
+  >
+    <CreateEventForm 
+      setIsModalOpen={setIsEventModalOpen} 
+      venueId={id} 
+      venueTitle={venue.Title}  // Pass venue title for use in event creation
+    />
+  </ModalOverlay>
+)}
 
-      {/* Modal for updating the venue */}
-      {isUpdateModalOpen && (
-        <ModalOverlay
-          isOpen={isUpdateModalOpen}
-          setIsOpen={setIsUpdateModalOpen}
-          title="Update Venue"
-        >
-          <UpdateVenueForm venue={venue} setIsModalOpen={setIsUpdateModalOpen} />
-        </ModalOverlay>
-      )}
-    </div>
+      </div>
+    </>
   );
 };
 

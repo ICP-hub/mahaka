@@ -6,7 +6,7 @@ import { getAllVenues } from "./redux/reducers/apiReducers/venueApiReducer";
 import { plugLogin } from "./redux/reducers/auth/authReducer";
 import NotificationToast from "./common/NotificationToast";
 import "flatpickr/dist/flatpickr.min.css";
-// import { updateVenue } from "./redux/reducers/apiReducers/venueApiReducer";
+import { updateVenue } from "./redux/reducers/apiReducers/venueApiReducer";
 
 function App() {
   const dispatch = useDispatch();
@@ -114,12 +114,34 @@ function App() {
   //   }
   // };
 
-
+  const updateVenueHandler = async () => {
+    try {
+      const venueId = "qwertyu#b77ix-eeaaa-aaaaa-qaada-cai"; // Replace with the actual venue ID
+      
+      const response = await dispatch(updateVenue({
+        backend,
+        venueId, // Pass the venueId here
+        updatedTitle: "Updated Title", // text: Updated title
+        updatedDescription: "Updated Description", // text: Updated description
+        startDate: "2024-10-01", // text: Start date
+        startTime: 14, // int: Start time (24-hour format)
+        location: "Updated Location", // text: Location
+        endDate: "2024-10-01", // text: End date
+        endTime: 16, // int: End time (24-hour format)
+        capacity: 500, // nat: Capacity
+      }));
+  
+      console.log("Update venue result", response);
+    } catch (err) {
+      console.error("Error in updating venue", err);
+    }
+  };
+  
   return (
     <div className="light bg-background">
-      {/* <button className="px-2 py-1 border rounded" onClick={updateVenueHandler}>
+      <button className="px-2 py-1 border rounded" onClick={updateVenueHandler}>
         Update Venue
-      </button> */}
+      </button>
       {/* <button className="px-2 py-1 border rounded mr-2" onClick={createEventHandler}>
         Create Event
       </button> */}
