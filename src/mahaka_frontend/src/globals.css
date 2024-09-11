@@ -1,38 +1,44 @@
 /* import index.css */
+@import "@/assets/styles/tailwind.css";
 @import "./index.css";
 /* //outfit */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
-*, *::before, *::after {
-    box-sizing: border-box;
-    padding: 0px;
-    margin: 0px;
-  }
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  padding: 0px;
+  margin: 0px;
+}
 
+/*  all images are responsive */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
 
-  /* Global  background */
-body {
-    background-color: #FFFFFF;
-  }
-  
-  /*  all images are responsive */
-  img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-  }
-  
-  /* Common elements styling */
-  a {
-    text-decoration: none;
-    color: inherit;
-  }
-  
-  ul, ol {
-    list-style: none;
-  }
-  
-  table {
-    border-collapse: collapse;
-    border-spacing: 0;
-  }
+/* Common elements styling */
+a {
+  text-decoration: none;
+  color: inherit;
+}
 
+ul,
+ol {
+  list-style: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* remove arrows from input number */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  margin: 0;
+}

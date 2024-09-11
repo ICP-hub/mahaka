@@ -20,7 +20,7 @@ const Chip = ({ text, selected, setSelected }) => {
   return (
     <button
       onClick={() => setSelected(text)}
-      className={`${"text-primary hover:text-slate-600"} font-bold text-xl transition-colors px-2.5 py-4 border-primary relative border-b-2 min-w-40 max-w-min`}
+      className={`${"text-primary hover:text-slate-600"} font-bold md:text-xl transition-colors px-2.5 py-4 border-primary relative border-b-2 min-w-40 max-w-min`}
     >
       <span className="relative z-10">{text}</span>
       {selected && (

@@ -1,3 +1,20 @@
+// Stagger animations :
+export const createStaggerContainer = (staggerAmount = 0.5) => ({
+  hidden: { opacity: 1 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: staggerAmount,
+    },
+  },
+});
+
+export const createStaggerVariant = (duration = 0.5) => ({
+  hidden: { opacity: 0, y: 50 },
+  show: { opacity: 1, y: 0, transition: { duration } },
+});
+
+// Fade in animation
 export const fadeIn = (direction, duration = 0.3, delay = 0) => {
   return {
     initial: {
@@ -18,6 +35,7 @@ export const fadeIn = (direction, duration = 0.3, delay = 0) => {
   };
 };
 
+// Rotate animation
 export const rotate = (degree, duration = 0.3, delay = 0) => {
   return {
     initial: {

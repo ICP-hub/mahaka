@@ -4,13 +4,13 @@ import PaymentComponent from "../customer/Pages/Payment";
 import SingleEvent from "../customer/Pages/SingleEvent";
 import UserProfile from "../customer/Pages/UserProfile";
 
-export const customerRouting = [
+export const customerRoutes = [
   {
     path: "/",
     element: <Master />,
     children: [
       { index: true, element: <Home /> },
-      { path: "single-event", element: <SingleEvent /> },
+      { path: "venues/:id", element: <SingleEvent /> },
       { path: "payment", element: <PaymentComponent /> },
       { path: "user-profile", element: <UserProfile /> },
     ],

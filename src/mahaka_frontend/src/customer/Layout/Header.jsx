@@ -1,21 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import "../style/index.css";
-import { FaUser } from "react-icons/fa";
-import ProfileCard from "../Components/ProfileCard";
 import { AnimatePresence, motion } from "framer-motion";
 import { HiMagnifyingGlass, HiMiniBars3 } from "react-icons/hi2";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  logout,
-  nfidLogin,
-  plugLogin,
-} from "../../redux/reducers/auth/authReducer";
-import {
-  deleteVenue,
-  getAllVenues,
-  getVenue,
-} from "../../redux/reducers/apiReducers/venueApiReducer";
+import { getUserDetailsByCaller } from "../../redux/reducers/apiReducers/userApiReducer";
+import useLogin from "../../common/hooks/useLogin";
+import ProfileDemoImg from "../../assets/images/profile-demo.png";
+import { Link } from "react-router-dom";
 
 const NavLinks = [
   { title: "ABOUT MAHAKA" },
@@ -57,7 +48,7 @@ const LogoSection = () => {
 
 const SearchBox = () => {
   return (
-    <div className="flex w-full items-center px-8">
+    <div className="flex items-center px-8 flex-1">
       <span className="flex p-2 border rounded-md gap-2 w-full">
         <input
           type="text"
@@ -153,69 +144,31 @@ const NavVertical = ({ isNavOpen }) => {
 };
 
 const ConnectWalletBtn = () => {
-  const dispatch = useDispatch();
-  const { backend, principal, isConnected } = useSelector(
-    (state) => state.auth
-  );
+  const { isConnected } = useSelector((state) => state.auth);
+  const { loginWithPlug } = useLogin();
 
-  const states = useSelector((state) => console.log("States are ", state));
-
-  /******************* This is for demo purpose only */
-  const handleDeleteVenue = () => {
-    dispatch(
-      deleteVenue({
-        backend: backend,
-        venueId: "57b4zy-br5f7-7uaaa-aaaaa-qaaca-cai",
-      })
+  if (isConnected)
+    return (
+      <Link
+        to="/user-profile"
+        className="p-2 rounded-full border-2 border-secondary"
+      >
+        <img
+          src={ProfileDemoImg}
+          alt="Profile-pic"
+          className="h-12 w-12 md:h-8 md:w-8 rounded-full"
+        />
+      </Link>
     );
-  };
-
-  useEffect(() => {
-    dispatch(getAllVenues({ backend: backend, pageLimit: 100, currPage: 0 }));
-    // dispatch(
-    //   getVenue({
-    //     backend: backend,
-    //     venueId: "57b4zy-br5f7-7uaaa-aaaaa-qaaca-cai",
-    //   })
-    // );
-  }, []);
-
-  /***************************** */
-
-  // Check if login with plug then fix refresh issue
-  useEffect(() => {
-    const isLoggedIn = sessionStorage.getItem("isPlugLogged");
-    if (isLoggedIn) {
-      dispatch(plugLogin());
-    }
-  }, []);
 
   return (
-    <>
-      {isConnected ? (
-        <div className="flex gap-4 md:fixed md:bg-white p-4 rounded-lg md:shadow-lg md:text-black text-white md:top-20">
-          <h4 className="text-2xl font-semibold">{principal}</h4>
-          <button
-            className="px-4 py-2 bg-gray-800 text-white rounded-lg"
-            onClick={() => dispatch(logout())}
-          >
-            Disconnect
-          </button>
-        </div>
-      ) : (
-        <button
-          className="p-4 bg-secondary text-white font-medium rounded-lg hover:bg-orange-600 min-w-max"
-          onClick={() => dispatch(plugLogin())}
-        >
-          Connect Wallet
-        </button>
-      )}
-    </>
+    <button
+      className="p-4 bg-secondary text-white font-medium rounded-lg hover:bg-orange-600 min-w-max"
+      onClick={loginWithPlug}
+    >
+      Connect Wallet
+    </button>
   );
-};
-
-const LoginModal = () => {
-  return <div>Login Modal</div>;
 };
 
 // export default function Header() {
