@@ -9,10 +9,13 @@ import Types "./Types";
 import Cycles "mo:base/ExperimentalCycles";
 import Time "mo:base/Time";
 import Debug "mo:base/Debug";
+import Buffer "mo:base/Buffer";
+import Array "mo:base/Array";
 
 shared actor class Dip721NFT(custodian: Principal, init : Types.Dip721NonFungibleToken) = Self {
   stable var transactionId: Types.TransactionId = 0;
   stable var nfts = List.nil<Types.Nft>();
+  stable var booking_limit = List.nil<(Types.Date,)>();
   stable var custodians = List.make<Principal>(custodian);
   stable var logo : Types.LogoResult = init.logo;
   stable var name : Text = init.name;  
@@ -24,6 +27,24 @@ shared actor class Dip721NFT(custodian: Principal, init : Types.Dip721NonFungibl
   stable var created_at : Time.Time = init.created_at;
   private stable var capacity = 1000000000000000000;
   private stable var balance = Cycles.balance();
+
+  stable var SINGLE_TICKET_DETAILS : Types.ticket_details = {
+    ticket_type = #SinglePass;
+    number_of_seats = init.sTicket_limit;
+    price = init.sTicket_price;
+  };
+
+  stable var GROUP_TICKET_DETAILS : Types.ticket_details = {
+    ticket_type = #SinglePass;
+    number_of_seats = init.sTicket_limit;
+    price = init.sTicket_price;
+  };
+
+  stable var VIP_TICKET_DETAILS : Types.ticket_details = {
+    ticket_type = #VipPass;
+    number_of_seats = init.vTicket_limit;
+    price = init.vTicket_price;
+  };
 
   // https://forum.dfinity.org/t/is-there-any-address-0-equivalent-at-dfinity-motoko/5445/3
   let null_address : Principal = Principal.fromText("aaaaa-aa");
@@ -156,6 +177,12 @@ shared actor class Dip721NFT(custodian: Principal, init : Types.Dip721NonFungibl
       banner = banner;
       description = description;
       created_at = created_at;
+      sTicket_limit=SINGLE_TICKET_DETAILS.number_of_seats;
+      sTicket_price=SINGLE_TICKET_DETAILS.price;
+      vTicket_limit=VIP_TICKET_DETAILS.number_of_seats;
+      vTicket_price=VIP_TICKET_DETAILS.price;
+      gTicket_limit=GROUP_TICKET_DETAILS.number_of_seats;
+      gTicket_price=GROUP_TICKET_DETAILS.price;
     };
   };
 
@@ -212,7 +239,7 @@ shared actor class Dip721NFT(custodian: Principal, init : Types.Dip721NonFungibl
     return List.toArray(nfts);
   };
 
-  public shared func mintDip721(to: Principal, metadata: Types.MetadataDesc ,ticket_details : Types.ticket_type, logo : Types.LogoResult) : async Types.MintReceipt {
+public shared func mintDip721(to: Principal, metadata: Types.MetadataDesc ,ticket_type : Types.ticket_type, logo : Types.LogoResult) : async Types.MintReceipt {
     if (not List.some(custodians, func (custodian : Principal) : Bool { custodian == to })) {
       return #Err(#Unauthorized);
     };
@@ -226,7 +253,7 @@ shared actor class Dip721NFT(custodian: Principal, init : Types.Dip721NonFungibl
       locked = true;
       forsale = false;
       listed = true;
-      ticket_type = ticket_details;
+      ticket_type = ticket_type;
       logo = logo;
     };
     nfts := List.push(nft, nfts);

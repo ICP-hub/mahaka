@@ -6,14 +6,14 @@ import Text "mo:base/Text";
 import Blob "mo:base/Blob";
 import Error "mo:base/Error";
 import List "mo:base/List";
-import StableTrieMap "mo:stable-trie/Map";
+// import StableTrieMap "mo:stable-trie/Map";
 import Cycles "mo:base/ExperimentalCycles";
 import Nat64 "mo:base/Nat64";
 import Region "mo:base/Region";
 import Result "mo:base/Result";
 import Iter "mo:base/Iter";
 import Debug "mo:base/Debug";
-import Uuid "mo:uuid/UUID";
+// import Uuid "mo:uuid/UUID";
 import Utils "./Utils";
 import nftTypes "../DIP721-NFT/Types";
 actor mahaka {
@@ -111,6 +111,8 @@ actor mahaka {
           let venueCollectionId = await venueCollection.getCanisterId();
           let venue_id =  _title # "#" # Principal.toText(venueCollectionId) ;
           let Venue : Types.Venue = {
+               logo = collection_details.collection_args.logo;
+               banner = collection_details.collection_args.banner;
                Collection_id : Principal = venueCollectionId;
                Description : Text = _description;
                Details : Types.venueDetails = _details;
@@ -149,7 +151,9 @@ actor mahaka {
      public shared ({caller}) func updateVenue( Venue_id : Text, events : [Types.Events] ,  Title : Text,
         Description : Text,
         Details : Types.venueDetails,
-        capacity : Nat
+        capacity : Nat,
+        logo : Types.LogoResult,
+        banner : Types.LogoResult
         ) : async (Principal, Types.Venue) {
           
           switch(_venueMap.get(Venue_id)){
@@ -161,6 +165,8 @@ actor mahaka {
                     let Venue : Types.Venue = {
                          id = Venue_id;
                          Title = Title;
+                         logo = logo;
+                         banner = banner;
                          Description : Text;
                          Details = Details;
                          Events = List.fromArray(events);
@@ -235,6 +241,8 @@ actor mahaka {
                id = eventId;
                Description = Event.Description;
                Details = Event.Details;
+               logo = Event.logo;
+               banner =Event.banner ;
                gTicket_limit = Event.gTicket_limit;
                sTicket_limit = Event.sTicket_limit;
                Title = Event.Title;
