@@ -8,20 +8,16 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
     const dispatch = useDispatch();
     const { backend } = useSelector((state) => state.auth);
     const [venueData, setVenueData] = useState({
-        id: venue.id,
-        sTicket_limit: venue.sTicket_limit ? venue.sTicket_limit.toString() : '0',
-        Title: venue.Title,
-        Description: venue.Description,
-        gTicket_limit: venue.gTicket_limit ? venue.gTicket_limit.toString() : '0',
-        vTicket_limit: venue.vTicket_limit ? venue.vTicket_limit.toString() : '0',
-        capacity: venue.capacity ? venue.capacity.toString() : '0',
+        Title: '',
+        Description: '',
         Details: {
-            StartDate: venue.Details.StartDate,
-            StartTime: venue.Details.StartTime ? venue.Details.StartTime.toString() : '0',
-            Location: venue.Details.Location,
-            EndDate: venue.Details.EndDate,
-            EndTime: venue.Details.EndTime ? venue.Details.EndTime.toString() : '0',
+            StartDate: '',
+            EndDate: '',
+            StartTime: '',
+            EndTime: '',
+            Location: '',
         },
+        capacity: '',
     });
 
     // Refs for Flatpickr
@@ -91,7 +87,7 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
                 }));
             },
         });
-    }, []);
+    }, [venueData.Details.StartDate, venueData.Details.EndDate, venueData.Details.StartTime, venueData.Details.EndTime]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -114,49 +110,26 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        const venueId = venue.id; 
 
-        const updatedVenueData = {
+        dispatch(updateVenue({
             backend,
-            venueId: venueData.id,
-            events: [
-                {
-                    id: venueData.id,
-                    sTicket_limit: BigInt(venueData.sTicket_limit),
-                    Description: venueData.Description,
-                    Details: {
-                        StartDate: venueData.Details.StartDate,
-                        StartTime: BigInt(venueData.Details.StartTime),
-                        Location: venueData.Details.Location,
-                        EndDate: venueData.Details.EndDate,
-                        EndTime: BigInt(venueData.Details.EndTime),
-                    },
-                    Title: venueData.Title,
-                    gTicket_limit: BigInt(venueData.gTicket_limit),
-                    vTicket_limit: BigInt(venueData.vTicket_limit),
-                },
-            ],
-            title: venueData.Title,
-            description: venueData.Description,
-            details: {
-                StartDate: venueData.Details.StartDate,
-                StartTime: BigInt(venueData.Details.StartTime),
-                Location: venueData.Details.Location,
-                EndDate: venueData.Details.EndDate,
-                EndTime: BigInt(venueData.Details.EndTime),
-            },
-            capacity: BigInt(venueData.capacity)
-        };
-
-        console.log('Dispatching updateVenue with payload:', updatedVenueData);
-
-        dispatch(updateVenue(updatedVenueData))
-            .then(() => {
-                setIsModalOpen(false);
-            })
-            .catch((error) => {
-                console.error('Error updating venue:', error);
-
-            });
+            venueId,
+            updatedTitle: venueData.Title,
+            updatedDescription: venueData.Description,
+            startDate: venueData.Details.StartDate,
+            startTime: parseInt(venueData.Details.StartTime, 10),
+            location: venueData.Details.Location,
+            endDate: venueData.Details.EndDate,
+            endTime: parseInt(venueData.Details.EndTime, 10),
+            capacity: parseInt(venueData.capacity, 10),
+        }))
+        .then(() => {
+            setIsModalOpen(false); // Close modal on success
+        })
+        .catch((err) => {
+            console.error("Error in updating venue", err);
+        });
     };
 
     return (
@@ -189,11 +162,6 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
                 </div>
             </div>
 
-
-
-
-
-
             <div className="flex space-x-4">
                 <div className="w-1/2 flex flex-col flex-auto gap-1">
                     <label className="font-semibold">Start Date</label>
@@ -201,10 +169,8 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
                         <input
                             ref={startDateRef}
                             className="my-3 outline-none w-full bg-transparent"
-
                         />
                         <FcCalendar size={24} />
-
                     </div>
                 </div>
 
@@ -217,7 +183,6 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
                         />
                         <FcCalendar size={24} />
                     </div>
-
                 </div>
             </div>
 
@@ -268,48 +233,6 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
                         className="my-3 outline-none w-full bg-transparent"
                         required
                     />
-                </div>
-            </div>
-            <div className="flex space-x-4">
-                <div className="w-1/3">
-                    <label className="font-semibold">General Ticket Limit</label>
-                    <div className="border border-border rounded focus-within:border-indigo-600 dark:focus-within:border-border">
-                        <input
-                            type="number"
-                            name="gTicket_limit"
-                            value={venueData.gTicket_limit}
-                            onChange={handleInputChange}
-                            className="mt-1 p-2 outline-none w-full bg-transparent"
-                            required
-                        />
-                    </div>
-                </div>
-
-                <div className="w-1/3">
-                    <label className="font-semibold">Student Ticket Limit</label>
-                    <div className="border border-border rounded focus-within:border-indigo-600 dark:focus-within:border-border">
-                        <input
-                            type="number"
-                            name="sTicket_limit"
-                            value={venueData.sTicket_limit}
-                            onChange={handleInputChange}
-                            className="mt-1 p-2 outline-none w-full bg-transparent"
-                            required
-                        />
-                    </div>
-                </div>
-                <div className="w-1/3">
-                    <label className="font-semibold">VIP Ticket Limit</label>
-                    <div className="border border-border rounded focus-within:border-indigo-600 dark:focus-within:border-border">
-                        <input
-                            type="number"
-                            name="vTicket_limit"
-                            value={venueData.vTicket_limit}
-                            onChange={handleInputChange}
-                            className="mt-1 p-2 outline-none w-full bg-transparent"
-                            required
-                        />
-                    </div>
                 </div>
             </div>
 

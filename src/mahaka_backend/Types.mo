@@ -1,4 +1,3 @@
-import Time "mo:base/Time";
 import Nat "mo:base/Nat";
 import Text "mo:base/Text";
 import List "mo:base/List";
@@ -31,9 +30,9 @@ module {
 
     public type eventDetails = {
         StartDate : Text;
-        StartTime : Time.Time;
+        StartTime : Text;
         EndDate : Text;
-        EndTime : Time.Time;
+        EndTime : Text;
         Location : Text;
     };
 
@@ -41,6 +40,8 @@ module {
         id : Text;
         Title : Text;
         Description : Text;
+        logo: LogoResult;
+        banner: LogoResult;
         Details : eventDetails;
         sTicket_limit : Nat;
         vTicket_limit : Nat;
@@ -57,9 +58,9 @@ module {
 
     public type venueDetails = {
         StartDate : Text;
-        StartTime : Time.Time;
+        StartTime : Text;
         EndDate : Text;
-        EndTime : Time.Time;
+        EndTime : Text;
         Location : Text;
     };
 
@@ -67,6 +68,8 @@ module {
         id : Text;
         Title : Text;
         Description : Text;
+        logo: LogoResult;
+        banner: LogoResult;
         Details : venueDetails;
         Events : List.List<Events>;
         capacity : Nat;

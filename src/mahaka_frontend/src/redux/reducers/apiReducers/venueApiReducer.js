@@ -40,18 +40,19 @@ export const deleteVenue = createAsyncThunk(
 // UpdateVenue 
 export const updateVenue = createAsyncThunk(
   "venues/updateVenue",
-  async ({ backend, venueId, events, title, description, details, capacity }) => {
+  async ({ backend, venueId, updatedTitle, updatedDescription, startDate, startTime, location, endDate, endTime, capacity }) => {
     const response = await backend.updateVenue(
       venueId,
-      events,
-      title,
-      description,
-      details,
+      [],
+      updatedTitle,
+      updatedDescription,
+      { StartDate: startDate, StartTime: startTime, Location: location, EndDate: endDate, EndTime: endTime },
       capacity
     );
     return response;
   }
 );
+
 
 //Create Venue
 export const createVenue = createAsyncThunk(
