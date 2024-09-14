@@ -40,52 +40,33 @@ export const deleteVenue = createAsyncThunk(
 // UpdateVenue 
 export const updateVenue = createAsyncThunk(
   "venues/updateVenue",
-  async ({ backend, venueId, updatedTitle, updatedDescription, startDate, startTime, location, endDate, endTime, capacity }) => {
-    const response = await backend.updateVenue(
-      venueId,
-      [],
-      updatedTitle,
-      updatedDescription,
-      { StartDate: startDate, StartTime: startTime, Location: location, EndDate: endDate, EndTime: endTime },
-      capacity
-    );
-    return response;
+  async ({ backend, venueId, updatedTitle, updatedDescription, eventDetails, capacity, logo, banner }) => {
+      const response = await backend.updateVenue(
+        venueId,
+        [],
+        updatedTitle,
+        updatedDescription,
+        eventDetails,
+        capacity,
+        logo,
+        banner
+      );
+      return response;
   }
 );
+
 
 
 //Create Venue
 export const createVenue = createAsyncThunk(
   "venues/createVenue",
-  async ({
-    backend,
-    collectionArgs,
-    custodian,
-    title,
-    capacity,
-    details,
-    description,
-  }) => {
-    const response = await backend.createVenue(
-      {
-        collection_args: {
-          maxLimit: collectionArgs.maxLimit,
-          logo: collectionArgs.logo,
-          name: collectionArgs.name,
-          banner: collectionArgs.banner,
-          description: collectionArgs.description,
-          created_at: collectionArgs.created_at,
-          collection_type: { Venue: null },
-          symbol: collectionArgs.symbol,
-        },
-        custodian: Principal.fromText(custodian),
-      },
-      title,
-      capacity,
-      details,
-      description
-    );
-    return response;
+  async ({ backend, collectionDetails, title, capacity, details, description }) => {
+    try {
+      const response = await backend.createVenue(collectionDetails, title, capacity, details, description);
+      return response;
+    } catch (error) {
+      throw error;
+    }
   }
 );
 
@@ -169,6 +150,7 @@ const venueSlice = createSlice({
       .addCase(createVenue.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
+        notificationManager.error("Failed to create venue");
       });
   },
 });

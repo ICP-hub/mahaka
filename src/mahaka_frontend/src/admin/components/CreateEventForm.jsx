@@ -8,28 +8,42 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
     const dispatch = useDispatch();
     const { backend } = useSelector((state) => state.auth);
     const { loading, error } = useSelector((state) => state.events);
+    useEffect(() => {
+        console.log('venueId:', venueId);
+        console.log('venueTitle:', venueTitle);
+    }, [venueId, venueTitle]);
+    
     const [eventData, setEventData] = useState({
         title: '',
         collection_args: {
-            description: '',
-            maxLimit: 1000,
-            logo: { data: '', logo_type: '' },
-            name: '',
-            banner: { data: '', logo_type: '' },
-            created_at: 0,
-            collection_type: { Event: null },
-            symbol: '',
+            maxLimit: 0,
+            logo: {
+                data: "",
+                logo_type: ""
+            },
+            name: "",
+            banner: {
+                data: "",
+                logo_type: ""
+            },
+            description: "",
+            created_at: Date.now(),
+            collection_type: "Event",
+            symbol: "",
+            sTicket_price: 0,
+            gTicket_price: 0,
+            vTicket_price: 0,
+            sTicket_limit: 0,
+            gTicket_limit: 0,
+            vTicket_limit: 0
         },
         eventDetails: {
-            StartDate: '',
-            StartTime: '',
-            EndDate: '',
-            EndTime: '',
-            Location: '',
-        },
-        sTicket_limit: 0,
-        gTicket_limit: 0,
-        vTicket_limit: 0,
+            StartDate: "",
+            StartTime: 0,
+            Location: "",
+            EndDate: "",
+            EndTime: 0
+        }
     });
 
     // Refs for Flatpickr
@@ -132,43 +146,67 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
     
     const handleSubmit = (e) => {
         e.preventDefault();
-        const fullVenueId = venueId; 
+        if (!venueId) {
+            console.error("Venue ID is missing");
+            return;
+        }
+        const fullVenueId = venueId;
     
         dispatch(createEvent({
             backend,
             text: fullVenueId, 
             record: {
-                id: venueId,  
+                id: fullVenueId,
+                sTicket_limit: eventData.collection_args.sTicket_limit,
                 Description: eventData.collection_args.description,
-                sTicket_limit: eventData.sTicket_limit,
-                gTicket_limit: eventData.gTicket_limit,
-                vTicket_limit: eventData.vTicket_limit,
+                logo: {
+                    data: eventData.collection_args.logo.data,
+                    logo_type: eventData.collection_args.logo.logo_type
+                },
+                banner: {
+                    data: eventData.collection_args.banner.data,
+                    logo_type: eventData.collection_args.banner.logo_type
+                },
                 Details: {
                     StartDate: eventData.eventDetails.StartDate,
-                    StartTime: eventData.eventDetails.StartTime ? parseInt(eventData.eventDetails.StartTime) : 0,
+                    StartTime: eventData.eventDetails.StartTime.toString(),  // Ensure StartTime is a string
                     Location: eventData.eventDetails.Location,
                     EndDate: eventData.eventDetails.EndDate,
-                    EndTime: eventData.eventDetails.EndTime ? parseInt(eventData.eventDetails.EndTime) : 0,
+                    EndTime: eventData.eventDetails.EndTime.toString() // Ensure EndTime is a string
                 },
-                Title: eventData.title,
+                Title: eventData.collection_args.name,
+                gTicket_limit: eventData.collection_args.gTicket_limit,
+                vTicket_limit: eventData.collection_args.vTicket_limit,
             },
             collection_args: {
             collection_args: {
                 maxLimit: eventData.collection_args.maxLimit,
-                logo: eventData.collection_args.logo,
+                logo: {
+                    data: eventData.collection_args.logo.data,
+                    logo_type: eventData.collection_args.logo.logo_type
+                },
                 name: eventData.collection_args.name,
-                banner: eventData.collection_args.banner,
+                banner: {
+                    data: eventData.collection_args.banner.data,
+                    logo_type: eventData.collection_args.banner.logo_type
+                },
                 description: eventData.collection_args.description,
-                created_at: Date.now(),
+                created_at: eventData.collection_args.created_at,
                 collection_type: { Event: null },
                 symbol: eventData.collection_args.symbol,
+                sTicket_price: eventData.collection_args.sTicket_price,
+                gTicket_price: eventData.collection_args.gTicket_price,
+                vTicket_price: eventData.collection_args.vTicket_price,
+                sTicket_limit: eventData.collection_args.sTicket_limit,
+                gTicket_limit: eventData.collection_args.gTicket_limit,
+                vTicket_limit: eventData.collection_args.vTicket_limit
             }}
-        })).then(() => {
-            setIsModalOpen(false); 
-        }).catch((err) => {
-            console.error("Event creation failed:", err);
+        }))
+        .catch((err) => {
+            console.error(err);
         });
     };
+    
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4 tracking-wider">
