@@ -7,18 +7,28 @@ import { FcAlarmClock, FcCalendar } from 'react-icons/fc';
 const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
     const dispatch = useDispatch();
     const { backend } = useSelector((state) => state.auth);
+  const [bannerPreview, setBannerPreview] = useState("");
     const [venueData, setVenueData] = useState({
-        Title: '',
-        Description: '',
+        Title: venue.Title || '',
+        Description: venue.Description || '',
+        capacity: venue.capacity || '',
         Details: {
-            StartDate: '',
-            EndDate: '',
-            StartTime: '',
-            EndTime: '',
-            Location: '',
+            StartDate: venue.Details?.StartDate || '',
+            EndDate: venue.Details?.EndDate || '',
+            StartTime: venue.Details?.StartTime || '',
+            EndTime: venue.Details?.EndTime || '',
+            Location: venue.Details?.Location || '',
         },
-        capacity: '',
+        logo: {
+            data: "",
+            logo_type: "image"
+          },
+          banner: {
+            data: "",
+            logo_type: "image"
+          },
     });
+
 
     // Refs for Flatpickr
     const startDateRef = useRef(null);
@@ -108,28 +118,54 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
         }));
     };
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const fileType = file.type;
+          const reader = new FileReader();
+    
+          reader.onloadend = () => {
+            setVenueData((prevState) => ({
+              ...prevState,
+              collection_args: {
+                ...prevState.collection_args,
+                banner: {
+                  data: reader.result,
+                  logo_type: fileType,
+                },
+              },
+            }));
+            setBannerPreview(reader.result);
+          };
+    
+          reader.readAsDataURL(file);
+        }
+      };
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        const venueId = venue.id; 
+        const venueId = venue.id;
+
+        const eventDetails = {
+            StartDate: venueData.Details.StartDate,
+            StartTime: venueData.Details.StartTime,
+            EndDate: venueData.Details.EndDate,
+            EndTime: venueData.Details.EndTime,
+            Location: venueData.Details.Location,
+        };
 
         dispatch(updateVenue({
             backend,
             venueId,
             updatedTitle: venueData.Title,
             updatedDescription: venueData.Description,
-            startDate: venueData.Details.StartDate,
-            startTime: parseInt(venueData.Details.StartTime, 10),
-            location: venueData.Details.Location,
-            endDate: venueData.Details.EndDate,
-            endTime: parseInt(venueData.Details.EndTime, 10),
-            capacity: parseInt(venueData.capacity, 10),
-        }))
-        .then(() => {
-            setIsModalOpen(false); // Close modal on success
-        })
-        .catch((err) => {
-            console.error("Error in updating venue", err);
-        });
+            eventDetails,
+            capacity: parseInt(venueData.capacity),
+            logo: venueData.logo,
+            banner: venueData.banner,
+        }));
+
+        setIsModalOpen(false);
     };
 
     return (
@@ -234,6 +270,59 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
                         required
                     />
                 </div>
+            </div>
+
+            <div className="flex space-x-4">
+            <div className="w-1/2 flex flex-col flex-auto gap-1">
+          <label className="font-semibold">Logo</label>
+          <div className="flex flex-col items-center justify-center border-dashed border-2 border-border p-4 rounded">
+            <input
+              type="file"
+              accept=".jpg,.jpeg,.png"
+              className="hidden"
+              id="upload-image"
+              onChange={handleFileChange}
+            />
+            <label
+              htmlFor="upload-image"
+              className="cursor-pointer bg-card text-text py-2 px-4 rounded-md border border-border"
+            >
+              Upload Logo
+            </label>
+            {bannerPreview && (
+              <img
+                src={bannerPreview}
+                alt="Banner Preview"
+                className="mt-2 w-full h-auto rounded"
+              />
+            )}
+          </div>
+        </div>
+            <div className="w-1/2 flex flex-col flex-auto gap-1">
+          <label className="font-semibold">Banner</label>
+          <div className="flex flex-col items-center justify-center border-dashed border-2 border-border p-4 rounded">
+            <input
+              type="file"
+              accept=".jpg,.jpeg,.png"
+              className="hidden"
+              id="upload-image"
+              onChange={handleFileChange}
+            />
+            <label
+              htmlFor="upload-image"
+              className="cursor-pointer bg-card text-text py-2 px-4 rounded-md border border-border"
+            >
+              Upload Banner
+            </label>
+            {bannerPreview && (
+              <img
+                src={bannerPreview}
+                alt="Banner Preview"
+                className="mt-2 w-full h-auto rounded"
+              />
+            )}
+          </div>
+        </div>
             </div>
 
             <div className="flex justify-end space-x-2">
