@@ -8,11 +8,11 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
     const dispatch = useDispatch();
     const { backend } = useSelector((state) => state.auth);
     const { loading, error } = useSelector((state) => state.events);
+
     useEffect(() => {
         console.log('venueId:', venueId);
-        console.log('venueTitle:', venueTitle);
-    }, [venueId, venueTitle]);
-    
+    }, [venueId]);
+
     const [eventData, setEventData] = useState({
         title: '',
         collection_args: {
@@ -30,12 +30,12 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
             created_at: Date.now(),
             collection_type: "Event",
             symbol: "",
-            sTicket_price: 0,
-            gTicket_price: 0,
-            vTicket_price: 0,
-            sTicket_limit: 0,
-            gTicket_limit: 0,
-            vTicket_limit: 0
+            sTicket_price: 25,
+            gTicket_price: 50,
+            vTicket_price: 30,
+            sTicket_limit: 100,
+            gTicket_limit: 200,
+            vTicket_limit: 150
         },
         eventDetails: {
             StartDate: "",
@@ -45,15 +45,12 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
             EndTime: 0
         }
     });
-
-    // Refs for Flatpickr
     const startDateRef = useRef(null);
     const endDateRef = useRef(null);
     const startTimeRef = useRef(null);
     const endTimeRef = useRef(null);
 
     useEffect(() => {
-        // Initialize Flatpickr for dates
         const formatDate = (date) => {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -83,7 +80,6 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
             },
         });
 
-        // Initialize Flatpickr for times
         flatpickr(startTimeRef.current, {
             enableTime: true,
             noCalendar: true,
@@ -143,70 +139,74 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
             reader.readAsDataURL(file);
         }
     };
-    
-    const handleSubmit = (e) => {
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!venueId) {
             console.error("Venue ID is missing");
             return;
         }
         const fullVenueId = venueId;
-    
-        dispatch(createEvent({
-            backend,
-            text: fullVenueId, 
-            record: {
-                id: fullVenueId,
-                sTicket_limit: eventData.collection_args.sTicket_limit,
-                Description: eventData.collection_args.description,
-                logo: {
-                    data: eventData.collection_args.logo.data,
-                    logo_type: eventData.collection_args.logo.logo_type
+
+        try {
+            await dispatch(createEvent({
+                backend,
+                text: fullVenueId,
+                record: {
+                    id: fullVenueId,
+                    sTicket_limit: eventData.collection_args.sTicket_limit,
+                    Description: eventData.collection_args.description,
+                    logo: {
+                        data: eventData.collection_args.logo.data,
+                        logo_type: eventData.collection_args.logo.logo_type
+                    },
+                    banner: {
+                        data: eventData.collection_args.banner.data,
+                        logo_type: eventData.collection_args.banner.logo_type
+                    },
+                    Details: {
+                        StartDate: eventData.eventDetails.StartDate,
+                        StartTime: eventData.eventDetails.StartTime.toString(),
+                        Location: eventData.eventDetails.Location,
+                        EndDate: eventData.eventDetails.EndDate,
+                        EndTime: eventData.eventDetails.EndTime.toString()
+                    },
+                    Title: eventData.title,
+                    gTicket_limit: eventData.collection_args.gTicket_limit,
+                    vTicket_limit: eventData.collection_args.vTicket_limit,
                 },
-                banner: {
-                    data: eventData.collection_args.banner.data,
-                    logo_type: eventData.collection_args.banner.logo_type
-                },
-                Details: {
-                    StartDate: eventData.eventDetails.StartDate,
-                    StartTime: eventData.eventDetails.StartTime.toString(),  // Ensure StartTime is a string
-                    Location: eventData.eventDetails.Location,
-                    EndDate: eventData.eventDetails.EndDate,
-                    EndTime: eventData.eventDetails.EndTime.toString() // Ensure EndTime is a string
-                },
-                Title: eventData.collection_args.name,
-                gTicket_limit: eventData.collection_args.gTicket_limit,
-                vTicket_limit: eventData.collection_args.vTicket_limit,
-            },
-            collection_args: {
-            collection_args: {
-                maxLimit: eventData.collection_args.maxLimit,
-                logo: {
-                    data: eventData.collection_args.logo.data,
-                    logo_type: eventData.collection_args.logo.logo_type
-                },
-                name: eventData.collection_args.name,
-                banner: {
-                    data: eventData.collection_args.banner.data,
-                    logo_type: eventData.collection_args.banner.logo_type
-                },
-                description: eventData.collection_args.description,
-                created_at: eventData.collection_args.created_at,
-                collection_type: { Event: null },
-                symbol: eventData.collection_args.symbol,
-                sTicket_price: eventData.collection_args.sTicket_price,
-                gTicket_price: eventData.collection_args.gTicket_price,
-                vTicket_price: eventData.collection_args.vTicket_price,
-                sTicket_limit: eventData.collection_args.sTicket_limit,
-                gTicket_limit: eventData.collection_args.gTicket_limit,
-                vTicket_limit: eventData.collection_args.vTicket_limit
-            }}
-        }))
-        .catch((err) => {
+                collection_args: {
+                    collection_args: {
+                        maxLimit: eventData.collection_args.maxLimit,
+                        logo: {
+                            data: eventData.collection_args.logo.data,
+                            logo_type: eventData.collection_args.logo.logo_type
+                        },
+                        name: eventData.collection_args.name,
+                        banner: {
+                            data: eventData.collection_args.banner.data,
+                            logo_type: eventData.collection_args.banner.logo_type
+                        },
+                        description: eventData.collection_args.description,
+                        created_at: eventData.collection_args.created_at,
+                        collection_type: { Event: null },
+                        symbol: eventData.collection_args.symbol,
+                        sTicket_price: eventData.collection_args.sTicket_price,
+                        gTicket_price: eventData.collection_args.gTicket_price,
+                        vTicket_price: eventData.collection_args.vTicket_price,
+                        sTicket_limit: eventData.collection_args.sTicket_limit,
+                        gTicket_limit: eventData.collection_args.gTicket_limit,
+                        vTicket_limit: eventData.collection_args.vTicket_limit
+                    }
+                }
+            }));
+
+            setIsModalOpen(false);
+        } catch (err) {
             console.error(err);
-        });
+        }
     };
-    
+
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4 tracking-wider">
@@ -232,6 +232,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
                 <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
                     <textarea
                         name="description"
+                        rows={5}
                         value={eventData.collection_args.description}
                         onChange={handleInputChange}
                         className="my-3 outline-none w-full bg-transparent"
@@ -317,7 +318,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
                         <input
                             type="number"
                             name="gTicket_limit"
-                            value={eventData.gTicket_limit}
+                            value={eventData.collection_args.gTicket_limit}
                             onChange={handleInputChange}
                             className="my-3 outline-none w-full bg-transparent"
                             required
@@ -330,7 +331,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
                         <input
                             type="number"
                             name="sTicket_limit"
-                            value={eventData.sTicket_limit}
+                            value={eventData.collection_args.sTicket_limit}
                             onChange={handleInputChange}
                             className="my-3 outline-none w-full bg-transparent"
                             required
@@ -343,7 +344,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
                         <input
                             type="number"
                             name="vTicket_limit"
-                            value={eventData.vTicket_limit}
+                            value={eventData.collection_args.vTicket_limit}
                             onChange={handleInputChange}
                             className="my-3 outline-none w-full bg-transparent"
                             required
@@ -383,8 +384,8 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
                     Cancel
                 </button>
                 <button
-                    type="submit"
-                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                    className={`text-white py-2 px-4 rounded ${loading ? "bg-gray-400" : "bg-secondary"
+                        }`}
                     disabled={loading}
                 >
                     {loading ? 'Creating Event...' : 'Create Event'}
