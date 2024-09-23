@@ -2,6 +2,7 @@ import { Navigate } from "react-router-dom";
 import AdminLayout from "../admin/layout/AdminLayout";
 import AdminDashboard from "../admin/pages/Dashboard";
 import EventManager from "../admin/pages/EventManager";
+import MemberManager from "../admin/pages/MemberManager";
 import VenueManger from "../admin/pages/VenueManager";
 import VenueDetailPage from "../admin/pages/VenueDetail";
 
@@ -20,6 +21,8 @@ export const adminRoutes = [
         path: "venues/venue/:title/:id",
         element: <VenueDetailPage />,
       },
+      { path: "members", element: <MemberManager /> },
+
     ],
   },
 ];
