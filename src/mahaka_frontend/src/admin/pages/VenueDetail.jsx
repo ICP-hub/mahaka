@@ -2,24 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getVenue } from '../../redux/reducers/apiReducers/venueApiReducer';
+import { getAllEventsByVenue } from '../../redux/reducers/apiReducers/eventApiReducer';
 import { formatDate } from '../../common/utils/dateFormater';
 import VenueDemoImg from "@/assets/images/Frame10.png";
 import ModalOverlay from "../../customer/Components/Modal-overlay";
 import UpdateVenueForm from "../components/UpdateVenueForm";
 import CreateEventForm from '../components/CreateEventForm';
 
-const formatTime = (time) => {
-  if (typeof time === 'bigint') {
-    time = Number(time);
-  }
-  if (typeof time === 'number') {
-    const hours = Math.floor(time / 60);
-    const minutes = time % 60;
-    const period = hours >= 12 ? 'PM' : 'AM';
-    const formattedHours = ((hours + 11) % 12 + 1);
-    return `${formattedHours}:${minutes.toString().padStart(2, '0')} ${period}`;
-  }
-  return time;
+const FormatTime = (timeString) => {
+  const time = parseInt(timeString, 10);
+  const hours = Math.floor(time / 100);
+  const minutes = time % 100;
+  const period = hours >= 12 ? 'PM' : 'AM';
+  const formattedHours = hours % 12 || 12; 
+  return `${formattedHours}:${minutes.toString().padStart(2, '0')} ${period}`;
 };
 
 const VenueDetailPage = () => {
@@ -27,12 +23,13 @@ const VenueDetailPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { currentVenue, loading, error } = useSelector((state) => state.venues);
+  const {events} = useSelector((state)=>state.events);
   const { backend } = useSelector((state) => state.auth);
   const [localError, setLocalError] = useState(null);
 
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);  // New state for event modal
-
+console.log(events);
   useEffect(() => {
     if (!id) {
       setLocalError("Venue ID is missing from the URL");
@@ -49,7 +46,23 @@ const VenueDetailPage = () => {
       .catch((err) => {
         setLocalError(err.message || "Failed to fetch venue details");
       });
+
+      dispatch(getAllEventsByVenue({ backend, chunkSize: 100, pageNo: 0, venueId: id }))
+    .unwrap()
+    .then((events) => {
+      if (events.length === 0) {
+        console.log("No events found for the venue.");
+      }
+    })
+    .catch((err) => {
+      if (err.message === "No event found in the venue") {
+        console.log("No events found for this venue.");
+      } else {
+        setLocalError(err.message || "Failed to fetch events for the venue");
+      }
+    });
   }, [dispatch, id, backend]);
+  
 
   if (loading) {
     return (
@@ -59,20 +72,20 @@ const VenueDetailPage = () => {
     );
   }
 
-  if (error || localError) {
-    return (
-      <div className="p-6">
-        <h1 className="text-2xl font-bold mb-4">Error</h1>
-        <p>{error || localError}</p>
-        <button
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          onClick={() => navigate('/admin/venues')}
-        >
-          Back to Venues List
-        </button>
-      </div>
-    );
-  }
+  // if (error || localError) {
+  //   return (
+  //     <div className="p-6">
+  //       <h1 className="text-2xl font-bold mb-4">Error</h1>
+  //       <p>{error || localError}</p>
+  //       <button
+  //         className="mt-4 px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-800"
+  //         onClick={() => navigate('/admin/venues')}
+  //       >
+  //         Back to Venues List
+  //       </button>
+  //     </div>
+  //   );
+  // }
 
   const venue = currentVenue && Array.isArray(currentVenue) ? currentVenue[1] : null;
 
@@ -107,7 +120,7 @@ const VenueDetailPage = () => {
               </p>
             </div>
             <div className="mb-2 leading-relaxed">
-              <p className="text-lg"><strong>🕒 </strong>{formatTime(venue.Details.StartTime)} - {formatTime(venue.Details.EndTime)}</p>
+              <p className="text-lg"><strong>🕒 </strong>{FormatTime(venue.Details.StartTime)} - {FormatTime(venue.Details.EndTime)}</p>
             </div>
             <div className="mb-2 leading-relaxed">
               <p className="text-lg"><strong>Location:</strong> {venue.Details.Location}</p>
@@ -137,24 +150,36 @@ const VenueDetailPage = () => {
         </div>
 
         <div className="mb-6">
-          <h2 className="text-xl font-semibold mb-2">Events</h2>
-          {venue.Events && venue.Events.length > 0 ? (
-            <ul>
-              {venue.Events.map((event, index) => (
-                <li key={index} className="hover:underline">{event.Title}</li>
-              ))}
-            </ul>
-          ) : (
-            <div>
-              <button
+      <h2 className="text-xl font-semibold mb-2">Events</h2>
+      {events.length > 0 ? (
+  <div>
+    {events.map((event) => (
+            <div key={event.id} className="border border-gray-300 p-4 mb-4 rounded">
+              <h3 className="text-lg font-semibold">{event.Title}</h3>
+              <p>
+                <strong>📅</strong> {formatDate(event.Details.StartDate)} - {formatDate(event.Details.EndDate)}
+              </p>
+              <p>
+                <strong>🕒</strong> {FormatTime(event.Details.StartTime)} - {FormatTime(event.Details.EndTime)}
+              </p>
+              <p><strong>Location:</strong> {event.Details.Location}</p>
+              <p><strong>Description:</strong> {event.Description}</p>
+            </div>
+          ))}
+          </div>
+        ) : (
+          <div>
+            <p>No events available for this venue.</p>
+          </div>
+        )}
+      <button
                 className="px-4 py-2 bg-indigo-700 text-white rounded hover:bg-indigo-800"
                 onClick={() => setIsEventModalOpen(true)}
               >
                 Create Event
               </button>
-            </div>
-          )}
-        </div>
+    </div>
+  </div>
 
         {/* Modal for updating the venue */}
         {isUpdateModalOpen && (
@@ -183,7 +208,7 @@ const VenueDetailPage = () => {
   </ModalOverlay>
 )}
 
-      </div>
+      
     </>
   );
 };
