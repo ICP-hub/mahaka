@@ -46,7 +46,7 @@ const VenueTableFormat = () => {
               <VenueTableLoader />
               <VenueTableLoader />
             </>
-          ) : !loading && venues.length > 0 ? (
+          ) : !loading && venues && venues.length > 0 ? (
             <motion.div
               variants={staggerContainer}
               initial="hidden"
@@ -57,8 +57,8 @@ const VenueTableFormat = () => {
                   <VenueTableData
                     key={index}
                     venue={venue}
-                  // isExpanded={expandedVenue === index}
-                  // onToggleDetail={() => handleToggleDetail(index)}
+                    // isExpanded={expandedVenue === index}
+                    // onToggleDetail={() => handleToggleDetail(index)}
                   />
                 </motion.div>
               ))}
@@ -103,12 +103,14 @@ const VenueTableData = ({ venue }) => {
         <div className="hidden lg:block">Time</div>
         <div className="truncate">{venue.Details.Location}</div>
         <Link
-          to={`/admin/venues/venue/${encodeURIComponent(venue.Title)}/${encodeURIComponent(venue.id)}`}
+          to={`/admin/venues/venue/${encodeURIComponent(
+            venue.Title
+          )}/${encodeURIComponent(venue.id)}`}
           className="flex w-full items-center justify-center"
         >
           <HiOutlineDotsHorizontal
             size={24}
-          // className={`${isExpanded ? "text-secondary" : "text-icon"}`}
+            // className={`${isExpanded ? "text-secondary" : "text-icon"}`}
           />
         </Link>
       </div>

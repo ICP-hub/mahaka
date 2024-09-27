@@ -7,17 +7,20 @@ import { getUserDetailsByCaller } from "../../redux/reducers/apiReducers/userApi
 import useLogin from "../../common/hooks/useLogin";
 import ProfileDemoImg from "../../assets/images/profile-demo.png";
 import { Link } from "react-router-dom";
+import {
+  NFIDLogin,
+  NFIDLogout,
+} from "../../redux/reducers/auth/authenticationReducer";
 
 const NavLinks = [
-  { title: "ABOUT MAHAKA" },
-  { title: "SIGN IN" },
-  { title: "SIGN UP" },
-  { title: "CREATE EVENT" },
+  { title: "HOME", url: "/" },
+  { title: "ABOUT MAHAKA", url: "/about-us" },
+  { title: "SERVICES", url: "/our-services" },
+  { title: "CONTACT US", url: "/contact-us" },
 ];
 
 export default function Header() {
   const [isNavOpen, setIsNavOpen] = useState(false);
-
   const toggleNavigation = () => setIsNavOpen((prev) => !prev);
 
   // Effect if sidenav open overflow hidden
@@ -30,14 +33,14 @@ export default function Header() {
           <SearchBox />
           <div className="flex items-center gap-8">
             <NavHorizontal />
-            <ConnectWalletBtn />
+            <ConnectWalletBtn onNavOpen={setIsNavOpen} />
           </div>
         </div>
         <button className="md:hidden" onClick={toggleNavigation}>
           <HiMiniBars3 size={24} />
         </button>
       </div>
-      <NavVertical isNavOpen={isNavOpen} />
+      <NavVertical isNavOpen={isNavOpen} onNavOpen={setIsNavOpen} />
     </>
   );
 }
@@ -90,30 +93,32 @@ const NavHorizontal = () => {
     <nav className="flex items-center gap-12 font-medium">
       {NavLinks.map((link, index) => (
         // Replace button with Link later
-        <motion.button
-          key={index}
-          initial="initial"
-          whileHover="hover"
-          className="min-w-max"
-        >
-          <h4>{link.title}</h4>
-          <div className="flex">
-            <motion.div
-              variants={swipeRight}
-              className="h-px w-full bg-white"
-            ></motion.div>
-            <motion.div
-              variants={swipeLeft}
-              className="h-px w-full"
-            ></motion.div>
-          </div>
-        </motion.button>
+        <Link to={link.url}>
+          <motion.div
+            key={index}
+            initial="initial"
+            whileHover="hover"
+            className="min-w-max"
+          >
+            <h4>{link.title}</h4>
+            <div className="flex">
+              <motion.div
+                variants={swipeRight}
+                className="h-px w-full bg-white"
+              ></motion.div>
+              <motion.div
+                variants={swipeLeft}
+                className="h-px w-full"
+              ></motion.div>
+            </div>
+          </motion.div>
+        </Link>
       ))}
     </nav>
   );
 };
 
-const NavVertical = ({ isNavOpen }) => {
+const NavVertical = ({ isNavOpen, onNavOpen }) => {
   return (
     <AnimatePresence>
       {isNavOpen && (
@@ -126,16 +131,18 @@ const NavVertical = ({ isNavOpen }) => {
         >
           {NavLinks.map((link, index) => (
             // Replace to links
-            <button
+            <Link
+              to={link.url}
               key={index}
+              onClick={() => onNavOpen(false)}
               className="flex px-2 py-4 font-medium rounded-md w-full"
             >
               {link.title}
-            </button>
+            </Link>
           ))}
 
           <span className="flex w-full my-6">
-            <ConnectWalletBtn />
+            <ConnectWalletBtn onNavOpen={onNavOpen} />
           </span>
         </motion.nav>
       )}
@@ -143,14 +150,18 @@ const NavVertical = ({ isNavOpen }) => {
   );
 };
 
-const ConnectWalletBtn = () => {
-  const { isConnected } = useSelector((state) => state.auth);
-  const { loginWithPlug } = useLogin();
+const ConnectWalletBtn = ({ onNavOpen }) => {
+  const { isConnected, NFIDInstance } = useSelector(
+    (state) => state.authentication
+  );
+  const dispatch = useDispatch();
+  // const { loginWithPlug } = useLogin();
 
   if (isConnected)
     return (
       <Link
         to="/user-profile"
+        onClick={() => onNavOpen(false)}
         className="p-2 rounded-full border-2 border-secondary"
       >
         <img
@@ -164,7 +175,7 @@ const ConnectWalletBtn = () => {
   return (
     <button
       className="p-4 bg-secondary text-white font-medium rounded-lg hover:bg-orange-600 min-w-max"
-      onClick={loginWithPlug}
+      onClick={() => dispatch(NFIDLogin(NFIDInstance))}
     >
       Connect Wallet
     </button>

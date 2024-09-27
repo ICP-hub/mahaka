@@ -1,6 +1,8 @@
 import ProfileDemoPng from "@/assets/images/profile-demo.png";
+import { useSelector } from "react-redux";
 
 const ProfileSection = () => {
+  const { principal } = useSelector((state) => state.authentication);
   return (
     <div className="flex w-full flex-col items-center p-4">
       <div className="relative h-24 w-24">
@@ -15,7 +17,7 @@ const ProfileSection = () => {
           Admin Name
         </div>
         <div className="text-secondaryText mt-0.5 w-full overflow-hidden text-ellipsis whitespace-nowrap text-center text-md font-medium leading-normal">
-          uktss-xp5gu-uwif5-hfpwu-rujms-foroa-4zdkd-ofspf-uqqre-wxqyj-cqe
+          {principal}
         </div>
       </div>
     </div>

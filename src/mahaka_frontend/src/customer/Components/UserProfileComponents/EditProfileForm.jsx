@@ -4,7 +4,7 @@ import { updateUser } from "../../../redux/reducers/apiReducers/userApiReducer";
 
 function EditProfileForm({ setIsModalOpen }) {
   const dispatch = useDispatch();
-  const { backend } = useSelector((state) => state.auth);
+  const { backend } = useSelector((state) => state.authentication);
   const { currentUser, userLoading } = useSelector((state) => state.users);
 
   const [firstName, setFirstName] = useState("");
