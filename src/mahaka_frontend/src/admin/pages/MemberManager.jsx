@@ -1,24 +1,43 @@
-import React, { useState } from 'react';
-import { MdPerson  , MdAddCircleOutline ,MdDelete} from "react-icons/md";
-
+import React, { useState } from "react";
+import { MdPerson, MdAddCircleOutline, MdDelete } from "react-icons/md";
+import ProfileDummy from "@/assets/images/profile-demo.png";
+import { CiEdit } from "react-icons/ci";
 
 const MemberManager = () => {
   const [members, setMembers] = useState([
-    { id: 1, name: 'Aarav Sharma', email: 'aaravsharma@gmail.com', role: 'Admin' },
-    { id: 2, name: 'Aditya Kapoor', email: 'adityakapoor@gmail.com', role: 'Admin' },
+    {
+      id: 1,
+      name: "Aarav Sharma",
+      email: "aaravsharma@gmail.com",
+      role: "Admin",
+    },
+    {
+      id: 2,
+      name: "Aditya Kapoor",
+      email: "adityakapoor@gmail.com",
+      role: "Admin",
+    },
   ]);
 
-  const [newMemberEmail, setNewMemberEmail] = useState('');
+  const [newMemberEmail, setNewMemberEmail] = useState("");
 
   const handleAddMember = () => {
     if (newMemberEmail) {
-      setMembers([...members, { id: members.length + 1, name: 'New Member', email: newMemberEmail, role: 'Read' }]);
-      setNewMemberEmail('');
+      setMembers([
+        ...members,
+        {
+          id: members.length + 1,
+          name: "New Member",
+          email: newMemberEmail,
+          role: "Read",
+        },
+      ]);
+      setNewMemberEmail("");
     }
   };
 
   const handleDeleteMember = (id) => {
-    setMembers(members.filter(member => member.id !== id));
+    setMembers(members.filter((member) => member.id !== id));
   };
 
   return (
@@ -42,7 +61,38 @@ const MemberManager = () => {
           </button>
         </div>
       </div>
-      <ul>
+      <div className="flex flex-col space-y-2">
+        {members.map((member, index) => (
+          <div
+            className="flex flex-col py-6 sm:flex-row sm:items-center bg-card px-4 md:px-6 rounded"
+            key={index}
+          >
+            <div className="flex items-center">
+              <div className="flex h-10 w-10 flex-0 items-center justify-center overflow-hidden rounded-full">
+                <img
+                  src={ProfileDummy}
+                  alt="user_avatar"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <div className="ml-4">
+                <div className="font-medium">{member.name}</div>
+                <div>{member.email}</div>
+              </div>
+            </div>
+            <div className="mt-4 flex items-center sm:ml-auto sm:mt-0">
+              <div className="order-2 ml-4 sm:order-1 sm:ml-0 flex space-x-1 px-4 py-2 bg-secondary rounded text-white">
+                <span>Role :</span>
+                <p>{member.role}</p>
+              </div>
+              <div className="order-1 sm:order-2 sm:ml-3">
+                <CiEdit size={24} />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      {/* <ul>
         {members.map((member) => (
           <li key={member.id} className="flex bg-card text-text items-center justify-between py-2 m-3 border-b border-gray-300">
             <div className="flex items-center">
@@ -73,7 +123,7 @@ const MemberManager = () => {
             </div>
           </li>
         ))}
-      </ul>
+      </ul> */}
     </div>
   );
 };
