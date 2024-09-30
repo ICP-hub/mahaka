@@ -9,11 +9,11 @@ const UserProfileData = () => {
   const dispatch = useDispatch();
   const logoutAndRedirect = useLogout();
   const { currentUser, userLoading } = useSelector((state) => state.users);
-  const { backend, principal } = useSelector((state) => state.auth);
+  const { backend, principal } = useSelector((state) => state.authentication);
 
   useEffect(() => {
     dispatch(getUserDetailsByCaller({ backend: backend }));
-  }, []);
+  }, [backend]);
 
   if (userLoading) return <ProfileDataLoader />;
   return (

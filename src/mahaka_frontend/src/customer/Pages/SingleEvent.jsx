@@ -2,9 +2,9 @@ import Frame13 from "../../assets/images/Frame13.png";
 import Frame15 from "../../assets/images/Frame15.png";
 import fram2 from "../../assets/images/fram2.png";
 import Ticket from "../../customer/Components/Ticket";
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { getVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
 import { getAllEventsByVenue } from "../../redux/reducers/apiReducers/eventApiReducer";
@@ -69,7 +69,7 @@ const calculateDuration = (StartDate, EndDate) => {
   const end = new Date(EndDate);
   const durationMs = end - start;
   const days = Math.floor(durationMs / (1000 * 60 * 60 * 24));
-  
+
   if (days === 0) return "1 day";
   if (days === 1) return "2 days";
   return `${days + 1} days`;
@@ -86,14 +86,22 @@ export default function SingleEvent() {
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   };
-  const { id } = useParams(); 
-const venueId = `${decodeURIComponent(id)}${window.location.hash}`; 
-console.log(venueId); 
+  const { id } = useParams();
+  const venueId = `${decodeURIComponent(id)}${window.location.hash}`;
+  console.log(venueId);
 
   const dispatch = useDispatch();
-  const { currentVenue, loading: venueLoading,  error: venueError } = useSelector((state) => state.venues);
-  const {events , loading: eventLoading,  error: eventError} = useSelector((state)=>state.events);
-  const { backend } = useSelector((state) => state.auth);
+  const {
+    currentVenue,
+    loading: venueLoading,
+    error: venueError,
+  } = useSelector((state) => state.venues);
+  const {
+    events,
+    loading: eventLoading,
+    error: eventError,
+  } = useSelector((state) => state.events);
+  const { backend } = useSelector((state) => state.authentication);
   const [localError, setLocalError] = useState(null);
 
   useEffect(() => {
@@ -106,7 +114,6 @@ console.log(venueId);
       setLocalError("Backend is not initialized");
       return;
     }
-    
 
     dispatch(getVenue({ backend, venueId }))
       .unwrap()
@@ -114,39 +121,44 @@ console.log(venueId);
         setLocalError(err.message || "Failed to fetch venue details");
       });
 
-      dispatch(getAllEventsByVenue({ backend, chunkSize: 100, pageNo: 0, venueId }))
-  .unwrap()
-  .catch((err) => {
-    setLocalError(err.message || "Failed to fetch events for the venue");
-  });
+    dispatch(
+      getAllEventsByVenue({ backend, chunkSize: 100, pageNo: 0, venueId })
+    )
+      .unwrap()
+      .catch((err) => {
+        setLocalError(err.message || "Failed to fetch events for the venue");
+      });
   }, [dispatch, venueId, backend]);
 
- 
   // Assuming the first event is the main event for this venue
   const currentEvent = events[0];
   const otherEvents = events.slice(1);
 
-  const duration = currentEvent?.Details.StartDate && currentEvent?.Details.EndDate
-    ? calculateDuration(currentEvent.Details.StartDate, currentEvent.Details.EndDate)
-    : '';
+  const duration =
+    currentEvent?.Details.StartDate && currentEvent?.Details.EndDate
+      ? calculateDuration(
+          currentEvent.Details.StartDate,
+          currentEvent.Details.EndDate
+        )
+      : "";
 
-    const formatDate = (dateString) => {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      });
-    };
-    
-    const formatTime = (timeString) => {
-      const time = parseInt(timeString, 10);
-      const hours = Math.floor(time / 100);
-      const minutes = time % 100;
-      const period = hours >= 12 ? 'PM' : 'AM';
-      const formattedHours = hours % 12 || 12; 
-      return `${formattedHours}:${minutes.toString().padStart(2, '0')} ${period}`;
-    };
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
+  const formatTime = (timeString) => {
+    const time = parseInt(timeString, 10);
+    const hours = Math.floor(time / 100);
+    const minutes = time % 100;
+    const period = hours >= 12 ? "PM" : "AM";
+    const formattedHours = hours % 12 || 12;
+    return `${formattedHours}:${minutes.toString().padStart(2, "0")} ${period}`;
+  };
 
   return (
     <>
@@ -175,14 +187,16 @@ console.log(venueId);
       </div>
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-black pb-10">{currentEvent?.Title || 'Event Name'}</h1>
+          <h1 className="text-4xl font-black pb-10">
+            {currentEvent?.Title || "Event Name"}
+          </h1>
           <div className="flex flex-col lg:flex-row gap-8">
             {/* left side section  */}
             <div className="lg:w-2/3 ">
               <div className="w-full  rounded-2xl">
                 <img
-                   src={currentEvent?.imageUrl || Frame13}
-                   alt={currentEvent?.title || 'Event'}
+                  src={currentEvent?.imageUrl || Frame13}
+                  alt={currentEvent?.title || "Event"}
                   className="object-cover h-full"
                 />
               </div>
@@ -281,13 +295,19 @@ console.log(venueId);
                       <div className="p-6 font-sans">
                         <ul className="list-disc list-inside mb-4">
                           <li>
-                            <strong>Duration:</strong>{duration || '1 Day'} (approx.) 
+                            <strong>Duration:</strong>
+                            {duration || "1 Day"} (approx.)
                           </li>
                           <li>
-                            <strong>Location:</strong> {currentEvent?.Details.Location || 'Indonesia'}
+                            <strong>Location:</strong>{" "}
+                            {currentEvent?.Details.Location || "Indonesia"}
                           </li>
                           <li>
-                            <strong>Last Entry:</strong>  {currentEvent?.Details.EndTime && formatTime(currentEvent.Details.EndTime || '4:00 PM')}
+                            <strong>Last Entry:</strong>{" "}
+                            {currentEvent?.Details.EndTime &&
+                              formatTime(
+                                currentEvent.Details.EndTime || "4:00 PM"
+                              )}
                           </li>
                         </ul>
                         <p className="mb-4">
@@ -351,15 +371,34 @@ console.log(venueId);
             <div className="lg:w-1/3 h-[340px] w-full shadow-lg rounded-lg sticky top-0">
               <div className="p-8">
                 <h1 className="text-2xl font-black">Event Details</h1>
-                <h3 className="text-lg font-normal"> {currentEvent?.Details.StartDate && formatDate(currentEvent.Details.StartDate)} - 
-                 {currentEvent?.Details.EndDate && formatDate(currentEvent.Details.EndDate) ||'13 Jul- 17 Jul 2024'}</h3>
-                <h3 className="text-lg font-normal">{currentEvent?.Details.StartTime && formatTime(currentEvent.Details.StartTime)} - 
-                 {currentEvent?.Details.EndTime && formatTime(currentEvent.Details.EndTime) ||'12:00AM - 3:00PM'}</h3>
-                <h3 className="text-lg font-normal">Location of the Event - {currentEvent?.Details.Location }</h3>
+                <h3 className="text-lg font-normal">
+                  {" "}
+                  {currentEvent?.Details.StartDate &&
+                    formatDate(currentEvent.Details.StartDate)}{" "}
+                  -
+                  {(currentEvent?.Details.EndDate &&
+                    formatDate(currentEvent.Details.EndDate)) ||
+                    "13 Jul- 17 Jul 2024"}
+                </h3>
+                <h3 className="text-lg font-normal">
+                  {currentEvent?.Details.StartTime &&
+                    formatTime(currentEvent.Details.StartTime)}{" "}
+                  -
+                  {(currentEvent?.Details.EndTime &&
+                    formatTime(currentEvent.Details.EndTime)) ||
+                    "12:00AM - 3:00PM"}
+                </h3>
+                <h3 className="text-lg font-normal">
+                  Location of the Event - {currentEvent?.Details.Location}
+                </h3>
               </div>
               <h2 className="text-2xl font-normal pl-8">
                 Event ends on :{" "}
-                <span className="text-red-600">{currentEvent?.Details.EndDate && formatDate(currentEvent.Details.EndDate) || '17 July, 2024'}</span>
+                <span className="text-red-600">
+                  {(currentEvent?.Details.EndDate &&
+                    formatDate(currentEvent.Details.EndDate)) ||
+                    "17 July, 2024"}
+                </span>
               </h2>
             </div>
           </div>

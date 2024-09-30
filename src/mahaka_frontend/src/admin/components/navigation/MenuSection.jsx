@@ -1,4 +1,9 @@
-import { MdEventNote, MdInsertChartOutlined, MdMap , MdPerson } from "react-icons/md";
+import {
+  MdEventNote,
+  MdInsertChartOutlined,
+  MdMap,
+  MdPerson,
+} from "react-icons/md";
 import { Link, useLocation } from "react-router-dom";
 
 const MenuSection = () => {

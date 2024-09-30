@@ -9,6 +9,7 @@ const initialState = {
   error: null,
   currentPage: 1,
   totalPages: 1,
+  createEventLoader: false,
 };
 
 // creating an event
@@ -25,7 +26,11 @@ export const getAllEventsByVenue = createAsyncThunk(
   "events/getAllEventsByVenue",
   async ({ backend, chunkSize, pageNo, venueId }) => {
     try {
-      const response = await backend.getallEventsbyVenue(chunkSize, pageNo, venueId );
+      const response = await backend.getallEventsbyVenue(
+        chunkSize,
+        pageNo,
+        venueId
+      );
       console.log("Events fetched:", response);
       return response;
     } catch (error) {
@@ -34,7 +39,6 @@ export const getAllEventsByVenue = createAsyncThunk(
     }
   }
 );
-
 
 // Create slice
 const eventSlice = createSlice({
@@ -45,16 +49,16 @@ const eventSlice = createSlice({
     builder
       // Handle createEvent
       .addCase(createEvent.pending, (state) => {
-        state.eventsLoading = true;
+        state.createEventLoader = true;
       })
       .addCase(createEvent.fulfilled, (state, action) => {
-        state.eventsLoading = false;
+        state.createEventLoader = false;
         state.events = [...state.events, action.payload];
         state.error = null;
         notificationManager.success("Event created successfully");
       })
       .addCase(createEvent.rejected, (state, action) => {
-        state.eventsLoading = false;
+        state.createEventLoader = false;
         state.error = action.error.message;
       })
 
@@ -69,7 +73,6 @@ const eventSlice = createSlice({
           state.events = [...state.events, ...action.payload.data];
         } else {
           state.events = action.payload.data;
-      
         }
         state.currentPage = action.payload.current_page;
         state.totalPages = action.payload.Total_pages;

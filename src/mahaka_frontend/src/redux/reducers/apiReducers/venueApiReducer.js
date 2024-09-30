@@ -8,14 +8,19 @@ const initialState = {
   currentVenue: null,
   loading: true,
   error: null,
+  createVenueLoader: false,
 };
 
 // async operations
 export const getAllVenues = createAsyncThunk(
   "venues/getAllVenues",
   async ({ backend, pageLimit, currPage }) => {
+    // try {
     const response = await backend.getAllVenues(pageLimit, currPage);
     return response.data;
+    // } catch (err) {
+    //   console.error("Error fetching all venues ", err);
+    // }
   }
 );
 
@@ -37,10 +42,21 @@ export const deleteVenue = createAsyncThunk(
   }
 );
 
-// UpdateVenue 
+// UpdateVenue
 export const updateVenue = createAsyncThunk(
   "venues/updateVenue",
-  async ({ backend, venueId, updatedTitle, updatedDescription, eventDetails, capacity, logo, banner }) => {
+  async ({
+    backend,
+    venueId,
+    updatedTitle,
+    updatedDescription,
+    eventDetails,
+    capacity,
+    logo,
+    banner,
+    action,
+  }) => {
+    try {
       const response = await backend.updateVenue(
         venueId,
         [],
@@ -51,18 +67,35 @@ export const updateVenue = createAsyncThunk(
         logo,
         banner
       );
+      action(false);
       return response;
+    } catch (err) {
+      console.error("Error while updating venue", err);
+    }
   }
 );
-
-
 
 //Create Venue
 export const createVenue = createAsyncThunk(
   "venues/createVenue",
-  async ({ backend, collectionDetails, title, capacity, details, description }) => {
+  async ({
+    backend,
+    collectionDetails,
+    title,
+    capacity,
+    details,
+    description,
+    action,
+  }) => {
     try {
-      const response = await backend.createVenue(collectionDetails, title, capacity, details, description);
+      const response = await backend.createVenue(
+        collectionDetails,
+        title,
+        capacity,
+        details,
+        description
+      );
+      action(false);
       return response;
     } catch (error) {
       throw error;
@@ -118,10 +151,10 @@ const venueSlice = createSlice({
 
       // Fix later : create and update
       .addCase(updateVenue.pending, (state) => {
-        state.loading = true;
+        state.createVenueLoader = true;
       })
       .addCase(updateVenue.fulfilled, (state, action) => {
-        state.loading = false;
+        state.createVenueLoader = false;
         const updatedVenue = action.payload;
         state.venues = state.venues.map((venue) =>
           venue.id === updatedVenue.id ? updatedVenue : venue
@@ -133,22 +166,22 @@ const venueSlice = createSlice({
         notificationManager.success("Venue updated successfully");
       })
       .addCase(updateVenue.rejected, (state, action) => {
-        state.loading = false;
+        state.createVenueLoader = false;
         state.error = action.error.message;
         notificationManager.error("Failed to update venue");
       })
       .addCase(createVenue.pending, (state) => {
-        state.loading = true;
+        state.createVenueLoader = true;
         state.error = null;
       })
       .addCase(createVenue.fulfilled, (state, action) => {
-        state.loading = false;
+        state.createVenueLoader = false;
         state.venues.push(action.payload[1]);
         state.error = null;
         notificationManager.success("Venue created successfully");
       })
       .addCase(createVenue.rejected, (state, action) => {
-        state.loading = false;
+        state.createVenueLoader = false;
         state.error = action.error.message;
         notificationManager.error("Failed to create venue");
       });
