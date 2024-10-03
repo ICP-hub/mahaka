@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect , useState } from "react";
 import { RouterProvider } from "react-router-dom";
 import appRoutes from "./routes/app.routing";
 import { useDispatch, useSelector } from "react-redux";
@@ -217,6 +217,79 @@ function App() {
   //     }
   //   };
 
+  //buy tickets
+  // const [ticketType, setTicketType] = useState("SinglePass");
+  // const [price, setPrice] = useState(100);
+  // const buyEventTicketHandler = async () => {
+  //   try {
+  //     const venueId = "Aarchi Jain#by6od-j4aaa-aaaaa-qaadq-cai";
+  //     const eventId = "new event#avqkn-guaaa-aaaaa-qaaea-cai";
+  //     const ticketTypeVariant = { [ticketType]: null };
+  //     const record = [
+  //       {
+  //         data: new Uint8Array([1, 2, 3]),
+  //         description: "Ticket metadata",
+  //         key_val_data: [
+  //           {
+  //             key: "eventName",
+  //             val: { TextContent: "Amazing Concert" }
+  //           },
+  //           {
+  //             key: "date",
+  //             val: { TextContent: "2024-12-31" }
+  //           }
+  //         ],
+  //         purpose: { Rendered: null }
+  //       }
+  //     ];
+
+  //     const response = await backend.buyEventTicket(
+  //       venueId,
+  //       eventId,
+  //       { ticket_type: ticketTypeVariant, price: price },
+  //       record
+  //     );
+
+  //     console.log("Event ticket purchased successfully:", response);
+  //         } catch (err) {
+  //           console.error("Error in buying event tickets:", err);
+  //         }
+  //       };
+
+ 
+  //       const buyVenueTicketHandler = async () => {
+  //         try {
+  //           const venueId = "Aarchi Jain#by6od-j4aaa-aaaaa-qaadq-cai";
+  //           const ticketTypeVariant = { [ticketType]: null };
+  //           const record = [
+  //             {
+  //               data: new Uint8Array([4, 5, 6]), 
+  //               description: "Venue ticket metadata",
+  //               key_val_data: [
+  //                 {
+  //                   key: "venueName",
+  //                   val: { TextContent: "Awesome Stadium" }
+  //                 },
+  //                 {
+  //                   key: "validUntil",
+  //                   val: { TextContent: "2024-12-31" }
+  //                 }
+  //               ],
+  //               purpose: { Rendered: null }
+  //             }
+  //           ];
+      
+  //           const response = await backend.buyVenueTicket(
+  //             venueId,
+  //             { ticket_type: ticketTypeVariant, price: price },
+  //             record
+  //           );
+  //           console.log("Venue ticket purchased successfully:", response);
+  //         } catch (err) {
+  //           console.error("Error in buying venue tickets:", err);
+  //         }
+  //       };
+      
   return (
     <div className="light bg-background">
       {/* <button className="px-2 py-1 border rounded mr-2" onClick={updateVenueHandler}>
@@ -228,6 +301,34 @@ function App() {
       <button className="px-2 py-1 border rounded" onClick={createVenueHandler}>
       Create Venue
     </button> */}
+
+
+     {/* <div className="p-4">
+        <select 
+          value={ticketType} 
+          onChange={(e) => setTicketType(e.target.value)} 
+          className="px-2 py-1 border rounded mr-2"
+        >
+          <option value="SinglePass">Single Pass</option>
+          <option value="GroupPass">Group Pass</option>
+          <option value="VipPass">VIP Pass</option>
+        </select>
+        <input 
+          type="number" 
+          value={price} 
+          onChange={(e) => setPrice(Number(e.target.value))} 
+          placeholder="Price" 
+          className="px-2 py-1 border rounded mr-2"
+        />
+        <button className="px-2 py-1 border rounded mr-2" onClick={buyEventTicketHandler}>
+          Buy Event Ticket
+        </button>
+        <button className="px-2 py-1 border rounded" onClick={buyVenueTicketHandler}>
+          Buy Venue Ticket
+        </button>
+      </div> */}
+
+
       {/* <div className="p-4">
       <div className="bg-foreground p-4 rounded-2xl">I am {theme} theme.</div>
       <button
