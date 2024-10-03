@@ -10,6 +10,7 @@ const initialState = {
   currentPage: 1,
   totalPages: 1,
   createEventLoader: false,
+  buyTicketLoading: false,
 };
 
 // creating an event
@@ -35,6 +36,26 @@ export const getAllEventsByVenue = createAsyncThunk(
       return response;
     } catch (error) {
       console.error("Error fetching events:", error);
+      throw error;
+    }
+  }
+);
+
+//buy Event Ticket
+export const buyEventTicket = createAsyncThunk(
+  "events/buyEventTicket",
+  async ({ backend, venueId, eventId, ticket_type, record }) => {
+    try {
+      const response = await backend.buyEventTicket(
+        venueId,
+        eventId,
+        ticket_type,
+        record
+      );
+      console.log("Ticket purchase response:", response);
+      return response;
+    } catch (error) {
+      console.error("Error buying event ticket:", error);
       throw error;
     }
   }
@@ -81,6 +102,20 @@ const eventSlice = createSlice({
       .addCase(getAllEventsByVenue.rejected, (state, action) => {
         state.eventsLoading = false;
         state.error = action.error.message;
+      })
+      .addCase(buyEventTicket.pending, (state) => {
+        state.buyTicketLoading = true;
+      })
+      .addCase(buyEventTicket.fulfilled, (state, action) => {
+        state.buyTicketLoading = false;
+        state.tickets = [...state.tickets, action.payload];
+        state.error = null;
+        notificationManager.success("Event ticket purchased successfully");
+      })
+      .addCase(buyEventTicket.rejected, (state, action) => {
+        state.buyTicketLoading = false;
+        state.error = action.error.message;
+        notificationManager.error("Failed to purchase event ticket");
       });
   },
 });

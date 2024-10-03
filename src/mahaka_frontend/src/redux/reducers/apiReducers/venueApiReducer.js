@@ -9,6 +9,7 @@ const initialState = {
   loading: true,
   error: null,
   createVenueLoader: false,
+  buyTicketLoading: false,
 };
 
 // async operations
@@ -103,6 +104,25 @@ export const createVenue = createAsyncThunk(
   }
 );
 
+//buy Venue Ticket
+export const buyVenueTicket = createAsyncThunk(
+  "venues/buyVenueTicket",
+  async ({ backend, venueId, ticket_type, record }) => {
+    try {
+      const response = await backend.buyVenueTicket(
+        venueId,
+        ticket_type,
+        record
+      );
+      console.log("Venue ticket purchase response:", response);
+      return response;
+    } catch (error) {
+      console.error("Error buying venue ticket:", error);
+      throw error;
+    }
+  }
+);
+
 // Create slice
 const venueSlice = createSlice({
   name: "venues",
@@ -184,6 +204,21 @@ const venueSlice = createSlice({
         state.createVenueLoader = false;
         state.error = action.error.message;
         notificationManager.error("Failed to create venue");
+      })
+
+      .addCase(buyVenueTicket.pending, (state) => {
+        state.buyTicketLoading = true;
+      })
+      .addCase(buyVenueTicket.fulfilled, (state, action) => {
+        state.buyTicketLoading = false;
+        state.tickets = [...state.tickets, action.payload];
+        state.error = null;
+        notificationManager.success("Venue ticket purchased successfully");
+      })
+      .addCase(buyVenueTicket.rejected, (state, action) => {
+        state.buyTicketLoading = false;
+        state.error = action.error.message;
+        notificationManager.error("Failed to purchase venue ticket");
       });
   },
 });
