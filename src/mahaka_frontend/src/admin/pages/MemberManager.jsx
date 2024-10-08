@@ -120,7 +120,7 @@ const MemberManager = () => {
             </div>
             <div className="mt-4 flex items-center sm:ml-auto sm:mt-0">
               <div
-                className={`order-2 ml-4 sm:order-1 sm:ml-0 flex space-x-1 px-4 py-2 rounded-full text-white ${getRoleColor(
+                className={`order-2 ml-4 sm:order-1 sm:ml-0 min-w-20 items-center justify-center flex space-x-1 px-4 py-2 rounded-full text-white ${getRoleColor(
                   member.role
                 )}`}
               >
@@ -218,9 +218,9 @@ const MemberManager = () => {
               }
               className="mt-3 mb-3 outline-none w-full bg-transparent"
             >
-              <option className="mt-3 mb-3 outline-none w-full bg-transparent" value="Admin">Admin</option>
-              <option className="mt-3 mb-3 outline-none w-full bg-transparent" value="Write">Write</option>
-              <option className="mt-3 mb-3 outline-none w-full bg-transparent" value="Read">Read</option>
+              <option className="mt-3 mb-3 outline-none w-full   bg-transparent" value="Admin">Admin</option>
+              <option className="mt-3 mb-3 outline-none w-full  bg-transparent" value="Write">Write</option>
+              <option className="mt-3 mb-3 outline-none w-full  bg-transparent" value="Read">Read</option>
             </select>
           </div>
           </div>

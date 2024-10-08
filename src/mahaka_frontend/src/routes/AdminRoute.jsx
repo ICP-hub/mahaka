@@ -5,6 +5,7 @@ import EventManager from "../admin/pages/EventManager";
 import MemberManager from "../admin/pages/MemberManager";
 import VenueManger from "../admin/pages/VenueManager";
 import VenueDetailPage from "../admin/pages/VenueDetail";
+import Sales from "../admin/pages/Sales";
 
 /* Admin routes */
 export const adminRoutes = [
@@ -22,6 +23,7 @@ export const adminRoutes = [
         element: <VenueDetailPage />,
       },
       { path: "members", element: <MemberManager /> },
+      { path: "sales", element: <Sales /> },
 
     ],
   },
