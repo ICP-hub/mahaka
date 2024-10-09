@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect , useState} from "react";
 import HeroSider from "../Components/LandingPageComponents/HeroSider";
 import venueImage from "../../assets/images/venue2.png";
 import venueImage1 from "../../assets/images/venue1.png";
@@ -21,6 +21,9 @@ import OngoingSlider from "../../customer/Components/LandingPageComponents/Ongoi
 import TestimonialCarousel from "../../customer/Components/LandingPageComponents/Testimonial";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
+
 
 const VenueCard = ({ venue, layout }) => (
   <Link
@@ -53,6 +56,18 @@ const VenueCard = ({ venue, layout }) => (
 
 export default function Home() {
   const { venues } = useSelector((state) => state.venues);
+  const [loading, setLoading] = useState(false)
+  // console.log("Venues home are",venues)
+  console.log("venues length", loading)
+
+  useEffect(()=>{
+    console.log("useeffect log")
+    if(venues.length ===0){
+      setLoading(true)
+    }else{
+      setLoading(false)
+    }
+  })
 
   const layoutConfigs = [
     {
@@ -128,7 +143,17 @@ export default function Home() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-5xl font-bold text-center mb-8">Our Venues</h2>
+       {loading?      
+          <div className="rounded-lg m-2 md:flex ml-3 text-center">
+          {/* Skeleton Cards */}
+          <Skeleton height={200} width={350} count={1} className="bg-gray-300 md:w-1/3 mx-2" />
+          <Skeleton height={200} width={350} count={1} className="bg-gray-300 md:w-1/3 mx-2" />
+          <Skeleton height={200} width={350} count={1} className="bg-gray-300 md:w-1/3 mx-2" />
+          {/* <Skeleton height={200} width={300} count={1} className="bg-gray-300 md:w-1/3" /> */}
+        </div>
 
+          :
+          <div> 
           {/* if length equals 1 */}
           {venues.length === 1 && (
             <div className="flex justify-center">
@@ -287,6 +312,8 @@ export default function Home() {
               )}
             </>
           )}
+        </div>
+}
         </div>
 
         {/* --------------------------------venues section end-------------------------------- */}

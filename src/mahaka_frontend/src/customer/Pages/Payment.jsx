@@ -1,6 +1,62 @@
 import React from 'react';
 import payimg from  '../../assets/images/payment.png'
+import{useSelector} from "react-redux"
+import {useState} from "react"
+import { useNavigate } from 'react-router-dom';
+
+
+
 const PaymentComponent = () => {
+  const navigate = useNavigate();
+  const { backend } = useSelector((state) => state.authentication);
+  // console.log("backend events are",events)
+  const [ticketType, setTicketType] = useState("SinglePass");
+  const [price, setPrice] = useState(100);
+  const [processing, setProcessing] = useState(false)
+  
+  const buyEventTicketHandler = async () => {
+    if(processing){
+      return
+    }
+    setProcessing(true)
+    
+    try {
+      const venueId = "dasara#br5f7-7uaaa-aaaaa-qaaca-cai";
+      const eventId = "dasara event#b77ix-eeaaa-aaaaa-qaada-cai";
+      const ticketTypeVariant = { [ticketType]: null };
+      const record = [
+        {
+          data: new Uint8Array([1, 2, 3]),
+          description: "Ticket metadata",
+          key_val_data: [
+            {
+              key: "eventName",
+              val: { TextContent: "Amazing Concert" }
+            },
+            {
+              key: "date",
+              val: { TextContent: "2024-12-31" }
+            }
+          ],
+          purpose: { Rendered: null }
+        }
+      ];
+
+      const response = await backend.buyEventTicket(
+        venueId,
+        eventId,
+        { ticket_type: ticketTypeVariant, price: price },
+        record
+      );
+
+      console.log("Event ticket purchased successfully:", response);
+          } catch (err) {
+            console.error("Error in buying event tickets:", err);
+          }finally {
+            setProcessing(false);  // Allow new event creation after process is done
+          }
+          navigate("/ticket")
+        };
   return (
     <div className="w-full max-h-screen bg-white m-auto">
       <div className="max-w-7xl w-full  mx-auto   rounded-lg shadow-md grid grid-cols-1 md:grid-cols-2 md:gap-6">
@@ -46,7 +102,9 @@ const PaymentComponent = () => {
             <input type="checkbox" id="saveCard" className="mr-2 " />
             <label htmlFor="saveCard">Save card details</label>
           </div>
-          <button className="w-full bg-orange-500 text-white py-2 rounded-md">Process Payment</button>
+          
+          <button className="w-full bg-orange-500 text-white py-2 rounded-md" type = "submit" disabled={processing} onClick={buyEventTicketHandler}> {processing?"Processing..":"Process Payment"}</button>
+         
           <p className="text-[#ACACAC] text-base font-normal mt-5">
             Lorem ipsum dolor sit amet consectetur. Malesuada sed senectus id tincidunt amet scelerisque
             diamam velit blandit. Bibendum fusce sed enim cursus sed in in. Quis malesuada mattis.

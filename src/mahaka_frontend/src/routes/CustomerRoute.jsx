@@ -6,6 +6,7 @@ import PaymentComponent from "../customer/Pages/Payment";
 import ServicesMahaka from "../customer/Pages/ServicesMahaka";
 import SingleEvent from "../customer/Pages/SingleEvent";
 import UserProfile from "../customer/Pages/UserProfile";
+import Ticket from "../customer/Pages/Ticket";
 
 export const customerRoutes = [
   {
@@ -19,6 +20,8 @@ export const customerRoutes = [
       { path: "about-us", element: <AboutMahaka /> },
       { path: "our-services", element: <ServicesMahaka /> },
       { path: "contact-us", element: <ContactMahaka /> },
+      { path: "ticket", element: <Ticket /> }
+      
     ],
   },
 ];

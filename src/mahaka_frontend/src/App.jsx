@@ -218,77 +218,77 @@ function App() {
   //   };
 
   //buy tickets
-  // const [ticketType, setTicketType] = useState("SinglePass");
-  // const [price, setPrice] = useState(100);
-  // const buyEventTicketHandler = async () => {
-  //   try {
-  //     const venueId = "Aarchi Jain#by6od-j4aaa-aaaaa-qaadq-cai";
-  //     const eventId = "new event#avqkn-guaaa-aaaaa-qaaea-cai";
-  //     const ticketTypeVariant = { [ticketType]: null };
-  //     const record = [
-  //       {
-  //         data: new Uint8Array([1, 2, 3]),
-  //         description: "Ticket metadata",
-  //         key_val_data: [
-  //           {
-  //             key: "eventName",
-  //             val: { TextContent: "Amazing Concert" }
-  //           },
-  //           {
-  //             key: "date",
-  //             val: { TextContent: "2024-12-31" }
-  //           }
-  //         ],
-  //         purpose: { Rendered: null }
-  //       }
-  //     ];
+  const [ticketType, setTicketType] = useState("SinglePass");
+  const [price, setPrice] = useState(100);
+  const buyEventTicketHandler = async () => {
+    try {
+      const venueId = "Aarchi Jain#by6od-j4aaa-aaaaa-qaadq-cai";
+      const eventId = "new event#avqkn-guaaa-aaaaa-qaaea-cai";
+      const ticketTypeVariant = { [ticketType]: null };
+      const record = [
+        {
+          data: new Uint8Array([1, 2, 3]),
+          description: "Ticket metadata",
+          key_val_data: [
+            {
+              key: "eventName",
+              val: { TextContent: "Amazing Concert" }
+            },
+            {
+              key: "date",
+              val: { TextContent: "2024-12-31" }
+            }
+          ],
+          purpose: { Rendered: null }
+        }
+      ];
 
-  //     const response = await backend.buyEventTicket(
-  //       venueId,
-  //       eventId,
-  //       { ticket_type: ticketTypeVariant, price: price },
-  //       record
-  //     );
+      const response = await backend.buyEventTicket(
+        venueId,
+        eventId,
+        { ticket_type: ticketTypeVariant, price: price },
+        record
+      );
 
-  //     console.log("Event ticket purchased successfully:", response);
-  //         } catch (err) {
-  //           console.error("Error in buying event tickets:", err);
-  //         }
-  //       };
+      console.log("Event ticket purchased successfully:", response);
+          } catch (err) {
+            console.error("Error in buying event tickets:", err);
+          }
+        };
 
  
-  //       const buyVenueTicketHandler = async () => {
-  //         try {
-  //           const venueId = "Aarchi Jain#by6od-j4aaa-aaaaa-qaadq-cai";
-  //           const ticketTypeVariant = { [ticketType]: null };
-  //           const record = [
-  //             {
-  //               data: new Uint8Array([4, 5, 6]), 
-  //               description: "Venue ticket metadata",
-  //               key_val_data: [
-  //                 {
-  //                   key: "venueName",
-  //                   val: { TextContent: "Awesome Stadium" }
-  //                 },
-  //                 {
-  //                   key: "validUntil",
-  //                   val: { TextContent: "2024-12-31" }
-  //                 }
-  //               ],
-  //               purpose: { Rendered: null }
-  //             }
-  //           ];
+        const buyVenueTicketHandler = async () => {
+          try {
+            const venueId = "Aarchi Jain#by6od-j4aaa-aaaaa-qaadq-cai";
+            const ticketTypeVariant = { [ticketType]: null };
+            const record = [
+              {
+                data: new Uint8Array([4, 5, 6]), 
+                description: "Venue ticket metadata",
+                key_val_data: [
+                  {
+                    key: "venueName",
+                    val: { TextContent: "Awesome Stadium" }
+                  },
+                  {
+                    key: "validUntil",
+                    val: { TextContent: "2024-12-31" }
+                  }
+                ],
+                purpose: { Rendered: null }
+              }
+            ];
       
-  //           const response = await backend.buyVenueTicket(
-  //             venueId,
-  //             { ticket_type: ticketTypeVariant, price: price },
-  //             record
-  //           );
-  //           console.log("Venue ticket purchased successfully:", response);
-  //         } catch (err) {
-  //           console.error("Error in buying venue tickets:", err);
-  //         }
-  //       };
+            const response = await backend.buyVenueTicket(
+              venueId,
+              { ticket_type: ticketTypeVariant, price: price },
+              record
+            );
+            console.log("Venue ticket purchased successfully:", response);
+          } catch (err) {
+            console.error("Error in buying venue tickets:", err);
+          }
+        };
       
   return (
     <div className="light bg-background">
