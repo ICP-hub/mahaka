@@ -222,12 +222,6 @@ actor mahaka {
      };
 
      public shared ({caller = user})  func createEvent( venueId : Types.venueId, Event : Types.Events, eCollection : Types.eventCollectionParams) : async  Types.completeEvent {
-          let _venue_details = await getVenue(venueId);
-          // switch (_venue_details){
-          //      case (Principal,Value) {
-          //           let new_obj = 
-          //      };
-          // };
           Cycles.add<system>(500_500_000_000);
           let eventCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), eCollection.collection_args);
           let new_custodian = await eventCollection.addcustodians(user);
@@ -235,23 +229,24 @@ actor mahaka {
           let nftcustodians = await eventCollection.showcustodians();
           Debug.print("These are the list of current custodians : " #debug_show (nftcustodians));
           ignore await eventCollection.wallet_receive();
-          let venueCollectionId = await eventCollection.getCanisterId();
-          let eventId =  Event.Title # "#" # Principal.toText(venueCollectionId) ;
+          let eventCollectionId = await eventCollection.getCanisterId();
+          let eventId =  Event.title # "#" # Principal.toText(eventCollectionId);
           let _event : Types.completeEvent = {
                id = eventId;
-               Description = Event.Description;
-               Details = Event.Details;
+               description = Event.description;
+               details = Event.details;
                logo = Event.logo;
                banner =Event.banner ;
                gTicket_limit = Event.gTicket_limit;
                sTicket_limit = Event.sTicket_limit;
-               Title = Event.Title;
+               title = Event.title;
                vTicket_limit = Event.vTicket_limit;
                event_collectionid = await eventCollection.getCanisterId();
           };
           let Events : Types.Events_data = {
                Events = List.push(_event, List.nil<Types.completeEvent>()); 
           };
+
           let event_blob = to_candid(Events);
           let Event_index = await stable_add(event_blob, Events_state);
           _EventsMap.put(venueId, Event_index);
@@ -259,7 +254,7 @@ actor mahaka {
           return _event;
      };
 
-     public shared ({caller}) func getallEventsbyVenue(chunkSize : Nat , pageNo : Nat, venueId : Types.venueId) : async {data : [Types.completeEvent] ; current_page : Nat ; Total_pages : Nat} {
+     public shared func getallEventsbyVenue(chunkSize : Nat , pageNo : Nat, venueId : Types.venueId) : async {data : [Types.completeEvent] ; current_page : Nat ; Total_pages : Nat} {
           let events_object = _EventsMap.get(venueId);
           switch (events_object){
                case null {
@@ -288,6 +283,64 @@ actor mahaka {
                };
           }; 
      };
+
+     public shared ({caller = user}) func edit_event(eventId : Text, venueId : Types.venueId ,  _eCollection : Types.eventCollectionParams , _event : Types.Events) : async Text {
+          let events_object = _EventsMap.get(venueId);
+          switch (events_object){
+               case null {
+                    throw (Error.reject("No Events Found in the Venue"));
+               };
+               case (?v){
+                    let events_object_blob = await stable_get(v,Events_state);
+                    let events_object : ?Types.Events_data = from_candid(events_object_blob);
+                    switch (events_object) {
+                         case null {
+                              throw (Error.reject("No object found in the memory"));
+                         };
+                         case (?val){
+                              var events_list = val.Events;
+                              let event = List.find<Types.completeEvent>(
+                                   events_list,
+                                   func x {x.id == eventId}
+                              );
+                              switch(event){
+                                   case null {
+                                        throw (Error.reject("Event not found in the list"));
+                                   };
+                                   case (?event){
+                                        let result = await Utils.is_event_editable(event);
+                                        assert( result == true);
+                                        Cycles.add<system>(500_500_000_000);
+                                        let eventCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), _eCollection.collection_args);
+                                        let new_custodian = await eventCollection.addcustodians(user);
+                                        Debug.print(" New added custodian is : " # debug_show (new_custodian));
+                                        let nftcustodians = await eventCollection.showcustodians();
+                                        Debug.print("These are the list of current custodians : " #debug_show (nftcustodians));
+                                        ignore await eventCollection.wallet_receive();
+                                        let eventCollectionId = await eventCollection.getCanisterId();
+                                        let eventId =  _event.title # "#" # Principal.toText(eventCollectionId);
+                                        let _events : Types.completeEvent = {
+                                             id = eventId;
+                                             description = _event.description;
+                                             details =_event.details;
+                                             logo = _event.logo;
+                                             banner =_event.banner ;
+                                             gTicket_limit = _event.gTicket_limit;
+                                             sTicket_limit = _event.sTicket_limit;
+                                             title = _event.title;
+                                             vTicket_limit = _event.vTicket_limit;
+                                             event_collectionid = await eventCollection.getCanisterId();
+                                        };
+                                        events_list := List.push(_events,events_list);
+                                        return "Event Edited and created";
+                                   };
+                              };
+                         };
+                    };
+               };
+          };
+     };
+
 
 
      /*********************************************************/
@@ -384,7 +437,6 @@ actor mahaka {
                 let user_index = await update_stable(v, user_blob, Users_state);
                 return #ok(user, user_index);
             };
-
         };
     };
 
@@ -431,11 +483,10 @@ actor mahaka {
                     case(?v){
                         return #ok(v);
                     };
-                };
-            };
-        };
-        
-    };
+               };
+          };
+     };        
+};
 
     // 📍📍📍📍📍
     public shared func listUsers(chunkSize : Nat , PageNo : Nat) : async{data : [Types.User]; current_page : Nat; total_pages : Nat} {
