@@ -30,6 +30,14 @@ module {
         #Wahana;
     };
 
+    public type wahana_details = {
+        id : Text;
+        ride_title : Text;
+        description : Text;
+        banner : LogoResult;
+        priceinusd : Text;
+    };
+
     public type ticket_info = {
         ticket_type : Types.ticket_type;
         price : Nat;

@@ -16,6 +16,7 @@ import Debug "mo:base/Debug";
 // import Uuid "mo:uuid/UUID";
 import Utils "./Utils";
 import nftTypes "../DIP721-NFT/Types";
+import ICRCactor "../ICRC/ICRC"
 actor mahaka {
 
 
@@ -30,13 +31,23 @@ actor mahaka {
     };
 
      var _EventsMap = TrieMap.TrieMap<Text, Types.Index>(Text.equal,Text.hash);
-     private stable var _stableEventsArray :[(Principal,Types.Index)] = [];
+     private stable var _stableEventsArray : [(Principal,Types.Index)] = [];
 
      stable var Events_state = {
         bytes = Region.new();
         var bytes_count : Nat64 = 0;
         elems = Region.new ();
         var elems_count : Nat64 = 0;
+     };
+
+     var _WahanaMap = TrieMap.TrieMap<Text, Types.Index>(Text.equal, Text.hash);
+     private stable var _stableWahanaArray : [(Principal, Types.Index)] = [];
+
+     stable var Wahana_state = {
+          bytes = Region.new();
+          var bytes_count : Nat64 = 0;
+          elems = Region.new ();
+          var elems_count : Nat64 = 0;
      };
 
      // private stable var _eventList : List.List<(Types.venueId, List.List<Types.completeEvent>)> = List.nil<(Types.venueId, List.List<Types.completeEvent>)>();
@@ -250,7 +261,6 @@ actor mahaka {
           let event_blob = to_candid(Events);
           let Event_index = await stable_add(event_blob, Events_state);
           _EventsMap.put(venueId, Event_index);
-          // List.push((),_eventList);
           return _event;
      };
 
@@ -277,7 +287,7 @@ actor mahaka {
                                    throw Error.reject("No products found");
                               };
                               let pages_data = index_pages[pageNo];
-                              return {data = pages_data; current_page = pageNo + 1 ; Total_pages = index_pages.size()};
+                              return {data = pages_data; current_page = pageNo + 1; Total_pages = index_pages.size()};
                          };
                     };
                };
@@ -399,11 +409,6 @@ actor mahaka {
           };
      };
 
-
-     // public shared ({caller}) func DeleteEvent (venue_id : Types.venueId, event_canisterId : Principal) : async {
-     //      return 
-     // };
-
      /*********************************************************/
      /*                   User CRUD                           */
      /*********************************************************/
@@ -514,11 +519,55 @@ actor mahaka {
                 };
             };
         };
-
         return { data = List.toArray(user_list); current_page = PageNo + 1; total_pages = index_pages.size(); };
-
     };
 
+     /*********************************************************/
+     /*                   Wahana Handling                     */
+     /*********************************************************/
+
+     public shared ({caller = user}) func createWahana(venueId : Text,_name : Text , _symbol : Text, _decimals : Nat8 , _totalSupply :Nat , description : Text , banner : Types.LogoResult, priceinusd : Text) : async Types.wahana_details {
+          Cycles.add<system>(500_000_000_000);
+          let initial_mints = [{
+               account = { owner = Principal.fromActor(mahaka); subaccount = null };
+               amount = _totalSupply;
+          }];
+
+          let init = {
+               decimals : Nat8 = _decimals;
+               initial_mints : [{
+               account : {
+                    owner : Principal;
+                    subaccount : ?Blob;
+               };
+               amount : Nat;
+               }] = initial_mints;
+               minting_account : {
+                    owner : Principal;
+                    subaccount : ?Blob;
+               } = { owner = user; subaccount = null };
+               token_name : Text = _name;
+               token_symbol : Text = _symbol;
+               transfer_fee : Nat = 0;
+          };
+
+          let Wahanatokens = await ICRCactor.Ledger(init);
+          let wahana_id = Principal.fromActor(Wahanatokens);
+          ignore await Wahanatokens.wallet_receive();
+          
+          let wahana_details : Types.wahana_details = {
+               id = Principal.toText(wahana_id);
+               banner = banner;
+               description = description;
+               priceinusd = priceinusd;
+               ride_title = _name;
+          };
+
+          let wahana_blob = to_candid(wahana_details);
+          let wahana_index = await stable_add(wahana_blob,Wahana_state);
+          _WahanaMap.put(venueId,wahana_index);
+          return wahana_details;
+     }; 
 
 }
 
