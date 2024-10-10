@@ -1,23 +1,26 @@
 import List "mo:base/List";
 import Iter "mo:base/Iter";
 import Text "mo:base/Text";
+import Time "mo:base/Time";
+import Types "./Types";
+// import Time
 
 module {
-    public func paginate<V>(array : [V], chunkSize : Nat) : [[V]] {
-        var paginationArray : List.List<[V]> = List.nil<[V]>();
-        var num_chunk : Nat = (array.size() + chunkSize -1) / chunkSize;
-        for (i in Iter.range(0, num_chunk -1)) {
-            var tempArray = List.nil<V>();
-            for (j in Iter.range(0, chunkSize -1)) {
-                var index = i * chunkSize + j;
-                if (index < array.size()) {
-                  tempArray := List.push(array[index],tempArray);
-                };
-            };
-          paginationArray := List.push(List.toArray(List.reverse(tempArray)), paginationArray);
+  public func paginate<V>(array : [V], chunkSize : Nat) : [[V]] {
+    var paginationArray : List.List<[V]> = List.nil<[V]>();
+    var num_chunk : Nat = (array.size() + chunkSize -1) / chunkSize;
+    for (i in Iter.range(0, num_chunk -1)) {
+      var tempArray = List.nil<V>();
+      for (j in Iter.range(0, chunkSize -1)) {
+        var index = i * chunkSize + j;
+        if (index < array.size()) {
+          tempArray := List.push(array[index], tempArray);
         };
-      List.toArray(List.reverse(paginationArray));
+      };
+      paginationArray := List.push(List.toArray(List.reverse(tempArray)), paginationArray);
     };
+    List.toArray(List.reverse(paginationArray));
+  };
 
   public func extractCanisterId(t : Text) : async Text {
     // Define the delimiter pattern for splitting the text
@@ -28,8 +31,14 @@ module {
 
     // Fetch the next element after the first split to get the canister ID
     switch (parts.next(), parts.next()) {
-        case (_, ?canisterId) { return canisterId };  // Return the second part as canister ID
-        case _ { return "Invalid Venue Id" };  // Return null if no canister ID found
-    }
+      case (_, ?canisterId) { return canisterId }; // Return the second part as canister ID
+      case _ { return "Invalid Venue Id" }; // Return null if no canister ID found
+    };
   };
-}
+
+  public func is_event_editable (e : Types.completeEvent) : async Bool{
+    let current_time = Time.now();
+    assert(e.details.StartTime > current_time);
+    return true;
+  }
+};
