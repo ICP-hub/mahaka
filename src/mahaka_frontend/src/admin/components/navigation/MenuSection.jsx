@@ -3,7 +3,8 @@ import {
   MdInsertChartOutlined,
   MdMap,
   MdPerson,
-  MdGraphicEq
+  MdEqualizer,
+  MdEvent
 } from "react-icons/md";
 import { Link, useLocation } from "react-router-dom";
 
@@ -19,7 +20,8 @@ const MenuSection = () => {
     // { path: "/admin/events", label: "Events", icon: <MdEventNote size={24} /> },
     { path: "/admin/venues", label: "Venues", icon: <MdMap size={24} /> },
     { path: "/admin/members", label: "Members", icon: <MdPerson size={24} /> },
-    { path: "/admin/sales", label: "Sales", icon: <MdGraphicEq size={24} /> },
+    { path: "/admin/sales", label: "Sales", icon: <MdEqualizer size={24} /> },
+    { path: "/admin/purchaseTicket", label: "Purchase Ticket", icon: <MdEvent size={24} /> },
 
   ];
 
