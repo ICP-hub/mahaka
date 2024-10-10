@@ -15,7 +15,7 @@ const VenueManger = () => {
     <div className="flex flex-col sm:overflow-hidden">
       <PageIntro
         title="Venue"
-        count={venues.length}
+        count={(venues && venues.length) || 0}
         actionOnButton={() => setIsVenueModalOpen(true)}
         isLoading={loading}
       />

@@ -8,14 +8,20 @@ const initialState = {
   currentVenue: null,
   loading: true,
   error: null,
+  createVenueLoader: false,
+  buyTicketLoading: false,
 };
 
 // async operations
 export const getAllVenues = createAsyncThunk(
   "venues/getAllVenues",
   async ({ backend, pageLimit, currPage }) => {
+    // try {
     const response = await backend.getAllVenues(pageLimit, currPage);
     return response.data;
+    // } catch (err) {
+    //   console.error("Error fetching all venues ", err);
+    // }
   }
 );
 
@@ -37,19 +43,36 @@ export const deleteVenue = createAsyncThunk(
   }
 );
 
-// UpdateVenue 
+// UpdateVenue
 export const updateVenue = createAsyncThunk(
   "venues/updateVenue",
-  async ({ backend, venueId, events, title, description, details, capacity }) => {
-    const response = await backend.updateVenue(
-      venueId,
-      events,
-      title,
-      description,
-      details,
-      capacity
-    );
-    return response;
+  async ({
+    backend,
+    venueId,
+    updatedTitle,
+    updatedDescription,
+    eventDetails,
+    capacity,
+    logo,
+    banner,
+    action,
+  }) => {
+    try {
+      const response = await backend.updateVenue(
+        venueId,
+        [],
+        updatedTitle,
+        updatedDescription,
+        eventDetails,
+        capacity,
+        logo,
+        banner
+      );
+      action(false);
+      return response;
+    } catch (err) {
+      console.error("Error while updating venue", err);
+    }
   }
 );
 
@@ -58,33 +81,45 @@ export const createVenue = createAsyncThunk(
   "venues/createVenue",
   async ({
     backend,
-    collectionArgs,
-    custodian,
+    collectionDetails,
     title,
     capacity,
     details,
     description,
+    action,
   }) => {
-    const response = await backend.createVenue(
-      {
-        collection_args: {
-          maxLimit: collectionArgs.maxLimit,
-          logo: collectionArgs.logo,
-          name: collectionArgs.name,
-          banner: collectionArgs.banner,
-          description: collectionArgs.description,
-          created_at: collectionArgs.created_at,
-          collection_type: { Venue: null },
-          symbol: collectionArgs.symbol,
-        },
-        custodian: Principal.fromText(custodian),
-      },
-      title,
-      capacity,
-      details,
-      description
-    );
-    return response;
+    try {
+      const response = await backend.createVenue(
+        collectionDetails,
+        title,
+        capacity,
+        details,
+        description
+      );
+      action(false);
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  }
+);
+
+//buy Venue Ticket
+export const buyVenueTicket = createAsyncThunk(
+  "venues/buyVenueTicket",
+  async ({ backend, venueId, ticket_type, record }) => {
+    try {
+      const response = await backend.buyVenueTicket(
+        venueId,
+        ticket_type,
+        record
+      );
+      console.log("Venue ticket purchase response:", response);
+      return response;
+    } catch (error) {
+      console.error("Error buying venue ticket:", error);
+      throw error;
+    }
   }
 );
 
@@ -136,10 +171,10 @@ const venueSlice = createSlice({
 
       // Fix later : create and update
       .addCase(updateVenue.pending, (state) => {
-        state.loading = true;
+        state.createVenueLoader = true;
       })
       .addCase(updateVenue.fulfilled, (state, action) => {
-        state.loading = false;
+        state.createVenueLoader = false;
         const updatedVenue = action.payload;
         state.venues = state.venues.map((venue) =>
           venue.id === updatedVenue.id ? updatedVenue : venue
@@ -151,23 +186,39 @@ const venueSlice = createSlice({
         notificationManager.success("Venue updated successfully");
       })
       .addCase(updateVenue.rejected, (state, action) => {
-        state.loading = false;
+        state.createVenueLoader = false;
         state.error = action.error.message;
         notificationManager.error("Failed to update venue");
       })
       .addCase(createVenue.pending, (state) => {
-        state.loading = true;
+        state.createVenueLoader = true;
         state.error = null;
       })
       .addCase(createVenue.fulfilled, (state, action) => {
-        state.loading = false;
+        state.createVenueLoader = false;
         state.venues.push(action.payload[1]);
         state.error = null;
         notificationManager.success("Venue created successfully");
       })
       .addCase(createVenue.rejected, (state, action) => {
-        state.loading = false;
+        state.createVenueLoader = false;
         state.error = action.error.message;
+        notificationManager.error("Failed to create venue");
+      })
+
+      .addCase(buyVenueTicket.pending, (state) => {
+        state.buyTicketLoading = true;
+      })
+      .addCase(buyVenueTicket.fulfilled, (state, action) => {
+        state.buyTicketLoading = false;
+        state.tickets = [...state.tickets, action.payload];
+        state.error = null;
+        notificationManager.success("Venue ticket purchased successfully");
+      })
+      .addCase(buyVenueTicket.rejected, (state, action) => {
+        state.buyTicketLoading = false;
+        state.error = action.error.message;
+        notificationManager.error("Failed to purchase venue ticket");
       });
   },
 });

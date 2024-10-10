@@ -10,7 +10,7 @@ const initialState = {
   isConnected: false,
   principal: null,
   backend: createActor(canisterID),
-  // identity: null,
+  identity: null,
   loading: false,
   error: null,
 };

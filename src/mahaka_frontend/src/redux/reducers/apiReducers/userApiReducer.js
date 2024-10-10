@@ -14,8 +14,15 @@ const initialState = {
 export const getUserDetailsByCaller = createAsyncThunk(
   "users/getUserDetailsByCaller",
   async ({ backend }) => {
-    const response = await backend.getUserdetailsbycaller();
-    return response;
+    if (backend) {
+      try {
+        const response = await backend.getUserdetailsbycaller();
+        return response;
+      } catch (err) {
+        console.error("Error fetching user data", err);
+        return err;
+      }
+    }
   }
 );
 
@@ -84,7 +91,7 @@ const userSlice = createSlice({
       })
       .addCase(listUsers.fulfilled, (state, action) => {
         state.userLoading = false;
-        state.users = action.payload.data; 
+        state.users = action.payload.data;
         state.currentPage = action.payload.current_page;
         state.totalPages = action.payload.total_pages;
         state.error = null;

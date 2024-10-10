@@ -3,31 +3,37 @@ import { useDispatch, useSelector } from "react-redux";
 import { createVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
 import flatpickr from "flatpickr";
 import { FcAlarmClock, FcCalendar } from "react-icons/fc";
+import { Principal } from "@dfinity/principal";
 
-const CreateVenueForm = () => {
+const CreateVenueForm = ({ setIsModalOpen }) => {
   const dispatch = useDispatch();
-  const { backend } = useSelector((state) => state.auth);
-  const { loading } = useSelector((state) => state.venues);
+  const { backend } = useSelector((state) => state.authentication);
+  const { createVenueLoader } = useSelector((state) => state.venues);
   const [venueData, setVenueData] = useState({
     collection_args: {
-      maxLimit: 100,
+      maxLimit: 500,
+      sTicket_limit: 100,
+      gTicket_price: 50,
       logo: {
-        data: "logodata_static",
-        logo_type: "logotype_static",
+        data: "",
+        logo_type: "image",
       },
       name: "",
+      vTicket_price: 30,
       banner: {
         data: "",
-        logo_type: "",
+        logo_type: "image",
       },
       description: "",
-      created_at: Date.now(),
+      created_at: BigInt(Date.now()),
       collection_type: { Venue: null },
-      symbol: "Venue_symbol_static",
+      sTicket_price: 25,
+      gTicket_limit: 200,
+      symbol: "VENUE",
+      vTicket_limit: 150,
     },
-    custodian: "2vxsx-fae",
     title: "",
-    capacity: 0,
+    capacity: 1000,
     eventDetails: {
       StartDate: "",
       StartTime: "",
@@ -35,6 +41,7 @@ const CreateVenueForm = () => {
       EndDate: "",
       EndTime: "",
     },
+    custodian: Principal.fromText("2vxsx-fae"),
   });
 
   const [bannerPreview, setBannerPreview] = useState("");
@@ -178,23 +185,30 @@ const CreateVenueForm = () => {
   // Handler form submit
   const handleVenueSubmit = (e) => {
     e.preventDefault();
+    if (createVenueLoader) return;
     // console.log(venueData);
     dispatch(
       createVenue({
         backend,
-        collectionArgs: venueData.collection_args,
-        custodian: "2vxsx-fae",
+        collectionDetails: {
+          collection_args: venueData.collection_args,
+          custodian: venueData.custodian,
+        },
         title: venueData.title,
         capacity: parseInt(venueData.capacity),
-        details: { ...venueData.eventDetails, StartTime: 4, EndTime: 6 },
+        details: venueData.eventDetails,
         description: venueData.collection_args.description,
+        action: setIsModalOpen,
       })
     );
   };
 
   return (
     <>
-      <form className="space-y-2" onSubmit={loading ? null : handleVenueSubmit}>
+      <form
+        className="space-y-2"
+        onSubmit={createVenueLoader ? null : handleVenueSubmit}
+      >
         <div className="flex flex-col flex-auto gap-1">
           <label className="font-semibold">Venue Name</label>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border ">
@@ -310,6 +324,49 @@ const CreateVenueForm = () => {
             />
           </div>
         </div>
+        {/* Ticket Limits */}
+        <div className="flex space-x-4">
+          <div className="w-1/3">
+            <label className="font-semibold">General Ticket Limit</label>
+            <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+              <input
+                type="number"
+                name="gTicket_limit"
+                value={venueData.gTicket_limit}
+                onChange={handleInputChange}
+                className="my-3 outline-none w-full bg-transparent"
+                required
+              />
+            </div>
+          </div>
+          <div className="w-1/3">
+            <label className="font-semibold">Student Ticket Limit</label>
+            <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+              <input
+                type="number"
+                name="sTicket_limit"
+                value={venueData.sTicket_limit}
+                onChange={handleInputChange}
+                className="my-3 outline-none w-full bg-transparent"
+                required
+              />
+            </div>
+          </div>
+          <div className="w-1/3">
+            <label className="font-semibold">VIP Ticket Limit</label>
+            <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+              <input
+                type="number"
+                name="vTicket_limit"
+                value={venueData.vTicket_limit}
+                onChange={handleInputChange}
+                className="my-3 outline-none w-full bg-transparent"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
         <div className="flex flex-col flex-auto gap-1">
           <label className="font-semibold">Banner</label>
           <div className="flex flex-col items-center justify-center border-dashed border-2 border-border p-4 rounded">
@@ -339,10 +396,11 @@ const CreateVenueForm = () => {
           <button
             type="submit"
             className={`text-white py-2 px-4 rounded ${
-              loading ? "bg-gray-400" : "bg-secondary"
+              createVenueLoader ? "bg-gray-400" : "bg-secondary"
             }`}
+            disabled={createVenueLoader}
           >
-            {loading ? "Creating..." : "Create Venue"}
+            {createVenueLoader ? "Creating..." : "Create Venue"}
           </button>
         </div>
       </form>
