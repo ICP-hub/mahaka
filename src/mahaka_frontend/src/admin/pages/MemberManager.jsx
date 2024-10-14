@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { MdPerson, MdAddCircleOutline, MdDelete } from "react-icons/md";
 import ProfileDummy from "@/assets/images/profile-demo.png";
 import { CiEdit } from "react-icons/ci";
+import ModalOverlay from "../../customer/Components/Modal-overlay"; // Import the modal
+import { motion, AnimatePresence } from "framer-motion";
+import ButtonWrapper from "../../common/ButtonWrapper";
 
 const MemberManager = () => {
   const [members, setMembers] = useState([
@@ -124,6 +127,16 @@ const MemberManager = () => {
                 <CiEdit size={24} />
               </div>
             </div>
+            <button
+              onClick={() => handleDeleteMember(member.id)}
+              className="text-red-500 ml-4"
+            >
+              <ButtonWrapper
+              color=" hover:text-red-400"
+              >
+              <MdDelete size={24} />
+              </ButtonWrapper>
+            </button>
           </div>
         ))}
       </div>

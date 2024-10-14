@@ -16,6 +16,7 @@ import Debug "mo:base/Debug";
 // import Uuid "mo:uuid/UUID";
 import Utils "./Utils";
 import nftTypes "../DIP721-NFT/Types";
+import ICRCactor "../ICRC/ICRC"
 actor mahaka {
 
 
@@ -30,13 +31,23 @@ actor mahaka {
     };
 
      var _EventsMap = TrieMap.TrieMap<Text, Types.Index>(Text.equal,Text.hash);
-     private stable var _stableEventsArray :[(Principal,Types.Index)] = [];
+     private stable var _stableEventsArray : [(Principal,Types.Index)] = [];
 
      stable var Events_state = {
         bytes = Region.new();
         var bytes_count : Nat64 = 0;
         elems = Region.new ();
         var elems_count : Nat64 = 0;
+     };
+
+     var _WahanaMap = TrieMap.TrieMap<Text, Types.Index>(Text.equal, Text.hash);
+     private stable var _stableWahanaArray : [(Principal, Types.Index)] = [];
+
+     stable var Wahana_state = {
+          bytes = Region.new();
+          var bytes_count : Nat64 = 0;
+          elems = Region.new ();
+          var elems_count : Nat64 = 0;
      };
 
      // private stable var _eventList : List.List<(Types.venueId, List.List<Types.completeEvent>)> = List.nil<(Types.venueId, List.List<Types.completeEvent>)>();
@@ -222,12 +233,6 @@ actor mahaka {
      };
 
      public shared ({caller = user})  func createEvent( venueId : Types.venueId, Event : Types.Events, eCollection : Types.eventCollectionParams) : async  Types.completeEvent {
-          let _venue_details = await getVenue(venueId);
-          // switch (_venue_details){
-          //      case (Principal,Value) {
-          //           let new_obj = 
-          //      };
-          // };
           Cycles.add<system>(500_500_000_000);
           let eventCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), eCollection.collection_args);
           let new_custodian = await eventCollection.addcustodians(user);
@@ -235,31 +240,31 @@ actor mahaka {
           let nftcustodians = await eventCollection.showcustodians();
           Debug.print("These are the list of current custodians : " #debug_show (nftcustodians));
           ignore await eventCollection.wallet_receive();
-          let venueCollectionId = await eventCollection.getCanisterId();
-          let eventId =  Event.Title # "#" # Principal.toText(venueCollectionId) ;
+          let eventCollectionId = await eventCollection.getCanisterId();
+          let eventId =  Event.title # "#" # Principal.toText(eventCollectionId);
           let _event : Types.completeEvent = {
                id = eventId;
-               Description = Event.Description;
-               Details = Event.Details;
+               description = Event.description;
+               details = Event.details;
                logo = Event.logo;
                banner =Event.banner ;
                gTicket_limit = Event.gTicket_limit;
                sTicket_limit = Event.sTicket_limit;
-               Title = Event.Title;
+               title = Event.title;
                vTicket_limit = Event.vTicket_limit;
                event_collectionid = await eventCollection.getCanisterId();
           };
           let Events : Types.Events_data = {
                Events = List.push(_event, List.nil<Types.completeEvent>()); 
           };
+
           let event_blob = to_candid(Events);
           let Event_index = await stable_add(event_blob, Events_state);
           _EventsMap.put(venueId, Event_index);
-          // List.push((),_eventList);
           return _event;
      };
 
-     public shared ({caller}) func getallEventsbyVenue(chunkSize : Nat , pageNo : Nat, venueId : Types.venueId) : async {data : [Types.completeEvent] ; current_page : Nat ; Total_pages : Nat} {
+     public shared func getallEventsbyVenue(chunkSize : Nat , pageNo : Nat, venueId : Types.venueId) : async {data : [Types.completeEvent] ; current_page : Nat ; Total_pages : Nat} {
           let events_object = _EventsMap.get(venueId);
           switch (events_object){
                case null {
@@ -282,12 +287,101 @@ actor mahaka {
                                    throw Error.reject("No products found");
                               };
                               let pages_data = index_pages[pageNo];
-                              return {data = pages_data; current_page = pageNo + 1 ; Total_pages = index_pages.size()};
+                              return {data = pages_data; current_page = pageNo + 1; Total_pages = index_pages.size()};
                          };
                     };
                };
           }; 
      };
+
+     public shared ({caller = user}) func edit_event(eventId : Text, venueId : Types.venueId ,  _eCollection : Types.eventCollectionParams , _event : Types.Events) : async Text {
+          let events_object = _EventsMap.get(venueId);
+          switch (events_object){
+               case null {
+                    throw (Error.reject("No Events Found in the Venue"));
+               };
+               case (?v){
+                    let events_object_blob = await stable_get(v,Events_state);
+                    let events_object : ?Types.Events_data = from_candid(events_object_blob);
+                    switch (events_object) {
+                         case null {
+                              throw (Error.reject("No object found in the memory"));
+                         };
+                         case (?val){
+                              var events_list = val.Events;
+                              let event = List.find<Types.completeEvent>(
+                                   events_list,
+                                   func x {x.id == eventId}
+                              );
+                              switch(event){
+                                   case null {
+                                        throw (Error.reject("Event not found in the list"));
+                                   };
+                                   case (?event){
+                                        let result = await Utils.is_event_editable(event);
+                                        assert( result == true);
+                                        Cycles.add<system>(500_500_000_000);
+                                        let eventCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), _eCollection.collection_args);
+                                        let new_custodian = await eventCollection.addcustodians(user);
+                                        Debug.print(" New added custodian is : " # debug_show (new_custodian));
+                                        let nftcustodians = await eventCollection.showcustodians();
+                                        Debug.print("These are the list of current custodians : " #debug_show (nftcustodians));
+                                        ignore await eventCollection.wallet_receive();
+                                        let eventCollectionId = await eventCollection.getCanisterId();
+                                        let eventId =  _event.title # "#" # Principal.toText(eventCollectionId);
+                                        let _events : Types.completeEvent = {
+                                             id = eventId;
+                                             description = _event.description;
+                                             details =_event.details;
+                                             logo = _event.logo;
+                                             banner =_event.banner ;
+                                             gTicket_limit = _event.gTicket_limit;
+                                             sTicket_limit = _event.sTicket_limit;
+                                             title = _event.title;
+                                             vTicket_limit = _event.vTicket_limit;
+                                             event_collectionid = await eventCollection.getCanisterId();
+                                        };
+                                        events_list := List.push(_events,events_list);
+                                        return "Event Edited and created";
+                                   };
+                              };
+                         };
+                    };
+               };
+          };
+     };
+
+     public shared ({caller = user}) func deleteEvent (venue_id : Types.venueId, event_canisterId : Principal) : async (Bool, Types.Index) {
+           switch(_EventsMap.get(venue_id)){
+               case null {
+                    throw(Error.reject("No venue found for the events"));
+               };
+               case (?Event_index){
+                    let event_blob = await stable_get(Event_index,Events_state);
+                    let event_object :?Types.Events_data = from_candid(event_blob);
+                    switch(event_object){
+                         case null {
+                              throw(Error.reject("No object found for this blob in the memory"));
+                         };
+                         case (?e){
+                              let updated_events_list = List.filter<Types.completeEvent>(
+                                   e.Events,
+                                   func x { x.event_collectionid != event_canisterId }
+                              );
+                              let updated_event_data = {
+                                   e with Events = updated_events_list
+                              };
+                              let event_blob = to_candid(updated_event_data);
+                              let event_index = await update_stable(Event_index, event_blob, Events_state);
+                              _EventsMap.put(venue_id, Event_index);
+                              return (true, event_index);
+                         };
+                    };
+               };
+          };
+     };
+
+
 
 
      /*********************************************************/
@@ -346,11 +440,6 @@ actor mahaka {
           };
      };
 
-
-     // public shared ({caller}) func DeleteEvent (venue_id : Types.venueId, event_canisterId : Principal) : async {
-     //      return 
-     // };
-
      /*********************************************************/
      /*                   User CRUD                           */
      /*********************************************************/
@@ -384,7 +473,6 @@ actor mahaka {
                 let user_index = await update_stable(v, user_blob, Users_state);
                 return #ok(user, user_index);
             };
-
         };
     };
 
@@ -431,11 +519,10 @@ actor mahaka {
                     case(?v){
                         return #ok(v);
                     };
-                };
-            };
-        };
-        
-    };
+               };
+          };
+     };        
+};
 
     // 📍📍📍📍📍
     public shared func listUsers(chunkSize : Nat , PageNo : Nat) : async{data : [Types.User]; current_page : Nat; total_pages : Nat} {
@@ -463,23 +550,68 @@ actor mahaka {
                 };
             };
         };
-
         return { data = List.toArray(user_list); current_page = PageNo + 1; total_pages = index_pages.size(); };
-
     };
 
-     public type Icrc28TrustedOriginsResponse = {
-        trusted_origins : [Text];
+
+    public shared func deleteUserByPrincipal(user : Principal) : async ?Types.User {
+          switch(Users.remove(user)){
+               case null {
+                    throw(Error.reject("No venue found for the events"));
+               };
+               case (?u){
+                    let user = await stable_get(u, Users_state);
+                    from_candid(user)
+               }
+          }
     };
 
-    // Equivalent to the Rust function that returns the record type
-    public func icrc28_trusted_origins() : async Icrc28TrustedOriginsResponse {
-        let trusted_origins = ["https://3rwjt-vqaaa-aaaak-akusq-cai.icp0.io", "http://localhost:3000", "http://bd3sg-teaaa-aaaaa-qaaba-cai.localhost:4943", "http://127.0.0.1:4943/?canisterId=bd3sg-teaaa-aaaaa-qaaba-cai", "http://127.0.0.1:4943", "http://localhost:4200"];
+     /*********************************************************/
+     /*                   Wahana Handling                     */
+     /*********************************************************/
 
-        return {
-            trusted_origins = trusted_origins;
-        };
-    };
+     public shared ({caller = user}) func createWahana(venueId : Text,_name : Text , _symbol : Text, _decimals : Nat8 , _totalSupply :Nat , description : Text , banner : Types.LogoResult, priceinusd : Text) : async Types.wahana_details {
+          Cycles.add<system>(500_000_000_000);
+          let initial_mints = [{
+               account = { owner = Principal.fromActor(mahaka); subaccount = null };
+               amount = _totalSupply;
+          }];
+
+          let init = {
+               decimals : Nat8 = _decimals;
+               initial_mints : [{
+               account : {
+                    owner : Principal;
+                    subaccount : ?Blob;
+               };
+               amount : Nat;
+               }] = initial_mints;
+               minting_account : {
+                    owner : Principal;
+                    subaccount : ?Blob;
+               } = { owner = user; subaccount = null };
+               token_name : Text = _name;
+               token_symbol : Text = _symbol;
+               transfer_fee : Nat = 0;
+          };
+
+          let Wahanatokens = await ICRCactor.Ledger(init);
+          let wahana_id = Principal.fromActor(Wahanatokens);
+          ignore await Wahanatokens.wallet_receive();
+          
+          let wahana_details : Types.wahana_details = {
+               id = Principal.toText(wahana_id);
+               banner = banner;
+               description = description;
+               priceinusd = priceinusd;
+               ride_title = _name;
+          };
+
+          let wahana_blob = to_candid(wahana_details);
+          let wahana_index = await stable_add(wahana_blob,Wahana_state);
+          _WahanaMap.put(venueId,wahana_index);
+          return wahana_details;
+     }; 
 
 
 }
