@@ -351,6 +351,37 @@ actor mahaka {
           };
      };
 
+     public shared ({caller = user}) func deleteEvent (venue_id : Types.venueId, event_canisterId : Principal) : async (Bool, Types.Index) {
+           switch(_EventsMap.get(venue_id)){
+               case null {
+                    throw(Error.reject("No venue found for the events"));
+               };
+               case (?Event_index){
+                    let event_blob = await stable_get(Event_index,Events_state);
+                    let event_object :?Types.Events_data = from_candid(event_blob);
+                    switch(event_object){
+                         case null {
+                              throw(Error.reject("No object found for this blob in the memory"));
+                         };
+                         case (?e){
+                              let updated_events_list = List.filter<Types.completeEvent>(
+                                   e.Events,
+                                   func x { x.event_collectionid != event_canisterId }
+                              );
+                              let updated_event_data = {
+                                   e with Events = updated_events_list
+                              };
+                              let event_blob = to_candid(updated_event_data);
+                              let event_index = await update_stable(Event_index, event_blob, Events_state);
+                              _EventsMap.put(venue_id, Event_index);
+                              return (true, event_index);
+                         };
+                    };
+               };
+          };
+     };
+
+
 
 
      /*********************************************************/
@@ -520,6 +551,19 @@ actor mahaka {
             };
         };
         return { data = List.toArray(user_list); current_page = PageNo + 1; total_pages = index_pages.size(); };
+    };
+
+
+    public shared func deleteUserByPrincipal(user : Principal) : async ?Types.User {
+          switch(Users.remove(user)){
+               case null {
+                    throw(Error.reject("No venue found for the events"));
+               };
+               case (?u){
+                    let user = await stable_get(u, Users_state);
+                    from_candid(user)
+               }
+          }
     };
 
      /*********************************************************/
