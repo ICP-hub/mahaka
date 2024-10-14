@@ -1,246 +1,60 @@
 import React from 'react';
-import { Bar } from 'react-chartjs-2';
-import 'chart.js/auto';  // Required for chart.js
 
-import { SiBitcoincash,SiPopos } from "react-icons/si";
-import { PiCellSignalFullBold } from "react-icons/pi";
-import { FcRating } from "react-icons/fc";
-import { GrDocumentPerformance } from "react-icons/gr";
+import { MdSportsCricket } from "react-icons/md";
+// import { FaFootballBall } from "react-icons/fa";
+import { GiMusicalScore } from "react-icons/gi";
+import { LuSignalHigh } from "react-icons/lu";
+
+import { BsFileBarGraph } from "react-icons/bs";
+import { FaTicket } from "react-icons/fa6";
+
+import { TfiPulse } from "react-icons/tfi";
 import { FaMusic, FaFootballBall, FaFilm, FaTheaterMasks } from 'react-icons/fa';
-import { TbBrandBooking } from "react-icons/tb";
 
-import { FaMoneyBillTrendUp } from "react-icons/fa6";
+
+
 import { FaWallet, FaCommentDollar,FaMobileAlt, FaUniversity, FaCcMastercard ,FaDollarSign,FaSyncAlt,FaChartLine, FaUsersCog, FaCalendarAlt, FaChartPie,FaUsers} from 'react-icons/fa'; 
 
 
 const DashboardAnalytics = () => {
-  const RevenueReport = () => {
-    // Sample data for graph earnings vs expense
-    const data = {
-      labels: ['January', 'February', 'March', 'April', 'May', 'June'],
-      datasets: [
-        {
-          label: 'Earnings',
-          data: [1200, 1500, 2000, 1800, 2200, 2500],
-          backgroundColor: 'rgba(255, 159, 64, 0.8)',  // Changed to orange
-          borderColor: 'rgba(255, 159, 64, 1)',  // Orange border
-          borderWidth: 2,
-          borderRadius: 10,
-          barPercentage: 0.5,
-        },
-        {
-          label: 'Expenses',
-          data: [800, 700, 1200, 900, 1100, 1300],
-          backgroundColor: 'rgba(54, 162, 235, 1)',  // Cool blue
-          borderColor: 'rgba(54, 162, 235, 1)',
-          borderWidth: 2,
-          borderRadius: 10,
-          barPercentage: 0.5,
-        },
-      ],
-    };
+  
 
-    const options = {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'top',
-          labels: {
-            boxWidth: 20,
-            padding: 15,
-            font: {
-              size: 16,
-              weight: 'bold',
-            },
-          },
-        },
-        title: {
-          display: true,
-          text: 'Revenue Report',
-          font: {
-            size: 24,
-            weight: 'bold',
-          },
-        },
-      },
-      scales: {
-        x: {
-          grid: {
-            display: false,
-          },
-          ticks: {
-            font: {
-              size: 14,
-            },
-          },
-        },
-        y: {
-          beginAtZero: true,
-          grid: {
-            color: 'rgba(200, 200, 200, 0.3)', // Light grid lines
-          },
-          ticks: {
-            font: {
-              size: 14,
-            },
-          },
-        },
-      },
-    };
+    
 
-    return (
-      <div className="max-w-full mx-3 p-6 bg-white rounded-lg shadow-md mb-6">
-        {/* <h2 className="text-xl font-bold text-center mb-4">Revenue Report3</h2> */}
-        <div className="h-64 md:h-96">
-          <Bar data={data} options={options} />
-        </div>
-      </div>
-    );
-  };
+// GoalCard component
 
-// Highest Earning Card component
-
-const HighestEarningsCard = () => {
+const GoalCard = () => {
   return (
-    <div className="relative p-4 bg-gradient-to-br from-orange-200 to- bg-orange-500 rounded-2xl shadow-xl transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl">
-      
-      <div className="flex justify-between items-center">
-       
-        <div className="space-y-4">
-          {/* Battery Icon and Title */}
-          <div className="flex items-center space-x-4">
-            <GrDocumentPerformance className="text-slate-800 text-6xl" />
-            <h2 className="text-3xl font-extrabold text-slate-800">Earnings</h2>
-          </div>
-
-          
-          <div className="text-5xl font-bold text-slate-800 flex items-center">
-            <FaDollarSign className="mr-2" />
-            3500
-          </div>
-
-        
-          <div className="text-slate-800 font-bold text-3xl">
-            70.8 % more earnings than last month
-          </div>
-
-          <div className="text-slate-600 font-semibold text-xl">
-          The earnings for this month have shown a significant increase, reaching a total of $3500
-          </div>
-        </div>
-
-        {/* Right Side: Large Circular Percentage */}
-        <div className="relative">
-          <div className="w-28 h-28 rounded-full bg-white flex items-center justify-center">
-            <span className="text-5xl font-bold text-slate-800 m-3 px-3 py-3">95%</span>
-          </div>
-          <svg className="absolute top-0 left-0 w-28 h-28">
-            <circle
-              className="text-slate-800 p-3"
-              strokeWidth="6"
-              stroke="currentColor"
-              fill="transparent"
-              r="40"
-              cx="56"
-              cy="56"
-            />
-            <circle
-              className="text-slate-400 "
-              strokeWidth="6"
-              strokeDasharray="250"
-              strokeDashoffset="30"
-              strokeLinecap="round"
-              stroke="currentColor"
-              fill="transparent"
-              r="40"
-              cx="56"
-              cy="56"
-              
-            />
-          </svg>
-        </div>
+    <div class="bg-white shadow-lg rounded-lg p-4 max-w-sm my-3 mx-2">
+    <h2 class="text-gray-500 text-xl font-medium">Goal Overview</h2>
+    <div class="relative flex items-center justify-center my-4">
+      {/* <!-- Circular Progress Bar using SVG --> */}
+      <svg class="w-32 h-32">
+        <circle class="text-gray-300" stroke-width="8" stroke="currentColor" fill="transparent" r="48" cx="64" cy="64"/>
+        <circle class="text-green-400" stroke-width="8" stroke-linecap="round" stroke="currentColor" fill="transparent" r="48" cx="64" cy="64"
+          stroke-dasharray="301.44" stroke-dashoffset="50.74" />
+        <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" class="text-3xl font-semibold fill-gray-800">83%</text>
+      </svg>
+    </div>
+   
+    <div class="flex justify-between items-center">
+   
+      <div class="text-center mt-10 mx-3">
+      <hr class="border-gray-300 my-4" />
+        <h3 class="text-gray-400 text-md font-semibold">Completed</h3>
+        <p class="text-xl font-bold text-gray-700">786,617</p>
       </div>
-
-      {/* Decorative Corner Icon */}
-      <div className="absolute top-0 right-0 p-2 text-white bg-slate-900 rounded-full transform -translate-x-1/2 -translate-y-1/2">
-        {/* <FaBatteryFull /> */}
-        <PiCellSignalFullBold />
+      <div class="text-center mt-10 mx-3">
+      <hr class="border-gray-300 my-4" />
+        <h3 class="text-gray-400 text-md font-semibold">In Progress</h3>
+        <p class="text-xl font-bold text-gray-700">13,561</p>
       </div>
     </div>
+  </div>
+  
   );
 };
 
-
-
-
-
-// Dash board cards component like profit bookings popular events
-
-const DashboardCards = () => {
-  return (
-    
-    
-    <div className = "grid grid-cols-1 md:grid-cols-2 gap-4 mt-3 md:h-30">
-    
-     
-      {/* Bookings Card */}
-      <div className="bg-blue-200 text-blue-900 shadow-lg rounded-lg p-6 flex flex-col items-center justify-center hover:scale-105 transition-transform duration-300 ease-out">
-        <div className="text-3xl mb-4">
-          <TbBrandBooking />
-        </div>
-        <h3 className="text-2xl font-bold">Bookings</h3>
-        <p className="text-lg mt-2 font-bold">3,500</p>
-      </div>
-
-
-      {/* Popular Events Card */}
-      <div className="bg-yellow-200 text-yellow-900 shadow-lg rounded-lg p-6 flex flex-col items-center justify-center hover:scale-105 transition-transform duration-300 ease-out">
-        <div className="text-6xl mb-4">
-          <SiPopos />
-        </div>
-        <h3 className="text-2xl font-bold">Popular Events</h3>
-        <p className="text-lg mt-2 font-bold">25 Events</p>
-      </div>
-
-      {/* Profits Card */}
-      <div className="bg-green-200 text-green-900 shadow-lg rounded-lg p-6 flex flex-col items-center justify-center hover:scale-105 transition-transform duration-300 ease-out  ">
-        <div className="text-6xl mb-4">
-          <SiBitcoincash />
-        </div>
-        <h3 className="text-2xl font-bold">Profits</h3>
-        <p className="text-lg mt-2 font-bold">$50,000</p>
-      </div>
-
-      {/* Visitors Card */}
-      <div className="bg-red-200 text-red-900 shadow-lg rounded-lg p-6 flex flex-col items-center justify-center hover:scale-105 transition-transform duration-300 ease-out  ">
-        <div className="text-6xl mb-4">
-          <FaUsers />
-        </div>
-        <h3 className="text-2xl font-bold">Visitors</h3>
-        <p className="text-lg mt-2 font-bold">8,000</p>
-      </div>
-      {/* testing card 1
-      <div className="bg-slate-200 text-blue-900 shadow-lg rounded-lg p-6 flex flex-col items-center justify-center hover:scale-105 transition-transform duration-300 ease-out  ">
-        <div className="text-3xl mb-4">
-          <TbBrandBooking />
-          <FcRating className="text-red-600 text-5xl" />
-        </div>
-        <h3 className="text-2xl font-bold">Ratings</h3>
-        <p className="text-lg mt-2 font-bold">4.5k</p>
-      </div> */}
-
-      {/* testing card 2
-      <div className="bg-pink-200 text-blue-900 shadow-lg rounded-lg p-6 flex flex-col items-center justify-center hover:scale-105 transition-transform duration-300 ease-out  ">
-        <div className="text-3xl mb-4">
-          <TbBrandBooking className="text-5xl"/>
-        </div>
-        <h3 className="text-xl font-bold">New Events</h3>
-        <p className="text-lg mt-2 font-bold">5</p>
-      </div> */}
-    </div>
-  );
-};
 
 
 // transactions component
@@ -253,23 +67,24 @@ const TransactionCard = () => {
   ];
 
   return (
-    <div className="rounded-lg p-3 md:h-auto">
-      <h2 className="text-3xl font-semibold mb-4">Recent Transactions</h2>
-      <div className="space-y-1 bg-orange-200 p-2 ">
+    <div className="rounded-lg p-3">
+     
+      <div className="space-y-1 bg-white p-3 shadow-lg rounded-lg">
+      <h2 className="text-2xl font-semibold text-gray-500 mb-4">Transactions</h2>
         
         {transactionData.map(transaction => (
           <div
             key={transaction.id}
-            className="flex items-center bg-gray-50 shadow-md rounded-lg p-4 hover:bg-blue-50 transition-colors duration-300"
+            className="flex items-center rounded-lg p-3"
           >
-            <div className="text-blue-600 text-4xl mr-4">
+            <div className="text-blue-500 text-2xl mr-4">
               {transaction.icon}
             </div>
-            <div className="flex-1">
-              <h3 className="text-xl font-semibold">{transaction.method}</h3>
+            <div className="flex-1 mr-3">
+              <h3 className="text-md font-semibold">{transaction.method}</h3>
               <p className="text-gray-500">{transaction.date}</p>
             </div>
-            <div className="text-xl font-semibold text-gray-700">
+            <div className="text-xl font-semibold text-green-400">
               {transaction.amount}
             </div>
           </div>
@@ -279,122 +94,231 @@ const TransactionCard = () => {
   );
 };
 
-// top events card component
-const TopEventsCard = () => {
-  const events = [
-    { name: "Music Concert", icon: <FaMusic />, percentage: "75%" },
-    { name: "Football Match", icon: <FaFootballBall />, percentage: "60%" },
-    { name: "Movie Premiere", icon: <FaFilm />, percentage: "85%" },
-    { name: "Theater Play", icon: <FaTheaterMasks />, percentage: "50%" },
-  ];
 
+   
+
+
+//cards 
+const Cards = ()=>{
   return (
-    <div className="bg-white shadow-lg rounded-lg p-6 w-full md:w-96 h-100">
-      <h3 className="text-xl font-bold text-gray-800 mb-4">Top Events</h3>
-      <ul>
-        {events.map((event, index) => (
-          <li
-            key={index}
-            className="flex items-center justify-between py-2 border-b border-gray-200"
-          >
-            <div className="flex items-center">
-              <span className="text-2xl text-gray-700 mr-4">{event.icon}</span>
-              <span className="text-lg text-gray-800">{event.name}</span>
-            </div>
-            <span className="text-lg font-semibold text-gray-700">
-              {event.percentage}
-            </span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
+    <>
+    <div className = "grid grid-cols-1 md:grid-cols-2">
+      {/* booking card */}
+      <div className = "bg-white mx-3 my-2 p-2 shadow-lg rounded-lg grid grid-cols-1">
+      <div class="flex flex-col items-center">
+      <p class="text-lg text-gray-500">Bookings</p>
+          <h4 class="text-4xl font-semibold">6,30k</h4>
+         
+          {/* <span className ="text-5xl"> </span> */}
+          <div>
+          <LuSignalHigh className = "text-5xl text-orange-400 w-30 h-20"/>
+          </div>
+        </div>
+        </div>
+      {/* profit card */}
+      <div className = "bg-white mx-3 my-2 p-2 shadow-lg rounded-lg grid grid-cols-1">
+      <div class="flex flex-col items-center">
+      <p class="text-lg text-gray-500">Profits</p>
+          <h4 class="text-4xl font-semibold">2,30k</h4>
+         
+          {/* <span className ="text-5xl"> </span> */}
+          <div>
+          <TfiPulse className = "text-5xl text-yellow-500 w-30 h-20"/>
+          </div>
+        </div>
+        </div>
+        </div>
+
+
+        {/* special card earnings on top events card */}
+
+        <div className = "grid grid-cols-1 md:gid-cols-2">
+     <div className = "bg-white mx-3 my-2 p-2 shadow-lg rounded-lg">
+     <h1 class="text-lg text-gray-700 text-left mb-3 mx-3 font-semibold">Earnings On Top Events</h1>
+     <div className = "flex justify-around">
+      {/* top event 1 */}
+      <div class="flex flex-col items-center">
+          {/*  */}
+          <h4 class="text-2xl font-semibold">230$</h4>
+          <p class="text-lg text-gray-500">Music</p>
+          <div class="bg-pink-100 p-2 my-2">
+           
+           <GiMusicalScore className = "text-3xl text-pink-400" />
+           
+          </div>
+        </div>
+
+        {/* top event 2 */}
+        <div class="flex flex-col items-center">
+        
+          <h4 class="text-2xl font-semibold">75$</h4>
+          <p class="text-lg text-gray-500">Foot Ball</p>
+          <div class="bg-emerald-100 p-2 my-2">
+           
+            <FaFootballBall className = "text-3xl text-emerald-400" />
+          </div>
+        </div>
+        {/* top event3 */}
+        <div class="flex flex-col items-center">
+          {/*  */}
+          <h4 class="text-2xl font-semibold">890$</h4>
+          <p class="text-lg text-gray-500">Cricket</p>
+          <div class="bg-orange-100 p-2 my-2"> 
+           
+           
+             <MdSportsCricket className = "text-3xl text-orange-400" /> 
+         </div> 
+        </div>
+
+
+        
+        </div>
+        </div>
+        </div> 
+    </>
+  )
+}
+
+
+
+
  
 
   return (
-    <div className="container mx-auto p-6">
-    
-    <h1 className="text-3xl font-bold text-left mb-8 text-gray-800">Statistics</h1>
-    <div className="grid grid-cols-1 p-3 md:grid-cols-3 shadow-sm gap-4">
-    
-      {/* Total Soles */}
-      <div className="relative p-6 bg-slate-200 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl">
-        <div className="flex items-center mb-4">
-          <FaMoneyBillTrendUp className="text-blue-400 text-7xl" />
-          <h2 className="text-xl font-bold ml-2 text-gray-800">Sales</h2>
+<div class="p-3 bg-gray-200">
+  {/* <!-- Card container --> */}
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {/* <!-- Congratulations Card --> */}
+    <div class="bg-white rounded-lg shadow-lg p-3 mx-2 my-2">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-700">Congratulations 🎉 Ankur!</h3>
+          <p class="text-md text-gray-500">You have won a gold medal </p>
         </div>
-        <p className="text-5xl font-bold text-gray-900">97%</p>
-        <div className="absolute top-0 right-0 p-2 text-white bg-blue-400 rounded-full transform -translate-x-1/2 -translate-y-1/2">
-          <FaChartLine />
-        </div>
-      </div>
-  
-      {/* Total Events */}
-      {/* <div className="relative p-6 bg-slate-200 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl">
-        <div className="flex items-center mb-4">
-          <FaCalendarAlt className="text-yellow-400 text-7xl" />
-          <h2 className="text-xl font-bold ml-2 text-gray-800">Events</h2>
-        </div>
-        <p className="text-5xl font-bold text-gray-900">35</p>
-        <div className="absolute top-0 right-0 p-2 text-white bg-yellow-400 rounded-full transform -translate-x-1/2 -translate-y-1/2">
-          <FaChartPie />
-        </div>
-      </div> */}
-  
-      {/* Total Customers */}
-      <div className="relative p-6 bg-slate-200 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl">
-        <div className="flex items-center mb-4">
-          <FaUsers className="text-green-400 text-7xl" />
-          <h2 className="text-xl font-bold ml-2 text-gray-800">Customers</h2>
-        </div>
-        <p className="text-5xl font-bold text-gray-900">1.25k</p>
-        <div className="absolute top-0 right-0 p-2 text-white bg-green-400 rounded-full transform -translate-x-1/2 -translate-y-1/2">
-          <FaUsersCog />
+        {/* <!-- Medal emogi --> */}
+        <div>
+         
+          <span className = "text-7xl">🏅</span>
         </div>
       </div>
-  
-      {/* Total Revenue */}
-      <div className="relative p-6 bg-slate-200 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl">
-        <div className="flex items-center mb-4">
-          {/* <FaMoneyBillAlt className="text-purple-600 text-7xl animate-bounce" /> */}
-          <FaCommentDollar className="text-purple-400 text-7xl"/>
-          <h2 className="text-xl font-bold ml-2 text-gray-800">Revenue</h2>
-        </div>
-        <p className="text-5xl font-bold text-gray-900">$250</p>
-        <div className="absolute top-0 right-0 p-2 text-white bg-purple-400 rounded-full transform -translate-x-1/2 -translate-y-1/2">
-          <FaDollarSign />
-        </div>
+      <div class="flex items-center mb-4">
+        <h2 class="text-4xl font-bold text-gray-700">$48.9k</h2>
       </div>
-  
-      {/* Rating */}
-      {/* <div className="relative p-6 bg-gradient-to-r from-red-400 to-red-200 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl">
-        <div className="flex items-center mb-4">
-          <FcRating className="text-red-600 text-7xl animate-bounce" />
-          <h2 className="text-xl font-bold ml-2 text-gray-800">Ratings</h2>
-        </div>
-        <p className="text-5xl font-bold text-gray-900">*****</p>
-        <div className="absolute top-0 right-0 p-2 text-white bg-red-600 rounded-full transform -translate-x-1/2 -translate-y-1/2">
-          <FaSyncAlt />
-        </div>
-      </div> */}
+      <button class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">View Sales</button>
     </div>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 mx-3">
-     <RevenueReport/> 
-     <HighestEarningsCard/>
-     <DashboardCards/>
-    
-     <TransactionCard/>
-     
-     </div>
-    
-    
-    
+    {/* <!-- Statistics Card --> */}
+    <div class="bg-white rounded-lg shadow-lg p-4 mx-2 my-2">
+      <div class="flex justify-between items-center p-3">
+        <h3 class="text-lg font-semibold text-gray-700">Statistics</h3>
+        <p class="text-sm text-gray-500">Updated 1 month ago</p>
+      </div>
+      <div class="flex justify-around">
+        {/* <!-- Sales --> */}
+        <div class="flex flex-col items-center">
+          <div class="bg-purple-100 p-2 rounded-full mb-2">
+           
+            <BsFileBarGraph className = "text-3xl text-purple-500" />
+          </div>
+          <h4 class="text-lg font-semibold">230k</h4>
+          <p class="text-lg text-gray-500">Sales</p>
+        </div>
+        {/* <!-- Customers --> */}
+        <div class="flex flex-col items-center">
+          <div class="bg-blue-100 p-2 rounded-full mb-2">
+           
+            <FaUsersCog className = "text-3xl text-blue-500"/>
+          </div>
+          <h4 class="text-lg font-semibold">8.549k</h4>
+          <p class="text-lg text-gray-500">Customers</p>
+        </div>
+        {/* <!-- Products --> */}
+        <div class="flex flex-col items-center">
+          <div class="bg-red-100 p-2 rounded-full mb-2">
+            
+            <FaTicket className = "text-3xl text-red-500"/>
+          </div>
+          <h4 class="text-lg font-semibold">1.423k</h4>
+          <p class="text-lg text-gray-500">Tickets</p>
+        </div>
+        {/* <!-- Revenue --> */}
+        <div class="flex flex-col items-center">
+          <div class="bg-green-100 p-2 rounded-full mb-2">
+            
+            <FaDollarSign className = "text-3xl text-green-500" />
+          </div>
+          <h4 class="text-lg font-semibold">$9745</h4>
+          <p class="text-lg text-gray-500">Revenue</p>
+        </div>
+      </div>
+    </div>
   </div>
- 
+  <div className = "grid grid-cols-1 md:grid-cols-2">
+  <Cards/>
   
+  </div>
+  
+  {/* support tracker card */}
+ 
+  <div className = "grid grid-cols-1 md:grid-cols-3 max-width-auto mx-auto">
+  <GoalCard />
+  <div class="bg-white shadow-lg rounded-lg p-4 mx-2 text-center my-3">
+  <h3 class="text-gray-500 text-2xl font-semibold mb-2 text-left">Support Tracker</h3>
+  
+  <div class="relative inline-block">
+    {/* <!-- SVG Circle for Dotted Progress with Increased Size --> */}
+    <svg class="w-50 h-50">
+       {/* <!-- Increase the size of the SVG --> */}
+      <circle cx="50%" cy="50%" r="65" fill="none" stroke-width="12" stroke-dasharray="7 7" stroke="url(#gradient)" />
+      <defs>
+        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#7C3AED" />
+          <stop offset="50%" stop-color="#9333EA" />
+          <stop offset="100%" stop-color="#F87171" />
+        </linearGradient>
+      </defs>
+    </svg>
+{/*     
+    <!-- Center Percentage Text --> */}
+    <div class="absolute inset-1 flex flex-col items-center justify-center">
+      <span class="text-2xl font-semibold text-gray-700">83%</span>
+       {/* <!-- Adjusted font size --> */}
+      <p class="text-gray-400 text-sm">Completed Tickets</p>
+    </div>
+  </div>
+  
+  <div className ="flex gap-4 px-2">
+    {/* <!-- New Tickets --> */}
+    <div>
+      <p class="text-gray-400 text-sm">New Tickets</p>
+      <h4 class="text-xl font-bold text-gray-700">29</h4>
+    </div>
+    
+    {/* <!-- Open Tickets --> */}
+    <div>
+      <p class="text-gray-400 text-sm">Open Tickets</p>
+      <h4 class="text-xl font-bold text-gray-700">63</h4>
+    </div>
+    
+    {/* <!-- Response Time --> */}
+    <div>
+      <p class="text-gray-400 text-sm">Response Time</p>
+      <h4 class="text-xl font-bold text-gray-700">1d</h4>
+    </div>
+  </div>
+</div>
+
+<TransactionCard />
+
+  </div>
+
+</div>
+
   );
 };
 
 export default DashboardAnalytics;
+
+
+
+
