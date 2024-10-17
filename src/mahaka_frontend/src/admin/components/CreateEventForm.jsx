@@ -174,8 +174,9 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
           text: fullVenueId,
           record: {
             id: fullVenueId,
+            title: eventData.title,
             sTicket_limit: eventData.collection_args.sTicket_limit,
-            Description: eventData.collection_args.description,
+            description: eventData.collection_args.description,
             logo: {
               data: eventData.collection_args.logo.data,
               logo_type: eventData.collection_args.logo.logo_type,
@@ -184,14 +185,13 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
               data: eventData.collection_args.banner.data,
               logo_type: eventData.collection_args.banner.logo_type,
             },
-            Details: {
+            details: {
               StartDate: eventData.eventDetails.StartDate,
-              StartTime: eventData.eventDetails.StartTime.toString(),
+              StartTime: parseInt(eventData.eventDetails.StartTime, 10), 
               Location: eventData.eventDetails.Location,
               EndDate: eventData.eventDetails.EndDate,
-              EndTime: eventData.eventDetails.EndTime.toString(),
+              EndTime: parseInt(eventData.eventDetails.EndTime, 10), 
             },
-            Title: eventData.title,
             gTicket_limit: eventData.collection_args.gTicket_limit,
             vTicket_limit: eventData.collection_args.vTicket_limit,
           },
@@ -409,9 +409,8 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
           Cancel
         </button> */}
         <button
-          className={`text-white py-2 px-4 rounded ${
-            createEventLoader ? "bg-gray-600" : "bg-secondary"
-          }`}
+          className={`text-white py-2 px-4 rounded ${createEventLoader ? "bg-gray-600" : "bg-secondary"
+            }`}
           disabled={createEventLoader}
           onClick={(e) => (createEventLoader ? null : handleSubmit(e))}
         >
@@ -420,7 +419,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
       </div>
 
       {/* Error Message */}
-      {/* {error && <div className="text-red-500 text-center">{error}</div>} */}
+      {error && <div className="text-red-500 text-center">{error}</div>}
     </form>
   );
 };

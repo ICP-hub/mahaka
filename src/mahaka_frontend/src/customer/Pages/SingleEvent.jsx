@@ -135,10 +135,10 @@ export default function SingleEvent() {
   const otherEvents = events.slice(1);
 
   const duration =
-    currentEvent?.Details.StartDate && currentEvent?.Details.EndDate
+    currentEvent?.details.StartDate && currentEvent?.details.EndDate
       ? calculateDuration(
-          currentEvent.Details.StartDate,
-          currentEvent.Details.EndDate
+          currentEvent.details.StartDate,
+          currentEvent.details.EndDate
         )
       : "";
 
@@ -188,7 +188,7 @@ export default function SingleEvent() {
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-black pb-10">
-            {currentEvent?.Title || "Event Name"}
+            {currentEvent?.title || "Event Name"}
           </h1>
           <div className="flex flex-col lg:flex-row gap-8">
             {/* left side section  */}
@@ -300,13 +300,13 @@ export default function SingleEvent() {
                           </li>
                           <li>
                             <strong>Location:</strong>{" "}
-                            {currentEvent?.Details.Location || "Indonesia"}
+                            {currentEvent?.details.Location || "Indonesia"}
                           </li>
                           <li>
                             <strong>Last Entry:</strong>{" "}
-                            {currentEvent?.Details.EndTime &&
+                            {currentEvent?.details.EndTime &&
                               formatTime(
-                                currentEvent.Details.EndTime || "4:00 PM"
+                                currentEvent.details.EndTime || "4:00 PM"
                               )}
                           </li>
                         </ul>
@@ -373,30 +373,30 @@ export default function SingleEvent() {
                 <h1 className="text-2xl font-black">Event Details</h1>
                 <h3 className="text-lg font-normal">
                   {" "}
-                  {currentEvent?.Details.StartDate &&
-                    formatDate(currentEvent.Details.StartDate)}{" "}
+                  {currentEvent?.details.StartDate &&
+                    formatDate(currentEvent.details.StartDate)}{" "}
                   -
-                  {(currentEvent?.Details.EndDate &&
-                    formatDate(currentEvent.Details.EndDate)) ||
+                  {(currentEvent?.details.EndDate &&
+                    formatDate(currentEvent.details.EndDate)) ||
                     "13 Jul- 17 Jul 2024"}
                 </h3>
                 <h3 className="text-lg font-normal">
-                  {currentEvent?.Details.StartTime &&
-                    formatTime(currentEvent.Details.StartTime)}{" "}
+                  {currentEvent?.details.StartTime &&
+                    formatTime(currentEvent.details.StartTime)}{" "}
                   -
-                  {(currentEvent?.Details.EndTime &&
-                    formatTime(currentEvent.Details.EndTime)) ||
+                  {(currentEvent?.details.EndTime &&
+                    formatTime(currentEvent.details.EndTime)) ||
                     "12:00AM - 3:00PM"}
                 </h3>
                 <h3 className="text-lg font-normal">
-                  Location of the Event - {currentEvent?.Details.Location}
+                  Location of the Event - {currentEvent?.details.Location}
                 </h3>
               </div>
               <h2 className="text-2xl font-normal pl-8">
                 Event ends on :{" "}
                 <span className="text-red-600">
-                  {(currentEvent?.Details.EndDate &&
-                    formatDate(currentEvent.Details.EndDate)) ||
+                  {(currentEvent?.details.EndDate &&
+                    formatDate(currentEvent.details.EndDate)) ||
                     "17 July, 2024"}
                 </span>
               </h2>

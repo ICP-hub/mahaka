@@ -11,6 +11,7 @@ const initialState = {
   totalPages: 1,
   createEventLoader: false,
   buyTicketLoading: false,
+  deleteEventLoader: false,
 };
 
 // creating an event
@@ -18,6 +19,15 @@ export const createEvent = createAsyncThunk(
   "events/createEvent",
   async ({ backend, text, record, collection_args }) => {
     const response = await backend.createEvent(text, record, collection_args);
+    return response;
+  }
+);
+
+// deleting an event
+export const deleteEvent = createAsyncThunk(
+  "events/deleteEvent",
+  async({backend , venueId ,custodianId  }) => {
+    const response = await backend.deleteEvent(venueId , custodianId);
     return response;
   }
 );
@@ -81,6 +91,24 @@ const eventSlice = createSlice({
       .addCase(createEvent.rejected, (state, action) => {
         state.createEventLoader = false;
         state.error = action.error.message;
+      })
+
+      // Handle deleteEvent
+      .addCase(deleteEvent.pending, (state) => {
+        state.deleteEventLoader = true;
+      })
+      .addCase(deleteEvent.fulfilled, (state, action) => {
+        state.deleteEventLoader = false;
+        state.events = state.events.filter(
+          (event) => event.id !== action.meta.arg.custodianId
+        );
+        state.error = null;
+        notificationManager.success("Event deleted successfully");
+      })
+      .addCase(deleteEvent.rejected, (state, action) => {
+        state.deleteEventLoader = false;
+        state.error = action.error.message;
+        notificationManager.error("Failed to delete event");
       })
 
       // Handle getAllEventsByVenue

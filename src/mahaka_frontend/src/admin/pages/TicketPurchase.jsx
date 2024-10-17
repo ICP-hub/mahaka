@@ -104,9 +104,14 @@ const TicketPurchase = () => {
           </div>
         ))}
 
-        {/* Price Display */}
-        <div className="text-lg font-bold  mb-8">
-          Total Price: Rs. {totalPrice.toLocaleString()}
+        {/* Tickets and Price Display Side by Side */}
+        <div className="flex justify-between items-center mb-8">
+          <div className="text-lg font-bold">
+            Total Tickets: <span className="text-orange-500">{totalTickets} </span>
+          </div>
+          <div className="text-lg font-bold">
+            Total Price: Rs. <span className="text-orange-500">{totalPrice.toLocaleString()}</span>
+          </div>
         </div>
 
         <button className="w-full bg-orange-400 text-white py-3 mx-2 rounded-lg font-semibold hover:bg-orange-500 transition duration-300">
