@@ -1,14 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-
-const UserActivity = () => {
-  
+const MgtUserActivity = () => {
   return (
     <div>
       <h1>user activity page</h1>
     </div>
-    
   );
 };
 
-export default UserActivity;
+export default MgtUserActivity;

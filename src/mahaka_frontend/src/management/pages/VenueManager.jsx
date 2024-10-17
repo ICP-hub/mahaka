@@ -7,21 +7,18 @@ import PageIntro from "../components/PageIntro";
 import { useSelector } from "react-redux";
 import VenueTableFormat from "../components/VenueTableFormat";
 
-const VenueManger = () => {
+const MgtVenueManger = () => {
   const [isVenueModalOpen, setIsVenueModalOpen] = useState(false);
   const { venues, loading } = useSelector((state) => state.venues);
-  const [searchInput, setSearchInput] = useState('')
+  const [searchInput, setSearchInput] = useState("");
   const [filteredVenues, setFilteredVenues] = useState(venues);
 
-  
- 
-  useEffect(()=>{
-    const filtered = venues.filter((venue)=>
+  useEffect(() => {
+    const filtered = venues.filter((venue) =>
       venue.Title.toLowerCase().includes(searchInput.toLowerCase())
     );
-    setFilteredVenues(filtered)
-  },[searchInput, venues])
-
+    setFilteredVenues(filtered);
+  }, [searchInput, venues]);
 
   return (
     <div className="flex flex-col sm:overflow-hidden">
@@ -30,13 +27,11 @@ const VenueManger = () => {
         count={(venues && venues.length) || 0}
         actionOnButton={() => setIsVenueModalOpen(true)}
         isLoading={loading}
-        searchInput = {searchInput}
-        setSearchInput = {setSearchInput}
-        
-
-
+        searchInput={searchInput}
+        setSearchInput={setSearchInput}
+        showBtn={false}
       />
-      <VenueTableFormat filteredVenues = {filteredVenues} />
+      <VenueTableFormat filteredVenues={filteredVenues} />
       {isVenueModalOpen && (
         <ModalOverlay
           isOpen={isVenueModalOpen}
@@ -50,4 +45,4 @@ const VenueManger = () => {
   );
 };
 
-export default VenueManger;
+export default MgtVenueManger;

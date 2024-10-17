@@ -1,9 +1,11 @@
 import { Navigate } from "react-router-dom";
 import ManagementLayout from "../management/layout/ManagementLayout";
-import ManagementDashboard from "../management/pages/Dashboard";
-import MemberManager from "../management/pages/MemberManager";
-import UserActivity from "../management/pages/UserActivity";
-import VenueManager from "../management/pages/VenueManager";
+import MgtUserList from "../management/pages/UserList";
+import MgtVenueDetailPage from "../management/pages/VenueDetail";
+import MgtDashBoard from "../management/pages/Dashboard";
+import MgtVenueManger from "../management/pages/VenueManager";
+import MgtUserActivity from "../management/pages/UserActivity";
+import MgtWahana from "../management/pages/Wahana";
 
 /* management routes */
 export const managementRoutes = [
@@ -12,20 +14,16 @@ export const managementRoutes = [
     element: <ManagementLayout />,
     children: [
       // Redirect to dashboard component
-      { index: true, element: <Navigate to="/management/dashboard" /> },
-      { path: "dashboard", element: <ManagementDashboard /> },
-    //   { path: "events", element: <EventManager /> },
-    //   { path: "venues", element: <VenueManger /> },
-    //   {
-    //     path: "venues/venue/:title/:id",
-    //     element: <VenueDetailPage />,
-    //   },
-      { path: "members", element: <MemberManager /> },
-      // { path: "sales", element: <Sales /> },
-      { path: "venues", element: <VenueManager /> },
-      { path: "useractivity", element: <UserActivity /> },
-
-
+      { index: true, element: <Navigate to="/management/wahana" /> },
+      {
+        path: "venues/venue/:title/:id",
+        element: <MgtVenueDetailPage />,
+      },
+      { path: "dashboard", element: <MgtDashBoard /> },
+      // { path: "users", element: <MgtUserList /> },
+      { path: "venues", element: <MgtVenueManger /> },
+      { path: "useractivity", element: <MgtUserActivity /> },
+      { path: "wahana", element: <MgtWahana /> },
     ],
   },
 ];

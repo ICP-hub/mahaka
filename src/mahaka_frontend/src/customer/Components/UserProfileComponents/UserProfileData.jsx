@@ -1,9 +1,10 @@
 import { MdLogout } from "react-icons/md";
-import ProfileDemoImg from "../../../assets/images/profile-demo.png";
+// import ProfileDemoImg from "../../../assets/images/profile-demo.png";
 import { useLogout } from "../../../common/hooks/useLogout";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserDetailsByCaller } from "../../../redux/reducers/apiReducers/userApiReducer";
 import { useEffect } from "react";
+import Avvvatars from "avvvatars-react";
 
 const UserProfileData = () => {
   const dispatch = useDispatch();
@@ -17,13 +18,14 @@ const UserProfileData = () => {
 
   if (userLoading) return <ProfileDataLoader />;
   return (
-    <div className="bg-white p-8 flex max-md:items-center flex-col md:flex-row gap-4 max-md:justify-center rounded-lg">
-      <div className="bg-gray-100 flex items-center flex-col p-6 h-96 gap-8 max-md:justify-center rounded-lg">
-        <img
+    <div className="bg-white p-8 flex max-md:items-center flex-col md:flex-row gap-4 max-md:justify-center rounded-md">
+      <div className="flex items-center flex-col p-6 h-96 gap-8 max-md:justify-center rounded-md">
+        {/* <img
           src={ProfileDemoImg}
           alt="profile-pic"
           className="min-h-60 min-w-60 max-h-min max-w-min rounded-full"
-        />
+        /> */}
+        <Avvvatars value={principal} size={240} shadow={true} />
         <div className="mt-2 space-y-2 flex flex-col items-center justify-center">
           <h1 className="text-base font-bold flex gap-1">
             <span className="text-gray-600">
@@ -81,15 +83,15 @@ const ProfileDataLoader = () => {
   const principalId = "7yywl-leric6-n33rr-vskrc6-yb4nd";
 
   return (
-    <div className="bg-white p-8 flex max-md:items-center flex-col md:flex-row gap-4 max-md:justify-center rounded-lg">
-      <div className="bg-gray-100 flex items-center flex-col p-6 h-96 gap-8 max-md:justify-center rounded-lg">
+    <div className="bg-white p-8 flex max-md:items-center flex-col md:flex-row gap-4 max-md:justify-center rounded-md">
+      <div className="flex items-center flex-col p-6 h-96 gap-8 max-md:justify-center rounded-md">
         <span className="min-h-60 min-w-60 max-h-min max-w-min rounded-full bg-gray-600 animate-pulse"></span>
         <div className="mt-2 space-y-2 flex flex-col items-center justify-center">
           <h1 className="text-base font-bold flex gap-1">
-            <span className="text-gray-600 bg-gray-600 animate-pulse rounded-sm">
+            <span className="text-gray-600 bg-gray-600 animate-pulse rounded-md">
               {firstName}
             </span>
-            <span className="text-gray-600 bg-gray-600 animate-pulse rounded-sm">
+            <span className="text-gray-600 bg-gray-600 animate-pulse rounded-md">
               {lastName}
             </span>
           </h1>
@@ -107,7 +109,7 @@ const ProfileDataLoader = () => {
           <label className="block text-gray-700 font-semibold w-32">
             First Name
           </label>
-          <p className="font-semibold text-gray-600 bg-gray-600 animate-pulse rounded-sm">
+          <p className="font-semibold text-gray-600 bg-gray-600 animate-pulse rounded-md">
             {firstName}
           </p>
         </div>
@@ -115,7 +117,7 @@ const ProfileDataLoader = () => {
           <label className="block text-gray-700 font-semibold w-32">
             Last Name
           </label>
-          <p className="font-semibold text-gray-600 bg-gray-600 animate-pulse rounded-sm">
+          <p className="font-semibold text-gray-600 bg-gray-600 animate-pulse rounded-md">
             {lastName}
           </p>
         </div>
@@ -123,7 +125,7 @@ const ProfileDataLoader = () => {
           <label className="block text-gray-700 font-semibold w-32">
             Email
           </label>
-          <p className="font-semibold text-gray-600 bg-gray-600 animate-pulse rounded-sm">
+          <p className="font-semibold text-gray-600 bg-gray-600 animate-pulse rounded-md">
             {email}
           </p>
         </div>
@@ -131,7 +133,7 @@ const ProfileDataLoader = () => {
           <label className="block text-gray-700 font-semibold w-32">
             Principal ID
           </label>
-          <p className="font-semibold break-all text-gray-600 bg-gray-600 animate-pulse rounded-sm">
+          <p className="font-semibold break-all text-gray-600 bg-gray-600 animate-pulse rounded-md">
             {principalId}
           </p>
         </div>

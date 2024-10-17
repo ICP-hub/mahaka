@@ -27,6 +27,7 @@
     "@react-three/fiber": "^8.17.9",
     "@reduxjs/toolkit": "^2.2.5",
     "artemis-web3-adapter": "^1.0.8",
+    "avvvatars-react": "^0.4.2",
     "chart.js": "^4.4.4",
     "esbuild": "^0.24.0",
     "flatpickr": "^4.6.13",

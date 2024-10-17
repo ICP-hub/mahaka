@@ -11,6 +11,7 @@ import {
   NFIDLogin,
   NFIDLogout,
 } from "../../redux/reducers/auth/authenticationReducer";
+import Avvvatars from "avvvatars-react";
 
 const NavLinks = [
   { title: "HOME", url: "/" },
@@ -151,7 +152,7 @@ const NavVertical = ({ isNavOpen, onNavOpen }) => {
 };
 
 const ConnectWalletBtn = ({ onNavOpen }) => {
-  const { isConnected, NFIDInstance } = useSelector(
+  const { isConnected, NFIDInstance, principal } = useSelector(
     (state) => state.authentication
   );
   const dispatch = useDispatch();
@@ -164,11 +165,12 @@ const ConnectWalletBtn = ({ onNavOpen }) => {
         onClick={() => onNavOpen(false)}
         className="p-2 rounded-full border-2 border-secondary"
       >
-        <img
+        {/* <img
           src={ProfileDemoImg}
           alt="Profile-pic"
           className="h-12 w-12 md:h-8 md:w-8 rounded-full"
-        />
+        /> */}
+        <Avvvatars value={principal} shadow={true} />
       </Link>
     );
 

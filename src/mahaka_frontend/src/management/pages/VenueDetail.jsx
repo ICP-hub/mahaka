@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
 import { getAllEventsByVenue } from "../../redux/reducers/apiReducers/eventApiReducer";
@@ -8,6 +8,7 @@ import VenueDemoImg from "@/assets/images/Frame10.png";
 import ModalOverlay from "../../customer/Components/Modal-overlay";
 import UpdateVenueForm from "../components/UpdateVenueForm";
 import CreateEventForm from "../components/CreateEventForm";
+import { HiArrowLongLeft } from "react-icons/hi2";
 
 const FormatTime = (timeString) => {
   const time = parseInt(timeString, 10);
@@ -18,7 +19,7 @@ const FormatTime = (timeString) => {
   return `${formattedHours}:${minutes.toString().padStart(2, "0")} ${period}`;
 };
 
-const VenueDetailPage = () => {
+const MgtVenueDetailPage = () => {
   const { title, id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -101,12 +102,12 @@ const VenueDetailPage = () => {
     <>
       <div className="p-5 tracking-wide">
         <div className="flex justify-left mb-2">
-          <button
+          <Link
+            to="/management/venues"
             className="px-4 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600"
-            onClick={() => navigate("/admin/venues")}
           >
-            <i className="fa-solid fa-arrow-left"></i>
-          </button>
+            <HiArrowLongLeft size={20} />
+          </Link>
         </div>
         <div className="flex flex-col md:flex-row items-start md:items-center mb-6 ">
           <div className="w-full md:w-1/2 h-64 bg-gray-200 mb-4 md:mb-0 rounded-lg shadow-lg">
@@ -137,12 +138,12 @@ const VenueDetailPage = () => {
                 <strong>Location:</strong> {venue.Details.Location}
               </p>
             </div>
-            <button
+            {/* <button
               className="px-4 py-2 mt-2 bg-orange-500 text-white rounded-full hover:bg-orange-600"
               onClick={() => setIsUpdateModalOpen(true)}
             >
               Update Venue
-            </button>
+            </button> */}
           </div>
         </div>
         <hr className="border-gray-300 my-6" />
@@ -197,12 +198,13 @@ const VenueDetailPage = () => {
               <p>No events available for this venue.</p>
             </div>
           )}
-          <button
+
+          {/* <button
             className="px-4 py-2 bg-indigo-700 text-white rounded hover:bg-indigo-800"
             onClick={() => setIsEventModalOpen(true)}
           >
             Create Event
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -239,4 +241,4 @@ const VenueDetailPage = () => {
   );
 };
 
-export default VenueDetailPage;
+export default MgtVenueDetailPage;
