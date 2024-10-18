@@ -9,13 +9,34 @@ const vouchersInitial = [
     { id: 3, title: 'VIP Area Access for VIP Pass Holders', description: 'VIP Pass holders receive exclusive entry to the premium VIP area with enhanced amenities.', startDate: '29 July 24', endDate: '1 August 24', time: 'All day', status: 'Active', icon: <MdVpnKey size={24} className="text-teal-500" /> },
     { id: 4, title: 'VIP Area Access for VIP Pass Holders', description: 'VIP Pass holders receive exclusive entry to the premium VIP area with enhanced amenities.', startDate: '29 July 24', endDate: '1 August 24', time: '10:00 AM - 5:00 PM', status: 'Active', icon: <MdVpnKey size={24} className="text-teal-500" /> },
     { id: 5, title: 'VIP Area Access for VIP Pass Holders', description: 'VIP Pass holders receive exclusive entry to the premium VIP area with enhanced amenities.', startDate: '29 July 24', endDate: '1 August 24', time: '10:00 AM - 5:00 PM', status: 'Expired', icon: <MdVpnKey size={24} className="text-teal-500" /> },
+    { id: 6, title: 'VIP Area Access for VIP Pass Holders', description: 'VIP Pass holders receive exclusive entry to the premium VIP area with enhanced amenities.', startDate: '29 July 24', endDate: '-', time: '10:00 AM - 5:00 PM', status: 'Active', icon: <MdVpnKey size={24} className="text-teal-500" /> },
+    { id: 7, title: 'VIP Area Access for VIP Pass Holders', description: 'VIP Pass holders receive exclusive entry to the premium VIP area with enhanced amenities.', startDate: '29 July 24', endDate: '1 August 24', time: '10:00 AM - 5:00 PM', status: 'Expired', icon: <MdVpnKey size={24} className="text-teal-500" /> },
+    { id: 8, title: 'VIP Area Access for VIP Pass Holders', description: 'VIP Pass holders receive exclusive entry to the premium VIP area with enhanced amenities.', startDate: '29 July 24', endDate: '1 August 24', time: '10:00 AM - 5:00 PM', status: 'Active', icon: <MdVpnKey size={24} className="text-teal-500" /> },
+    { id: 9, title: 'VIP Area Access for VIP Pass Holders', description: 'VIP Pass holders receive exclusive entry to the premium VIP area with enhanced amenities.', startDate: '29 July 24', endDate: '1 August 24', time: '10:00 AM - 5:00 PM', status: 'Expired', icon: <MdVpnKey size={24} className="text-teal-500" /> },
+    { id: 10, title: 'VIP Area Access for VIP Pass Holders', description: 'VIP Pass holders receive exclusive entry to the premium VIP area with enhanced amenities.', startDate: '29 July 24', endDate: '1 August 24', time: '10:00 AM - 5:00 PM', status: 'Expired', icon: <MdVpnKey size={24} className="text-teal-500" /> },
+    { id: 11, title: 'VIP Area Access for VIP Pass Holders', description: 'VIP Pass holders receive exclusive entry to the premium VIP area with enhanced amenities.', startDate: '29 July 24', endDate: '1 August 24', time: '10:00 AM - 5:00 PM', status: 'Active', icon: <MdVpnKey size={24} className="text-teal-500" /> },
+    { id: 12, title: 'VIP Area Access for VIP Pass Holders', description: 'VIP Pass holders receive exclusive entry to the premium VIP area with enhanced amenities.', startDate: '29 July 24', endDate: '-', time: '10:00 AM - 5:00 PM', status: 'Expired', icon: <MdVpnKey size={24} className="text-teal-500" /> },
+    { id: 13, title: 'VIP Area Access for VIP Pass Holders', description: 'VIP Pass holders receive exclusive entry to the premium VIP area with enhanced amenities.', startDate: '29 July 24', endDate: '1 August 24', time: '10:00 AM - 5:00 PM', status: 'Active', icon: <MdVpnKey size={24} className="text-teal-500" /> },
+    { id: 14, title: 'VIP Area Access for VIP Pass Holders', description: 'VIP Pass holders receive exclusive entry to the premium VIP area with enhanced amenities.', startDate: '29 July 24', endDate: '1 August 24', time: '10:00 AM - 5:00 PM', status: 'Expired', icon: <MdVpnKey size={24} className="text-teal-500" /> },
+    { id: 15, title: 'VIP Area Access for VIP Pass Holders', description: 'VIP Pass holders receive exclusive entry to the premium VIP area with enhanced amenities.', startDate: '29 July 24', endDate: '1 August 24', time: '10:00 AM - 5:00 PM', status: 'Expired', icon: <MdVpnKey size={24} className="text-teal-500" /> },
+    { id: 16, title: 'VIP Area Access for VIP Pass Holders', description: 'VIP Pass holders receive exclusive entry to the premium VIP area with enhanced amenities.', startDate: '29 July 24', endDate: '1 August 24', time: '10:00 AM - 5:00 PM', status: 'Active', icon: <MdVpnKey size={24} className="text-teal-500" /> },
+    { id: 17, title: 'VIP Area Access for VIP Pass Holders', description: 'VIP Pass holders receive exclusive entry to the premium VIP area with enhanced amenities.', startDate: '29 July 24', endDate: '1 August 24', time: '10:00 AM - 5:00 PM', status: 'Expired', icon: <MdVpnKey size={24} className="text-teal-500" /> },
+    { id: 18, title: 'VIP Area Access for VIP Pass Holders', description: 'VIP Pass holders receive exclusive entry to the premium VIP area with enhanced amenities.', startDate: '29 July 24', endDate: '1 August 24', time: '10:00 AM - 5:00 PM', status: 'Active', icon: <MdVpnKey size={24} className="text-teal-500" /> },
+    { id: 19, title: 'VIP Area Access for VIP Pass Holders', description: 'VIP Pass holders receive exclusive entry to the premium VIP area with enhanced amenities.', startDate: '29 July 24', endDate: '1 August 24', time: '10:00 AM - 5:00 PM', status: 'Expired', icon: <MdVpnKey size={24} className="text-teal-500" /> },
+    { id: 20, title: 'VIP Area Access for VIP Pass Holders', description: 'VIP Pass holders receive exclusive entry to the premium VIP area with enhanced amenities.', startDate: '29 July 24', endDate: '1 August 24', time: '10:00 AM - 5:00 PM', status: 'Expired', icon: <MdVpnKey size={24} className="text-teal-500" /> },
 ];
+
+const VOUCHERS_PER_PAGE = 8;
 
 function MgtVoucher() {
     const [filter, setFilter] = useState('All');
     const [searchTerm, setSearchTerm] = useState('');
     const [vouchers, setVouchers] = useState(vouchersInitial);
     const [isVoucherModalOpen, setIsVoucherModalOpen] = useState(false);
+
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const vouchersPerPage = 8;
 
     const filteredVouchers = vouchers.filter(voucher => {
         if (filter === 'Active') return voucher.status === 'Active';
@@ -24,6 +45,12 @@ function MgtVoucher() {
     }).filter(voucher =>
         voucher.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    // Calculate pagination
+    const indexOfLastVoucher = currentPage * vouchersPerPage;
+    const indexOfFirstVoucher = indexOfLastVoucher - vouchersPerPage;
+    const currentVouchers = filteredVouchers.slice(indexOfFirstVoucher, indexOfLastVoucher);
+    const totalPages = Math.ceil(filteredVouchers.length / vouchersPerPage);
 
     return (
         <div className="min-h-screen p-4">
@@ -80,7 +107,7 @@ function MgtVoucher() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredVouchers.map(voucher => (
+                            {currentVouchers.map(voucher => (
                                 <tr key={voucher.id} className="border-b border-gray-200 last:border-b-0">
                                     <td className="py-4 flex items-center">
                                         {voucher.icon}
@@ -111,19 +138,19 @@ function MgtVoucher() {
                         </tbody>
                     </table>
 
-                    {/* Pagination Section */}
-                    <div className="mt-6 flex justify-end items-center space-x-2">
-                        <span className="text-gray-500">Page</span>
-                        {[1, 2, 3].map(page => (
-                            <button key={page} className="px-3 py-1 border rounded-md hover:bg-gray-100">
-                                {page}
+                    {/* Pagination Controls */}
+                    <div className="flex justify-end mt-6">
+                        {Array.from({ length: totalPages }, (_, index) => (
+                            <button
+                                key={index}
+                                className={`px-3 py-1 mx-1 rounded-md ${currentPage === index + 1 ? 'bg-teal-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+                                onClick={() => setCurrentPage(index + 1)}
+                            >
+                                {index + 1}
                             </button>
                         ))}
-                        <span className="text-gray-500">... 10</span>
                     </div>
                 </div>
-
-
             </div>
             {isVoucherModalOpen && (
                 <ModalOverlay
@@ -131,14 +158,10 @@ function MgtVoucher() {
                     setIsOpen={setIsVoucherModalOpen}
                     title="Create Voucher"
                 >
-                    <CreateVoucherForm
-                        setIsModalOpen={setIsVoucherModalOpen}
-                    />
+                    <CreateVoucherForm setIsModalOpen={setIsVoucherModalOpen} />
                 </ModalOverlay>
-                
             )}
         </div>
-
     );
 }
 
