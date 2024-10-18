@@ -1,4 +1,4 @@
-import React, { useEffect , useState } from "react";
+import React, { useEffect, useState } from "react";
 import { RouterProvider } from "react-router-dom";
 import appRoutes from "./routes/app.routing";
 import { useDispatch, useSelector } from "react-redux";
@@ -64,77 +64,76 @@ function App() {
     }
   }, [dispatch]);
 
-  const createEventHandler = async () => {
-    try {
-      const response = await backend.createEvent(
-        "Venue1#br5f7-7uaaa-aaaaa-qaaca-cai",
-        {
-          id: "event123",
-          title: "Event Title",
-          sTicket_limit: 50,
-          description: "Event Description",
-          logo: {
-            data: "example-logo-data",
-            logo_type: "image"
-          },
-          banner: {
-            data: "example-banner-data",
-            logo_type: "image"
-          },
-          details: {  
-            StartDate: "2024-12-01",
-            StartTime: 14,  
-            Location: "Event Location",
-            EndDate: "2024-12-01",
-            EndTime: 18 
-          },
-          gTicket_limit: 100,
-          vTicket_limit: 80
-        },
-        {
-          collection_args: {
-            maxLimit: 500,
-            sTicket_limit: 50,
-            gTicket_price: 100,
-            logo: {
-              data: "collection-logo-data",
-              logo_type: "image"
-            },
-            name: "Collection Name",
-            vTicket_price: 50,
-            banner: {
-              data: "collection-banner-data",
-              logo_type: "image"
-            },
-            description: "Collection description",  
-            created_at: BigInt(Date.now()),
-            collection_type: { Event: null },
-            sTicket_price: 75,
-            gTicket_limit: 100,
-            symbol: "COL",
-            vTicket_limit: 80,
-          },
-        }
-      );
-  
-      console.log("Event created successfully:", response);
-    } catch (err) {
-      console.error("Error creating event:", err);
-    }
-  };
+  //   const createEventHandler = async () => {
+  //     try {
+  //       const response = await backend.createEvent(
+  //         "Venue1#br5f7-7uaaa-aaaaa-qaaca-cai",
+  //         {
+  //           id: "event123",
+  //           title: "Event Title",
+  //           sTicket_limit: 50,
+  //           description: "Event Description",
+  //           logo: {
+  //             data: "example-logo-data",
+  //             logo_type: "image"
+  //           },
+  //           banner: {
+  //             data: "example-banner-data",
+  //             logo_type: "image"
+  //           },
+  //           details: {
+  //             StartDate: "2024-12-01",
+  //             StartTime: 14,
+  //             Location: "Event Location",
+  //             EndDate: "2024-12-01",
+  //             EndTime: 18
+  //           },
+  //           gTicket_limit: 100,
+  //           vTicket_limit: 80
+  //         },
+  //         {
+  //           collection_args: {
+  //             maxLimit: 500,
+  //             sTicket_limit: 50,
+  //             gTicket_price: 100,
+  //             logo: {
+  //               data: "collection-logo-data",
+  //               logo_type: "image"
+  //             },
+  //             name: "Collection Name",
+  //             vTicket_price: 50,
+  //             banner: {
+  //               data: "collection-banner-data",
+  //               logo_type: "image"
+  //             },
+  //             description: "Collection description",
+  //             created_at: BigInt(Date.now()),
+  //             collection_type: { Event: null },
+  //             sTicket_price: 75,
+  //             gTicket_limit: 100,
+  //             symbol: "COL",
+  //             vTicket_limit: 80,
+  //           },
+  //         }
+  //       );
 
-const deleteEventHandler = async () => {
-  try {
-    const response = await backend.deleteEvent(
-      "Venue1#br5f7-7uaaa-aaaaa-qaaca-cai", 
-      Principal.fromText("2vxsx-fae") 
-    );
-    console.log("Event deleted successfully:", response);
-  } catch (err) {
-    console.error("Error deleting event:", err);
-  }
-};
+  //       console.log("Event created successfully:", response);
+  //     } catch (err) {
+  //       console.error("Error creating event:", err);
+  //     }
+  //   };
 
+  // const deleteEventHandler = async () => {
+  //   try {
+  //     const response = await backend.deleteEvent(
+  //       "Venue1#br5f7-7uaaa-aaaaa-qaaca-cai",
+  //       Principal.fromText("2vxsx-fae")
+  //     );
+  //     console.log("Event deleted successfully:", response);
+  //   } catch (err) {
+  //     console.error("Error deleting event:", err);
+  //   }
+  // };
 
   //   const updateVenueHandler = async () => {
   //   try {
@@ -231,95 +230,96 @@ const deleteEventHandler = async () => {
   //   };
 
   //buy tickets
-  const [ticketType, setTicketType] = useState("SinglePass");
-  const [price, setPrice] = useState(100);
-  const buyEventTicketHandler = async () => {
-    try {
-      const venueId = "Aarchi Jain#by6od-j4aaa-aaaaa-qaadq-cai";
-      const eventId = "new event#avqkn-guaaa-aaaaa-qaaea-cai";
-      const ticketTypeVariant = { [ticketType]: null };
-      const record = [
-        {
-          data: new Uint8Array([1, 2, 3]),
-          description: "Ticket metadata",
-          key_val_data: [
-            {
-              key: "eventName",
-              val: { TextContent: "Amazing Concert" }
-            },
-            {
-              key: "date",
-              val: { TextContent: "2024-12-31" }
-            }
-          ],
-          purpose: { Rendered: null }
-        }
-      ];
+  // const [ticketType, setTicketType] = useState("SinglePass");
+  // const [price, setPrice] = useState(100);
+  // const buyEventTicketHandler = async () => {
+  //   try {
+  //     const venueId = "Aarchi Jain#by6od-j4aaa-aaaaa-qaadq-cai";
+  //     const eventId = "new event#avqkn-guaaa-aaaaa-qaaea-cai";
+  //     const ticketTypeVariant = { [ticketType]: null };
+  //     const record = [
+  //       {
+  //         data: new Uint8Array([1, 2, 3]),
+  //         description: "Ticket metadata",
+  //         key_val_data: [
+  //           {
+  //             key: "eventName",
+  //             val: { TextContent: "Amazing Concert" }
+  //           },
+  //           {
+  //             key: "date",
+  //             val: { TextContent: "2024-12-31" }
+  //           }
+  //         ],
+  //         purpose: { Rendered: null }
+  //       }
+  //     ];
 
-      const response = await backend.buyEventTicket(
-        venueId,
-        eventId,
-        { ticket_type: ticketTypeVariant, price: price },
-        record
-      );
+  //     const response = await backend.buyEventTicket(
+  //       venueId,
+  //       eventId,
+  //       { ticket_type: ticketTypeVariant, price: price },
+  //       record
+  //     );
 
-      console.log("Event ticket purchased successfully:", response);
-          } catch (err) {
-            console.error("Error in buying event tickets:", err);
-          }
-        };
+  //     console.log("Event ticket purchased successfully:", response);
+  //         } catch (err) {
+  //           console.error("Error in buying event tickets:", err);
+  //         }
+  //       };
 
- 
-        const buyVenueTicketHandler = async () => {
-          try {
-            const venueId = "Aarchi Jain#by6od-j4aaa-aaaaa-qaadq-cai";
-            const ticketTypeVariant = { [ticketType]: null };
-            const record = [
-              {
-                data: new Uint8Array([4, 5, 6]), 
-                description: "Venue ticket metadata",
-                key_val_data: [
-                  {
-                    key: "venueName",
-                    val: { TextContent: "Awesome Stadium" }
-                  },
-                  {
-                    key: "validUntil",
-                    val: { TextContent: "2024-12-31" }
-                  }
-                ],
-                purpose: { Rendered: null }
-              }
-            ];
-      
-            const response = await backend.buyVenueTicket(
-              venueId,
-              { ticket_type: ticketTypeVariant, price: price },
-              record
-            );
-            console.log("Venue ticket purchased successfully:", response);
-          } catch (err) {
-            console.error("Error in buying venue tickets:", err);
-          }
-        };
-      
+  //       const buyVenueTicketHandler = async () => {
+  //         try {
+  //           const venueId = "Aarchi Jain#by6od-j4aaa-aaaaa-qaadq-cai";
+  //           const ticketTypeVariant = { [ticketType]: null };
+  //           const record = [
+  //             {
+  //               data: new Uint8Array([4, 5, 6]),
+  //               description: "Venue ticket metadata",
+  //               key_val_data: [
+  //                 {
+  //                   key: "venueName",
+  //                   val: { TextContent: "Awesome Stadium" }
+  //                 },
+  //                 {
+  //                   key: "validUntil",
+  //                   val: { TextContent: "2024-12-31" }
+  //                 }
+  //               ],
+  //               purpose: { Rendered: null }
+  //             }
+  //           ];
+
+  //           const response = await backend.buyVenueTicket(
+  //             venueId,
+  //             { ticket_type: ticketTypeVariant, price: price },
+  //             record
+  //           );
+  //           console.log("Venue ticket purchased successfully:", response);
+  //         } catch (err) {
+  //           console.error("Error in buying venue tickets:", err);
+  //         }
+  //       };
+
   return (
     <div className="light bg-background">
       {/* <button className="px-2 py-1 border rounded mr-2" onClick={updateVenueHandler}>
         Update Venue
       </button> */}
-      <button className="px-2 py-1 border rounded mr-2" onClick={createEventHandler}>
+      {/* <button
+        className="px-2 py-1 border rounded mr-2"
+        onClick={createEventHandler}
+      >
         Create Event
-      </button>
+      </button> */}
       {/* <button className="px-2 py-1 border rounded" onClick={createVenueHandler}>
       Create Venue
     </button> */}
-     <button className="px-2 py-1 border rounded" onClick={deleteEventHandler}>
-      Delete Event
-    </button>
+      {/* <button className="px-2 py-1 border rounded" onClick={deleteEventHandler}>
+        Delete Event
+      </button> */}
 
-
-     {/* <div className="p-4">
+      {/* <div className="p-4">
         <select 
           value={ticketType} 
           onChange={(e) => setTicketType(e.target.value)} 
@@ -343,7 +343,6 @@ const deleteEventHandler = async () => {
           Buy Venue Ticket
         </button>
       </div> */}
-
 
       {/* <div className="p-4">
       <div className="bg-foreground p-4 rounded-2xl">I am {theme} theme.</div>

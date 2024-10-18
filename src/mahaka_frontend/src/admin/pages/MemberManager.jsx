@@ -217,13 +217,11 @@ const MemberList = ({ members, onMemberClick, isRtNavOpen }) => {
       {members.map((member) => (
         <div
           key={member.id}
-          className="z-20 flex cursor-pointer items-left border-b px-6 py-4 md:px-8 dark:hover:bg-hover hover:bg-gray-100 border-b-border bg-card justify-start"
-         
+          className="z-20 flex cursor-pointer items-center border-b px-6 py-4 md:px-8 dark:hover:bg-hover hover:bg-gray-100 border-b-border bg-card justify-start"
           onClick={() => {
             if (!isRtNavOpen) onMemberClick(member);
           }}
         >
-         
           <div className="flex h-10 w-10 flex-0 items-center justify-center overflow-hidden rounded-full">
             <Avvvatars value={member.name} size={48} shadow={true} />
           </div>
@@ -235,12 +233,9 @@ const MemberList = ({ members, onMemberClick, isRtNavOpen }) => {
               </span>
             </div>
           </div>
-          
-          <FaArrowRight className = "flex items-end ml-auto opacity-90"/>   
+          <FaArrowRight className="flex items-end ml-auto opacity-90" />
         </div>
       ))}
-      
-     
     </div>
   );
 };
