@@ -174,20 +174,20 @@ const VenueDetailPage = () => {
                   key={event.id}
                   className="border border-gray-300 p-4 mb-4 rounded"
                 >
-                  <h3 className="text-lg font-semibold">{event.Title}</h3>
+                  <h3 className="text-lg font-semibold">{event.title}</h3>
                   <p>
-                    <strong>📅</strong> {formatDate(event.Details.StartDate)} -{" "}
-                    {formatDate(event.Details.EndDate)}
+                    <strong>📅</strong> {formatDate(event.details.StartDate)} -{" "}
+                    {formatDate(event.details.EndDate)}
                   </p>
                   <p>
-                    <strong>🕒</strong> {FormatTime(event.Details.StartTime)} -{" "}
-                    {FormatTime(event.Details.EndTime)}
+                    <strong>🕒</strong> {FormatTime(event.details.StartTime)} -{" "}
+                    {FormatTime(event.details.EndTime)}
                   </p>
                   <p>
-                    <strong>Location:</strong> {event.Details.Location}
+                    <strong>Location:</strong> {event.details.Location}
                   </p>
                   <p>
-                    <strong>Description:</strong> {event.Description}
+                    <strong>Description:</strong> {event.description}
                   </p>
                 </div>
               ))}

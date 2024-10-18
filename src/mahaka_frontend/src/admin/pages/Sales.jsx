@@ -1,5 +1,6 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { MdTrendingUp } from "react-icons/md";
 
 const eventData = [
   { id: '01', name: 'Halloween Retreat', popularity: 68, color: '#00b8a9' },
@@ -66,7 +67,7 @@ const Sales = () => {
               <span className="text-6xl">{item.icon}</span>
             </div>
             <p className="text-green-500">
-              <span>↑ {item.increase} Up from past week</span>
+              <MdTrendingUp className='text-4xl'/> {item.increase} Up from past week
             </p>
           </div>
         ))}

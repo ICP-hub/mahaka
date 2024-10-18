@@ -11,7 +11,7 @@ import {
   NFIDSync,
 } from "./redux/reducers/auth/authenticationReducer";
 import { NFID } from "@nfid/embed";
-// import { Principal } from "@dfinity/principal";
+import { Principal } from "@dfinity/principal";
 // import { createVenue , updateVenue } from "./redux/reducers/apiReducers/venueApiReducer";
 
 function App() {
@@ -64,64 +64,77 @@ function App() {
     }
   }, [dispatch]);
 
-  //   const createEventHandler = async () => {
-  //     try {
-  //       const response = await backend.createEvent(
-  //         "Venue1 Title#br5f7-7uaaa-aaaaa-qaaca-cai",
-  //         {
-  //            id: "event123",
-  //         sTicket_limit: 50,
-  //         Description: "Event Description",
-  //         logo: {
-  //           data: "example-logo-data",
-  //           logo_type: "image"
-  //         },
-  //         banner: {
-  //           data: "example-banner-data",
-  //           logo_type: "image"
-  //         },
-  //         Details: {
-  //           StartDate: "2024-12-01",
-  //           StartTime: "14", // Time as string
-  //           Location: "Event Location",
-  //           EndDate: "2024-12-01",
-  //           EndTime: "18" // Time as string
-  //         },
-  //         Title: "Event Title",
-  //         gTicket_limit: 100,
-  //         vTicket_limit: 80
-  //       },
-  //         {
-  //           collection_args: {
-  //             maxLimit: 500,
-  //             sTicket_limit: 50,
-  //             gTicket_price: 100,
-  //             logo: {
-  //               data: "collection-logo-data",
-  //               logo_type: "image"
-  //             },
-  //             name: "Collection Name",
-  //             vTicket_price: 50,
-  //             banner: {
-  //               data: "collection-banner-data",
-  //               logo_type: "image"
-  //             },
-  //             description: "Collection description",
-  //             created_at: BigInt(Date.now()),
-  //             collection_type: { Event: null },
-  //             sTicket_price: 75,
-  //             gTicket_limit: 100,
-  //             symbol: "COL",
-  //             vTicket_limit: 80,
-  //           },
-  //         }
-  //       );
+  const createEventHandler = async () => {
+    try {
+      const response = await backend.createEvent(
+        "Venue1#br5f7-7uaaa-aaaaa-qaaca-cai",
+        {
+          id: "event123",
+          title: "Event Title",
+          sTicket_limit: 50,
+          description: "Event Description",
+          logo: {
+            data: "example-logo-data",
+            logo_type: "image"
+          },
+          banner: {
+            data: "example-banner-data",
+            logo_type: "image"
+          },
+          details: {  
+            StartDate: "2024-12-01",
+            StartTime: 14,  
+            Location: "Event Location",
+            EndDate: "2024-12-01",
+            EndTime: 18 
+          },
+          gTicket_limit: 100,
+          vTicket_limit: 80
+        },
+        {
+          collection_args: {
+            maxLimit: 500,
+            sTicket_limit: 50,
+            gTicket_price: 100,
+            logo: {
+              data: "collection-logo-data",
+              logo_type: "image"
+            },
+            name: "Collection Name",
+            vTicket_price: 50,
+            banner: {
+              data: "collection-banner-data",
+              logo_type: "image"
+            },
+            description: "Collection description",  
+            created_at: BigInt(Date.now()),
+            collection_type: { Event: null },
+            sTicket_price: 75,
+            gTicket_limit: 100,
+            symbol: "COL",
+            vTicket_limit: 80,
+          },
+        }
+      );
+  
+      console.log("Event created successfully:", response);
+    } catch (err) {
+      console.error("Error creating event:", err);
+    }
+  };
 
-  //       console.log("create event result", response);
-  //     } catch (err) {
-  //       console.error("Error in create event", err);
-  //     }
-  //   };
+const deleteEventHandler = async () => {
+  try {
+    const response = await backend.deleteEvent(
+      "Venue1#br5f7-7uaaa-aaaaa-qaaca-cai", 
+      Principal.fromText("2vxsx-fae") 
+    );
+    console.log("Event deleted successfully:", response);
+  } catch (err) {
+    console.error("Error deleting event:", err);
+  }
+};
+
 
   //   const updateVenueHandler = async () => {
   //   try {
@@ -294,13 +307,16 @@ function App() {
     <div className="light bg-background">
       {/* <button className="px-2 py-1 border rounded mr-2" onClick={updateVenueHandler}>
         Update Venue
-      </button>
+      </button> */}
       <button className="px-2 py-1 border rounded mr-2" onClick={createEventHandler}>
         Create Event
       </button>
-      <button className="px-2 py-1 border rounded" onClick={createVenueHandler}>
+      {/* <button className="px-2 py-1 border rounded" onClick={createVenueHandler}>
       Create Venue
     </button> */}
+     <button className="px-2 py-1 border rounded" onClick={deleteEventHandler}>
+      Delete Event
+    </button>
 
 
      {/* <div className="p-4">
