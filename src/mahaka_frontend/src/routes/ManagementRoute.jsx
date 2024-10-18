@@ -6,6 +6,7 @@ import MgtDashBoard from "../management/pages/Dashboard";
 import MgtVenueManger from "../management/pages/VenueManager";
 import MgtUserActivity from "../management/pages/UserActivity";
 import MgtWahana from "../management/pages/Wahana";
+import MgtVoucher from "../management/pages/Voucher";
 
 /* management routes */
 export const managementRoutes = [
@@ -24,6 +25,8 @@ export const managementRoutes = [
       { path: "venues", element: <MgtVenueManger /> },
       { path: "useractivity", element: <MgtUserActivity /> },
       { path: "wahana", element: <MgtWahana /> },
+      { path: "voucher", element: <MgtVoucher /> },
+
     ],
   },
 ];

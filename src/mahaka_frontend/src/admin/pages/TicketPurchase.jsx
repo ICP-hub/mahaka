@@ -31,6 +31,8 @@ const TicketPurchase = () => {
     visitorCounts.group * 100 +
     visitorCounts.student * 50;
 
+    const totalTickets = visitorCounts.group + visitorCounts.student + visitorCounts.vip;
+
   const today = new Date().toISOString().split("T")[0];
 
   return (
