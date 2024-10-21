@@ -38,10 +38,10 @@ const Ticket = () => {
 
     return(
       <>
-      <div className = "bg-gray-200 min-h-screen p-3">
+      <div className = "bg-gray-200 min-h-screen p-3 dark:bg-slate-700">
       <div className = "grid grid-cols-1 md:grid-cols-3">
         {/* card1 */}
-        <div className = "bg-white p-3 mx-2 my-2 shadow-lg rounded-lg text-center hover:scale-105 transition-transform animate">
+        <div className = "bg-white p-3 mx-2 my-2 shadow-lg rounded-lg text-center hover:scale-105 transition-transform animate dark:bg-slate-600">
           <h1 className = "text-xl text-gray-600 my-2 font-bold text-left">Regular Events</h1>
           <p className = "text-8xl text-green-400 font-bold">10</p>
           <button className = "bg-blue-400 text-white p-3 rounded-lg hover:bg-blue-500">
@@ -51,11 +51,11 @@ const Ticket = () => {
             </button>
             <div className = "flex">
             <MdDateRange className = "mt-2 mx-2 opacity-90" size={25}/>
-          <p className = "mt-3 text-md  text-gray-600 font-semibold">Ends on 13 days</p>
+          <p className = "mt-3 text-md  text-gray-600 font-semibold dark:text-white">Ends on 13 days</p>
           </div>
         </div>
         {/* card2 */}
-        <div className = "bg-white p-3 mx-2 my-2 shadow-lg rounded-lg text-center  hover:scale-105 transition-transform animate">
+        <div className = "bg-white p-3 mx-2 my-2 shadow-lg rounded-lg text-center  hover:scale-105 transition-transform animate dark:bg-slate-600">
           <h1 className = "text-xl text-gray-600 my-2 font-bold text-left">Special Events</h1>
           <p className = "text-8xl text-pink-400 font-bold">5</p>
           <button className = "bg-blue-400 text-white p-3 rounded-lg hover:bg-blue-500">
@@ -65,10 +65,10 @@ const Ticket = () => {
             </button>
             <div className = "flex">
             <MdDateRange className = "mt-2 mx-2 opacity-90" size={25}/>
-          <p className = "mt-3 text-md  text-gray-600 font-semibold">Ends on 13 days</p>
+          <p className = "mt-3 text-md  text-gray-600 font-semibold dark:text-white">Ends on 13 days</p>
           </div>
         </div>
-        <div className = "bg-white p-3 mx-2 my-2 shadow-lg rounded-lg text-center  hover:scale-105 transition-transform animate">
+        <div className = "bg-white p-3 mx-2 my-2 shadow-lg rounded-lg text-center  hover:scale-105 transition-transform animate dark:bg-slate-600">
         <h1 className = "text-xl text-gray-600 my-2 font-bold text-left">Discount</h1>
           <p className = "text-8xl text-red-400 font-bold animate-bounce">30%</p>
           <button className = "bg-blue-400 text-white p-3 rounded-lg hover:bg-blue-500">
@@ -78,22 +78,22 @@ const Ticket = () => {
             </button>
             <div className = "flex">
             <MdDateRange className = "mt-2 mx-2 opacity-90" size={25}/>
-          <p className = "mt-3 text-md  text-gray-600 font-semibold">Ends on 13 days</p>
+          <p className = "mt-3 text-md  text-gray-600 font-semibold dark:text-white">Ends on 13 days</p>
           </div>
         </div>
       </div>
 
       <section className="mb-8">
-        <h2 className="text-xl font-semibold text-gray-500 mx-2 my-2">What Our Users Say</h2>
+        <h2 className="text-xl font-semibold text-gray-500 mx-2 my-2 dark:text-white">What Our Users Say</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <blockquote className="bg-white p-4 rounded-lg shadow-lg">
-            <p className="text-gray-600 italic">
+          <blockquote className="bg-white p-4 rounded-lg shadow-lg dark:bg-slate-600">
+            <p className="text-gray-600 italic dark:text-white">
               "Amazing platform! I always find the best events here."
             </p>
             <footer className="text-right mt-4">- John Doe</footer>
           </blockquote>
-          <blockquote className="bg-white p-4 rounded-lg shadow-lg">
-            <p className="text-gray-600 italic">
+          <blockquote className="bg-white p-4 rounded-lg shadow-lg dark:bg-slate-600">
+            <p className="text-gray-600 italic dark:text-white">
               "The booking process is super smooth. Highly recommend!"
             </p>
             <footer className="text-right mt-4">- Jane Smith</footer>
@@ -138,7 +138,7 @@ const Events = ()=>{
       
       {
         EventsList.map((event)=>(
-          <div className = "bg-white p-2 shadow-lg mx-3 my-2 rounded-lg hover:bg-gray-100"
+          <div className = "bg-white p-2 shadow-lg mx-3 my-2 rounded-lg hover:bg-gray-100 dark:bg-slate-600"
           onClick =  {()=>{eventDetails(event)}} 
           >
             <div className="flex">
@@ -151,8 +151,8 @@ const Events = ()=>{
             <div className="mx-2 my-2">
             <h1 className = "text-lg text-slate-600 font-bold">{event.heading}</h1>
             <p className = "text-orange-400 text-md">{event.para}</p>
-            <p className = "text-slate-500 text-md">{event.address}</p>
-            <p className = "text-slate-500 text-md font-bold">{event.date}</p>
+            <p className = "text-slate-500 text-md dark:text-white">{event.address}</p>
+            <p className = "text-slate-500 text-md font-bold dark:text-white">{event.date}</p>
             </div>
 
             <div className = "ml-auto my-2 p-3">
@@ -196,15 +196,15 @@ useEffect(()=>{
 
 
   return (
-    <div className = "bg-gray-200 min-h-screen">
+    <div className = "bg-gray-200 overflow-hidden overflow-y-auto h-screen dark:bg-slate-700">
 
       {/* Top heading */}
-      <div className = "bg-white p-4 flex justify-around">
+      <div className = "bg-white p-4 flex justify-around dark:bg-slate-700">
       <div>
-        <h1 className = "font-bold text-left text-2xl text-slate-700 mx-2 md:text-5xl">Mahaka Bookings</h1>
+        <h1 className = "font-bold text-left text-2xl text-slate-700 mx-2 md:text-5xl dark:text-white">Mahaka Bookings</h1>
         <div className = "flex">
         <FaSmileBeam className = "my-2 size-5 opacity-90"/>
-        <p className = "text-md text-slate-500 my-2 text-left mx-2"> Platform for booking tickets to exciting events!</p>
+        <p className = "text-md text-slate-500 my-2 text-left mx-2 dark:text-white"> Platform for booking tickets to exciting events!</p>
         </div>
         </div>
         <div className = "text-purple-400 text-8xl ml-auto p-2 my-2"> 
@@ -216,7 +216,7 @@ useEffect(()=>{
     <div className="flex flex-col relative p-4">
       <div className="flex space-x-8 justify-around">
         <button
-          className={`relative text-lg font-semibold transition-colors duration-200 ${
+          className={`relative text-lg font-semibold transition-colors dark:text-white duration-200 ${
             selectedView === 'home' ? 'text-blue-500' : 'text-gray-700 hover:text-blue-600'
           }`}
           onClick={() => setSelectedView('home')}
@@ -224,7 +224,7 @@ useEffect(()=>{
           Home
         </button>
         <button
-          className={`relative text-lg font-semibold transition-colors duration-200 ${
+          className={`relative text-lg font-semibold transition-colors dark:text-white duration-200 ${
             selectedView === 'total' ? 'text-blue-500' : 'text-gray-700 hover:text-blue-600'
           }`}
           onClick={() => setSelectedView('total')}
@@ -250,7 +250,7 @@ useEffect(()=>{
        {rightNav && (
          <>
            <motion.div
-              className="fixed top-2 md:top-4 right-1 w-full p-3 md:w-100 bg-gray-100 md:h-full shadow-lg z-20 md:z-20 mt-10 md:rounded-lg overflow-x-hidden "
+              className="fixed top-2 md:top-4 right-1 w-full p-3 md:w-100 bg-gray-100 md:h-full shadow-lg z-20 md:z-20 mt-10 md:rounded-lg"
               initial={{ marginRight: -640 }}
                animate={{ marginRight: 0 }}
               exit={{ marginRight: -640 }}
@@ -272,15 +272,15 @@ useEffect(()=>{
             type="text"
             id="name"
             placeholder='Full Name'
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            // value={name}
+            // onChange={(e) => setName(e.target.value)}
             className="w-full p-3 border border-gray-300 rounded-lg my-2"
             required
           />
 
           {/* Email field */}
           <input
-            type="email"
+            type="text"
             id="email"
              placeholder='Email'
             // value={email}
@@ -291,7 +291,7 @@ useEffect(()=>{
 
           {/* Address field */}
           <textarea
-            type="tel"
+            type="text"
             id="phone"
               placeholder='Address'
             // value={phone}
@@ -305,7 +305,7 @@ useEffect(()=>{
                  {/* choose the ticket */}
                  <div>
           <label className="block text-md font-semibold text-slate-600 mb-2 mt-2 ml-2" htmlFor="ticketType">Choose Ticket Type</label>
-          <select id="ticketType" className="w-full p-3 border border-gray-300 rounded-lg" value={ticketType} onChange={(e) => setTicketType(e.target.value)}>
+          <select id="ticketType" className="w-full p-3 border border-gray-300 rounded-lg dark:text-gray-500" value={ticketType} onChange={(e) => setTicketType(e.target.value)}>
      
             <option value="general">General </option>
             <option value="vip">VIP</option>
@@ -315,14 +315,14 @@ useEffect(()=>{
 
         {/* quantity */}
         <div>
-          <label className="block text-md font-semibold text-slate-600 mb-2 mt-2 ml-2" htmlFor="ticketQuantity">Ticket Quantity</label>
+          <label className="block text-md font-semibold text-slate-600 mb-2 mt-2 ml-2 dark:text-gray-600" htmlFor="ticketQuantity">Ticket Quantity</label>
           <input
             type="number"
             id="ticketQuantity"
             min="1"
             value={ticketQuantity}
             onChange={(e) => setTicketQuantity(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg"
+            className="w-full p-3 border border-gray-300 rounded-lg dark:text-gray-500"
           />
         </div>
 
