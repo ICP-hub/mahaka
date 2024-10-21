@@ -30,12 +30,17 @@ module {
         #Wahana;
     };
 
-    public type wahana_details = {
+    public type Wahana_details = {
         id : Text;
         ride_title : Text;
         description : Text;
         banner : LogoResult;
         priceinusd : Text;
+        creator : Principal;
+    };
+
+    public type Wahana_data = {
+        Wahanas : List.List<Wahana_details>;
     };
 
     public type ticket_info = {
@@ -92,6 +97,7 @@ module {
         banner : LogoResult;
         Details : venueDetails;
         Events : List.List<Events>;
+        Wahanas : List.List<Wahana_details>;
         capacity : Nat;
         Collection_id : Principal;
     };
@@ -105,6 +111,8 @@ module {
         firstName : Text;
         lastName : Text;
         email : Text;
+        role : Roles;
+        assignedVenue : Text;
     };
 
     public type UpdateUserError = {
@@ -113,6 +121,7 @@ module {
         #EmptyEmail;
         #EmptyFirstName;
         #EmptyLastName;
+        #EmptyAssignedVenue;
     };
 
     public type GetUserError = {
