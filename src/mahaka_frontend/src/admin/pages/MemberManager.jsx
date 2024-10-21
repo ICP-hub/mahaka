@@ -12,6 +12,8 @@ import {
   HiXMark,
 } from "react-icons/hi2";
 import { AnimatePresence, motion } from "framer-motion";
+import NavigationRight from "../../common/components/NavigationRight";
+import { useSelector } from "react-redux";
 
 const teamData = [
   {
@@ -184,27 +186,17 @@ const MemberManager = () => {
               isRtNavOpen={isRtNavOpen}
             />
           </div>
-          <AnimatePresence>
-            {isRtNavOpen && (
-              <motion.div
-                initial={{ marginRight: -640 }}
-                animate={{ marginRight: 0 }}
-                exit={{ marginRight: -640 }}
-                transition={{ duration: 0.3 }}
-                className="absolute md:relative right-0 top-0 left-0 bottom-0 w-full bg-card h-full md:w-160 z-20 overflow-y-auto overflow-x-hidden custom-scroll"
-              >
-                <UpdateMember
-                  member={currentMember}
-                  onToggle={toggleNav}
-                  onDelete={deleteMember}
-                  isEditing={isEditing}
-                  setIsEditing={setIsEditing}
-                  members={members}
-                  setMembers={setMembers}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <NavigationRight isOpen={isRtNavOpen}>
+            <UpdateMember
+              member={currentMember}
+              onToggle={toggleNav}
+              onDelete={deleteMember}
+              isEditing={isEditing}
+              setIsEditing={setIsEditing}
+              members={members}
+              setMembers={setMembers}
+            />
+          </NavigationRight>
         </div>
       </div>
     </div>
@@ -239,6 +231,7 @@ const MemberList = ({ members, onMemberClick, isRtNavOpen }) => {
     </div>
   );
 };
+
 const UpdateMember = ({
   member,
   onToggle,
@@ -254,6 +247,7 @@ const UpdateMember = ({
   const [principalId, setPrincipalId] = useState(
     member ? member.principalId : ""
   );
+  const { venues } = useSelector((state) => state.venues);
   const isNewMember = !member;
 
   const handleSubmit = () => {
@@ -335,7 +329,7 @@ const UpdateMember = ({
                 onDelete={() => onDelete(member.id)}
               />
             ) : (
-              <ViewDetails member={member} />
+              <ViewDetails member={member} venues={venues} />
             )}
           </div>
         </div>
@@ -469,7 +463,7 @@ const EditDetails = ({
   );
 };
 
-const ViewDetails = ({ member }) => {
+const ViewDetails = ({ member, venues }) => {
   if (!member) return null;
 
   const permissions = rolePermissions[member.role] || [];

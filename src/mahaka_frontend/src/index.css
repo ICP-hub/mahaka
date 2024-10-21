@@ -69,4 +69,33 @@
 }
 */
 
+.hint-box::before {
+  content: "";
+  display: inline-block;
+  height: 16px;
+}
 
+/*Inventory grid for event table */
+.inventory-grid {
+  display: grid;
+  grid-template-columns: 48px auto 40px;
+  gap: 8px;
+}
+
+@media (min-width: 600px) {
+  .inventory-grid {
+    grid-template-columns: 48px auto 112px 72px;
+  }
+}
+
+@media (min-width: 960px) {
+  .inventory-grid {
+    grid-template-columns: 48px 112px auto 112px 72px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .inventory-grid {
+    grid-template-columns: 48px 112px auto 112px 96px 96px 72px;
+  }
+}
