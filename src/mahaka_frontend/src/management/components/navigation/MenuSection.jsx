@@ -19,7 +19,9 @@ const MenuSection = () => {
       icon: <HiOutlineStar size={24} />,
     },
     // { path: "/admin/events", label: "Events", icon: <MdEventNote size={24} /> },
-    { path: "/management/venues", label: "venues", icon: <MdMap size={24} /> },
+    { path: "/management/venues", label: "Venues", icon: <MdMap size={24} /> },
+    { path: "/management/voucher", label: "Voucher", icon: <MdMap size={24} /> },
+
     // {
     //   path: "/management/users",
     //   label: "users",

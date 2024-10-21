@@ -14,27 +14,27 @@ const DashboardAnalytics = () => {
   // GoalCard component
   const GoalCard = () => {
     return (
-      <div class="bg-white shadow-lg rounded-lg p-4 max-w-sm my-3 mx-2">
-        <h2 class="text-gray-500 text-xl font-medium">Goal Overview</h2>
+      <div class="bg-card shadow-lg rounded-lg p-4 max-w-sm my-3 mx-2">
+        <h2 class=" text-xl font-medium">Goal Overview</h2>
         <div class="relative flex items-center justify-center my-4">
           {/* <!-- Circular Progress Bar using SVG --> */}
           <svg class="w-32 h-32">
             <circle class="text-gray-300" stroke-width="8" stroke="currentColor" fill="transparent" r="48" cx="64" cy="64" />
             <circle class="text-green-400" stroke-width="8" stroke-linecap="round" stroke="currentColor" fill="transparent" r="48" cx="64" cy="64"
               stroke-dasharray="301.44" stroke-dashoffset="50.74" />
-            <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" class="text-3xl font-semibold fill-gray-800">83%</text>
+            <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" class="text-3xl font-semibold fill-gray-500">83%</text>
           </svg>
         </div>
         <div class="flex justify-between items-center">
           <div class="text-center mt-10 mx-3">
             <hr class="border-gray-300 my-4" />
-            <h3 class="text-gray-400 text-md font-semibold">Completed</h3>
-            <p class="text-xl font-bold text-gray-700">786,617</p>
+            <h3 class=" text-md font-semibold">Completed</h3>
+            <p class="text-xl font-bold ">786,617</p>
           </div>
           <div class="text-center mt-10 mx-3">
             <hr class="border-gray-300 my-4" />
-            <h3 class="text-gray-400 text-md font-semibold">In Progress</h3>
-            <p class="text-xl font-bold text-gray-700">13,561</p>
+            <h3 class=" text-md font-semibold">In Progress</h3>
+            <p class="text-xl font-bold ">13,561</p>
           </div>
         </div>
       </div>
@@ -52,8 +52,8 @@ const DashboardAnalytics = () => {
 
     return (
       <div className="rounded-lg p-3">
-        <div className="space-y-1 bg-white p-3 shadow-lg rounded-lg">
-          <h2 className="text-2xl font-semibold text-gray-500 mb-4">Transactions</h2>
+        <div className="space-y-1 bg-card p-3 shadow-lg rounded-lg">
+          <h2 className="text-2xl font-semibold  mb-4">Transactions</h2>
           {transactionData.map(transaction => (
             <div
               key={transaction.id}
@@ -64,7 +64,7 @@ const DashboardAnalytics = () => {
               </div>
               <div className="flex-1 mr-3">
                 <h3 className="text-md font-semibold">{transaction.method}</h3>
-                <p className="text-gray-500">{transaction.date}</p>
+                <p className="">{transaction.date}</p>
               </div>
               <div className="text-xl font-semibold text-green-400">
                 {transaction.amount}
@@ -82,9 +82,9 @@ const DashboardAnalytics = () => {
       <>
         <div className="grid grid-cols-1 md:grid-cols-2">
           {/* booking card */}
-          <div className="bg-white mx-3 my-2 p-2 shadow-lg rounded-lg grid grid-cols-1">
+          <div className="bg-card mx-3 my-2 p-2 shadow-lg rounded-lg grid grid-cols-1">
             <div class="flex flex-col items-center">
-              <p class="text-lg text-gray-500">Bookings</p>
+              <p class="text-lg ">Bookings</p>
               <h4 class="text-4xl font-semibold">6,30k</h4>
 
               {/* <span className ="text-5xl"> </span> */}
@@ -94,9 +94,9 @@ const DashboardAnalytics = () => {
             </div>
           </div>
           {/* profit card */}
-          <div className="bg-white mx-3 my-2 p-2 shadow-lg rounded-lg grid grid-cols-1">
+          <div className="bg-card mx-3 my-2 p-2 shadow-lg rounded-lg grid grid-cols-1">
             <div class="flex flex-col items-center">
-              <p class="text-lg text-gray-500">Profits</p>
+              <p class="text-lg ">Profits</p>
               <h4 class="text-4xl font-semibold">2,30k</h4>
 
               {/* <span className ="text-5xl"> </span> */}
@@ -109,15 +109,15 @@ const DashboardAnalytics = () => {
 
         {/* special card earnings on top events card */}
         <div className="grid grid-cols-1 md:gid-cols-2">
-          <div className="bg-white mx-3 my-2 p-2 shadow-lg rounded-lg">
-            <h1 class="text-lg text-gray-700 text-left mb-3 mx-3 font-semibold">Earnings On Top Events</h1>
+          <div className="bg-card mx-3 my-2 p-2 shadow-lg rounded-lg">
+            <h1 class="text-lg  text-left mb-3 mx-3 font-semibold">Earnings On Top Events</h1>
             <div className="flex justify-around">
               {/* top event 1 */}
               <div class="flex flex-col items-center">
                 {/*  */}
                 <h4 class="text-2xl font-semibold">230$</h4>
-                <p class="text-lg text-gray-500">Music</p>
-                <div class="bg-pink-100 p-2 my-2">
+                <p class="text-lg ">Music</p>
+                <div class="bg-pink-100 p-2 my-2 rounded-full">
                   <GiMusicalScore className="text-3xl text-pink-400" />
                 </div>
               </div>
@@ -125,8 +125,8 @@ const DashboardAnalytics = () => {
               {/* top event 2 */}
               <div class="flex flex-col items-center">
                 <h4 class="text-2xl font-semibold">75$</h4>
-                <p class="text-lg text-gray-500">Foot Ball</p>
-                <div class="bg-emerald-100 p-2 my-2">
+                <p class="text-lg ">Foot Ball</p>
+                <div class="bg-emerald-100 p-2 my-2 rounded-full">
                   <FaFootballBall className="text-3xl text-emerald-400" />
                 </div>
               </div>
@@ -134,8 +134,8 @@ const DashboardAnalytics = () => {
               <div class="flex flex-col items-center">
                 {/*  */}
                 <h4 class="text-2xl font-semibold">890$</h4>
-                <p class="text-lg text-gray-500">Cricket</p>
-                <div class="bg-orange-100 p-2 my-2">
+                <p class="text-lg ">Cricket</p>
+                <div class="bg-orange-100 p-2 my-2 rounded-full">
                   <MdSportsCricket className="text-3xl text-orange-400" />
                 </div>
               </div>
@@ -147,15 +147,15 @@ const DashboardAnalytics = () => {
   }
 
   return (
-    <div class="p-3 bg-gray-200">
+    <div class="p-3 ">
       {/* <!-- Card container --> */}
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* <!-- Congratulations Card --> */}
-        <div class="bg-white rounded-lg shadow-lg p-3 mx-2 my-2">
+        <div class="bg-card rounded-lg shadow-lg p-3 mx-2 my-2">
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h3 class="text-lg font-semibold text-gray-700">Congratulations 🎉 Ankur!</h3>
-              <p class="text-md text-gray-500">You have won a gold medal </p>
+              <h3 class="text-lg font-semibold ">Congratulations 🎉 Ankur!</h3>
+              <p class="text-md ">You have won a gold medal </p>
             </div>
             {/* <!-- Medal emogi --> */}
             <div>
@@ -164,16 +164,16 @@ const DashboardAnalytics = () => {
             </div>
           </div>
           <div class="flex items-center mb-4">
-            <h2 class="text-4xl font-bold text-gray-700">$48.9k</h2>
+            <h2 class="text-4xl font-bold ">$48.9k</h2>
           </div>
           <button class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">View Sales</button>
         </div>
 
         {/* <!-- Statistics Card --> */}
-        <div class="bg-white rounded-lg shadow-lg p-4 mx-2 my-2">
+        <div class="bg-card rounded-lg shadow-lg p-4 mx-2 my-2">
           <div class="flex justify-between items-center p-3">
-            <h3 class="text-lg font-semibold text-gray-700">Statistics</h3>
-            <p class="text-sm text-gray-500">Updated 1 month ago</p>
+            <h3 class="text-lg font-semibold ">Statistics</h3>
+            <p class="text-sm ">Updated 1 month ago</p>
           </div>
           <div class="flex justify-around">
             {/* <!-- Sales --> */}
@@ -183,7 +183,7 @@ const DashboardAnalytics = () => {
                 <BsFileBarGraph className="text-3xl text-purple-500" />
               </div>
               <h4 class="text-lg font-semibold">230k</h4>
-              <p class="text-lg text-gray-500">Sales</p>
+              <p class="text-lg ">Sales</p>
             </div>
             {/* <!-- Customers --> */}
             <div class="flex flex-col items-center">
@@ -192,7 +192,7 @@ const DashboardAnalytics = () => {
                 <FaUsersCog className="text-3xl text-blue-500" />
               </div>
               <h4 class="text-lg font-semibold">8.549k</h4>
-              <p class="text-lg text-gray-500">Customers</p>
+              <p class="text-lg ">Customers</p>
             </div>
             {/* <!-- Products --> */}
             <div class="flex flex-col items-center">
@@ -201,7 +201,7 @@ const DashboardAnalytics = () => {
                 <FaTicket className="text-3xl text-red-500" />
               </div>
               <h4 class="text-lg font-semibold">1.423k</h4>
-              <p class="text-lg text-gray-500">Tickets</p>
+              <p class="text-lg ">Tickets</p>
             </div>
             {/* <!-- Revenue --> */}
             <div class="flex flex-col items-center">
@@ -210,7 +210,7 @@ const DashboardAnalytics = () => {
                 <FaDollarSign className="text-3xl text-green-500" />
               </div>
               <h4 class="text-lg font-semibold">$9745</h4>
-              <p class="text-lg text-gray-500">Revenue</p>
+              <p class="text-lg ">Revenue</p>
             </div>
           </div>
         </div>
@@ -224,8 +224,8 @@ const DashboardAnalytics = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 max-width-auto mx-auto">
         <GoalCard />
-        <div class="bg-white shadow-lg rounded-lg p-4 mx-2 text-center my-3">
-          <h3 class="text-gray-500 text-2xl font-semibold mb-2 text-left">Support Tracker</h3>
+        <div class="bg-card shadow-lg rounded-lg p-4 mx-2 text-center my-3">
+          <h3 class=" text-2xl font-semibold mb-2 text-left">Support Tracker</h3>
 
           <div class="relative inline-block">
             {/* <!-- SVG Circle for Dotted Progress with Increased Size --> */}
@@ -243,29 +243,29 @@ const DashboardAnalytics = () => {
             {/*     
     <!-- Center Percentage Text --> */}
             <div class="absolute inset-1 flex flex-col items-center justify-center">
-              <span class="text-2xl font-semibold text-gray-700">83%</span>
+              <span class="text-2xl font-semibold ">83%</span>
               {/* <!-- Adjusted font size --> */}
-              <p class="text-gray-400 text-sm">Completed Tickets</p>
+              <p class=" text-sm">Completed Tickets</p>
             </div>
           </div>
 
           <div className="flex gap-4 px-2">
             {/* <!-- New Tickets --> */}
             <div>
-              <p class="text-gray-400 text-sm">New Tickets</p>
-              <h4 class="text-xl font-bold text-gray-700">29</h4>
+              <p class=" text-sm">New Tickets</p>
+              <h4 class="text-xl font-bold ">29</h4>
             </div>
 
             {/* <!-- Open Tickets --> */}
             <div>
-              <p class="text-gray-400 text-sm">Open Tickets</p>
-              <h4 class="text-xl font-bold text-gray-700">63</h4>
+              <p class=" text-sm">Open Tickets</p>
+              <h4 class="text-xl font-bold ">63</h4>
             </div>
 
             {/* <!-- Response Time --> */}
             <div>
-              <p class="text-gray-400 text-sm">Response Time</p>
-              <h4 class="text-xl font-bold text-gray-700">1d</h4>
+              <p class=" text-sm">Response Time</p>
+              <h4 class="text-xl font-bold ">1d</h4>
             </div>
           </div>
         </div>
