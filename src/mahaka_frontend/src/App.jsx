@@ -302,7 +302,7 @@ function App() {
   //       };
 
   return (
-    <div className="light bg-background">
+    <div className="light bg-background no-scrollbar">
       {/* <button className="px-2 py-1 border rounded mr-2" onClick={updateVenueHandler}>
         Update Venue
       </button> */}
