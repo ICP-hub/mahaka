@@ -158,27 +158,49 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
     }));
   };
 
+  const imageToFileBlob = (imageFile) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        resolve(reader.result);
+      };
+      reader.onerror = (error) => {
+        reject(error);
+      };
+      reader.readAsDataURL(imageFile);
+    });
+  };
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const fileType = file.type;
+
+      // Create a Blob from the file
       const reader = new FileReader();
 
-      reader.onloadend = () => {
+      reader.onloadend = async () => {
+        // Convert the file into a Blob
+        const blob = await imageToFileBlob(file);
+        console.log(blob);
+
+        // Update state with the Blob
         setVenueData((prevState) => ({
           ...prevState,
           collection_args: {
             ...prevState.collection_args,
             banner: {
-              data: reader.result,
+              data: blob, // Store the Blob here
               logo_type: fileType,
             },
           },
         }));
-        setBannerPreview(reader.result);
+
+        // Set the banner preview (optional, for displaying image)
+        setBannerPreview(URL.createObjectURL(file)); // Create a URL for preview
       };
 
-      reader.readAsDataURL(file);
+      reader.readAsArrayBuffer(file); // Read the file as an ArrayBuffer for Blob conversion
     }
   };
 

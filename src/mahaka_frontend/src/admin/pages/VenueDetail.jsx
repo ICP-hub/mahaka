@@ -111,7 +111,7 @@ const VenueDetailPage = () => {
         <div className="flex flex-col md:flex-row items-start md:items-center mb-6 ">
           <div className="w-full md:w-1/2 h-64 bg-gray-200 mb-4 md:mb-0 rounded-lg shadow-lg">
             <img
-              src={VenueDemoImg}
+              src={venue.banner.data ? venue.banner.data : VenueDemoImg}
               alt="Venue Banner"
               className="w-full h-full object-cover rounded-lg"
             />
@@ -128,8 +128,7 @@ const VenueDetailPage = () => {
             <div className="mb-2 leading-relaxed">
               <p className="text-lg">
                 <strong>🕒 </strong>
-                {FormatTime(venue.Details.StartTime)} -{" "}
-                {FormatTime(venue.Details.EndTime)}
+                {venue.Details.StartTime} - {venue.Details.EndTime}
               </p>
             </div>
             <div className="mb-2 leading-relaxed">

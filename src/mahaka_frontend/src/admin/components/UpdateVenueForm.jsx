@@ -133,33 +133,52 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
     }));
   };
 
+  const imageToFileBlob = (imageFile) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        resolve(reader.result);
+      };
+      reader.onerror = (error) => {
+        reject(error);
+      };
+      reader.readAsDataURL(imageFile);
+    });
+  };
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const fileType = file.type;
+
+      // Create a Blob from the file
       const reader = new FileReader();
 
-      reader.onloadend = () => {
+      reader.onloadend = async () => {
+        // Convert the file into a Blob
+        const blob = await imageToFileBlob(file);
+
+        // Update state with the Blob directly in banner
         setVenueData((prevState) => ({
           ...prevState,
-          collection_args: {
-            ...prevState.collection_args,
-            banner: {
-              data: reader.result,
-              logo_type: fileType,
-            },
+          banner: {
+            data: blob, // Store the Blob here
+            logo_type: fileType, // Set the correct logo type
           },
         }));
-        setBannerPreview(reader.result);
+
+        // Set the banner preview (optional, for displaying image)
+        setBannerPreview(URL.createObjectURL(file)); // Create a URL for preview
       };
 
-      reader.readAsDataURL(file);
+      reader.readAsArrayBuffer(file); // Read the file as an ArrayBuffer for Blob conversion
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const venueId = venue.id;
+    console.log(venueId);
 
     const eventDetails = {
       StartDate: venueData.Details.StartDate,
@@ -168,6 +187,8 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
       EndTime: venueData.Details.EndTime,
       Location: venueData.Details.Location,
     };
+
+    console.log(venueData.banner, "banner");
 
     dispatch(
       updateVenue({

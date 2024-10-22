@@ -46,11 +46,13 @@ export const updateUser = createAsyncThunk(
   "users/updateUser",
   async ({ backend, user, setIsModalOpen }) => {
     const response = await backend.updateUser(
-      user.email,
       user.firstName,
-      user.lastName
+      user.lastName,
+      user.email,
+      user.role,
+      user.principal
     );
-    if (response.ok) setIsModalOpen(false);
+    if (response.ok);
     return response;
   }
 );
@@ -107,9 +109,11 @@ const userSlice = createSlice({
         state.userLoading = false;
         state.currentUser = {
           ...state.currentUser,
-          email: action.payload.ok[0].email,
           firstName: action.payload.ok[0].firstName,
           lastName: action.payload.ok[0].lastName,
+          email: action.payload.ok[0].email,
+          role: action.payload.ok[0].role,
+          principal: action.payload.ok[0].principal,
         };
         state.error = null;
       })
