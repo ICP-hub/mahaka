@@ -13,8 +13,11 @@ module {
         #sysAdmin;
         #admin;
         #manager;
+        #bod;
         #user;
         #vendor;
+        #staff;
+        #supervisor;
     };
 
     public type MetadataDesc = [Types.MetadataPart];
@@ -117,6 +120,8 @@ module {
 
     public type UpdateUserError = {
         #UserNotAuthenticated;
+        #UserNotAuthorized;
+        #RoleError;
         #UserNotFound;
         #EmptyEmail;
         #EmptyFirstName;
