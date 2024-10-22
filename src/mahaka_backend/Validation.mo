@@ -23,9 +23,24 @@ module {
         return true;
     };
 
-    public func check_for_Vendor(role : Types.Roles) : async Bool {
+    public func check_for_Bod(role : Types.Roles) : async Bool {
+        assert (role == #bod);
+        return true;
+    };
+
+    public func check_for_vendor(role : Types.Roles) : async Bool {
         assert (role == #vendor);
         return true;
     };
+
+    public func check_for_Staff(role : Types.Roles) : async Bool {
+        assert (role == #staff);
+        return true;
+    };
+    public func check_for_SuperVisor(role : Types.Roles) : async Bool {
+        assert (role == #supervisor);
+        return true;
+    };
+    // 
 
 };

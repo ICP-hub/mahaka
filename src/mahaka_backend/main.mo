@@ -1,4 +1,5 @@
 import Types "./Types";
+import Validation "./Validation";
 import Principal "mo:base/Principal";
 import TrieMap "mo:base/TrieMap";
 import NFTactor "../DIP721-NFT/Nft";
@@ -113,20 +114,48 @@ actor mahaka {
         elem_i
   }; 
 
-  func update_stable(index : Types.Index , blob : Blob , state : Types.state) : async Types.Index {
-    assert index < state.elems_count;
-    let pos = Region.loadNat64(state.elems, index * elem_size);
-    let size = Region.loadNat64(state.elems, index * elem_size + 8);
-    let elem = { pos ; size };
-    Region.storeBlob(state.bytes, elem.pos, blob);
-    Region.storeNat64(state.elems, index * elem_size + 8, Nat64.fromNat(blob.size()));
-    index
-    };
+     func update_stable(index: Types.Index, blob: Blob, state: Types.state): async Types.Index {
+          assert index < state.elems_count;
+
+          let prev_pos = Region.loadNat64(state.elems, index * elem_size);
+          let prev_size = Region.loadNat64(state.elems, index * elem_size + 8);
+          let new_size = Nat64.fromNat(blob.size());
+
+          if (new_size > prev_size) {
+               let new_pos = state.bytes_count;
+               state.bytes_count += new_size;
+
+               regionEnsureSizeBytes(state.bytes, state.bytes_count);
+               Region.storeBlob(state.bytes, new_pos, blob);
+               Region.storeNat64(state.elems, index * elem_size, new_pos);
+          } else {
+          
+               Region.storeBlob(state.bytes, prev_pos, blob);
+          };
+
+          Region.storeNat64(state.elems, index * elem_size + 8, new_size);
+          index
+     };
+
 
 //     --------------------------------------------------------------------------------------------------------------------
 
      
-     public shared ({caller = user}) func createVenue(collection_details : Types.venueCollectionParams, _title : Text,_capacity : Nat, _details : Types.venueDetails , _description : Text) : async (id : Text,  venue :Types.Venue) {
+     public shared ({caller = user}) func createVenue(collection_details : Types.venueCollectionParams, _title : Text,_capacity : Nat, _details : Types.venueDetails , _description : Text) : async Result.Result<(id : Text,  venue :Types.Venue),Types.UpdateUserError> {
+          // if (Principal.isAnonymous(user)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
+          let roleResult = await getRoleByPrincipal(user);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
           Cycles.add<system>(500_500_000_000);
           let venueCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), collection_details.collection_args);
           ignore await venueCollection.wallet_receive();
@@ -151,7 +180,7 @@ actor mahaka {
           let venue_blob = to_candid(Venue);
           let Venue_index : Types.Index = await stable_add(venue_blob, Venue_state);
           _venueMap.put(venue_id, Venue_index);
-          return (venue_id,Venue);
+          return #ok(venue_id,Venue);
      };
 
      public shared ({caller}) func getVenue(Venue_id : Text) : async (Principal, Types.Venue) {
@@ -181,8 +210,21 @@ actor mahaka {
         capacity : Nat,
         logo : Types.LogoResult,
         banner : Types.LogoResult
-        ) : async (Principal, Types.Venue) {
-          
+        ) : async Result.Result<(Principal, Types.Venue), Types.UpdateUserError> {
+          // if (Principal.isAnonymous(caller)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
+          let roleResult = await getRoleByPrincipal(caller);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
           switch(_venueMap.get(Venue_id)){
                case null {
                     throw Error.reject("Venue not found");
@@ -204,7 +246,7 @@ actor mahaka {
                     let venue_blob = to_candid(Venue);
                     let Venue_index = await update_stable(v, venue_blob, Venue_state);
                     _venueMap.put(Venue_id, Venue_index);
-                    return (caller, Venue);
+                    return #ok(caller, Venue);
                };
           };
      };
@@ -264,7 +306,21 @@ actor mahaka {
           }
      };
 
-     public shared func deleteVenue(Venue_id : Text) : async (Bool,?Types.Venue) {
+     public shared ({caller = user}) func deleteVenue(Venue_id : Text) : async Result.Result<(Bool,?Types.Venue), Types.UpdateUserError> {
+          // if (Principal.isAnonymous(user)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
+          let roleResult = await getRoleByPrincipal(user);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
           switch(_venueMap.get(Venue_id)){
                case null {
                     throw Error.reject("Venue not found");
@@ -274,7 +330,7 @@ actor mahaka {
                     let venue_blob = await stable_get(v, Venue_state);
                     let venue : ?Types.Venue = from_candid(venue_blob);
                     _venueMap.delete(Venue_id);
-                    return (true,venue);
+                    return #ok(true,venue);
                };
           };
      };
@@ -342,7 +398,10 @@ actor mahaka {
 
 
 
-     public shared ({caller = user}) func createEvent(venueId: Types.venueId, Event: Types.Events, eCollection: Types.eventCollectionParams): async Types.completeEvent {
+     public shared ({caller = user}) func createEvent(venueId: Types.venueId, Event: Types.Events, eCollection: Types.eventCollectionParams): async Result.Result<Types.completeEvent, Types.UpdateUserError> {
+          // if (Principal.isAnonymous(user)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
           Cycles.add<system>(500_500_000_000);
           let eventCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), eCollection.collection_args);
           let new_custodian = await eventCollection.addcustodians(user);
@@ -398,7 +457,7 @@ actor mahaka {
           let eventIndex = await stable_add(eventBlob, Events_state);
           _EventsMap.put(venueId, eventIndex);
 
-          return newEvent;
+          return #ok(newEvent);
      };
 
      public shared func getallEventsbyVenue(chunkSize : Nat , pageNo : Nat, venueId : Types.venueId) : async {data : [Types.completeEvent] ; current_page : Nat ; Total_pages : Nat} {
@@ -431,7 +490,10 @@ actor mahaka {
           }; 
      };
 
-     public shared ({caller = user}) func edit_event(eventId : Text, venueId : Types.venueId ,  _eCollection : Types.eventCollectionParams , _event : Types.Events) : async (Types.completeEvent, Text) {
+     public shared ({caller = user}) func edit_event(eventId : Text, venueId : Types.venueId ,  _eCollection : Types.eventCollectionParams , _event : Types.Events) : async Result.Result<(Types.completeEvent, Text), Types.UpdateUserError> {
+          // if (Principal.isAnonymous(user)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
           let events_object = _EventsMap.get(venueId);
           switch (events_object){
                case null {
@@ -497,7 +559,7 @@ actor mahaka {
                                         let eventIndex = await update_stable(v,eventBlob, Events_state);
                                         _EventsMap.put(venueId, eventIndex);
 
-                                        return (updated_event,"Event Edited");
+                                        return #ok(updated_event,"Event Edited");
 
                                    };
                               };
@@ -507,7 +569,10 @@ actor mahaka {
           };
      };
 
-     public shared ({caller = user}) func deleteEvent (venue_id : Types.venueId, eventId : Text) : async (Bool, Types.Index) {
+     public shared ({caller = user}) func deleteEvent (venue_id : Types.venueId, eventId : Text) : async Result.Result<(Bool, Types.Index), Types.UpdateUserError> {
+          // if (Principal.isAnonymous(user)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
            switch(_EventsMap.get(venue_id)){
                case null {
                     throw(Error.reject("No venue found for the events"));
@@ -530,7 +595,7 @@ actor mahaka {
                               let event_blob = to_candid(updated_event_data);
                               let event_index = await update_stable(Event_index, event_blob, Events_state);
                               _EventsMap.put(venue_id, Event_index);
-                              return (true, event_index);
+                              return #ok(true, event_index);
                          };
                     };
                };
@@ -588,7 +653,10 @@ actor mahaka {
      /*********************************************************/
 
     
-     public shared ({caller}) func buyVenueTicket(venueId : Types.venueId, _ticket_type : Types.ticket_info, _metadata : nftTypes.MetadataDesc ) : async nftTypes.MintReceipt {
+     public shared ({caller}) func buyVenueTicket(venueId : Types.venueId, _ticket_type : Types.ticket_info, _metadata : nftTypes.MetadataDesc ) : async Result.Result<nftTypes.MintReceipt, Types.UpdateUserError> {
+          // if (Principal.isAnonymous(caller)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
           let collection_id = await Utils.extractCanisterId(venueId);
           let collection_actor = actor (collection_id) : actor {
                logoDip721 : () -> async Types.LogoResult;
@@ -597,13 +665,16 @@ actor mahaka {
           let _logo = await collection_actor.logoDip721();
           let _ticket = await collection_actor.mintDip721(caller,_metadata,_ticket_type.ticket_type,_logo);
      
-          return _ticket;
+          return #ok(_ticket);
      };
 
-     public shared ({caller}) func buyEventTicket(_venueId : Text,_eventId : Text, _ticket_type : Types.ticket_info, _metadata : nftTypes.MetadataDesc) : async nftTypes.MintReceipt {
+     public shared ({caller}) func buyEventTicket(_venueId : Text,_eventId : Text, _ticket_type : Types.ticket_info, _metadata : nftTypes.MetadataDesc) : async Result.Result<nftTypes.MintReceipt, Types.UpdateUserError> {
+          // if (Principal.isAnonymous(caller)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
           switch(_EventsMap.get(_venueId)){
                case null {
-                    throw(Error.reject("No venue dound for the events"));
+                    throw(Error.reject("No venue found for the events"));
                };
                case (?Event_index){
                     let event_blob = await stable_get(Event_index,Events_state);
@@ -630,7 +701,7 @@ actor mahaka {
                                         };
                                         let _logo = await collection_actor.logoDip721();
                                         let _ticket = await collection_actor.mintDip721(caller,_metadata,_ticket_type.ticket_type,_logo);
-                                        return _ticket;
+                                        return #ok(_ticket);
                                    };
                               };                           
                          };
@@ -643,40 +714,87 @@ actor mahaka {
      /*                   User CRUD                           */
      /*********************************************************/
 
-    public shared ({ caller }) func updateUser(email : Text, firstName : Text, lastName : Text, role : Types.Roles, assignedVenue : Text) : async Result.Result<(Types.User, Types.Index), Types.UpdateUserError> {
-        /*  if (Principal.isAnonymous(msg.caller)) {
-      return #err(#UserNotAuthenticated); // We require the user to be authenticated,
-    }; */
+    public shared ({ caller }) func updateUser(principalId : Principal, email : Text, firstName : Text, lastName : Text, role : Types.Roles, assignedVenue : Text) : async Result.Result<(Types.User, Types.Index), Types.UpdateUserError> {
+          // if (Principal.isAnonymous(caller)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
+          let roleResult = await getRoleByPrincipal(caller);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
+          if (email == "") { return #err(#EmptyEmail) };
+          if (firstName == "") { return #err(#EmptyFirstName) };
+          if (lastName == "") { return #err(#EmptyLastName) };
+          //    if (role == "") { return #err(#EmptyRole) };
+          if (assignedVenue == "") { return #err(#EmptyLastName) };
 
-        if (email == "") { return #err(#EmptyEmail) };
-        if (firstName == "") { return #err(#EmptyFirstName) };
-        if (lastName == "") { return #err(#EmptyLastName) };
-     //    if (role == "") { return #err(#EmptyRole) };
-        if (assignedVenue == "") { return #err(#EmptyLastName) };
+          let user : Types.User = {
+               id = principalId;
+               email = email;
+               firstName = firstName;
+               lastName = lastName;
+               role = role;
+               assignedVenue = assignedVenue;
+          };
+          switch(Users.get(principalId)){
 
-        let user : Types.User = {
-            id = caller;
-            email = email;
-            firstName = firstName;
-            lastName = lastName;
-            role = role;
-            assignedVenue = assignedVenue;
-        };
-        switch(Users.get(caller)){
+               case null {
+                    let user_blob = to_candid(user);
+                    let user_index = await stable_add(user_blob, Users_state);
+                    Users.put(principalId, user_index);
+                    return #ok(user, user_index);
+               };
+               case (?v){
+                    let user_blob = to_candid(user);
+                    let user_index = await update_stable(v, user_blob, Users_state);
+                    return #ok(user, user_index);
+               };
+          };
+     };
 
-            case null {
-                let user_blob = to_candid(user);
-                let user_index = await stable_add(user_blob, Users_state);
-                Users.put(caller, user_index);
-                return #ok(user, user_index);
-            };
-            case (?v){
-                let user_blob = to_candid(user);
-                let user_index = await update_stable(v, user_blob, Users_state);
-                return #ok(user, user_index);
-            };
-        };
-    };
+     public shared ({ caller }) func addAdmins(principalId : Principal, email : Text, firstName : Text, lastName : Text, role : Types.Roles, assignedVenue : Text) : async Result.Result<(Types.User, Types.Index), Types.UpdateUserError> {
+          // if (Principal.isAnonymous(caller)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
+          if (not Principal.isController(caller)) {
+               return #err(#UserNotAuthorized);
+          };
+          if (email == "") { return #err(#EmptyEmail) };
+          if (firstName == "") { return #err(#EmptyFirstName) };
+          if (lastName == "") { return #err(#EmptyLastName) };
+          //    if (role == "") { return #err(#EmptyRole) };
+          if (assignedVenue == "") { return #err(#EmptyLastName) };
+
+          let user : Types.User = {
+               id = principalId;
+               email = email;
+               firstName = firstName;
+               lastName = lastName;
+               role = role;
+               assignedVenue = assignedVenue;
+          };
+          switch(Users.get(principalId)){
+
+               case null {
+                    let user_blob = to_candid(user);
+                    let user_index = await stable_add(user_blob, Users_state);
+                    Users.put(principalId, user_index);
+                    return #ok(user, user_index);
+               };
+               case (?v){
+                    let user_blob = to_candid(user);
+                    let user_index = await update_stable(v, user_blob, Users_state);
+                    return #ok(user, user_index);
+               };
+          };
+     };
 
     public shared ({ caller }) func getUserdetailsbycaller() : async Result.Result<Types.User, Types.GetUserError> {
         let index = Users.get(caller);
@@ -756,14 +874,28 @@ actor mahaka {
     };
 
 
-    public shared func deleteUserByPrincipal(user : Principal) : async ?Types.User {
+    public shared ({caller}) func deleteUserByPrincipal(user : Principal) : async Result.Result<?Types.User, Types.UpdateUserError> {
+          // if (Principal.isAnonymous(user)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
+          let roleResult = await getRoleByPrincipal(caller);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
           switch(Users.remove(user)){
                case null {
                     throw(Error.reject("No User found"));
                };
                case (?u){
                     let user = await stable_get(u, Users_state);
-                    from_candid(user)
+                    return #ok(from_candid(user));
                };
           };
     };
@@ -795,7 +927,10 @@ actor mahaka {
      /*                   Wahana Handling                     */
      /*********************************************************/
 
-     public shared ({caller = user}) func createWahana(venueId : Text,_name : Text , _symbol : Text, _decimals : Nat8 , _totalSupply :Nat , description : Text , banner : Types.LogoResult, priceinusd : Text) : async Types.Wahana_details {
+     public shared ({caller = user}) func createWahana(venueId : Text,_name : Text , _symbol : Text, _decimals : Nat8 , _totalSupply :Nat , description : Text , banner : Types.LogoResult, priceinusd : Text) : async Result.Result<Types.Wahana_details, Types.UpdateUserError> {
+          // if (Principal.isAnonymous(user)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
           Cycles.add<system>(500_000_000_000);
           let initial_mints = [{
                account = { owner = Principal.fromActor(mahaka); subaccount = null };
@@ -861,7 +996,7 @@ actor mahaka {
           let wahana_blob = to_candid(updatedWahanas);
           let wahana_index = await stable_add(wahana_blob,Wahana_state);
           _WahanaMap.put(venueId,wahana_index);
-          return new_wahana;
+          return #ok(new_wahana);
      };
 
      public shared func getallWahanasbyVenue(chunkSize : Nat , pageNo : Nat, venueId : Types.venueId) : async {data : [Types.Wahana_details] ; current_page : Nat ; Total_pages : Nat} {
@@ -904,7 +1039,10 @@ actor mahaka {
           description: Text,
           banner: Types.LogoResult,
           priceinusd: Text
-     ) : async Text {
+     ) : async Result.Result<Text, Types.UpdateUserError> {
+          // if (Principal.isAnonymous(user)) {
+          //      return #err(#UserNotAuthenticated); 
+          // };
           let wahanas_object = _WahanaMap.get(venueId);
           switch (wahanas_object) {
                case null {
@@ -983,7 +1121,7 @@ actor mahaka {
                                    let wahana_blob = to_candid(updated_wahana_data);
                                    let wahana_index = await update_stable(w,wahana_blob, Wahana_state);
                                    _WahanaMap.put(venueId, wahana_index);
-                                   return "Wahana updated successfully!";
+                                   return #ok("Wahana updated successfully!");
                               };
                               };
                          };
@@ -993,7 +1131,10 @@ actor mahaka {
      };
 
 
-     public shared ({caller = user}) func deleteWahana (venue_id: Types.venueId, wahanaId: Text) : async Result.Result<(Bool, Types.Index), Text> {
+     public shared ({caller = user}) func deleteWahana (venue_id: Types.venueId, wahanaId: Text) : async Result.Result<(Bool, Types.Index), Types.UpdateUserError> {
+          // if (Principal.isAnonymous(user)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
           switch(_WahanaMap.get(venue_id)) {
                case null {
                     throw(Error.reject("No venue found for the events"));
