@@ -38,7 +38,7 @@ const Ticket = () => {
 
     return(
       <>
-      <div className = "bg-gray-200 min-h-screen p-3 dark:bg-slate-700">
+      <div className = "bg-gray-200 h-screen p-3 dark:bg-slate-700  overflow-auto">
       <div className = "grid grid-cols-1 md:grid-cols-3">
         {/* card1 */}
         <div className = "bg-white p-3 mx-2 my-2 shadow-lg rounded-lg text-center hover:scale-105 transition-transform animate dark:bg-slate-600">
@@ -123,7 +123,7 @@ const Events = ()=>{
   
   return(
     <>
-    <div className = "grid grid-cols-1">
+    <div className = "grid grid-cols-1  overflow-auto">
       
        <div className="px-4 w-1/2 mx-2 my-2 min-h-12 rounded-md border border-border flex items-center bg-card">
               <FaSearch  size={20} />
@@ -149,7 +149,7 @@ const Events = ()=>{
             />
            
             <div className="mx-2 my-2">
-            <h1 className = "text-lg text-slate-600 font-bold">{event.heading}</h1>
+            <h1 className = "text-lg text-slate-600 font-bold dark:text-white">{event.heading}</h1>
             <p className = "text-orange-400 text-md">{event.para}</p>
             <p className = "text-slate-500 text-md dark:text-white">{event.address}</p>
             <p className = "text-slate-500 text-md font-bold dark:text-white">{event.date}</p>
@@ -196,7 +196,7 @@ useEffect(()=>{
 
 
   return (
-    <div className = "bg-gray-200 overflow-hidden overflow-y-auto h-screen dark:bg-slate-700">
+    <div className = "bg-gray-200 overflow-auto h-screen dark:bg-slate-700">
 
       {/* Top heading */}
       <div className = "bg-white p-4 flex justify-around dark:bg-slate-700">
