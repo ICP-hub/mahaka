@@ -225,11 +225,11 @@ Since it's emergence, Mahaka Media has been evolving and adapting to constant ch
     </div>
 
     <div>
-    <h1 className="text-slate-700 font-bold mx-2 text-xl md:text-3xl text-left mt-4 mb-2">OUR VISION</h1>
+    <h1 className="text-slate-700 font-bold mx-2 text-xl md:text-3xl text-left mt-4 mb-4">OUR VISION</h1>
           
           <p className = "text-lg text-slate-600 mx-2 my-1 text-left">We aspire to empower creativity and intelligence to improve our society.</p>
        
-          <h1 className="text-slate-700 font-bold mx-2 text-xl md:text-3xl text-left mt-4">OUR MISSION</h1>
+          <h1 className="text-slate-700 font-bold mx-2 text-xl md:text-3xl text-left mt-4 mb-4">OUR MISSION</h1>
           <p className = "text-lg text-slate-600 mx-2 my-2 text-left">Transforming the community through a supercharged ecosystem of creativity, business, and techmology.</p>
     </div>
 
