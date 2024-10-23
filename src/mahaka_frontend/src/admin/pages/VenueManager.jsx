@@ -1,27 +1,39 @@
 import { HiOutlinePlus } from "react-icons/hi2";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import CreateVenueForm from "../components/CreateVenueForm";
 import ModalOverlay from "../../customer/Components/Modal-overlay";
 import PageIntro from "../components/PageIntro";
-import { useSelector } from "react-redux";
 import VenueTableFormat from "../components/VenueTableFormat";
+import {
+  searchVenues,
+  getAllVenues,
+} from "../../redux/reducers/apiReducers/venueApiReducer"; // Import the searchVenues action
 
-const VenueManger = () => {
+const VenueManager = () => {
   const [isVenueModalOpen, setIsVenueModalOpen] = useState(false);
+  const { backend } = useSelector((state) => state.authentication);
   const { venues, loading } = useSelector((state) => state.venues);
-  const [searchInput, setSearchInput] = useState('')
-  const [filteredVenues, setFilteredVenues] = useState(venues);
+  const dispatch = useDispatch();
 
-  
- 
-  useEffect(()=>{
-    const filtered = venues.filter((venue)=>
-      venue.Title.toLowerCase().includes(searchInput.toLowerCase())
-    );
-    setFilteredVenues(filtered)
-  },[searchInput, venues])
+  const [searchInput, setSearchInput] = useState("");
 
+  useEffect(() => {
+    // Trigger the search whenever the user types in the search input
+    if (searchInput) {
+      dispatch(
+        searchVenues({
+          backend,
+          searchText: searchInput,
+          pageLimit: 10,
+          currPage: 0,
+        })
+      );
+    } else {
+      dispatch(getAllVenues({ backend, pageLimit: 10, currPage: 0 }));
+    }
+  }, [searchInput, dispatch]);
 
   return (
     <div className="flex flex-col sm:overflow-hidden">
@@ -30,13 +42,11 @@ const VenueManger = () => {
         count={(venues && venues.length) || 0}
         actionOnButton={() => setIsVenueModalOpen(true)}
         isLoading={loading}
-        searchInput = {searchInput}
-        setSearchInput = {setSearchInput}
-        
-
-
+        searchInput={searchInput}
+        setSearchInput={setSearchInput} // Handle search input
       />
-      <VenueTableFormat filteredVenues = {filteredVenues} />
+      <VenueTableFormat filteredVenues={venues} />{" "}
+      {/* Use venues from Redux directly */}
       {isVenueModalOpen && (
         <ModalOverlay
           isOpen={isVenueModalOpen}
@@ -50,4 +60,4 @@ const VenueManger = () => {
   );
 };
 
-export default VenueManger;
+export default VenueManager;

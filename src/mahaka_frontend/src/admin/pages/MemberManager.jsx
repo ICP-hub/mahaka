@@ -13,7 +13,9 @@ import {
 } from "react-icons/hi2";
 import { AnimatePresence, motion } from "framer-motion";
 import NavigationRight from "../../common/components/NavigationRight";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
+import { updateUser } from "../../redux/reducers/apiReducers/userApiReducer";
 
 const teamData = [
   {
@@ -118,6 +120,7 @@ const rolePermissions = {
 };
 
 const MemberManager = () => {
+  const { venues } = useSelector((state) => state.venues);
   const [isRtNavOpen, setIsRtNavOpen] = useState(false);
   const [members, setMembers] = useState(teamData);
   const [currentMember, setCurrentMember] = useState(null);
@@ -247,38 +250,23 @@ const UpdateMember = ({
   const [principalId, setPrincipalId] = useState(
     member ? member.principalId : ""
   );
+  const { backend } = useSelector((state) => state.authentication);
   const { venues } = useSelector((state) => state.venues);
   const isNewMember = !member;
+  const dispatch = useDispatch();
 
   const handleSubmit = () => {
-    if (isNewMember) {
-      const newMember = {
-        id: Date.now(),
-        name,
-        email,
-        role,
-        principalId,
-        assignedVenues: [],
-      };
+    // Create user object from form data
+    const user = {
+      firstName: name,
+      lastName: "user name",
+      email: email,
+      role: { manager: null },
+      principal: principalId,
+    };
 
-      setMembers((prevMembers) => [...prevMembers, newMember]);
-    } else {
-      const updatedMember = {
-        id: member.id,
-        name,
-        email,
-        role,
-        principalId,
-        assignedVenues: member.assignedVenues,
-      };
-
-      setMembers((prevMembers) =>
-        prevMembers.map((m) => (m.id === member.id ? updatedMember : m))
-      );
-    }
-
-    setIsEditing(false);
-    onToggle(false);
+    // Dispatch the updateUser action with necessary arguments
+    dispatch(updateUser({ backend, user }));
   };
 
   return (
@@ -327,6 +315,7 @@ const UpdateMember = ({
                 setPrincipalId={setPrincipalId}
                 onSubmit={handleSubmit}
                 onDelete={() => onDelete(member.id)}
+                venues={venues}
               />
             ) : (
               <ViewDetails member={member} venues={venues} />
@@ -350,8 +339,10 @@ const EditDetails = ({
   onSubmit,
   onDelete,
 }) => {
-  const availableRoles = ["Staff", "Manager", "Supervisor", "BOD", "Admin"];
-  const availableVenues = ["Venue One", "Venue Two", "Venue Three"];
+  const availableRoles = ["Staff", "manager", "Supervisor", "BOD", "Admin"];
+  const { venues } = useSelector((state) => state.venues);
+
+  const availableVenues = venues.map((venue) => venue.Title);
 
   const permissions = rolePermissions[role] || [];
 

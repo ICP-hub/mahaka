@@ -61,6 +61,7 @@ export const updateVenue = createAsyncThunk(
       const response = await backend.updateVenue(
         venueId,
         [],
+        [],
         updatedTitle,
         updatedDescription,
         eventDetails,
@@ -118,6 +119,23 @@ export const buyVenueTicket = createAsyncThunk(
       return response;
     } catch (error) {
       console.error("Error buying venue ticket:", error);
+      throw error;
+    }
+  }
+);
+
+export const searchVenues = createAsyncThunk(
+  "venues/searchVenues",
+  async ({ backend, searchText, pageLimit, currPage }) => {
+    try {
+      const response = await backend.searchVenues(
+        searchText,
+        pageLimit,
+        currPage
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error searching venues:", error);
       throw error;
     }
   }
@@ -219,6 +237,18 @@ const venueSlice = createSlice({
         state.buyTicketLoading = false;
         state.error = action.error.message;
         notificationManager.error("Failed to purchase venue ticket");
+      })
+      .addCase(searchVenues.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(searchVenues.fulfilled, (state, action) => {
+        state.loading = false;
+        state.venues = action.payload;
+        state.error = null;
+      })
+      .addCase(searchVenues.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
       });
   },
 });
