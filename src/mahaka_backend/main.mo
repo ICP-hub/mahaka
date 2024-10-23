@@ -145,17 +145,17 @@ actor mahaka {
           // if (Principal.isAnonymous(user)) {
           //      return #err(#UserNotAuthenticated); 
           // }; 
-          let roleResult = await getRoleByPrincipal(user);
-          switch (roleResult) {
-               case (#err(error)) {
-                    return #err(#RoleError);
-               };
-               case (#ok(role)) {
-                    if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-                         return #err(#UserNotAuthorized);
-                    };
-               };
-          };
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           Cycles.add<system>(500_500_000_000);
           let venueCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), collection_details.collection_args);
           ignore await venueCollection.wallet_receive();
@@ -214,17 +214,17 @@ actor mahaka {
           // if (Principal.isAnonymous(caller)) {
           //      return #err(#UserNotAuthenticated); 
           // }; 
-          let roleResult = await getRoleByPrincipal(caller);
-          switch (roleResult) {
-               case (#err(error)) {
-                    return #err(#RoleError);
-               };
-               case (#ok(role)) {
-                    if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-                         return #err(#UserNotAuthorized);
-                    };
-               };
-          };
+          // let roleResult = await getRoleByPrincipal(caller);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           switch(_venueMap.get(Venue_id)){
                case null {
                     throw Error.reject("Venue not found");
@@ -310,17 +310,17 @@ actor mahaka {
           // if (Principal.isAnonymous(user)) {
           //      return #err(#UserNotAuthenticated); 
           // }; 
-          let roleResult = await getRoleByPrincipal(user);
-          switch (roleResult) {
-               case (#err(error)) {
-                    return #err(#RoleError);
-               };
-               case (#ok(role)) {
-                    if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-                         return #err(#UserNotAuthorized);
-                    };
-               };
-          };
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           switch(_venueMap.get(Venue_id)){
                case null {
                     throw Error.reject("Venue not found");
@@ -401,7 +401,18 @@ actor mahaka {
      public shared ({caller = user}) func createEvent(venueId: Types.venueId, Event: Types.Events, eCollection: Types.eventCollectionParams): async Result.Result<Types.completeEvent, Types.UpdateUserError> {
           // if (Principal.isAnonymous(user)) {
           //      return #err(#UserNotAuthenticated); 
-          // }; 
+          // };
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           Cycles.add<system>(500_500_000_000);
           let eventCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), eCollection.collection_args);
           let new_custodian = await eventCollection.addcustodians(user);
@@ -494,6 +505,17 @@ actor mahaka {
           // if (Principal.isAnonymous(user)) {
           //      return #err(#UserNotAuthenticated); 
           // }; 
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           let events_object = _EventsMap.get(venueId);
           switch (events_object){
                case null {
@@ -572,7 +594,18 @@ actor mahaka {
      public shared ({caller = user}) func deleteEvent (venue_id : Types.venueId, eventId : Text) : async Result.Result<(Bool, Types.Index), Types.UpdateUserError> {
           // if (Principal.isAnonymous(user)) {
           //      return #err(#UserNotAuthenticated); 
-          // }; 
+          // };
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
            switch(_EventsMap.get(venue_id)){
                case null {
                     throw(Error.reject("No venue found for the events"));
@@ -657,6 +690,17 @@ actor mahaka {
           // if (Principal.isAnonymous(caller)) {
           //      return #err(#UserNotAuthenticated); 
           // }; 
+          // let roleResult = await getRoleByPrincipal(caller);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           let collection_id = await Utils.extractCanisterId(venueId);
           let collection_actor = actor (collection_id) : actor {
                logoDip721 : () -> async Types.LogoResult;
@@ -672,6 +716,17 @@ actor mahaka {
           // if (Principal.isAnonymous(caller)) {
           //      return #err(#UserNotAuthenticated); 
           // }; 
+          // let roleResult = await getRoleByPrincipal(caller);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           switch(_EventsMap.get(_venueId)){
                case null {
                     throw(Error.reject("No venue found for the events"));
@@ -718,17 +773,17 @@ actor mahaka {
           // if (Principal.isAnonymous(caller)) {
           //      return #err(#UserNotAuthenticated); 
           // }; 
-          let roleResult = await getRoleByPrincipal(caller);
-          switch (roleResult) {
-               case (#err(error)) {
-                    return #err(#RoleError);
-               };
-               case (#ok(role)) {
-                    if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-                         return #err(#UserNotAuthorized);
-                    };
-               };
-          };
+          // let roleResult = await getRoleByPrincipal(caller);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           if (email == "") { return #err(#EmptyEmail) };
           if (firstName == "") { return #err(#EmptyFirstName) };
           if (lastName == "") { return #err(#EmptyLastName) };
@@ -878,17 +933,17 @@ actor mahaka {
           // if (Principal.isAnonymous(user)) {
           //      return #err(#UserNotAuthenticated); 
           // }; 
-          let roleResult = await getRoleByPrincipal(caller);
-          switch (roleResult) {
-               case (#err(error)) {
-                    return #err(#RoleError);
-               };
-               case (#ok(role)) {
-                    if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-                         return #err(#UserNotAuthorized);
-                    };
-               };
-          };
+          // let roleResult = await getRoleByPrincipal(caller);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           switch(Users.remove(user)){
                case null {
                     throw(Error.reject("No User found"));
@@ -931,6 +986,17 @@ actor mahaka {
           // if (Principal.isAnonymous(user)) {
           //      return #err(#UserNotAuthenticated); 
           // }; 
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           Cycles.add<system>(500_000_000_000);
           let initial_mints = [{
                account = { owner = Principal.fromActor(mahaka); subaccount = null };
@@ -1043,6 +1109,17 @@ actor mahaka {
           // if (Principal.isAnonymous(user)) {
           //      return #err(#UserNotAuthenticated); 
           // };
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           let wahanas_object = _WahanaMap.get(venueId);
           switch (wahanas_object) {
                case null {
@@ -1135,6 +1212,17 @@ actor mahaka {
           // if (Principal.isAnonymous(user)) {
           //      return #err(#UserNotAuthenticated); 
           // }; 
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           switch(_WahanaMap.get(venue_id)) {
                case null {
                     throw(Error.reject("No venue found for the events"));
