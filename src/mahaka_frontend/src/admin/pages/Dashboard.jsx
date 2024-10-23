@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { MdSportsCricket } from "react-icons/md";
 // import { FaFootballBall } from "react-icons/fa";
 import { GiMusicalScore } from "react-icons/gi";
@@ -6,11 +6,29 @@ import { LuSignalHigh } from "react-icons/lu";
 import { BsFileBarGraph } from "react-icons/bs";
 import { FaTicket } from "react-icons/fa6";
 import { TfiPulse } from "react-icons/tfi";
-import { FaMusic, FaFootballBall, FaFilm, FaTheaterMasks } from 'react-icons/fa';
-import { FaWallet, FaCommentDollar, FaMobileAlt, FaUniversity, FaCcMastercard, FaDollarSign, FaSyncAlt, FaChartLine, FaUsersCog, FaCalendarAlt, FaChartPie, FaUsers } from 'react-icons/fa';
+import {
+  FaMusic,
+  FaFootballBall,
+  FaFilm,
+  FaTheaterMasks,
+} from "react-icons/fa";
+import {
+  FaWallet,
+  FaCommentDollar,
+  FaMobileAlt,
+  FaUniversity,
+  FaCcMastercard,
+  FaDollarSign,
+  FaSyncAlt,
+  FaChartLine,
+  FaUsersCog,
+  FaCalendarAlt,
+  FaChartPie,
+  FaUsers,
+} from "react-icons/fa";
+import { motion } from "framer-motion";
 
 const DashboardAnalytics = () => {
-
   // GoalCard component
   const GoalCard = () => {
     return (
@@ -19,10 +37,36 @@ const DashboardAnalytics = () => {
         <div class="relative flex items-center justify-center my-4">
           {/* <!-- Circular Progress Bar using SVG --> */}
           <svg class="w-32 h-32">
-            <circle class="text-gray-300" stroke-width="8" stroke="currentColor" fill="transparent" r="48" cx="64" cy="64" />
-            <circle class="text-green-400" stroke-width="8" stroke-linecap="round" stroke="currentColor" fill="transparent" r="48" cx="64" cy="64"
-              stroke-dasharray="301.44" stroke-dashoffset="50.74" />
-            <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" class="text-3xl font-semibold fill-gray-500">83%</text>
+            <circle
+              class="text-gray-300"
+              stroke-width="8"
+              stroke="currentColor"
+              fill="transparent"
+              r="48"
+              cx="64"
+              cy="64"
+            />
+            <circle
+              class="text-green-400"
+              stroke-width="8"
+              stroke-linecap="round"
+              stroke="currentColor"
+              fill="transparent"
+              r="48"
+              cx="64"
+              cy="64"
+              stroke-dasharray="301.44"
+              stroke-dashoffset="50.74"
+            />
+            <text
+              x="50%"
+              y="50%"
+              dominant-baseline="middle"
+              text-anchor="middle"
+              class="text-3xl font-semibold fill-gray-500"
+            >
+              83%
+            </text>
           </svg>
         </div>
         <div class="flex justify-between items-center">
@@ -44,17 +88,41 @@ const DashboardAnalytics = () => {
   // transactions component
   const TransactionCard = () => {
     const transactionData = [
-      { id: 1, method: 'Wallet', icon: <FaWallet />, amount: '$200', date: 'Oct 1, 2024' },
-      { id: 2, method: 'PhonePay', icon: <FaMobileAlt />, amount: '$150', date: 'Sep 28, 2024' },
-      { id: 3, method: 'Bank Transfer', icon: <FaUniversity />, amount: '$1,000', date: 'Sep 26, 2024' },
-      { id: 4, method: 'MasterCard', icon: <FaCcMastercard />, amount: '$500', date: 'Sep 24, 2024' },
+      {
+        id: 1,
+        method: "Wallet",
+        icon: <FaWallet />,
+        amount: "$200",
+        date: "Oct 1, 2024",
+      },
+      {
+        id: 2,
+        method: "PhonePay",
+        icon: <FaMobileAlt />,
+        amount: "$150",
+        date: "Sep 28, 2024",
+      },
+      {
+        id: 3,
+        method: "Bank Transfer",
+        icon: <FaUniversity />,
+        amount: "$1,000",
+        date: "Sep 26, 2024",
+      },
+      {
+        id: 4,
+        method: "MasterCard",
+        icon: <FaCcMastercard />,
+        amount: "$500",
+        date: "Sep 24, 2024",
+      },
     ];
 
     return (
       <div className="rounded-lg p-3">
         <div className="space-y-1 bg-card p-3 shadow-lg rounded-lg">
           <h2 className="text-2xl font-semibold  mb-4">Transactions</h2>
-          {transactionData.map(transaction => (
+          {transactionData.map((transaction) => (
             <div
               key={transaction.id}
               className="flex items-center rounded-lg p-3"
@@ -76,7 +144,7 @@ const DashboardAnalytics = () => {
     );
   };
 
-  //cards 
+  //cards
   const Cards = () => {
     return (
       <>
@@ -110,7 +178,9 @@ const DashboardAnalytics = () => {
         {/* special card earnings on top events card */}
         <div className="grid grid-cols-1 md:gid-cols-2">
           <div className="bg-card mx-3 my-2 p-2 shadow-lg rounded-lg">
-            <h1 class="text-lg  text-left mb-3 mx-3 font-semibold">Earnings On Top Events</h1>
+            <h1 class="text-lg  text-left mb-3 mx-3 font-semibold">
+              Earnings On Top Events
+            </h1>
             <div className="flex justify-around">
               {/* top event 1 */}
               <div class="flex flex-col items-center">
@@ -143,11 +213,11 @@ const DashboardAnalytics = () => {
           </div>
         </div>
       </>
-    )
-  }
+    );
+  };
 
   return (
-    <div class="p-3 ">
+    <div class="p-6 md:p-8 container mx-auto">
       {/* <!-- Card container --> */}
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* <!-- Congratulations Card --> */}
@@ -159,14 +229,15 @@ const DashboardAnalytics = () => {
             </div>
             {/* <!-- Medal emogi --> */}
             <div>
-
               <span className="text-7xl">🏅</span>
             </div>
           </div>
           <div class="flex items-center mb-4">
             <h2 class="text-4xl font-bold ">$48.9k</h2>
           </div>
-          <button class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">View Sales</button>
+          <button class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
+            View Sales
+          </button>
         </div>
 
         {/* <!-- Statistics Card --> */}
@@ -179,7 +250,6 @@ const DashboardAnalytics = () => {
             {/* <!-- Sales --> */}
             <div class="flex flex-col items-center">
               <div class="bg-purple-100 p-2 rounded-full mb-2">
-
                 <BsFileBarGraph className="text-3xl text-purple-500" />
               </div>
               <h4 class="text-lg font-semibold">230k</h4>
@@ -188,7 +258,6 @@ const DashboardAnalytics = () => {
             {/* <!-- Customers --> */}
             <div class="flex flex-col items-center">
               <div class="bg-blue-100 p-2 rounded-full mb-2">
-
                 <FaUsersCog className="text-3xl text-blue-500" />
               </div>
               <h4 class="text-lg font-semibold">8.549k</h4>
@@ -197,7 +266,6 @@ const DashboardAnalytics = () => {
             {/* <!-- Products --> */}
             <div class="flex flex-col items-center">
               <div class="bg-red-100 p-2 rounded-full mb-2">
-
                 <FaTicket className="text-3xl text-red-500" />
               </div>
               <h4 class="text-lg font-semibold">1.423k</h4>
@@ -206,7 +274,6 @@ const DashboardAnalytics = () => {
             {/* <!-- Revenue --> */}
             <div class="flex flex-col items-center">
               <div class="bg-green-100 p-2 rounded-full mb-2">
-
                 <FaDollarSign className="text-3xl text-green-500" />
               </div>
               <h4 class="text-lg font-semibold">$9745</h4>
@@ -217,7 +284,6 @@ const DashboardAnalytics = () => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2">
         <Cards />
-
       </div>
 
       {/* support tracker card */}
@@ -225,13 +291,23 @@ const DashboardAnalytics = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 max-width-auto mx-auto">
         <GoalCard />
         <div class="bg-card shadow-lg rounded-lg p-4 mx-2 text-center my-3">
-          <h3 class=" text-2xl font-semibold mb-2 text-left">Support Tracker</h3>
+          <h3 class=" text-2xl font-semibold mb-2 text-left">
+            Support Tracker
+          </h3>
 
           <div class="relative inline-block">
             {/* <!-- SVG Circle for Dotted Progress with Increased Size --> */}
             <svg class="w-50 h-50">
               {/* <!-- Increase the size of the SVG --> */}
-              <circle cx="50%" cy="50%" r="65" fill="none" stroke-width="12" stroke-dasharray="7 7" stroke="url(#gradient)" />
+              <circle
+                cx="50%"
+                cy="50%"
+                r="65"
+                fill="none"
+                stroke-width="12"
+                stroke-dasharray="7 7"
+                stroke="url(#gradient)"
+              />
               <defs>
                 <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
                   <stop offset="0%" stop-color="#7C3AED" />

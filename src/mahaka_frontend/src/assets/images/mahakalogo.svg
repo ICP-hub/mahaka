@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 600 600">
+  <defs>
+    <style>
+      .cls-1 {
+        font-size: 72px;
+        fill: #fff;
+        font-family: Inter;
+        font-weight: 700;
+      }
+
+      .cls-2 {
+        fill: #ea1c31;
+        font-size: 92px;
+        font-style: italic;
+      }
+    </style>
+  </defs>
+  <text id="MahakaX" class="cls-1" x="101" y="255">Mahaka<tspan class="cls-2">X</tspan></text>
+</svg>
