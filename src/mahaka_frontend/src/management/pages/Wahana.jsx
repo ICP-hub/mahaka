@@ -1,50 +1,74 @@
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { HiMagnifyingGlass } from "react-icons/hi2";
+import { getallWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApiReducer";
+import ModalOverlay from "../../customer/Components/Modal-overlay";
+import CreateWahanaForm from "../components/CreateWahanaForm";
 import wahanaDummy1 from "../../assets/images/Frame10.png";
-import wahanaDummy2 from "../../assets/images/Frame11.png";
-import wahanaDummy3 from "../../assets/images/Frame7.png";
-import wahanaDummy4 from "../../assets/images/Frame8.png";
-import { FaRupiahSign } from "react-icons/fa6";
+// import wahanaDummy2 from "../../assets/images/Frame11.png";
+// import wahanaDummy3 from "../../assets/images/Frame7.png";
+// import wahanaDummy4 from "../../assets/images/Frame8.png";
+// import { FaRupiahSign } from "react-icons/fa6";
 
-const wahanaData = [
-  {
-    id: 1,
-    title: "Wahana One",
-    description:
-      "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Impedit sunt aut explicabo magnam rem! Ipsam, enim. Ipsum cupiditate quo vero.",
-    price: 6,
-    event: "Event One",
-    image: wahanaDummy1,
-  },
-  {
-    id: 2,
-    title: "Wahana Two",
-    description:
-      "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Impedit sunt aut explicabo magnam rem! Ipsam, enim. Ipsum cupiditate quo vero.",
-    price: 8,
-    event: "Event Two",
-    image: wahanaDummy2,
-  },
-  {
-    id: 3,
-    title: "Wahana Three",
-    description:
-      "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Impedit sunt aut explicabo magnam rem! Ipsam, enim. Ipsum cupiditate quo vero.",
-    price: 10,
-    event: "Event Three",
-    image: wahanaDummy3,
-  },
-  {
-    id: 4,
-    title: "Wahana Four",
-    description:
-      "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Impedit sunt aut explicabo magnam rem! Ipsam, enim. Ipsum cupiditate quo vero.",
-    price: 12,
-    event: "Event Four",
-    image: wahanaDummy4,
-  },
-];
+// const wahanaData = [
+//   {
+//     id: 1,
+//     title: "Wahana One",
+//     description:
+//       "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Impedit sunt aut explicabo magnam rem! Ipsam, enim. Ipsum cupiditate quo vero.",
+//     price: 6,
+//     event: "Event One",
+//     image: wahanaDummy1,
+//   },
+//   {
+//     id: 2,
+//     title: "Wahana Two",
+//     description:
+//       "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Impedit sunt aut explicabo magnam rem! Ipsam, enim. Ipsum cupiditate quo vero.",
+//     price: 8,
+//     event: "Event Two",
+//     image: wahanaDummy2,
+//   },
+//   {
+//     id: 3,
+//     title: "Wahana Three",
+//     description:
+//       "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Impedit sunt aut explicabo magnam rem! Ipsam, enim. Ipsum cupiditate quo vero.",
+//     price: 10,
+//     event: "Event Three",
+//     image: wahanaDummy3,
+//   },
+//   {
+//     id: 4,
+//     title: "Wahana Four",
+//     description:
+//       "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Impedit sunt aut explicabo magnam rem! Ipsam, enim. Ipsum cupiditate quo vero.",
+//     price: 12,
+//     event: "Event Four",
+//     image: wahanaDummy4,
+//   },
+// ];
+
 
 const MgtWahana = () => {
+  const dispatch = useDispatch();
+  const { backend } = useSelector((state) => state.authentication);
+  const { wahanas, loading } = useSelector((state) => state.wahana);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    fetchWahanas();
+  }, []);
+
+  const fetchWahanas = () => {
+    dispatch(getallWahanasbyVenue({
+      backend,
+      chunkSize: 100,
+      pageNo: 0,
+      venueId: "Venue1#br5f7-7uaaa-aaaaa-qaaca-cai"
+    }));
+  };
+
   return (
     <div className="relative h-full">
       <div className="absolute inset-0 flex min-w-0 flex-col overflow-y-auto">
@@ -74,13 +98,28 @@ const MgtWahana = () => {
             </div>
           </div>
         </div>
-        <WahanaMain wahanaData={wahanaData} />
+
+        <WahanaMain
+          wahanaData={wahanas}
+          onCreateClick={() => setIsModalOpen(true)}
+          loading={loading}
+        />
+
+        <ModalOverlay
+          isOpen={isModalOpen}
+          setIsOpen={setIsModalOpen}
+          title="Create New Wahana">
+          <CreateWahanaForm
+            onClose={() => setIsModalOpen(false)}
+            onSuccess={fetchWahanas}
+          />
+        </ModalOverlay>
       </div>
     </div>
   );
 };
 
-const WahanaMain = ({ wahanaData }) => {
+const WahanaMain = ({ wahanaData, onCreateClick, loading }) => {
   return (
     <div className="flex flex-auto p-6 sm:p-10">
       <div className="mx-auto flex w-full max-w-xs flex-auto flex-col sm:max-w-5xl">
@@ -115,23 +154,33 @@ const WahanaMain = ({ wahanaData }) => {
             />
           </div>
 
-          <button className="mt-8 sm:ml-auto sm:mt-0">
+          <button className="mt-8 sm:ml-auto sm:mt-0" onClick={onCreateClick}>
             <div className="inline-flex items-center align-middle bg-secondary px-3 py-2 rounded-full text-white">
               + Add Wahana
             </div>
           </button>
         </div>
-        <div className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3">
-          {wahanaData.map((wahana) => (
-            <WahanaCard key={wahana.id} wahana={wahana} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="mt-8 text-center">Loading...</div>
+        ) : (
+          <div className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3">
+            {wahanaData?.map((wahana) => (
+              <WahanaCard key={wahana.id} wahana={{
+                ...wahana,
+                title: wahana.ride_title,
+                price: wahana.priceinusd,
+                image: wahana.banner.data,
+              }} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
 const WahanaCard = ({ wahana }) => {
+  const bannerImage = wahana.image || wahanaDummy1;
   return (
     <div className="bg-card flex h-96 flex-col overflow-hidden rounded-2xl shadow relative group">
       <div className="flex flex-col relative">
@@ -143,21 +192,21 @@ const WahanaCard = ({ wahana }) => {
         <div
           className="absolute h-60 w-full inset-0 group-hover:scale-110 transition-all duration-500"
           style={{
-            backgroundImage: `url(${wahana.image})`,
+            backgroundImage: `url(${bannerImage})`,
             backgroundSize: "cover",
             backgroundPosition: "center center",
           }}
         ></div>
       </div>
       <div className="mt-auto flex w-full flex-col p-6">
-        <div className="text-lg font-medium">{wahana.title}</div>
+        <div className="text-lg font-medium">{wahana.ride_title}</div>
         <div className="text-secondary mt-0.5 line-clamp-1">
           {wahana.description}
         </div>
         <div className="flex items-baseline whitespace-nowrap">
           <div className="mr-2 text-2xl">IDR</div>
           <div className="text-6xl font-semibold leading-tight tracking-tight">
-            {wahana.price}
+            {wahana.priceinusd}
           </div>
           <div className="text-secondary text-2xl">/person</div>
         </div>
