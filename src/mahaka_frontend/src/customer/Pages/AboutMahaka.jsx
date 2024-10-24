@@ -81,14 +81,14 @@ Since it's emergence, Mahaka Media has been evolving and adapting to constant ch
  {/* circle logo */}
 
  <div
-  className="relative bg-white shadow-lg rounded-full h-80 w-80 md:h-90 md:w-90 bg-cover bg-center bg-no-repeat md:ml-30 overflow-hidden"
+  className="relative bg-red-400 opacity-80 shadow-lg rounded-full h-80 w-80 md:h-90 md:w-90 bg-cover bg-center bg-no-repeat md:ml-30 overflow-hidden"
   style={{ backgroundImage: `url('path_to_your_background_image')` }}
 >
   <div className="flex items-center justify-center h-full">
     <img
       src={mahakalogo2}
       alt="logo"
-      className="h-45 w-auto opacity-90"
+      className="h-45 w-auto opacity-80"
     />
   </div>
 </div>
@@ -183,7 +183,7 @@ Since it's emergence, Mahaka Media has been evolving and adapting to constant ch
            audio podcasts, audio books, original audio series, online radio, etc.</p>
 
            <img src = {logosub}
-    className = "w-auto h-40 md:h-50 mx-2 opacity-80"
+    className = "w-auto h-40 md:h-50 mx-2 mt-3 opacity-80"
     alt = "sub dividelogo"
     />
           
@@ -204,18 +204,13 @@ Since it's emergence, Mahaka Media has been evolving and adapting to constant ch
 
 
 {/* mahaka member section */}
-    {/* <div className = "flex justify-start">
-    <img src = {memlogo}
-    className = "w-auto h-20 mx-2 opacity-80"
-    alt = "mem logo"
-    />
-    </div> */}
+   
      <h1 className="text-slate-700 font-bold mx-2 text-xl md:text-3xl text-left mt-4 mb-6">MAHAKA MEMBER</h1>
 
     <div className = "grid grid-cols-3 md:grid-cols-6">
       {MemberMahaka.map(mem=>(
           // console.log("iterate is",mem.id)
-        <div key ={mem.id} className ="border rounded text-orange-400 mx-2 my-2 flex justify-center p-1 hover:scale-105 transition-transform">
+        <div key ={mem.id} className =" rounded bg-white shadow-lg mx-2 my-2 flex justify-center p-2 hover:scale-105 transition-transform">
           <img src={mem.logo}
           alt = "memlogo"
           className="w-auto h-15 opacity-80"/>
