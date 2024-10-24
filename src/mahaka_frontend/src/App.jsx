@@ -64,7 +64,41 @@ function App() {
     }
   }, [dispatch]);
 
+  // const createWahanaHandler = async () => {
+  //   try {
+  //     const response = await backend.createWahana(
+  //       "Venue1#br5f7-7uaaa-aaaaa-qaaca-cai",  
+  //       "Example Wahana",                     
+  //       "WAHANA",                              
+  //       8,                                     
+  //       1000000,                              
+  //       "An amazing wahana experience",       
+  //       {                                    
+  //         data: "example-banner-data",
+  //         logo_type: "image"
+  //       },
+  //       "99.99"                              
+  //     );
+  
+  //     console.log("Wahana created successfully:", response);
+  //   } catch (err) {
+  //     console.error("Error creating wahana:", err);
+  //   }
+  // };
 
+  // const getallWahanasbyVenueHandler = async()=>{
+  //   try{
+  //     const response = await backend.getallWahanasbyVenue(
+  //       100,
+  //       0,
+  //       "Venue1#br5f7-7uaaa-aaaaa-qaaca-cai",
+  //     );
+  //     console.log("Wahana fetched successfully:", response);
+  //   } catch (err) {
+  //     console.error("Error fetching wahana:", err);
+  //   }
+  // };
+ 
   //   const createEventHandler = async () => {
   //     try {
   //       const response = await backend.createEvent(
@@ -136,47 +170,7 @@ function App() {
   //   }
   // };
 
-  //   const updateVenueHandler = async () => {
-  //   try {
-  //     const venueId = "Venue1 Title#br5f7-7uaaa-aaaaa-qaaca-cai";
-  //     const updatedTitle = "Updated Title";
-  //     const updatedDescription = "Updated Description";
 
-  //     const eventDetails = {
-  //       StartDate: "2024-09-13",
-  //       StartTime: "08:00",
-  //       Location: "New York",
-  //       EndDate: "2024-09-14",
-  //       EndTime: "18:00",
-  //     };
-
-  //     const capacity = 200;
-
-  //     const logo = {
-  //       data: "base64-logo-data",
-  //       logo_type: "image/png",
-  //     };
-
-  //     const banner = {
-  //       data: "base64-banner-data",
-  //       logo_type: "image/png",
-  //     };
-
-  //     dispatch(updateVenue({
-  //       backend,
-  //       venueId,
-  //       updatedTitle,
-  //       updatedDescription,
-  //       eventDetails,
-  //       capacity,
-  //       logo,
-  //       banner
-  //     }));
-
-  //   } catch (err) {
-  //     console.error("Error updating venue:", err);
-  //   }
-  // };
 
   //   const createVenueHandler = async () => {
   //     try {
@@ -319,6 +313,14 @@ function App() {
       {/* <button className="px-2 py-1 border rounded" onClick={deleteEventHandler}>
         Delete Event
       </button> */}
+ {/* <button className="px-2 py-1 border rounded mr-2" onClick={createWahanaHandler}>
+        Create Wahana
+      </button> */}
+
+      {/* <button className="px-2 py-1 border rounded" onClick={getallWahanasbyVenueHandler}>
+        Fetch Wahana
+      </button> */}
+      
 
       {/* <div className="p-4">
         <select 

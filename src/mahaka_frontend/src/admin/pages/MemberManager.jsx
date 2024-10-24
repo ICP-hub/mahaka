@@ -338,9 +338,9 @@ const EditDetails = ({
   setPrincipalId,
   onSubmit,
   onDelete,
+  venues,
 }) => {
   const availableRoles = ["Staff", "manager", "Supervisor", "BOD", "Admin"];
-  const { venues } = useSelector((state) => state.venues);
 
   const availableVenues = venues.map((venue) => venue.Title);
 

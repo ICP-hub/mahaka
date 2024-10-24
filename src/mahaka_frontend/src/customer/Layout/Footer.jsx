@@ -1,4 +1,16 @@
 import React from "react";
+import MahakaLogo from "../../assets/images/mahakalogo.svg";
+import { HiMiniMapPin, HiMiniPhone, HiMiniPrinter } from "react-icons/hi2";
+import {
+  FaFacebookSquare,
+  FaGooglePlusG,
+  FaInstagram,
+  FaLinkedinIn,
+  FaPinterest,
+  FaTwitter,
+  FaYoutube,
+} from "react-icons/fa";
+import { MdMailOutline } from "react-icons/md";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -7,78 +19,61 @@ export default function Footer() {
     address
   )}`;
   return (
-    <>
-      <footer className="bg-[#124076] text-white p-8">
-        <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div>
-            <div className="text-2xl mb-4">LOGO</div>
-            <p>345 Faulconer Drive, Suite 4</p>
-            <p>Charlottesville, CA, 12345</p>
+    <footer className="bg-[#124076] px-6 md:px-8 pt-12 text-neutral-100 md:flex-row tracking-wider">
+      <div className="mx-auto grid w-full max-w-6xl grid-cols-2 gap-12 md:grid-cols-[1fr,_175px,_175px,_175px]">
+        <div className="flex flex-col items-start gap-4">
+          <span className="font-black italic text-4xl">MAHAKA</span>
+        </div>
+        <div className="space-y-4">
+          <span className="block font-bold">Socials</span>
+          <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 cursor-pointer font-medium">
+            <FaFacebookSquare size={16} />
+            <span>Facebook</span>
           </div>
-          <div>
-            <p className="mb-2">
-              <i className="fas fa-phone mr-2"></i>(123) 456-7890
-            </p>
-            <p className="mb-2">
-              <i className="fas fa-envelope mr-2"></i>
-              <a href="mailto:info@example.com" className="text-white">
-                mahaka@example.com
-              </a>
-            </p>
-            <p className="mb-2 cursor-pointer">
-              <i className="fas fa-map-marker-alt mr-2 "></i>{" "}
-              <a
-                href={googleMapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white"
-              >
-                {address}
-              </a>
-            </p>
+          <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 cursor-pointer font-medium">
+            <FaInstagram size={16} />
+            <span>Instagram</span>
           </div>
-          <div>
-            <p className="mb-2">Social Media</p>
-            <div className="flex space-x-4">
-              <a href="#">
-                <i className="text-lg fab fa-facebook-f"></i>
-              </a>
-              <a href="#">
-                <i className="text-lg fab fa-twitter"></i>
-              </a>
-              <a href="#">
-                <i className="text-lg fab fa-linkedin-in"></i>
-              </a>
-              <a href="#">
-                <i className="text-lg fab fa-youtube"></i>
-              </a>
-              <a href="#">
-                <i className="text-lg fab fa-instagram"></i>
-              </a>
-              <a href="#">
-                <i className="text-lg fab fa-google-plus-g"></i>
-              </a>
-              <a href="#">
-                <i className="text-lg fab fa-pinterest"></i>
-              </a>
-            </div>
+          <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 cursor-pointer font-medium">
+            <FaLinkedinIn size={16} />
+            <span>Linkdn</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 cursor-pointer font-medium">
+            <FaTwitter size={16} />
+            <span>Twitter</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 cursor-pointer font-medium">
+            <MdMailOutline size={16} />
+            <span>Email</span>
           </div>
         </div>
-        <div className="mt-8 border-t  pt-4">
-          <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
-            <div className="md:col-span-2 flex gap-7">
-              <a href="#">About us</a>
-              <a href="#">Contact us</a>
-              <a href="#">Help</a>
-              <a href="#">Privacy Policy</a>
-              <a href="#">Disclaimer</a>
-            </div>
-            <div className="md:text-right">
-              Copyright © {currentYear} Lift Media Inc.
-            </div>
+        <div className="space-y-4">
+          <span className="block font-bold">Site</span>
+          <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 font-medium cursor-pointer">
+            Home
+          </div>
+          <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 font-medium cursor-pointer">
+            About Mahaka
           </div>
         </div>
-      </footer>
-    </>
+        <div className="space-y-4">
+          <span className="block font-bold">Legal</span>
+          <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 font-medium cursor-pointer">
+            License
+          </div>
+          <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 font-medium cursor-pointer">
+            Privacy Policy
+          </div>
+          <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 font-medium cursor-pointer">
+            Terms
+          </div>
+        </div>
+      </div>
+      <div className="-mx-4 mt-12 border-t-[1px] border-border p-4">
+        <div className="mx-auto flex max-w-6xl flex-col-reverse items-center justify-between gap-4 text-xs sm:flex-row">
+          <span>© 2024 MAHAKA, LLC. All rights reserved.</span>
+        </div>
+      </div>
+    </footer>
   );
 }

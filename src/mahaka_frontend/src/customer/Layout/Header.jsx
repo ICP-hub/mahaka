@@ -28,8 +28,8 @@ export default function Header() {
   // Effect if sidenav open overflow hidden
 
   return (
-    <>
-      <div className="flex conatiner mx-auto px-4 lg:px-12 user_header overflow-hidden justify-between items-center z-999">
+    <div className="bg-[#124076]">
+      <div className="flex px-6 md:px-8 container mx-auto user_header justify-between items-center z-999">
         <LogoSection />
         <div className="hidden md:flex items-center gap-8 flex-1 justify-between">
           <SearchBox />
@@ -44,7 +44,7 @@ export default function Header() {
         </button>
       </div>
       <NavVertical isNavOpen={isNavOpen} onNavOpen={setIsNavOpen} />
-    </>
+    </div>
   );
 }
 

@@ -2,8 +2,8 @@
 /* light theme */
 body.light,
 body .light {
-  --primary: #124076;
-  --secondary: #f08e1e;
+  --primary: #4f46e5;
+  --secondary: #ff6f30;
   --accent: #fbfbfb;
   --warn: #eded3a;
   --error: #ed3a3a;
@@ -26,7 +26,7 @@ body .light {
   --slider-off-active: #94a3b8;
   --status-bar: #cbd5e1;
   --app-bar: #ffffff;
-  --background: #efeff1;
+  --background: #f1f5f9;
   --foreground: #fbfbfb;
   --hover: rgba(148, 163, 184, 0.3);
   --card: #ffffff;
@@ -46,7 +46,7 @@ body .light {
 body.dark,
 body .dark {
   --primary: #1e293b;
-  --secondary: #f08e1e;
+  --secondary: #ffa500;
   --accent: #2d3748;
   --warn: #f6e05e;
   --error: #e53e3e;
