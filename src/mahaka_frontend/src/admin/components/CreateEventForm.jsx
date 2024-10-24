@@ -47,6 +47,10 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
       EndTime: 0,
     },
   });
+
+  const [bannerPreview, setBannerPreview] = useState(null);
+  const [imageArrayBuffer, setImageArrayBuffer] = useState(null);
+
   const startDateRef = useRef(null);
   const endDateRef = useRef(null);
   const startTimeRef = useRef(null);
@@ -147,14 +151,26 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
       const fileType = file.type;
       const reader = new FileReader();
       reader.onloadend = () => {
+        const dataUrl = reader.result;
         setEventData((prevState) => ({
           ...prevState,
           collection_args: {
             ...prevState.collection_args,
-            banner: { data: reader.result, logo_type: fileType },
+            banner: { data: dataUrl, logo_type: fileType },
           },
         }));
+        setBannerPreview(dataUrl);
+        // Reading the image as an ArrayBuffer for backend submission
+        const arrayBufferReader = new FileReader();
+        arrayBufferReader.onloadend = (event) => {
+          const arrayBuffer = event.target.result;
+          const uintArray = new Uint8Array(arrayBuffer);
+          const byteArray = Array.from(uintArray);
+          setImageArrayBuffer(byteArray);
+        };
+        arrayBufferReader.readAsArrayBuffer(file);
       };
+
       reader.readAsDataURL(file);
     }
   };
@@ -187,10 +203,10 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
             },
             details: {
               StartDate: eventData.eventDetails.StartDate,
-              StartTime: parseInt(eventData.eventDetails.StartTime, 10), 
+              StartTime: parseInt(eventData.eventDetails.StartTime, 10),
               Location: eventData.eventDetails.Location,
               EndDate: eventData.eventDetails.EndDate,
-              EndTime: parseInt(eventData.eventDetails.EndTime, 10), 
+              EndTime: parseInt(eventData.eventDetails.EndTime, 10),
             },
             gTicket_limit: eventData.collection_args.gTicket_limit,
             vTicket_limit: eventData.collection_args.vTicket_limit,
@@ -395,6 +411,19 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
           >
             Upload Image
           </label>
+          {bannerPreview && (
+            <img
+              src={bannerPreview}
+              alt="Banner Preview"
+              className="mt-2 w-full h-auto rounded"
+              style={{
+                maxWidth: "96px",
+                maxHeight: "96px",
+                minWidth: "96px",
+                minHeight: "96px",
+              }}
+            />
+          )}
           {/* <p className="text-sm text-gray-500 mt-2">JPEG, PNG less than 5MB</p> */}
         </div>
       </div>

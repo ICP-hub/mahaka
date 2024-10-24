@@ -12,6 +12,7 @@ import {
   NFIDLogout,
 } from "../../redux/reducers/auth/authenticationReducer";
 import Avvvatars from "avvvatars-react";
+import TranslationForCustomer from "../../TranslationForCustomer";
 
 const NavLinks = [
   { title: "HOME", url: "/" },
@@ -34,6 +35,7 @@ export default function Header() {
           <SearchBox />
           <div className="flex items-center gap-8">
             <NavHorizontal />
+
             <ConnectWalletBtn onNavOpen={setIsNavOpen} />
           </div>
         </div>
@@ -53,7 +55,7 @@ const LogoSection = () => {
 const SearchBox = () => {
   return (
     <div className="flex items-center px-8 flex-1">
-      <span className="flex p-2 border rounded-md gap-2 w-full">
+      <span className="flex p-2 border rounded-md gap-2 w-[100%]">
         <input
           type="text"
           placeholder="Search for events, venues and more"
@@ -91,7 +93,7 @@ const NavHorizontal = () => {
   };
 
   return (
-    <nav className="flex items-center gap-12 font-medium">
+    <nav className="flex items-center gap-12 font-medium over">
       {NavLinks.map((link, index) => (
         // Replace button with Link later
         <Link to={link.url}>
@@ -115,6 +117,7 @@ const NavHorizontal = () => {
           </motion.div>
         </Link>
       ))}
+      <TranslationForCustomer />
     </nav>
   );
 };
@@ -141,6 +144,7 @@ const NavVertical = ({ isNavOpen, onNavOpen }) => {
               {link.title}
             </Link>
           ))}
+          <TranslationForCustomer />
 
           <span className="flex w-full my-6">
             <ConnectWalletBtn onNavOpen={onNavOpen} />

@@ -1,0 +1,4 @@
+[ZoneTransfer]
+ZoneId=3
+ReferrerUrl=https://cloudconvert.com/
+HostUrl=https://eu-central.storage.cloudconvert.com/tasks/2e13f10a-99f7-4d96-832c-b1c298e73e49/Radio-Gen-103.1-FM.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=cloudconvert-production%2F20241023%2Ffra%2Fs3%2Faws4_request&X-Amz-Date=20241023T125217Z&X-Amz-Expires=86400&X-Amz-Signature=7fe414580f85e8c964eba9e0c4e5f969dcdb14c2ca579d50a253234fe5957284&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3D%22Radio-Gen-103.1-FM.png%22&response-content-type=image%2Fpng&x-id=GetObject

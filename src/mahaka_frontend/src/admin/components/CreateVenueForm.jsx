@@ -208,7 +208,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
   const handleVenueSubmit = (e) => {
     e.preventDefault();
     if (createVenueLoader) return;
-    // console.log(venueData);
+    console.log(venueData);
     dispatch(
       createVenue({
         backend,

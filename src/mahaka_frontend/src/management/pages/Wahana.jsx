@@ -5,6 +5,7 @@ import { getallWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApi
 import ModalOverlay from "../../customer/Components/Modal-overlay";
 import CreateWahanaForm from "../components/CreateWahanaForm";
 import wahanaDummy1 from "../../assets/images/Frame10.png";
+import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
 // import wahanaDummy2 from "../../assets/images/Frame11.png";
 // import wahanaDummy3 from "../../assets/images/Frame7.png";
 // import wahanaDummy4 from "../../assets/images/Frame8.png";
@@ -68,6 +69,10 @@ const MgtWahana = () => {
       venueId: "Venue1#br5f7-7uaaa-aaaaa-qaaca-cai"
     }));
   };
+
+  useEffect(() => {
+    dispatch(getAllVenues({ backend: backend, pageLimit: 100, currPage: 0 }));
+  }, []);
 
   return (
     <div className="relative h-full">

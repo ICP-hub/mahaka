@@ -3,10 +3,25 @@ import ButtonWrapper from "../../../common/ButtonWrapper";
 import { motion } from "framer-motion";
 import { FiMoon, FiSun } from "react-icons/fi";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import i18n from "../../../i18n";
+import TranslateButton from "../../../Translation";
 
 const AppBar = ({ toggleNavigation, selected, setSelected }) => {
+  const { t, i18n } = useTranslation();
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng); // Function to change the language
+  };
+
+  const [showTranslate, setShowTranslate] = useState(false);
+
+  // Function to handle the toggle button click
+  const handleToggle = () => {
+    setShowTranslate((prev) => !prev);
+  };
+
   return (
-    <div className="bg-appBar relative z-49 flex h-16 w-full flex-0 items-center px-4 shadow dark:border-b dark:bg-transparent dark:shadow-none md:px-6 border-border">
+    <div className="bg-appBar relative z-49 flex h-16 overflow-hidden w-full flex-0 items-center px-4 shadow dark:border-b dark:bg-transparent dark:shadow-none md:px-6 border-border">
       <ButtonWrapper
         size={24}
         color="text-icon hover:text-secondary"
@@ -14,6 +29,18 @@ const AppBar = ({ toggleNavigation, selected, setSelected }) => {
       >
         <MdMenu />
       </ButtonWrapper>
+      <TranslateButton />
+      {/* <div>
+        <h1>{t("welcome")}</h1>
+        <p>{t("description")}</p>
+        <button onClick={() => changeLanguage("en")}>English</button>
+        <button onClick={() => changeLanguage("id")}>
+          Bahasa Indonesia
+        </button>
+ 
+      </div> */}
+
+      {showTranslate && <div id="google_translate_element"></div>}
       <SliderToggle selected={selected} setSelected={setSelected} />
     </div>
   );

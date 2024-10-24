@@ -135,29 +135,29 @@ const VenueTableData = ({ venue, onDelete }) => {
         <div className="flex items-center">
           <div className="relative mr-6 flex h-12 w-12 flex-0 items-center justify-center overflow-hidden rounded border border-border">
             <img
-              src={venue.banner.data ? venue.banner.data : VenueDemoImg}
+              src={venue?.banner?.data ? venue?.banner?.data : VenueDemoImg}
               alt="Venue_img"
               className="w-8"
             />
           </div>
         </div>
-        <div>{venue.Title}</div>
-        <div className="hidden sm:block truncate">{venue.Description}</div>
+        <div>{venue?.Title}</div>
+        <div className="hidden sm:block truncate">{venue?.Description}</div>
         <div className="hidden sm:block">
-          {formatDate(venue.Details.StartDate)}
+          {formatDate(venue?.Details?.StartDate)}
         </div>
         <div className="hidden lg:block">
-          {formatDate(venue.Details.EndDate)}
+          {formatDate(venue?.Details?.EndDate)}
         </div>
-        <div className="hidden lg:block">{venue.Details.StartTime}-{venue.Details.EndTime}</div>
-        <div className="truncate">{venue.Details.Location}</div>
+        <div className="hidden lg:block">{venue?.Details?.StartTime}-{venue?.Details?.EndTime}</div>
+        <div className="truncate">{venue?.Details?.Location}</div>
 
         {/* Wrap both icons inside a flex container */}
         <div className="flex items-center justify-center space-x-2">
           <Link
             to={`/admin/venues/venue/${encodeURIComponent(
-              venue.Title
-            )}/${encodeURIComponent(venue.id)}`}
+              venue?.Title
+            )}/${encodeURIComponent(venue?.id)}`}
             className="flex items-center"
           >
             <HiOutlineDotsHorizontal

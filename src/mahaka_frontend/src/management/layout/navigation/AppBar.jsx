@@ -3,10 +3,11 @@ import ButtonWrapper from "../../../common/ButtonWrapper";
 import { motion } from "framer-motion";
 import { FiMoon, FiSun } from "react-icons/fi";
 import { useState } from "react";
+import TranslateButton from "../../../Translation";
 
 const AppBar = ({ toggleNavigation, selected, setSelected }) => {
   return (
-    <div className="bg-appBar relative z-49 flex h-16 w-full flex-0 items-center px-4 shadow dark:border-b dark:bg-transparent dark:shadow-none md:px-6 border-border">
+    <div className="bg-appBar relative z-49 overflow-hidden flex h-16 w-full flex-0 items-center px-4 shadow dark:border-b dark:bg-transparent dark:shadow-none md:px-6 border-border">
       <ButtonWrapper
         size={24}
         color="text-icon hover:text-secondary"
@@ -14,6 +15,7 @@ const AppBar = ({ toggleNavigation, selected, setSelected }) => {
       >
         <MdMenu />
       </ButtonWrapper>
+      <TranslateButton />
       <SliderToggle selected={selected} setSelected={setSelected} />
     </div>
   );
