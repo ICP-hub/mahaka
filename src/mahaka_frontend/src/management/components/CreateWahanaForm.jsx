@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createWahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
+import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
 
 const CreateWahanaForm = ({ onClose, onSuccess }) => {
     const dispatch = useDispatch();
     const { backend } = useSelector((state) => state.authentication);
+    const { venues } = useSelector((state) => state.venues);
     const [formData, setFormData] = useState({
         name: "",
         symbol: "",
@@ -16,33 +18,53 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
             data: "",
             logo_type: "image",
         },
+        venueId: "",
     });
 
     const [bannerPreview, setBannerPreview] = useState("");
+    const [imageArrayBuffer, setImageArrayBuffer] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        dispatch(getAllVenues({ backend, pageLimit: 100, currPage: 0 }));
+    }, [dispatch, backend]);
+
+    console.log("Fetched Venues:", venues);
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setFormData({
-                    ...formData,
-                    banner: { data: reader.result, logo_type: "image" },
-                });
-                setBannerPreview(reader.result);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
+        if (!file) return;
 
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const dataUrl = reader.result;
+            setFormData({
+                ...formData,
+                banner: { data: dataUrl, logo_type: "image" },
+            });
+            setBannerPreview(dataUrl);
+
+            // Reading the image as an ArrayBuffer for backend submission
+            const arrayBufferReader = new FileReader();
+            arrayBufferReader.onloadend = (event) => {
+                const arrayBuffer = event.target.result;
+                const uintArray = new Uint8Array(arrayBuffer);
+                const byteArray = Array.from(uintArray);
+                setImageArrayBuffer(byteArray);
+            };
+            arrayBufferReader.readAsArrayBuffer(file);
+        };
+
+        reader.readAsDataURL(file);
+    };
+    
     const handleCreateWahana = async () => {
         setIsSubmitting(true);
         try {
             await dispatch(
                 createWahana({
                     backend,
-                    venueId: "Venue1#br5f7-7uaaa-aaaaa-qaaca-cai",
+                    venueId: formData.venueId,
                     ...formData,
                 })
             );
@@ -59,6 +81,23 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
         <div>
 
             <div className="space-y-4">
+                 {/* Select Venue */}
+                 <div className="flex flex-col gap-1">
+                    <label className="font-semibold">Select Venue</label>
+                    <select
+                        value={formData.venueId}
+                        onChange={(e) => setFormData({ ...formData, venueId: e.target.value })}
+                        className="border border-border rounded-lg px-4 py-2 bg-transparent"
+                        required
+                    >
+                        <option value="" disabled>Select a venue</option>
+                        {venues?.map((venue) => (
+                            <option key={venue.id} value={venue.id}>
+                                {venue.Title}
+                            </option>
+                        ))}
+                    </select>
+                </div>
                 <div className="flex flex-col flex-auto gap-1">
                     <label className="font-semibold">Wahana Name</label>
                     <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border ">
@@ -141,6 +180,12 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
                                 src={bannerPreview}
                                 alt="Banner Preview"
                                 className="mt-2 w-full h-auto rounded"
+                                style={{
+                                    maxWidth: "96px",
+                                    maxHeight: "96px",
+                                    minWidth: "96px",
+                                    minHeight: "96px",
+                                }}
                             />
                         )}
                     </div>
