@@ -4,6 +4,7 @@ import NavigationVertical from "./navigation/NavigationVertical";
 import ScreenOverlayBlur from "../../common/ScreenOverlay";
 import useNavigationControl from "../../common/hooks/useNavigationControl";
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 
 const AdminLayout = () => {
   const { state, toggleNavigation } = useNavigationControl();
@@ -30,12 +31,13 @@ const AdminLayout = () => {
       <div className={`layout ${selected}`}>
         <div className="min-h-screen text-text">
           <NavigationVertical navigationState={state} />
-          <div className="flex w-full min-w-0 flex-auto flex-col overflow-y-auto h-screen custom-scroll">
+          <div className="flex w-full min-w-0 flex-auto flex-col overflow-y-auto h-screen custom-scroll bg-background">
             <AppBar
               toggleNavigation={toggleNavigation}
               selected={selected}
               setSelected={setSelected}
             />
+
             <Outlet />
           </div>
         </div>

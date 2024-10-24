@@ -28,7 +28,6 @@ import memlogo14 from "../../assets/images/memlogo14.png";
 import memlogo15 from "../../assets/images/memlogo15.png";
 import memlogo16 from "../../assets/images/memlogo16.png";
 
-
 const About = () => {
 
   const MemberMahaka = [

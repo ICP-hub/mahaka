@@ -124,7 +124,7 @@ input[type="radio"]:checked::before {
 }
 
 .user_header {
-  background: #124076;
+  background: ;
   color: white;
   min-height: 80px;
   max-height: 80px;

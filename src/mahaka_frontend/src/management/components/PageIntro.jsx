@@ -47,7 +47,7 @@ const PageIntro = ({
             <motion.button
               initial="initial"
               whileHover="hover"
-              className={`ml-4 py-3 px-4 min-w-max border border-border flex gap-1 items-center justify-center ${
+              className={`ml-4 py-3 px-4 min-w-max flex gap-1 items-center justify-center ${
                 isLoading ? "bg-gray-400" : "bg-secondary hover:bg-orange-600"
               } h-full text-white font-medium rounded-full`}
               onClick={isLoading ? null : actionOnButton}
