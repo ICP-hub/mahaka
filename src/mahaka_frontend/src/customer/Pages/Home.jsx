@@ -1,4 +1,4 @@
-import React, { useEffect , useState} from "react";
+import React, { useEffect, useState } from "react";
 import HeroSider from "../Components/LandingPageComponents/HeroSider";
 import venueImage from "../../assets/images/venue2.png";
 import venueImage1 from "../../assets/images/venue1.png";
@@ -21,9 +21,8 @@ import OngoingSlider from "../../customer/Components/LandingPageComponents/Ongoi
 import TestimonialCarousel from "../../customer/Components/LandingPageComponents/Testimonial";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
-
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const VenueCard = ({ venue, layout }) => (
   <Link
@@ -56,18 +55,18 @@ const VenueCard = ({ venue, layout }) => (
 
 export default function Home() {
   const { venues } = useSelector((state) => state.venues);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   // console.log("Venues home are",venues)
-  console.log("venues length", loading)
+  console.log("venues length", loading);
 
-  useEffect(()=>{
-    console.log("useeffect log")
-    if(venues.length ===0){
-      setLoading(true)
-    }else{
-      setLoading(false)
+  useEffect(() => {
+    console.log("useeffect log");
+    if (venues.length === 0) {
+      setLoading(true);
+    } else {
+      setLoading(false);
     }
-  })
+  });
 
   const layoutConfigs = [
     {
@@ -143,177 +142,180 @@ export default function Home() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-5xl font-bold text-center mb-8">Our Venues</h2>
-       {loading?      
-          <div className="rounded-lg m-2 md:flex ml-3 text-center">
-          {/* Skeleton Cards */}
+          {loading ? (
+            <div className="rounded-lg m-2 md:flex ml-3 text-center">
+              Loading...
+              {/* Skeleton Cards */}
+              {/* <Skeleton height={200} width={350} count={1} className="bg-gray-300 md:w-1/3 mx-2" />
           <Skeleton height={200} width={350} count={1} className="bg-gray-300 md:w-1/3 mx-2" />
-          <Skeleton height={200} width={350} count={1} className="bg-gray-300 md:w-1/3 mx-2" />
-          <Skeleton height={200} width={350} count={1} className="bg-gray-300 md:w-1/3 mx-2" />
-          {/* <Skeleton height={200} width={300} count={1} className="bg-gray-300 md:w-1/3" /> */}
-        </div>
-
-          :
-          <div> 
-          {/* if length equals 1 */}
-          {venues.length === 1 && (
-            <div className="flex justify-center">
-              <div className="w-full max-w-4xl shadow-lg rounded-2xl flex flex-col overflow-hidden">
-                <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
-              </div>
+          <Skeleton height={200} width={350} count={1} className="bg-gray-300 md:w-1/3 mx-2" /> */}
+              {/* <Skeleton height={200} width={300} count={1} className="bg-gray-300 md:w-1/3" /> */}
             </div>
-          )}
-
-          {/* if length equals 2 */}
-          {venues.length === 2 && (
-            <>
-              <div className="flex flex-col lg:flex-row gap-4 mb-12">
-                <div className="lg:w-[60%]">
-                  <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
-                </div>
-                <div className="lg:w-[40%]">
-                  <VenueCard venue={venues[1]} layout={layoutConfigs[1]} />
-                </div>
-              </div>
-            </>
-          )}
-          {/* </div> */}
-
-          {/* if length equals 3 */}
-          {venues.length === 3 && (
-            <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-[33px] mb-12">
-              {venues.map((venue, index) => (
-                <div
-                  className="col-span-1 shadow-lg rounded-2xl"
-                  style={{ height: layoutConfigs[4].height }}
-                  key={venue.id}
-                >
-                  <VenueCard venue={venue} layout={layoutConfigs[index + 2]} />
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* if length equals 4 */}
-          {venues.length === 4 && (
-            <>
-              <div className="flex flex-col lg:flex-row gap-4 mb-12">
-                <div className="lg:w-[60%]">
-                  <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
-                </div>
-                <div className="lg:w-[40%]">
-                  <VenueCard venue={venues[1]} layout={layoutConfigs[1]} />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                <div className="col-span-1 shadow-lg rounded-2xl">
-                  <VenueCard venue={venues[2]} layout={layoutConfigs[6]} />
-                </div>
-                <div className="col-span-1 shadow-lg rounded-2xl">
-                  <VenueCard venue={venues[3]} layout={layoutConfigs[5]} />
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* if length equals 6 */}
-          {venues.length === 6 && (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                <div className="col-span-1 shadow-lg rounded-2xl">
-                  <VenueCard venue={venues[2]} layout={layoutConfigs[6]} />
-                </div>
-                <div className="col-span-1 shadow-lg rounded-2xl">
-                  <VenueCard venue={venues[3]} layout={layoutConfigs[5]} />
-                </div>
-              </div>
-
-              <div className="flex flex-col lg:flex-row gap-4 mb-12">
-                <div className="lg:w-[60%]">
-                  <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
-                </div>
-                <div className="lg:w-[40%]">
-                  <VenueCard venue={venues[1]} layout={layoutConfigs[1]} />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                <div className="col-span-1 shadow-lg rounded-2xl">
-                  <VenueCard venue={venues[2]} layout={layoutConfigs[6]} />
-                </div>
-                <div className="col-span-1 shadow-lg rounded-2xl">
-                  <VenueCard venue={venues[3]} layout={layoutConfigs[5]} />
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* if length equals 5 or more than equal to 7 */}
-          {/* First Row */}
-          {(venues.length === 5 || venues.length === 7) && (
-            <>
-              {/* First Row */}
-              <div className="flex flex-col lg:flex-row gap-4 mb-12">
-                <div className="lg:w-[60%]">
-                  <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
-                </div>
-                <div className="lg:w-[40%]">
-                  <VenueCard venue={venues[1]} layout={layoutConfigs[1]} />
-                </div>
-              </div>
-
-              {/* Second Row */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-[33px] mb-8">
-                {venues.slice(2, 5).map((venue, index) => (
-                  <div
-                    className="col-span-1 shadow-lg rounded-2xl"
-                    style={{ height: layoutConfigs[4].height }}
-                    key={venue.id}
-                  >
-                    <VenueCard
-                      venue={venue}
-                      layout={layoutConfigs[index + 2]}
-                    />
+          ) : (
+            <div>
+              {/* if length equals 1 */}
+              {venues.length === 1 && (
+                <div className="flex justify-center">
+                  <div className="w-full max-w-4xl shadow-lg rounded-2xl flex flex-col overflow-hidden">
+                    <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
                   </div>
-                ))}
-              </div>
+                </div>
+              )}
 
-              {/* Third Row */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                {venues.slice(5, 7).map((venue, index) => (
-                  <div
-                    className="col-span-1 shadow-lg rounded-2xl"
-                    style={{ height: layoutConfigs[4].height }}
-                    key={venue.id}
-                  >
-                    <VenueCard
-                      venue={venue}
-                      layout={layoutConfigs[index + 5]}
-                    />
+              {/* if length equals 2 */}
+              {venues.length === 2 && (
+                <>
+                  <div className="flex flex-col lg:flex-row gap-4 mb-12">
+                    <div className="lg:w-[60%]">
+                      <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
+                    </div>
+                    <div className="lg:w-[40%]">
+                      <VenueCard venue={venues[1]} layout={layoutConfigs[1]} />
+                    </div>
                   </div>
-                ))}
-              </div>
+                </>
+              )}
+              {/* </div> */}
 
-              {/* Additional Rows for Remaining Venues */}
-              {venues.length > 7 && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-[33px]">
-                  {venues.slice(7).map((venue, index) => (
+              {/* if length equals 3 */}
+              {venues.length === 3 && (
+                <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-[33px] mb-12">
+                  {venues.map((venue, index) => (
                     <div
-                      className="col-span-1 shadow-lg rounded-2xl mb-8"
+                      className="col-span-1 shadow-lg rounded-2xl"
                       style={{ height: layoutConfigs[4].height }}
                       key={venue.id}
                     >
                       <VenueCard
                         venue={venue}
-                        layout={layoutConfigs[(index % 6) + 1]}
+                        layout={layoutConfigs[index + 2]}
                       />
                     </div>
                   ))}
                 </div>
               )}
-            </>
+
+              {/* if length equals 4 */}
+              {venues.length === 4 && (
+                <>
+                  <div className="flex flex-col lg:flex-row gap-4 mb-12">
+                    <div className="lg:w-[60%]">
+                      <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
+                    </div>
+                    <div className="lg:w-[40%]">
+                      <VenueCard venue={venues[1]} layout={layoutConfigs[1]} />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    <div className="col-span-1 shadow-lg rounded-2xl">
+                      <VenueCard venue={venues[2]} layout={layoutConfigs[6]} />
+                    </div>
+                    <div className="col-span-1 shadow-lg rounded-2xl">
+                      <VenueCard venue={venues[3]} layout={layoutConfigs[5]} />
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* if length equals 6 */}
+              {venues.length === 6 && (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    <div className="col-span-1 shadow-lg rounded-2xl">
+                      <VenueCard venue={venues[2]} layout={layoutConfigs[6]} />
+                    </div>
+                    <div className="col-span-1 shadow-lg rounded-2xl">
+                      <VenueCard venue={venues[3]} layout={layoutConfigs[5]} />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col lg:flex-row gap-4 mb-12">
+                    <div className="lg:w-[60%]">
+                      <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
+                    </div>
+                    <div className="lg:w-[40%]">
+                      <VenueCard venue={venues[1]} layout={layoutConfigs[1]} />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    <div className="col-span-1 shadow-lg rounded-2xl">
+                      <VenueCard venue={venues[2]} layout={layoutConfigs[6]} />
+                    </div>
+                    <div className="col-span-1 shadow-lg rounded-2xl">
+                      <VenueCard venue={venues[3]} layout={layoutConfigs[5]} />
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* if length equals 5 or more than equal to 7 */}
+              {/* First Row */}
+              {(venues.length === 5 || venues.length === 7) && (
+                <>
+                  {/* First Row */}
+                  <div className="flex flex-col lg:flex-row gap-4 mb-12">
+                    <div className="lg:w-[60%]">
+                      <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
+                    </div>
+                    <div className="lg:w-[40%]">
+                      <VenueCard venue={venues[1]} layout={layoutConfigs[1]} />
+                    </div>
+                  </div>
+
+                  {/* Second Row */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-[33px] mb-8">
+                    {venues.slice(2, 5).map((venue, index) => (
+                      <div
+                        className="col-span-1 shadow-lg rounded-2xl"
+                        style={{ height: layoutConfigs[4].height }}
+                        key={venue.id}
+                      >
+                        <VenueCard
+                          venue={venue}
+                          layout={layoutConfigs[index + 2]}
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Third Row */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    {venues.slice(5, 7).map((venue, index) => (
+                      <div
+                        className="col-span-1 shadow-lg rounded-2xl"
+                        style={{ height: layoutConfigs[4].height }}
+                        key={venue.id}
+                      >
+                        <VenueCard
+                          venue={venue}
+                          layout={layoutConfigs[index + 5]}
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Additional Rows for Remaining Venues */}
+                  {venues.length > 7 && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-[33px]">
+                      {venues.slice(7).map((venue, index) => (
+                        <div
+                          className="col-span-1 shadow-lg rounded-2xl mb-8"
+                          style={{ height: layoutConfigs[4].height }}
+                          key={venue.id}
+                        >
+                          <VenueCard
+                            venue={venue}
+                            layout={layoutConfigs[(index % 6) + 1]}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           )}
-        </div>
-}
         </div>
 
         {/* --------------------------------venues section end-------------------------------- */}
