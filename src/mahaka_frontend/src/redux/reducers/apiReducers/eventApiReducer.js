@@ -26,8 +26,8 @@ export const createEvent = createAsyncThunk(
 // deleting an event
 export const deleteEvent = createAsyncThunk(
   "events/deleteEvent",
-  async({backend , venueId ,custodianId  }) => {
-    const response = await backend.deleteEvent(venueId , custodianId);
+  async ({ backend, venueId, custodianId }) => {
+    const response = await backend.deleteEvent(venueId, custodianId);
     return response;
   }
 );
@@ -84,7 +84,7 @@ const eventSlice = createSlice({
       })
       .addCase(createEvent.fulfilled, (state, action) => {
         state.createEventLoader = false;
-        state.events = [...state.events, action.payload];
+        state.events = [...state.events, action.payload.ok];
         state.error = null;
         notificationManager.success("Event created successfully");
       })

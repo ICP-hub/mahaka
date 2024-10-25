@@ -3,34 +3,40 @@ import React, { useEffect } from "react";
 const TranslateButton = () => {
   useEffect(() => {
     const addGoogleTranslate = () => {
-      const script = document.createElement("script");
-      script.src =
-        "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-      document.body.appendChild(script);
+      if (!document.querySelector("#google-translate-script")) {
+        const script = document.createElement("script");
+        script.id = "google-translate-script";
+        script.src =
+          "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+        document.body.appendChild(script);
+      }
+    };
+
+    window.googleTranslateElementInit = () => {
+      new window.google.translate.TranslateElement(
+        { pageLanguage: "en" },
+        "google_translate_element"
+      );
     };
 
     const hidePoweredByGoogle = () => {
       const style = document.createElement("style");
       style.innerHTML = `
-        .goog-logo-link { display: none !important; } /* Hide Google logo */
-        .goog-te-gadget { font-size: 0 !important; } /* Hide gadget */
-        iframe[id^=":"] { display: none !important; } /* Hide iframes */
-        .goog-te-banner-frame { display: none !important; } /* Hide dialog box */
-        body { top: 0 !important; } /* Remove space taken by dialog box */
-         #google_translate_element select {
-               
-              width: auto !important; /* Set width to auto */
-              max-width: 150px !important; /* Limit the width */
-
-            }
-
-             #google_translate_element select::-webkit-scrollbar {
-          width: 0px; /* Completely hide the scrollbar */
-        }
-
+        .goog-logo-link { display: none !important; }
+        .goog-te-gadget { font-size: 0 !important; }
+        iframe[id^=":"] { display: none !important; }
+        .goog-te-banner-frame { display: none !important; }
+        body { top: 0 !important; }
         #google_translate_element select {
-          scrollbar-width: none; /* For Firefox */
-          -ms-overflow-style: none; /* For Internet Explorer and Edge */
+          width: auto !important;
+          max-width: 150px !important;
+        }
+        #google_translate_element select::-webkit-scrollbar {
+          width: 0px;
+        }
+        #google_translate_element select {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
         }
       `;
       document.head.appendChild(style);

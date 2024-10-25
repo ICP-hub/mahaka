@@ -57,11 +57,10 @@ export default function Home() {
   const { venues } = useSelector((state) => state.venues);
   const [loading, setLoading] = useState(false);
   // console.log("Venues home are",venues)
-  console.log("venues length", loading);
 
   useEffect(() => {
     console.log("useeffect log");
-    if (venues.length === 0) {
+    if (venues?.length === 0) {
       setLoading(true);
     } else {
       setLoading(false);
@@ -154,7 +153,7 @@ export default function Home() {
           ) : (
             <div>
               {/* if length equals 1 */}
-              {venues.length === 1 && (
+              {venues?.length === 1 && (
                 <div className="flex justify-center">
                   <div className="w-full max-w-4xl shadow-lg rounded-2xl flex flex-col overflow-hidden">
                     <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
@@ -163,7 +162,7 @@ export default function Home() {
               )}
 
               {/* if length equals 2 */}
-              {venues.length === 2 && (
+              {venues?.length === 2 && (
                 <>
                   <div className="flex flex-col lg:flex-row gap-4 mb-12">
                     <div className="lg:w-[60%]">
@@ -178,7 +177,7 @@ export default function Home() {
               {/* </div> */}
 
               {/* if length equals 3 */}
-              {venues.length === 3 && (
+              {venues?.length === 3 && (
                 <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-[33px] mb-12">
                   {venues.map((venue, index) => (
                     <div
@@ -196,7 +195,7 @@ export default function Home() {
               )}
 
               {/* if length equals 4 */}
-              {venues.length === 4 && (
+              {venues?.length === 4 && (
                 <>
                   <div className="flex flex-col lg:flex-row gap-4 mb-12">
                     <div className="lg:w-[60%]">
@@ -218,7 +217,7 @@ export default function Home() {
               )}
 
               {/* if length equals 6 */}
-              {venues.length === 6 && (
+              {venues?.length === 6 && (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                     <div className="col-span-1 shadow-lg rounded-2xl">
@@ -251,7 +250,7 @@ export default function Home() {
 
               {/* if length equals 5 or more than equal to 7 */}
               {/* First Row */}
-              {(venues.length === 5 || venues.length === 7) && (
+              {(venues?.length === 5 || venues?.length === 7) && (
                 <>
                   {/* First Row */}
                   <div className="flex flex-col lg:flex-row gap-4 mb-12">
@@ -296,7 +295,7 @@ export default function Home() {
                   </div>
 
                   {/* Additional Rows for Remaining Venues */}
-                  {venues.length > 7 && (
+                  {venues?.length > 7 && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-[33px]">
                       {venues.slice(7).map((venue, index) => (
                         <div

@@ -3,8 +3,8 @@ import notificationManager from "../../../common/utils/notificationManager";
 
 // Initial state for Wahana
 const initialState = {
-  wahanas: [], 
-  loading: false, 
+  wahanas: [],
+  loading: false,
   error: null,
   currentPage: 1,
   totalPages: 1,
@@ -14,17 +14,27 @@ const initialState = {
 // Creating a wahana
 export const createWahana = createAsyncThunk(
   "wahana/createWahana",
-  async ({ backend, venueId, name, symbol, decimal, totalSupply, description, banner, price }) => {
+  async ({
+    backend,
+    venueId,
+    name,
+    symbol,
+    decimal,
+    totalSupply,
+    description,
+    banner,
+    price,
+  }) => {
     try {
       const response = await backend.createWahana(
-        venueId,   
-        name,      
-        symbol,    
-        decimal, 
-        totalSupply,  
-        description, 
-        banner,    
-        price      
+        venueId,
+        name,
+        symbol,
+        decimal,
+        totalSupply,
+        description,
+        banner,
+        price
       );
       return response;
     } catch (error) {
@@ -39,7 +49,11 @@ export const getallWahanasbyVenue = createAsyncThunk(
   "wahana/getallWahanasbyVenue",
   async ({ backend, chunkSize, pageNo, venueId }) => {
     try {
-      const response = await backend.getallWahanasbyVenue(chunkSize, pageNo, venueId);
+      const response = await backend.getallWahanasbyVenue(
+        chunkSize,
+        pageNo,
+        venueId
+      );
       return response;
     } catch (error) {
       console.error("Error fetching wahanas:", error);
@@ -61,7 +75,9 @@ const wahanaSlice = createSlice({
       })
       .addCase(createWahana.fulfilled, (state, action) => {
         state.createWahanaLoader = false;
-        state.wahanas = [...state.wahanas, action.payload]; 
+        console.log(action.payload, "create wahana");
+
+        state.wahanas.push(action.payload.ok);
         state.error = null;
         notificationManager.success("Wahana created successfully");
       })
@@ -73,7 +89,7 @@ const wahanaSlice = createSlice({
 
       // Handle getallWahanasbyVenue
       .addCase(getallWahanasbyVenue.pending, (state) => {
-        state.loading = true; 
+        state.loading = true;
         state.error = null;
       })
       .addCase(getallWahanasbyVenue.fulfilled, (state, action) => {
