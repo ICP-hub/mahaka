@@ -12,7 +12,7 @@ const ProfileSection = () => {
           alt="profile_pic"
           className="h-full w-full rounded-full"
         /> */}
-        <Avvvatars value={principal} size={96} shadow={true} />
+        <Avvvatars value={"a"} size={96} shadow={true} />
       </div>
       <div className="mt-6 flex w-full flex-col items-center justify-center">
         <div className="w-full overflow-hidden text-ellipsis whitespace-nowrap text-center font-medium leading-normal text-white">
