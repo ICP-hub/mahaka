@@ -410,6 +410,12 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
                 src={bannerPreview}
                 alt="Banner Preview"
                 className="mt-2 w-full h-auto rounded"
+                style={{
+                  maxWidth: "96px",
+                  maxHeight: "96px",
+                  minWidth: "96px",
+                  minHeight: "96px",
+                }}
               />
             )}
           </div>
@@ -417,9 +423,8 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         <div className="flex justify-center">
           <button
             type="submit"
-            className={`text-white py-2 px-4 rounded ${
-              createVenueLoader ? "bg-gray-400" : "bg-secondary"
-            }`}
+            className={`text-white py-2 px-4 rounded ${createVenueLoader ? "bg-gray-400" : "bg-secondary"
+              }`}
             disabled={createVenueLoader}
           >
             {createVenueLoader ? "Creating..." : "Create Venue"}

@@ -8,6 +8,7 @@ import VenueDemoImg from "@/assets/images/Frame10.png";
 import ModalOverlay from "../../customer/Components/Modal-overlay";
 import UpdateVenueForm from "../components/UpdateVenueForm";
 import CreateEventForm from "../components/CreateEventForm";
+import { HiArrowLongLeft } from "react-icons/hi2";
 
 const FormatTime = (timeString) => {
   const time = parseInt(timeString, 10);
@@ -105,7 +106,7 @@ const VenueDetailPage = () => {
             className="px-4 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600"
             onClick={() => navigate("/admin/venues")}
           >
-            <i className="fa-solid fa-arrow-left"></i>
+             <HiArrowLongLeft size={20} />
           </button>
         </div>
         <div className="flex flex-col md:flex-row items-start md:items-center mb-6 ">

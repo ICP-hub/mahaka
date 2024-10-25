@@ -134,7 +134,11 @@ const VenueTableData = ({ venue, onDelete }) => {
       <div className="custom-grid items-center gap-4 border-b px-6 py-3 md:px-8 text-text bg-card border-border">
         <div className="flex items-center">
           <div className="relative mr-6 flex h-12 w-12 flex-0 items-center justify-center overflow-hidden rounded border border-border">
-            <img src={VenueDemoImg} alt="Venue_img" className="w-8" />
+          <img
+              src={venue.banner && venue.banner.data ? venue.banner.data : VenueDemoImg}
+              alt="Venue_img"
+              className="w-8"
+            />
           </div>
         </div>
         <div>{venue.Title}</div>
