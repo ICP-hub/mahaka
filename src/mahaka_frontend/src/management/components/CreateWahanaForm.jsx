@@ -57,7 +57,7 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
 
         reader.readAsDataURL(file);
     };
-    
+
     const handleCreateWahana = async () => {
         setIsSubmitting(true);
         try {
@@ -87,12 +87,12 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
                     <select
                         value={formData.venueId}
                         onChange={(e) => setFormData({ ...formData, venueId: e.target.value })}
-                        className="border border-border rounded-lg px-4 py-2 bg-transparent"
+                        className="border border-border rounded-lg px-4 py-2 bg-card"
                         required
                     >
                         <option value="" disabled>Select a venue</option>
                         {venues?.map((venue) => (
-                            <option key={venue.id} value={venue.id}>
+                            <option className="bg-card" key={venue.id} value={venue.id}>
                                 {venue.Title}
                             </option>
                         ))}

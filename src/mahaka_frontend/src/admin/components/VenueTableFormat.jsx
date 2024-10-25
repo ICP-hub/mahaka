@@ -102,8 +102,8 @@ const VenueTableFormat = ({ filteredVenues }) => {
                       key={index}
                       venue={venue}
                       onDelete={() => handleDeleteClick(venue.id)}
-                      // isExpanded={expandedVenue === index}
-                      // onToggleDetail={() => handleToggleDetail(index)}
+                    // isExpanded={expandedVenue === index}
+                    // onToggleDetail={() => handleToggleDetail(index)}
                     />
                   </motion.div>
                 ))}

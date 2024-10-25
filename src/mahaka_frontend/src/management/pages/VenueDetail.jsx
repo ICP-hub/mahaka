@@ -112,9 +112,9 @@ const MgtVenueDetailPage = () => {
           </Link>
         </div>
         <div className="flex flex-col md:flex-row items-start md:items-center mb-6 ">
-          <div className="w-full md:w-1/2 h-64 bg-gray-200 mb-4 md:mb-0 rounded-lg shadow-lg">
+        <div className="w-full md:w-1/2 h-64 bg-gray-200 mb-4 md:mb-0 rounded-lg shadow-lg">
             <img
-              src={VenueDemoImg}
+              src={venue.banner.data ? venue.banner.data : VenueDemoImg}
               alt="Venue Banner"
               className="w-full h-full object-cover rounded-lg"
             />
@@ -230,7 +230,7 @@ const EventTable = ({ eventArr }) => {
                 <div className="inventory-grid grid items-center gap-4 border-b px-6 py-3 md:px-8 border-b-border">
                   <div className="flex items-center">
                     <div className="relative mr-6 flex h-12 w-12 flex-0 items-center justify-center overflow-hidden rounded border border-border">
-                      <img src={EventDummyImg} alt="Event_img" />
+                      <img  src={event.banner.data} alt="Event_img" />
                     </div>
                   </div>
                   <div className="hidden truncate md:block">{event.title}</div>
@@ -256,7 +256,7 @@ const EventTable = ({ eventArr }) => {
                       <div className="mb-8 flex flex-col items-center sm:mb-0 sm:items-start">
                         <div className="w-32 border h-44 rounded-md border-border">
                           <img
-                            src={EventDummyImg}
+                             src={event.banner.data}
                             alt="event_img"
                             className="h-full w-full object-cover"
                           />

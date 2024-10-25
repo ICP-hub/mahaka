@@ -55,24 +55,29 @@ const MgtWahana = () => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
   const { wahanas, loading } = useSelector((state) => state.wahana);
+  const { venues } = useSelector((state) => state.venues);
+  
+  const [selectedVenue, setSelectedVenue] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    fetchWahanas();
-  }, []);
+    dispatch(getAllVenues({ backend, pageLimit: 100, currPage: 0 }));
+  }, [dispatch, backend]);
 
-  const fetchWahanas = () => {
+  useEffect(() => {
+    if (selectedVenue) {
+      fetchWahanas(selectedVenue);
+    }
+  }, [selectedVenue]);
+
+  const fetchWahanas = (venueId) => {
     dispatch(getallWahanasbyVenue({
       backend,
       chunkSize: 100,
       pageNo: 0,
-      venueId: "Venue1#br5f7-7uaaa-aaaaa-qaaca-cai"
+      venueId: venueId
     }));
   };
-
-  useEffect(() => {
-    dispatch(getAllVenues({ backend: backend, pageLimit: 100, currPage: 0 }));
-  }, []);
 
   return (
     <div className="relative h-full">
@@ -106,6 +111,9 @@ const MgtWahana = () => {
 
         <WahanaMain
           wahanaData={wahanas}
+          venues={venues}
+          selectedVenue={selectedVenue}
+          setSelectedVenue={setSelectedVenue}
           onCreateClick={() => setIsModalOpen(true)}
           loading={loading}
         />
@@ -113,10 +121,11 @@ const MgtWahana = () => {
         <ModalOverlay
           isOpen={isModalOpen}
           setIsOpen={setIsModalOpen}
-          title="Create New Wahana">
+          title="Create New Wahana"
+        >
           <CreateWahanaForm
             onClose={() => setIsModalOpen(false)}
-            onSuccess={fetchWahanas}
+            onSuccess={() => fetchWahanas(selectedVenue)}
           />
         </ModalOverlay>
       </div>
@@ -124,32 +133,26 @@ const MgtWahana = () => {
   );
 };
 
-const WahanaMain = ({ wahanaData, onCreateClick, loading }) => {
+const WahanaMain = ({ wahanaData, venues, selectedVenue, setSelectedVenue, onCreateClick, loading }) => {
   return (
     <div className="flex flex-auto p-6 sm:p-10">
       <div className="mx-auto flex w-full max-w-xs flex-auto flex-col sm:max-w-5xl">
         <div className="flex w-full max-w-xs flex-col justify-between sm:max-w-none sm:flex-row">
           <select
-            name=""
-            id=""
+            value={selectedVenue || ""}
+            onChange={(e) => setSelectedVenue(e.target.value)}
             className="bg-card text-icon px-4 min-h-12 rounded-md border border-border sm:w-36"
           >
             <option value="" className="min-h-12">
-              All
+              Select Venue
             </option>
-            <option value="" className="min-h-12">
-              Event One
-            </option>
-            <option value="" className="min-h-12">
-              Event Two
-            </option>
-            <option value="" className="min-h-12">
-              Event Three
-            </option>
-            <option value="" className="min-h-12">
-              Event Four
-            </option>
+            {venues.map((venues) => (
+              <option key={venues.id} value={venues.id} className="min-h-12">
+                {venues.Title}
+              </option>
+            ))}
           </select>
+
           <div className="px-4 mt-4 w-full sm:ml-4 sm:mt-0 sm:w-72 min-h-12 rounded-md border border-border flex items-center bg-card text-icon">
             <HiMagnifyingGlass size={20} />
             <input
@@ -174,7 +177,7 @@ const WahanaMain = ({ wahanaData, onCreateClick, loading }) => {
                 ...wahana,
                 title: wahana.ride_title,
                 price: wahana.priceinusd,
-                image: wahana.banner.data,
+                image: wahana.banner?.data,
               }} />
             ))}
           </div>
@@ -191,7 +194,7 @@ const WahanaCard = ({ wahana }) => {
       <div className="flex flex-col relative">
         <div className="flex items-center justify-between p-6 z-10">
           <div className="rounded-full px-3 py-0.5 text-sm font-semibold bg-blue-100 text-blue-800 dark:bg-blue-500 dark:text-blue-50">
-            {wahana.event}
+            {wahana.title}
           </div>
         </div>
         <div
