@@ -16,13 +16,9 @@ const initialState = {
 export const getAllVenues = createAsyncThunk(
   "venues/getAllVenues",
   async ({ backend, pageLimit, currPage }) => {
-    try {
-      const response = await backend.getAllVenues(pageLimit, currPage);
-      console.log(response.data, "All venues");
-      return response.data;
-    } catch (err) {
-      console.error("Error fetching all venues ", err);
-    }
+    const response = await backend.getAllVenues(pageLimit, currPage);
+
+    return response.data;
   }
 );
 
@@ -216,7 +212,6 @@ const venueSlice = createSlice({
       })
       .addCase(createVenue.fulfilled, (state, action) => {
         state.createVenueLoader = false;
-        console.log(action.payload.ok, "newly created");
 
         state.venues.push(action.payload.ok[1]);
         state.error = null;
