@@ -14,7 +14,7 @@ const TranslateButton = () => {
 
     window.googleTranslateElementInit = () => {
       new window.google.translate.TranslateElement(
-        { pageLanguage: "en" },
+        { pageLanguage: "en", includedLanguages: "en,id" },
         "google_translate_element"
       );
     };
