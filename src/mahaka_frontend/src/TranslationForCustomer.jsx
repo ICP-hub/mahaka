@@ -14,7 +14,10 @@ const TranslationForCustomer = () => {
 
     window.googleTranslateElementInit = () => {
       new window.google.translate.TranslateElement(
-        { pageLanguage: "en" },
+        {
+          pageLanguage: "en",
+          includedLanguages: "en,id", // Only English and Indonesian
+        },
         "google_translate_element"
       );
     };
