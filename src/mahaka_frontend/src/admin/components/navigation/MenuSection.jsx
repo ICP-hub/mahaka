@@ -6,6 +6,7 @@ import {
   MdEqualizer,
   MdEvent,
 } from "react-icons/md";
+import { HiOutlineStar, HiOutlineUserGroup } from "react-icons/hi2";
 import { Link, useLocation } from "react-router-dom";
 
 const MenuSection = () => {
@@ -16,6 +17,11 @@ const MenuSection = () => {
       path: "/admin/dashboard",
       label: "Analytics",
       icon: <MdInsertChartOutlined size={24} />,
+    },
+    {
+      path: "/admin/wahana",
+      label: "Wahana",
+      icon: <HiOutlineStar size={24} />,
     },
     // { path: "/admin/events", label: "Events", icon: <MdEventNote size={24} /> },
     { path: "/admin/venues", label: "Venues", icon: <MdMap size={24} /> },
