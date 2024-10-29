@@ -1,4 +1,5 @@
 import Types "./Types";
+import TypesICRC "../ICRC/Types";
 import Validation "./Validation";
 import Principal "mo:base/Principal";
 import TrieMap "mo:base/TrieMap";
@@ -14,10 +15,13 @@ import Region "mo:base/Region";
 import Result "mo:base/Result";
 import Iter "mo:base/Iter";
 import Debug "mo:base/Debug";
+import Time "mo:base/Time";
+import Array "mo:base/Array";
 // import Uuid "mo:uuid/UUID";
 import Utils "./Utils";
 import nftTypes "../DIP721-NFT/Types";
-import ICRCactor "../ICRC/ICRC"
+import ICRCactor "../ICRC/ICRC";
+import icrcTypes "../ICRC/Types";
 actor mahaka {
 
 
@@ -51,7 +55,22 @@ actor mahaka {
           var elems_count : Nat64 = 0;
      };
 
-     // private stable var _eventList : List.List<(Types.venueId, List.List<Types.completeEvent>)> = List.nil<(Types.venueId, List.List<Types.completeEvent>)>();
+     var _VenueTicketsMap = TrieMap.TrieMap<Text, Types.Index>(Text.equal, Text.hash);
+     private stable var _stableVenueTicketsArray : [(Text, Types.Index)] = [];
+
+     var _EventTicketsMap = TrieMap.TrieMap<Text, Types.Index>(Text.equal, Text.hash);
+     private stable var _stableEventTicketsArray : [(Text, Types.Index)] = [];
+
+     var _WahanaTicketsMap = TrieMap.TrieMap<Text, Types.Index>(Text.equal, Text.hash);
+     private stable var _stableWahanaTicketsArray : [(Text, Types.Index)] = [];
+
+     stable var Ticket_state = {
+          bytes = Region.new();
+          var bytes_count : Nat64 = 0;
+          elems = Region.new ();
+          var elems_count : Nat64 = 0;
+     };
+
 
      private var Users = TrieMap.TrieMap<Principal, Types.Index>(Principal.equal, Principal.hash);
      private var _stableusers : [(Principal, Types.Index)] = [];
@@ -67,6 +86,9 @@ actor mahaka {
           _stableVenueArray := Iter.toArray(_venueMap.entries());
           _stableEventsArray := Iter.toArray(_EventsMap.entries());
           _stableWahanaArray := Iter.toArray(_WahanaMap.entries());
+          _stableVenueTicketsArray := Iter.toArray(_VenueTicketsMap.entries());
+          _stableEventTicketsArray := Iter.toArray(_EventTicketsMap.entries());
+          _stableWahanaTicketsArray := Iter.toArray(_WahanaTicketsMap.entries());
           _stableusers := Iter.toArray(Users.entries());
      };
 
@@ -74,6 +96,9 @@ actor mahaka {
           _venueMap := TrieMap.fromEntries(_stableVenueArray.vals(), Text.equal, Text.hash);
           _EventsMap := TrieMap.fromEntries(_stableEventsArray.vals(), Text.equal, Text.hash);
           _WahanaMap := TrieMap.fromEntries(_stableWahanaArray.vals(), Text.equal, Text.hash);
+          _VenueTicketsMap := TrieMap.fromEntries(_stableVenueTicketsArray.vals(), Text.equal, Text.hash);
+          _EventTicketsMap := TrieMap.fromEntries(_stableEventTicketsArray.vals(), Text.equal, Text.hash);
+          _WahanaTicketsMap := TrieMap.fromEntries(_stableWahanaTicketsArray.vals(), Text.equal, Text.hash);
           Users := TrieMap.fromEntries(_stableusers.vals(), Principal.equal, Principal.hash);
 
      };
@@ -171,11 +196,12 @@ actor mahaka {
                Collection_id : Principal = venueCollectionId;
                Description : Text = _description;
                Details : Types.venueDetails = _details;
-               Events : List.List<Types.Events> = List.nil<Types.Events>();
-               Wahanas : List.List<Types.Wahana_details> = List.nil<Types.Wahana_details>();
+               Events : List.List<Text> = List.nil<Text>();
+               Wahanas : List.List<Text> = List.nil<Text>();
                Title : Text = _title;
                capacity : Nat = _capacity;
                id : Text = venue_id;
+               creator = user;
           };
           let venue_blob = to_candid(Venue);
           let Venue_index : Types.Index = await stable_add(venue_blob, Venue_state);
@@ -204,7 +230,7 @@ actor mahaka {
           };
      };
 
-     public shared ({caller}) func updateVenue( Venue_id : Text, events : [Types.Events], wahanas : [Types.Wahana_details] ,  Title : Text,
+     public shared ({caller}) func updateVenue( Venue_id : Text, events : [Text], event : [Types.Events],wahanas : [Text] , wahana:[Types.Wahana_details], Title : Text,
         Description : Text,
         Details : Types.venueDetails,
         capacity : Nat,
@@ -231,8 +257,9 @@ actor mahaka {
                };
                case (?v){
                     let collection_id = await Utils.extractCanisterId(Venue_id);
+                    let venue_id =  Title # "#" # collection_id ;
                     let Venue : Types.Venue = {
-                         id = Venue_id;
+                         id = venue_id;
                          Title = Title;
                          logo = logo;
                          banner = banner;
@@ -242,6 +269,7 @@ actor mahaka {
                          Wahanas = List.fromArray(wahanas);
                          capacity = capacity;
                          Collection_id = Principal.fromText(collection_id);
+                         creator = caller;
                     };
                     let venue_blob = to_candid(Venue);
                     let Venue_index = await update_stable(v, venue_blob, Venue_state);
@@ -251,7 +279,7 @@ actor mahaka {
           };
      };
 
-     func updateVenuewithEvents( Venue_id : Text, events : [Types.completeEvent]) : async Types.Venue {
+     func updateVenuewithEvents( Venue_id : Text, events : [Text]) : async Types.Venue {
           switch(_venueMap.get(Venue_id)){
                case null {
                     throw Error.reject("Venue not found");
@@ -269,6 +297,7 @@ actor mahaka {
                          Wahanas = venue.Wahanas;
                          capacity = venue.capacity;
                          Collection_id = venue.Collection_id;
+                         creator = venue.creator;
                     };
                     let venue_blob = to_candid(Venue);
                     let Venue_index = await update_stable(v, venue_blob, Venue_state);
@@ -279,7 +308,7 @@ actor mahaka {
      };
 
 
-     func updateVenuewithWahanas( Venue_id : Text, wahanas : [Types.Wahana_details]) : async Types.Venue {
+     func updateVenuewithWahanas( Venue_id : Text, wahanas : [Text]) : async Types.Venue {
           switch(_venueMap.get(Venue_id)){
                case null {
                     throw Error.reject("Venue not found");
@@ -297,6 +326,7 @@ actor mahaka {
                          Events = venue.Events;
                          capacity = venue.capacity;
                          Collection_id = venue.Collection_id;
+                         creator = venue.creator;
                     };
                     let venue_blob = to_candid(Venue);
                     let Venue_index = await update_stable(v, venue_blob, Venue_state);
@@ -408,7 +438,11 @@ actor mahaka {
           //           return #err(#RoleError);
           //      };
           //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or 
+          //                (await Validation.check_for_Staff(role)))
+          //           ) {
           //                return #err(#UserNotAuthorized);
           //           };
           //      };
@@ -434,6 +468,8 @@ actor mahaka {
                title = Event.title;
                vTicket_limit = Event.vTicket_limit;
                event_collectionid = await eventCollection.getCanisterId();
+               creator = user;
+               venueId = venueId;
           };
 
           let existingEvents = _EventsMap.get(venueId);
@@ -442,7 +478,9 @@ actor mahaka {
                case null {
                     let Events : Types.Events_data = {
                          Events = List.push(newEvent, List.nil<Types.completeEvent>());
+                         EventIds = List.push(newEvent.id, List.nil<Text>());
                     }
+                    
                };
                case (?eventIndex) {
                     let eventsBlob = await stable_get(eventIndex, Events_state);
@@ -450,28 +488,50 @@ actor mahaka {
                     switch (existingData) {
                          case null {
                               let Events : Types.Events_data = {
-                              Events = List.push(newEvent, List.nil<Types.completeEvent>());
-                              }    
+                                   Events = List.push(newEvent, List.nil<Types.completeEvent>());
+                                   EventIds = List.push(newEvent.id, List.nil<Text>());
+                              }
                          };
                          case (?data) {
                               let Events : Types.Events_data = {
-                              Events = List.push(newEvent, data.Events);
+                                   Events = List.push(newEvent, data.Events);
+                                   EventIds = List.push(newEvent.id, data.EventIds);
                               }
                          };
                     }
                };
           };
 
-          let updatedVenue = await updateVenuewithEvents(venueId,List.toArray(updatedEvents.Events));
+          let updatedVenue = await updateVenuewithEvents(venueId,List.toArray(updatedEvents.EventIds));
 
           let eventBlob = to_candid(updatedEvents);
-          let eventIndex = await stable_add(eventBlob, Events_state);
+          let eventIndex = switch (existingEvents) {
+               case null { await stable_add(eventBlob, Events_state) };
+               case (?index) { await update_stable(index, eventBlob, Events_state) };
+          };
           _EventsMap.put(venueId, eventIndex);
 
           return #ok(newEvent);
      };
 
-     public shared func getallEventsbyVenue(chunkSize : Nat , pageNo : Nat, venueId : Types.venueId) : async {data : [Types.completeEvent] ; current_page : Nat ; Total_pages : Nat} {
+     public shared ({caller = user}) func getallEventsbyVenue(chunkSize : Nat , pageNo : Nat, venueId : Types.venueId) : async Result.Result<{data : [Types.completeEvent] ; current_page : Nat ; Total_pages : Nat}, Types.UpdateUserError> {
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or 
+          //                (await Validation.check_for_Staff(role)) or 
+          //                (await Validation.check_for_Manager(role)) or 
+          //                (await Validation.check_for_Bod(role)))
+          //           ) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           let events_object = _EventsMap.get(venueId);
           switch (events_object){
                case null {
@@ -494,11 +554,75 @@ actor mahaka {
                                    throw Error.reject("No products found");
                               };
                               let pages_data = index_pages[pageNo];
-                              return {data = pages_data; current_page = pageNo + 1; Total_pages = index_pages.size()};
+                              return #ok{data = pages_data; current_page = pageNo + 1; Total_pages = index_pages.size()};
                          };
                     };
                };
           }; 
+     };
+
+     public shared ({caller}) func getAllEvents(chunkSize : Nat, pageNo : Nat) : async Result.Result<{data : [Types.completeEvent]; current_page : Nat; Total_pages : Nat}, Types.CommonErrors> {
+          var allEvents : List.List<Types.completeEvent> = List.nil();
+
+          for ((_, eventIndex) in _EventsMap.entries()) {
+               let event_object_blob = await stable_get(eventIndex, Events_state);
+               let event_object : ?Types.Events_data = from_candid(event_object_blob);
+               
+               switch (event_object) {
+                    case (null) {
+                         return #err(#DataNotFound);
+                    };
+                    case (?eventData) {
+                         allEvents := List.append(allEvents, eventData.Events);
+                    };
+               };
+          };
+
+          let index_pages = Utils.paginate<Types.completeEvent>(List.toArray(allEvents), chunkSize);
+          if (index_pages.size() < pageNo) {
+               throw Error.reject("Page not found");
+          };
+          if (index_pages.size() == 0) {
+               throw Error.reject("No data found");
+          };
+          let pages_data = index_pages[pageNo];
+          return #ok{data = pages_data; current_page = pageNo + 1; Total_pages = index_pages.size()};
+     };
+
+     public shared ({caller}) func getEvent(eventId : Text, venueId : Text) : async Result.Result<Types.completeEvent, Types.CommonErrors> {
+          let eventIndex = _EventsMap.get(venueId);
+          switch(eventIndex){
+               case null {
+                    throw Error.reject("No event found in the venue");
+                    return #err(#EventNotFound);
+               };
+               case (?e){
+                    let events_object_blob = await stable_get(e,Events_state);
+                    let events_object : ?Types.Events_data = from_candid(events_object_blob);
+                    switch(events_object){
+                         case null {
+                              throw (Error.reject("No object found in the memory"));
+                              return #err(#EventNotFound);
+                         };
+                         case (?e){
+                              let events_list : List.List<Types.completeEvent> = e.Events;
+                              let event = List.find<Types.completeEvent>(
+                                   events_list,
+                                   func x {x.id == eventId}
+                              );
+                              switch(event){
+                                   case null {
+                                        throw Error.reject("No Event found");
+                                        return #err(#EventNotFound);
+                                   };
+                                   case (?_event){
+                                        return #ok(_event);
+                                   }
+                              }
+                         }
+                    }
+               };
+          }
      };
 
      public shared ({caller = user}) func edit_event(eventId : Text, venueId : Types.venueId ,  _eCollection : Types.eventCollectionParams , _event : Types.Events) : async Result.Result<(Types.completeEvent, Text), Types.UpdateUserError> {
@@ -511,7 +635,11 @@ actor mahaka {
           //           return #err(#RoleError);
           //      };
           //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or
+          //                (await Validation.check_for_SuperVisor(role))
+          //           )) {
           //                return #err(#UserNotAuthorized);
           //           };
           //      };
@@ -533,6 +661,11 @@ actor mahaka {
                               let event = List.find<Types.completeEvent>(
                                    events_list,
                                    func x {x.id == eventId}
+                              );
+                              var eventIds_list = val.EventIds;
+                              let exists_eventId = List.find<Text>(
+                                   eventIds_list,
+                                   func x {x == eventId}
                               );
                               switch(event){
                                    case null {
@@ -561,6 +694,8 @@ actor mahaka {
                                              title = _event.title;
                                              vTicket_limit = _event.vTicket_limit;
                                              event_collectionid = await eventCollection.getCanisterId();
+                                             creator = user;
+                                             venueId = venueId;
                                         };
                                         let updated_events_list = List.map<Types.completeEvent, Types.completeEvent>(
                                              events_list,
@@ -572,11 +707,22 @@ actor mahaka {
                                                   }
                                              }
                                         );
+                                        let updated_eventId_list = List.map<Text, Text>(
+                                             eventIds_list,
+                                             func(existing_eventId) {
+                                                  if (existing_eventId == eventId) {
+                                                       updated_event.id
+                                                  } else {
+                                                       existing_eventId
+                                                  }
+                                             }
+                                        );
                                         let updated_events_data: Types.Events_data = {
                                              Events = updated_events_list;
+                                             EventIds = updated_eventId_list;
                                         };
 
-                                        let updatedVenue = await updateVenuewithEvents(venueId,List.toArray(updated_events_data.Events));
+                                        let updatedVenue = await updateVenuewithEvents(venueId,List.toArray(updated_events_data.EventIds));
                                         let eventBlob = to_candid(updated_events_data);
                                         let eventIndex = await update_stable(v,eventBlob, Events_state);
                                         _EventsMap.put(venueId, eventIndex);
@@ -601,12 +747,16 @@ actor mahaka {
           //           return #err(#RoleError);
           //      };
           //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or
+          //                (await Validation.check_for_Staff(role)))
+          //           ) {
           //                return #err(#UserNotAuthorized);
           //           };
           //      };
           // };
-           switch(_EventsMap.get(venue_id)){
+          switch(_EventsMap.get(venue_id)){
                case null {
                     throw(Error.reject("No venue found for the events"));
                };
@@ -765,6 +915,369 @@ actor mahaka {
           };
      };
 
+     public shared ({caller}) func buyWahanaToken(wahanaId : Text, receiver : Principal )  {
+          // if (Principal.isAnonymous(caller)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
+          // let roleResult = await getRoleByPrincipal(caller);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
+          let collection_actor = actor (wahanaId) : actor {
+               icrc1_transfer : ({
+                    from_subaccount : ?TypesICRC.Subaccount;
+                    to : TypesICRC.Account;
+                    amount : TypesICRC.Tokens;
+                    fee : ?TypesICRC.Tokens;
+                    memo : ?TypesICRC.Memo;
+                    created_at_time : ?TypesICRC.Timestamp;
+                    }) -> async TypesICRC.Result<TypesICRC.TxIndex, TypesICRC.TransferError>
+          };
+          let transferObj = {
+               from_subaccount = null : ?TypesICRC.Subaccount;
+               to = { owner = receiver; subaccount = null } : TypesICRC.Account;
+               amount = 1 : TypesICRC.Tokens;
+               memo = null : ?TypesICRC.Memo;
+               created_at_time = null : ?TypesICRC.Timestamp;
+               fee = null : ?TypesICRC.Tokens;
+          };
+
+          let response = await  collection_actor.icrc1_transfer(transferObj);
+          Debug.print(debug_show(response));
+
+     };
+
+     /*********************************************************/
+     /*                 Offline  Tickets Handlig              */
+     /*********************************************************/
+
+    
+
+     public shared ({caller}) func buyOfflineVenueTicket(
+          venueId: Types.venueId,
+          _ticket_type: Types.ticket_info,
+          _metadata: nftTypes.MetadataDesc,
+          receivers : [Principal],
+          paymentType: Types.PaymentType,
+          numOfVisitors: Nat
+     ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError> {
+          // if (Principal.isAnonymous(caller)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
+          // let roleResult = await getRoleByPrincipal(caller);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
+          let collection_id = await Utils.extractCanisterId(venueId);
+          let collection_actor = actor (collection_id) : actor {
+               logoDip721: () -> async Types.LogoResult;
+               mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
+          };
+          let _logo = await collection_actor.logoDip721();
+          var mintReceipts: List.List<nftTypes.MintReceiptPart> = List.nil();
+          for (i in Iter.range(0, numOfVisitors - 1)) {
+               if (numOfVisitors > Array.size(receivers)) {
+                    throw Error.reject("Receivers Count doesnot match number of visitors");
+                    return #err(#ReceiversCountError);
+               };
+               let _ticketResult = await collection_actor.mintDip721(receivers[i], _metadata, _ticket_type.ticket_type, _logo);
+               
+               switch (_ticketResult) {
+                    case (#Ok(mintReceipt)) {
+
+                         mintReceipts := List.push(mintReceipt, mintReceipts);
+                         let ticketSaleInfo: Types.TicketSaleInfo = {
+                              ticketId = Nat64.toNat(mintReceipt.token_id);
+                              category = "venue";
+                              paymentType = paymentType;
+                              numOfVisitors = 1;
+                              saleDate = Time.now();
+                              ticketIssuer = caller;
+                              price = _ticket_type.price;
+                         };
+
+                         let res = await recordTicketSale(venueId, ticketSaleInfo, "venue");
+                         Debug.print(debug_show(res));
+                    };
+                    case (#Err(e)) {
+                         Debug.print(debug_show(e));
+                         return #err(#MintErr);
+                    };
+               };
+          };
+          return #ok(List.toArray(mintReceipts));
+     };
+
+     
+
+
+     public shared ({caller}) func buyOfflineEventTicket(
+          _venueId : Text,
+          _eventId : Text,
+          _ticket_type : Types.ticket_info,
+          _metadata : nftTypes.MetadataDesc,
+          receivers : [Principal],
+          numOfVisitors : Nat, 
+          paymentType : Types.PaymentType
+     ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError> {
+          
+          let eventResult = await getEvent(_eventId, _venueId);
+          
+          switch (eventResult) {
+               case (#err(e)) {
+                    return #err(#EventError);
+               };
+               case (#ok(_event)) {
+                    let collection_actor = actor (Principal.toText(_event.event_collectionid)) : actor {
+                         logoDip721 : () -> async Types.LogoResult;
+                         mintDip721 : (to : Principal, metadata : Types.MetadataDesc, ticket_details : nftTypes.ticket_type, logo : Types.LogoResult) -> async nftTypes.MintReceipt;                                        
+                    };
+
+                    let _logo = await collection_actor.logoDip721();
+                    var mintReceipts: List.List<nftTypes.MintReceiptPart> = List.nil();
+
+                    for (i in Iter.range(0, numOfVisitors - 1)) {
+                         if (numOfVisitors > Array.size(receivers)) {
+                              throw Error.reject("Receivers Count doesnot match number of visitors");
+                              return #err(#ReceiversCountError);
+                         };
+
+                         let _ticketResult = await collection_actor.mintDip721(receivers[i], _metadata, _ticket_type.ticket_type, _logo);
+                         switch (_ticketResult) {
+                              case (#Ok(mintReceipt)) {
+                                   mintReceipts := List.push(mintReceipt, mintReceipts);
+                                   let ticketSaleInfo: Types.TicketSaleInfo = {
+                                        ticketId = Nat64.toNat(mintReceipt.token_id);
+                                        category = "event";
+                                        paymentType = paymentType;
+                                        numOfVisitors = 1;
+                                        saleDate = Time.now();
+                                        ticketIssuer = caller;
+                                        price = _ticket_type.price;
+                                   };
+                                   let res = await recordTicketSale(_eventId, ticketSaleInfo, "event");
+                              };
+                              case (#Err(e)) {
+                                   Debug.print(debug_show(e));
+                                   return #err(#MintErr);
+                              };
+                         };
+                    };
+
+                    return #ok(List.toArray(mintReceipts));
+               };
+          };
+     };
+
+     public shared ({caller}) func buyOfflineWahanaToken(
+          venueId : Text, 
+          wahanaId : Text, 
+          receivers : [Principal], 
+          numOfVisitors : Nat, 
+          paymentType : Types.PaymentType 
+     ) : async Result.Result<[icrcTypes.TxIndex], icrcTypes.TransferError or Types.MintError> {
+
+          let wahanaResult = await getWahana(wahanaId, venueId);
+          
+          switch (wahanaResult) {
+               case (#err(e)) {
+                    return #err(#WahanaError);
+               };
+               case (#ok(_wahana)) {
+                    let collection_actor = actor (_wahana.id) : actor {
+                         icrc1_transfer : ({
+                              from_subaccount : ?TypesICRC.Subaccount;
+                              to : TypesICRC.Account;
+                              amount : TypesICRC.Tokens;
+                              fee : ?TypesICRC.Tokens;
+                              memo : ?TypesICRC.Memo;
+                              created_at_time : ?TypesICRC.Timestamp;
+                         }) -> async TypesICRC.Result<TypesICRC.TxIndex, TypesICRC.TransferError>
+                    };
+
+                    var transferReceipts: List.List<icrcTypes.TxIndex> = List.nil();
+
+                    for (i in Iter.range(0, numOfVisitors - 1)) {
+                         if (numOfVisitors > Array.size(receivers)) {
+                              throw Error.reject("Receivers Count doesnot match number of visitors");
+                              return #err(#ReceiversCountError);
+                         };
+
+                         let transferObj = {
+                              from_subaccount = null : ?TypesICRC.Subaccount;
+                              to = { owner = receivers[i]; subaccount = null } : TypesICRC.Account;
+                              amount = 1 : TypesICRC.Tokens;
+                              memo = null : ?TypesICRC.Memo;
+                              created_at_time = null : ?TypesICRC.Timestamp;
+                              fee = null : ?TypesICRC.Tokens;
+                         };
+
+                         let _ticketResult = await collection_actor.icrc1_transfer(transferObj);
+                         switch (_ticketResult) {
+                              case (#Ok(transferReceipt)) {
+                                   transferReceipts := List.push(transferReceipt, transferReceipts);
+                                   let ticketSaleInfo: Types.TicketSaleInfo = {
+                                        ticketId = transferReceipt;
+                                        category = "wahana";
+                                        paymentType = paymentType;
+                                        numOfVisitors = 1;
+                                        saleDate = Time.now();
+                                        ticketIssuer = caller;
+                                        price = _wahana.price
+                                   };
+                                   let res = await recordTicketSale(wahanaId, ticketSaleInfo, "wahana");
+                                   Debug.print(debug_show(res));
+                              };
+                              case (#Err(e)) {
+                                   Debug.print(debug_show(e));
+                                   return #err(e);
+                              };
+                         };
+                    };
+
+                    return #ok(List.toArray(transferReceipts));
+               };
+          };
+     };
+
+     public shared ({caller}) func getVenueTickets(venueId : Text) : async Result.Result<List.List<Types.TicketSaleInfo>, Text> {
+          switch (_VenueTicketsMap.get(venueId)) {
+               case null {
+                    return #err("Venue Ticets not found");
+               };
+               case (?ticketsIndex) {
+                    let ticketBlob = await stable_get(ticketsIndex, Ticket_state);
+                    let obj: ?List.List<Types.TicketSaleInfo> = from_candid(ticketBlob);
+                    switch obj {
+                         case null {
+                              return #err("Failed to deserialize ticket data");
+                         };
+                         case (?deserializedTickets) {
+                              return #ok(deserializedTickets);
+                         };
+                    };
+               };
+          }
+     };
+
+
+     public shared ({caller}) func getEventTickets(eventId : Text) : async Result.Result<List.List<Types.TicketSaleInfo>, Text> {
+          switch (_EventTicketsMap.get(eventId)) {
+               case null {
+                    return #err("Event Tickets not found");
+               };
+               case (?ticketsIndex) {
+                    let ticketBlob = await stable_get(ticketsIndex, Ticket_state);
+                    let obj: ?List.List<Types.TicketSaleInfo> = from_candid(ticketBlob);
+                    switch obj {
+                         case null {
+                              return #err("Failed to deserialize ticket data");
+                         };
+                         case (?deserializedTickets) {
+                              return #ok(deserializedTickets);
+                         };
+                    };
+               };
+          }
+     };
+
+
+
+     public shared ({caller}) func getWahanaTickets(wahanaId : Text) : async Result.Result<List.List<Types.TicketSaleInfo>, Text> {
+          switch (_WahanaTicketsMap.get(wahanaId)) {
+               case null {
+                    return #err("Wahana Tickets not found");
+               };
+               case (?ticketsIndex) {
+                    let ticketBlob = await stable_get(ticketsIndex, Ticket_state);
+                    let obj: ?List.List<Types.TicketSaleInfo> = from_candid(ticketBlob);
+                    switch obj {
+                         case null {
+                              return #err("Failed to deserialize ticket data");
+                         };
+                         case (?deserializedTickets) {
+                              return #ok(deserializedTickets);
+                         };
+                    };
+               };
+          }
+     };
+
+
+     // Helper function to handle stable memory updates
+     private func updateTicketSales(
+          categoryId: Text,
+          saleInfo: Types.TicketSaleInfo,
+          map: TrieMap.TrieMap<Text, Types.Index>,
+          state: Types.state
+     ) : async Types.Index {
+          let currentSalesIndex = map.get(categoryId);
+          let updatedSales: List.List<Types.TicketSaleInfo> = switch (currentSalesIndex) {
+               case null {
+                    List.push(saleInfo, List.nil<Types.TicketSaleInfo>())
+               };
+               case (?index) {
+                    let ticketBlob = await stable_get(index, state);
+                    let existingData: ?List.List<Types.TicketSaleInfo> = from_candid(ticketBlob);
+                    switch (existingData) {
+                         case null { List.push(saleInfo, List.nil<Types.TicketSaleInfo>()) };
+                         case (?data) { List.push(saleInfo, data) };
+                    }
+               };
+          };
+
+          // Convert the updated list to candid for storage in stable memory
+          let updatedBlob = to_candid(updatedSales);
+          let updatedIndex = switch (currentSalesIndex) {
+               case null { await stable_add(updatedBlob, state) };
+               case (?index) { await update_stable(index, updatedBlob, state) };
+          };
+
+          map.put(categoryId, updatedIndex);
+          return updatedIndex;
+     };
+
+     // Main function to record ticket sale
+     public shared ({caller}) func recordTicketSale(
+          categoryId: Text,
+          saleInfo: Types.TicketSaleInfo,
+          saleType: Text
+     ) : async Result.Result<Text, Text> {
+          switch (saleType) {
+               case ("venue") {
+                    let index = await updateTicketSales(categoryId, saleInfo, _VenueTicketsMap, Ticket_state);
+                    return #ok("Ticket sale recorded for venue");
+               };
+               case ("event") {
+                    let index = await updateTicketSales(categoryId, saleInfo, _EventTicketsMap, Ticket_state);
+                    return #ok("Ticket sale recorded for event");
+               };
+               case ("wahana") {
+                    let index = await updateTicketSales(categoryId, saleInfo, _WahanaTicketsMap, Ticket_state);
+                    return #ok("Ticket sale recorded for wahana");
+               };
+               case (_) {
+                    return #err("Invalid sale type. Use 'venue', 'event', or 'wahana'.");
+               };
+          };
+     };
+
+
+
      /*********************************************************/
      /*                   User CRUD                           */
      /*********************************************************/
@@ -778,8 +1291,8 @@ actor mahaka {
           //      case (#err(error)) {
           //           return #err(#RoleError);
           //      };
-          //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //      case (#ok(roleRes)) {
+          //           if (not ((await Validation.check_for_sysAdmin(roleRes)) or (await Validation.check_for_Admin(roleRes)))) {
           //                return #err(#UserNotAuthorized);
           //           };
           //      };
@@ -818,6 +1331,17 @@ actor mahaka {
           // if (Principal.isAnonymous(caller)) {
           //      return #err(#UserNotAuthenticated); 
           // }; 
+          // let roleResult = await getRoleByPrincipal(caller);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           if (not Principal.isController(caller)) {
                return #err(#UserNotAuthorized);
           };
@@ -982,7 +1506,16 @@ actor mahaka {
      /*                   Wahana Handling                     */
      /*********************************************************/
 
-     public shared ({caller = user}) func createWahana(venueId : Text,_name : Text , _symbol : Text, _decimals : Nat8 , _totalSupply :Nat , description : Text , banner : Types.LogoResult, priceinusd : Text) : async Result.Result<Types.Wahana_details, Types.UpdateUserError> {
+     public shared ({caller = user}) func createWahana(
+          venueId : Text,
+          _name : Text , 
+          _symbol : Text, 
+          _decimals : Nat8 , 
+          _totalSupply :Nat , 
+          description : Text , 
+          banner : Types.LogoResult, 
+          price : Nat
+     ) : async Result.Result<Types.Wahana_details, Types.UpdateUserError> {
           // if (Principal.isAnonymous(user)) {
           //      return #err(#UserNotAuthenticated); 
           // }; 
@@ -992,7 +1525,11 @@ actor mahaka {
           //           return #err(#RoleError);
           //      };
           //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or 
+          //                (await Validation.check_for_Staff(role)))
+          //           ) {
           //                return #err(#UserNotAuthorized);
           //           };
           //      };
@@ -1028,44 +1565,78 @@ actor mahaka {
                id = Principal.toText(wahana_id);
                banner = banner;
                description = description;
-               priceinusd = priceinusd;
+               price = price;
                ride_title = _name;
                creator = user;
+               venueId = venueId
           };
-
+          
           let existingWahanas = _WahanaMap.get(venueId);
-
+          Debug.print(debug_show(List.fromArray([new_wahana])));
           let updatedWahanas: Types.Wahana_data = switch (existingWahanas) {
-               case null {
+               case (null) {
+                    Debug.print("wahanamap null");
                     let Wahanas : Types.Wahana_data = {
-                         Wahanas = List.push(new_wahana, List.nil<Types.Wahana_details>());
-                    }
+                         Wahanas = List.fromArray([new_wahana]);
+                         WahanaIds = List.fromArray([new_wahana.id]);
+                    };
+                    Debug.print(debug_show(Wahanas));
+                    Wahanas
                };
                case (?wahanaIndex) {
                     let wahanasBlob = await stable_get(wahanaIndex, Wahana_state);
                     let existingData: ?Types.Wahana_data = from_candid(wahanasBlob);
                     switch (existingData) {
                          case null {
+                              Debug.print("null");
+                              
                               let Wahanas : Types.Wahana_data = {
-                              Wahanas = List.push(new_wahana, List.nil<Types.Wahana_details>());
-                              }    
+                                   Wahanas = List.fromArray([new_wahana]);
+                                   WahanaIds = List.fromArray([new_wahana.id]);
+                                   
+                              };
+                              Wahanas
                          };
                          case (?data) {
+                                   Debug.print("existing data");
                               let Wahanas : Types.Wahana_data = {
-                              Wahanas = List.push(new_wahana, data.Wahanas);
-                              }
+                                   Wahanas = List.push<Types.Wahana_details>(new_wahana, data.Wahanas);
+                                   WahanaIds = List.push<Text>(new_wahana.id, data.WahanaIds);
+                              };
+                              Wahanas
                          };
                     }
                };
           };
-          let updatedVenue = await updateVenuewithWahanas(venueId,List.toArray(updatedWahanas.Wahanas));
+          Debug.print(debug_show(updatedWahanas));
+          let updatedVenue = await updateVenuewithWahanas(venueId,List.toArray(updatedWahanas.WahanaIds));
           let wahana_blob = to_candid(updatedWahanas);
-          let wahana_index = await stable_add(wahana_blob,Wahana_state);
+          let wahana_index = switch (existingWahanas) {
+               case null { await stable_add(wahana_blob, Wahana_state) };
+               case (?index) { await update_stable(index, wahana_blob, Wahana_state) };
+          };
           _WahanaMap.put(venueId,wahana_index);
           return #ok(new_wahana);
      };
 
-     public shared func getallWahanasbyVenue(chunkSize : Nat , pageNo : Nat, venueId : Types.venueId) : async {data : [Types.Wahana_details] ; current_page : Nat ; Total_pages : Nat} {
+     public shared ({caller = user}) func getAllWahanasbyVenue(chunkSize : Nat , pageNo : Nat, venueId : Types.venueId) : async Result.Result<{data : [Types.Wahana_details] ; current_page : Nat ; Total_pages : Nat}, Types.UpdateUserError> {
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or 
+          //                (await Validation.check_for_Staff(role)) or 
+          //                (await Validation.check_for_Manager(role)) or 
+          //                (await Validation.check_for_Bod(role)))
+          //           ) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           let wahanas_object = _WahanaMap.get(venueId);
           switch (wahanas_object){
                case null {
@@ -1088,7 +1659,73 @@ actor mahaka {
                                    throw Error.reject("No data found");
                               };
                               let pages_data = index_pages[pageNo];
-                              return {data = pages_data; current_page = pageNo + 1; Total_pages = index_pages.size()};
+                              return #ok{data = pages_data; current_page = pageNo + 1; Total_pages = index_pages.size()};
+                         };
+                    };
+               };
+          };
+     };
+
+     public shared ({caller}) func getAllWahanas(chunkSize : Nat, pageNo : Nat) : async Result.Result<{data : [Types.Wahana_details]; current_page : Nat; Total_pages : Nat}, Types.CommonErrors> {
+          var allWahanas : List.List<Types.Wahana_details> = List.nil();
+
+          for ((_, wahanaIndex) in _WahanaMap.entries()) {
+               let wahana_object_blob = await stable_get(wahanaIndex, Wahana_state);
+               let wahana_object : ?Types.Wahana_data = from_candid(wahana_object_blob);
+               
+               switch (wahana_object) {
+                    case (null) {
+                         return #err(#DataNotFound);
+                    };
+                    case (?wahanaData) {
+                         allWahanas := List.append(allWahanas, wahanaData.Wahanas);
+                    };
+               };
+          };
+
+          let index_pages = Utils.paginate<Types.Wahana_details>(List.toArray(allWahanas), chunkSize);
+          if (index_pages.size() < pageNo) {
+               throw Error.reject("Page not found");
+          };
+          if (index_pages.size() == 0) {
+               throw Error.reject("No data found");
+          };
+          let pages_data = index_pages[pageNo];
+          return #ok{data = pages_data; current_page = pageNo + 1; Total_pages = index_pages.size()};
+     };
+
+
+
+     public shared ({caller}) func getWahana(wahanaId : Text, venueId : Text) : async Result.Result<Types.Wahana_details,Types.CommonErrors> {
+          let wahanaIndex = _WahanaMap.get(venueId);
+          switch(wahanaIndex){
+               case null {
+                    throw Error.reject("No Wahana found in the venue");
+                    return #err(#WahanaNotFound);
+               };
+               case (?w){
+                    let wahanas_object_blob = await stable_get(w,Wahana_state);
+                    let wahanas_object : ?Types.Wahana_data = from_candid(wahanas_object_blob);
+                    switch(wahanas_object){
+                         case null {
+                              throw (Error.reject("No object found in the memory"));
+                              return #err(#WahanaNotFound);
+                         };
+                         case (?w){
+                              let wahanas_list : List.List<Types.Wahana_details> = w.Wahanas;
+                              let wahana = List.find<Types.Wahana_details>(
+                                   wahanas_list,
+                                   func x {x.id == wahanaId}
+                              );
+                              switch(wahana){
+                                   case null {
+                                        throw Error.reject("No Wahana found");
+                                        return #err(#WahanaNotFound);
+                                   };
+                                   case (?_wahana){
+                                        return #ok(_wahana);
+                                   };
+                              };
                          };
                     };
                };
@@ -1104,7 +1741,7 @@ actor mahaka {
           _totalSupply: Nat,
           description: Text,
           banner: Types.LogoResult,
-          priceinusd: Text
+          price: Nat
      ) : async Result.Result<Text, Types.UpdateUserError> {
           // if (Principal.isAnonymous(user)) {
           //      return #err(#UserNotAuthenticated); 
@@ -1115,7 +1752,11 @@ actor mahaka {
           //           return #err(#RoleError);
           //      };
           //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or
+          //                (await Validation.check_for_SuperVisor(role))
+          //           )) {
           //                return #err(#UserNotAuthorized);
           //           };
           //      };
@@ -1137,6 +1778,11 @@ actor mahaka {
                               let wahana = List.find<Types.Wahana_details>(
                                    wahanas_list,
                                    func x { x.id == wahanaId }
+                              );
+                              var wahanaIds_list = val.WahanaIds;
+                              let exists_wahanaid = List.find<Text>(
+                                   wahanaIds_list,
+                                   func x { x == wahanaId }
                               );
                               switch (wahana) {
                               case null {
@@ -1176,9 +1822,10 @@ actor mahaka {
                                         id = Principal.toText(wahana_id); 
                                         banner = banner;
                                         description = description;
-                                        priceinusd = priceinusd;
+                                        price = price;
                                         ride_title = _name;
                                         creator = wahana.creator;
+                                        venueId = venueId
                                    };
 
                                    let updated_wahanas_list = List.map<Types.Wahana_details, Types.Wahana_details>(
@@ -1191,10 +1838,21 @@ actor mahaka {
                                              }
                                         }
                                    );
+                                   let updated_wahanaIds_list = List.map<Text, Text>(
+                                        wahanaIds_list,
+                                        func(existing_wahanaId) {
+                                             if (existing_wahanaId == wahanaId) {
+                                                  updated_wahana.id
+                                             } else {
+                                                  existing_wahanaId
+                                             }
+                                        }
+                                   );
                                    let updated_wahana_data: Types.Wahana_data = {
                                         Wahanas = updated_wahanas_list;
+                                        WahanaIds = updated_wahanaIds_list;
                                    };
-                                   let updatedVenue = await updateVenuewithWahanas(venueId,List.toArray(updated_wahana_data.Wahanas));
+                                   let updatedVenue = await updateVenuewithWahanas(venueId,List.toArray(updated_wahana_data.WahanaIds));
                                    let wahana_blob = to_candid(updated_wahana_data);
                                    let wahana_index = await update_stable(w,wahana_blob, Wahana_state);
                                    _WahanaMap.put(venueId, wahana_index);
@@ -1218,7 +1876,11 @@ actor mahaka {
           //           return #err(#RoleError);
           //      };
           //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or
+          //                (await Validation.check_for_Staff(role)))
+          //           ) {
           //                return #err(#UserNotAuthorized);
           //           };
           //      };
@@ -1271,7 +1933,7 @@ actor mahaka {
      public shared func searchWahanas(searchTerm: Text, chunkSize: Nat, pageNo: Nat) : async {data: [Types.Wahana_details]; current_page: Nat; total_pages: Nat} {
           var matchingWahanas = List.nil<Types.Wahana_details>();
           let loweredSearchTerm = Text.toLowercase(searchTerm);
-
+          
           for ((venue_id, wahana_index) in _WahanaMap.entries()) {
                let wahana_blob = await stable_get(wahana_index, Wahana_state);
                let wahanasList: ?Types.Wahana_data = from_candid(wahana_blob);
