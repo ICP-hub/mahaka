@@ -64,27 +64,6 @@ function App() {
     }
   }, [dispatch]);
 
-  // const createWahanaHandler = async () => {
-  //   try {
-  //     const response = await backend.createWahana(
-  //       "Venue1#br5f7-7uaaa-aaaaa-qaaca-cai",  
-  //       "Example Wahana",                     
-  //       "WAHANA",                              
-  //       8,                                     
-  //       1000000,                              
-  //       "An amazing wahana experience",       
-  //       {                                    
-  //         data: "example-banner-data",
-  //         logo_type: "image"
-  //       },
-  //       "99.99"                              
-  //     );
-  
-  //     console.log("Wahana created successfully:", response);
-  //   } catch (err) {
-  //     console.error("Error creating wahana:", err);
-  //   }
-  // };
 
   // const getallWahanasbyVenueHandler = async()=>{
   //   try{
@@ -296,8 +275,64 @@ function App() {
   //         }
   //       };
 
+
+
+   const createWahanaHandler = async () => {
+    try {
+      const response = await backend.createWahana(
+        "asara#br5f7-7uaaa-aaaaa-qaaca-cai",  
+        "Example Wahana",                     
+        "WAHANA",                              
+        8,                                     
+        1000000,                              
+        "An amazing wahana experience",       
+        {                                    
+          data: "example-banner-data",
+          logo_type: "image"
+        },
+        "99.99"                              
+      );
+  
+      console.log("Wahana created successfully:", response);
+    } catch (err) {
+      console.error("Error creating wahana:", err);
+    }
+  };
+
+  const editWahanaHandler = async ()=>{
+    try {
+          const response = await backend.edit_wahana(
+             "bw4dl-smaaa-aaaaa-qaacq-cai",  
+             "Example edit Wahana",                     
+           "EDIT WAHANA", 
+           "Edit wahana",                             
+            8,                                     
+            1000000,                              
+          "An amazing wahana experience",       
+           {                                    
+             data: "example-banner-data",
+             logo_type: "image"
+             },
+            "143"                              
+          );
+      
+           console.log("Wahana edited successfully:", response);
+         } catch (err) {
+           console.error("Error editing wahana:", err);
+        }
+    
+    
+  }
+
   return (
     <div className="light bg-background no-scrollbar">
+       <button className="px-2 py-1 border rounded mr-2" onClick={editWahanaHandler}>
+        Edit wahana
+      </button>
+
+      <button className="px-2 py-1 border rounded mr-2" onClick={createWahanaHandler}>
+        Create wahana
+      </button>
       {/* <button className="px-2 py-1 border rounded mr-2" onClick={updateVenueHandler}>
         Update Venue
       </button> */}
