@@ -9,6 +9,7 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
   const { backend } = useSelector((state) => state.authentication);
   const { createVenueLoader } = useSelector((state) => state.venues);
   const [bannerPreview, setBannerPreview] = useState("");
+  const [error, setError] = useState("");
   const [venueData, setVenueData] = useState({
     Title: venue.Title || "",
     Description: venue.Description || "",
@@ -57,6 +58,7 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
           Details: { ...prev.Details, StartDate: newStartDate },
         }));
       },
+      required: true,
     });
 
     flatpickr(endDateRef.current, {
@@ -69,6 +71,7 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
           Details: { ...prev.Details, EndDate: newEndDate },
         }));
       },
+      required: true,
     });
 
     // Initialize Flatpickr for times
@@ -88,6 +91,7 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
           Details: { ...prev.Details, StartTime: newStartTime.toString() },
         }));
       },
+      required: true,
     });
 
     flatpickr(endTimeRef.current, {
@@ -106,6 +110,7 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
           Details: { ...prev.Details, EndTime: newEndTime.toString() },
         }));
       },
+      required: true,
     });
   }, [
     venueData.Details.StartDate,
@@ -145,33 +150,98 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
       reader.readAsDataURL(imageFile);
     });
   };
+  const resizeImage = (file) => {
+    return new Promise((resolve) => {
+      const maxSize = 200 * 1024; // 200KB
 
-  const handleFileChange = (e) => {
+      // Create image element to load the file
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+
+      img.onload = () => {
+        // Create canvas
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        // Calculate new dimensions while maintaining aspect ratio
+        const aspectRatio = width / height;
+
+        // Start with original dimensions
+        let quality = 0.7;
+        canvas.width = width;
+        canvas.height = height;
+
+        // Draw image on canvas
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Function to convert canvas to file
+        const getCanvasBlob = (quality) => {
+          return new Promise((resolve) => {
+            canvas.toBlob(
+              (blob) => {
+                resolve(blob);
+              },
+              file.type,
+              quality
+            );
+          });
+        };
+
+        // Recursively reduce quality until file size is under maxSize
+        const reduceSize = async (currentQuality) => {
+          const blob = await getCanvasBlob(currentQuality);
+
+          if (blob.size <= maxSize || currentQuality <= 0.1) {
+            // Convert blob to file
+            const resizedFile = new File([blob], file.name, {
+              type: file.type,
+            });
+            resolve(resizedFile);
+          } else {
+            // Reduce quality and try again
+            await reduceSize(currentQuality - 0.1);
+          }
+        };
+
+        reduceSize(quality);
+      };
+    });
+  };
+
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
+    setError("");
+
     if (file) {
-      const fileType = file.type;
+      try {
+        let processedFile = file;
+        const maxSize = 200 * 1024; // 200KB
 
-      // Create a Blob from the file
-      const reader = new FileReader();
-
-      reader.onloadend = async () => {
+        // Check if file needs resizing
+        if (file.size > maxSize) {
+          processedFile = await resizeImage(file);
+        }
         // Convert the file into a Blob
-        const blob = await imageToFileBlob(file);
+        const blob = await imageToFileBlob(processedFile);
 
         // Update state with the Blob directly in banner
         setVenueData((prevState) => ({
           ...prevState,
           banner: {
             data: blob, // Store the Blob here
-            logo_type: fileType, // Set the correct logo type
+            logo_type: file.type, // Set the correct logo type
           },
         }));
 
         // Set the banner preview (optional, for displaying image)
-        setBannerPreview(URL.createObjectURL(file)); // Create a URL for preview
-      };
+        setBannerPreview(URL.createObjectURL(processedFile));
 
-      reader.readAsArrayBuffer(file); // Read the file as an ArrayBuffer for Blob conversion
+      } catch (error) {
+        setError("Error processing image. Please try again.");
+        console.error("Error processing image:", error);
+      }
     }
   };
 
@@ -179,7 +249,7 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
     e.preventDefault();
     const venueId = venue.id;
     console.log(venueId);
-
+    setError("");
     const eventDetails = {
       StartDate: venueData.Details.StartDate,
       StartTime: venueData.Details.StartTime,
@@ -188,7 +258,6 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
       Location: venueData.Details.Location,
     };
 
-    console.log(venueData.banner, "banner");
 
     dispatch(
       updateVenue({
@@ -210,7 +279,9 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
   return (
     <form className="space-y-4">
       <div>
-        <label className="font-semibold">Title</label>
+        <label className="font-semibold">
+          Title <span className="text-red-500">*</span>
+        </label>
         <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border ">
           <input
             type="text"
@@ -224,7 +295,9 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
       </div>
 
       <div className="flex flex-col flex-auto gap-1">
-        <label className="font-semibold">Description</label>
+        <label className="font-semibold">
+          Description <span className="text-red-500">*</span>
+        </label>
         <div className="border border-border rounded-lg pl-4 focus-within:border-indigo-600 dark:focus-within:border-border">
           <textarea
             name="Description"
@@ -239,22 +312,28 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
 
       <div className="flex space-x-4">
         <div className="w-1/2 flex flex-col flex-auto gap-1">
-          <label className="font-semibold">Start Date</label>
+          <label className="font-semibold">
+            Start Date <span className="text-red-500">*</span>
+          </label>
           <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               ref={startDateRef}
               className="my-3 outline-none w-full bg-transparent"
+              required
             />
             <FcCalendar size={24} />
           </div>
         </div>
 
         <div className="w-1/2 flex flex-col flex-auto gap-1">
-          <label className="font-semibold">End Date</label>
+          <label className="font-semibold">
+            End Date <span className="text-red-500">*</span>
+          </label>
           <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               ref={endDateRef}
               className="my-3 outline-none w-full bg-transparent"
+              required
             />
             <FcCalendar size={24} />
           </div>
@@ -263,21 +342,27 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
 
       <div className="flex space-x-4">
         <div className="w-1/2 flex flex-col flex-auto gap-1">
-          <label className="font-semibold">Start Time</label>
+          <label className="font-semibold">
+            Start Time <span className="text-red-500">*</span>
+          </label>
           <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               ref={startTimeRef}
               className="my-3 outline-none w-full bg-transparent"
+              required
             />
             <FcAlarmClock size={24} />
           </div>
         </div>
         <div className="w-1/2 flex flex-col flex-auto gap-1">
-          <label className="font-semibold">End Time</label>
+          <label className="font-semibold">
+            End Time <span className="text-red-500">*</span>
+          </label>
           <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               ref={endTimeRef}
               className="my-3 outline-none w-full bg-transparent"
+              required
             />
             <FcAlarmClock size={24} />
           </div>
@@ -298,7 +383,9 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
         </div>
       </div>
       <div className="flex flex-col flex-auto gap-1">
-        <label className="font-semibold">Maximum number of people</label>
+        <label className="font-semibold">
+          Maximum number of people <span className="text-red-500">*</span>
+        </label>
         <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
           <input
             type="number"
@@ -311,56 +398,38 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
         </div>
       </div>
 
-      <div className="flex space-x-4">
-        <div className="w-1/2 flex flex-col flex-auto gap-1">
-          <label className="font-semibold">Logo</label>
-          <div className="flex flex-col items-center justify-center border-dashed border-2 border-border p-4 rounded">
-            <input
-              type="file"
-              accept=".jpg,.jpeg,.png"
-              className="hidden"
-              id="upload-image"
-              onChange={handleFileChange}
+      <div className="flex flex-col flex-auto gap-1">
+        <label className="font-semibold">
+          Banner  <span className="text-red-500">*</span>
+        </label>
+        <div className="flex flex-col items-center justify-center border-dashed border-2 border-border p-4 rounded">
+          <input
+            type="file"
+            accept=".jpg,.jpeg,.png"
+            className="hidden"
+            id="upload-image"
+            onChange={handleFileChange}
+            required
+          />
+          <label
+            htmlFor="upload-image"
+            className="cursor-pointer bg-card text-text py-2 px-4 rounded-md border border-border"
+          >
+            Upload Banner
+          </label>
+          {bannerPreview && (
+            <img
+              src={bannerPreview}
+              alt="Banner Preview"
+              className="mt-2 w-full h-auto rounded"
+              style={{
+                maxWidth: "96px",
+                maxHeight: "96px",
+                minWidth: "96px",
+                minHeight: "96px",
+              }}
             />
-            <label
-              htmlFor="upload-image"
-              className="cursor-pointer bg-card text-text py-2 px-4 rounded-md border border-border"
-            >
-              Upload Logo
-            </label>
-            {bannerPreview && (
-              <img
-                src={bannerPreview}
-                alt="Banner Preview"
-                className="mt-2 w-full h-auto rounded"
-              />
-            )}
-          </div>
-        </div>
-        <div className="w-1/2 flex flex-col flex-auto gap-1">
-          <label className="font-semibold">Banner</label>
-          <div className="flex flex-col items-center justify-center border-dashed border-2 border-border p-4 rounded">
-            <input
-              type="file"
-              accept=".jpg,.jpeg,.png"
-              className="hidden"
-              id="upload-image"
-              onChange={handleFileChange}
-            />
-            <label
-              htmlFor="upload-image"
-              className="cursor-pointer bg-card text-text py-2 px-4 rounded-md border border-border"
-            >
-              Upload Banner
-            </label>
-            {bannerPreview && (
-              <img
-                src={bannerPreview}
-                alt="Banner Preview"
-                className="mt-2 w-full h-auto rounded"
-              />
-            )}
-          </div>
+          )}
         </div>
       </div>
 
@@ -375,11 +444,10 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
         <button
           //   type="submit"
           onClick={(e) => (createVenueLoader ? null : handleSubmit(e))}
-          className={`px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
-            createVenueLoader
+          className={`px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${createVenueLoader
               ? "bg-gray-600"
               : "bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
-          }`}
+            }`}
         >
           {createVenueLoader ? "Updating..." : "Update Venue"}
         </button>
