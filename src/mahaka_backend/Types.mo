@@ -3,6 +3,7 @@ import Text "mo:base/Text";
 import List "mo:base/List";
 import Region "mo:base/Region";
 import Time "mo:base/Time";
+import Principal "mo:base/Principal";
 import Types "../DIP721-NFT/Types";
 
 module {
@@ -38,12 +39,14 @@ module {
         ride_title : Text;
         description : Text;
         banner : LogoResult;
-        priceinusd : Text;
+        price : Nat;
         creator : Principal;
+        venueId : Text;
     };
 
     public type Wahana_data = {
         Wahanas : List.List<Wahana_details>;
+        WahanaIds : List.List<Text>;
     };
 
     public type ticket_info = {
@@ -74,6 +77,8 @@ module {
         sTicket_limit : Nat;
         vTicket_limit : Nat;
         gTicket_limit : Nat;
+        creator : Principal;
+        venueId : Text;
     };
 
     public type completeEvent = Events and {
@@ -99,14 +104,16 @@ module {
         logo : LogoResult;
         banner : LogoResult;
         Details : venueDetails;
-        Events : List.List<Events>;
-        Wahanas : List.List<Wahana_details>;
+        Events : List.List<Text>;
+        Wahanas : List.List<Text>;
         capacity : Nat;
         Collection_id : Principal;
+        creator : Principal;
     };
 
     public type Events_data = {
         Events : List.List<completeEvent>;
+        EventIds : List.List<Text>;
     };
 
     public type User = {
@@ -133,11 +140,39 @@ module {
         #UserNotFound;
     };
 
+    public type CommonErrors = {
+        #WahanaNotFound;
+        #EventNotFound;
+        #DataNotFound;
+    };
+
     public type CreateUserError = {
         #UserAlreadyExists;
         #EmptyEmail;
         #EmptyFirstName;
         #EmptyLastName;
+    };
+
+    public type PaymentType = {
+        #Cash;
+        #Card;
+    };
+
+    public type TicketSaleInfo = {
+        ticketId : Nat;
+        category : Text;
+        paymentType : PaymentType;
+        numOfVisitors : Nat;
+        saleDate : Time.Time;
+        ticketIssuer : Principal;
+        price : Nat;
+    };
+
+    public type MintError = {
+        #MintErr;
+        #ReceiversCountError;
+        #EventError;
+        #WahanaError;
     };
 
     public type Index = Nat64;

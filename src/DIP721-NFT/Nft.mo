@@ -9,6 +9,7 @@ import Types "./Types";
 import Cycles "mo:base/ExperimentalCycles";
 import Time "mo:base/Time";
 import Debug "mo:base/Debug";
+import Error "mo:base/Error";
 
 shared actor class Dip721NFT(custodian : Principal, init : Types.Dip721NonFungibleToken) = Self {
   stable var transactionId : Types.TransactionId = 0;
@@ -240,8 +241,9 @@ shared actor class Dip721NFT(custodian : Principal, init : Types.Dip721NonFungib
     return List.toArray(nfts);
   };
 
-  public shared func mintDip721(to : Principal, metadata : Types.MetadataDesc, ticket_type : Types.ticket_type, logo : Types.LogoResult) : async Types.MintReceipt {
-    if (not List.some(custodians, func(custodian : Principal) : Bool { custodian == to })) {
+  public shared ({caller}) func mintDip721(to : Principal, metadata : Types.MetadataDesc, ticket_type : Types.ticket_type, logo : Types.LogoResult) : async Types.MintReceipt {
+    if (not List.some(custodians, func(custodian : Principal) : Bool { custodian == caller })) {
+      throw (Error.reject("mintDip721 function is returning unauthorised because caller is not a custodian"));
       return #Err(#Unauthorized);
     };
 
