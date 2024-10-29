@@ -20,43 +20,116 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
     },
     venueId: "",
   });
-
+  const [error, setError] = useState("");
   const [bannerPreview, setBannerPreview] = useState("");
-  const [imageArrayBuffer, setImageArrayBuffer] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     dispatch(getAllVenues({ backend, pageLimit: 100, currPage: 0 }));
   }, [dispatch, backend]);
 
-  console.log("Fetched Venues:", venues);
+  const imageToFileBlob = (imageFile) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        resolve(reader.result);
+      };
+      reader.onerror = (error) => {
+        reject(error);
+      };
+      reader.readAsDataURL(imageFile);
+    });
+  };
+  const resizeImage = (file) => {
+    return new Promise((resolve) => {
+      const maxSize = 200 * 1024; // 200KB
 
-  const handleFileChange = (e) => {
+      // Create image element to load the file
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+
+      img.onload = () => {
+        // Create canvas
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        // Calculate new dimensions while maintaining aspect ratio
+        const aspectRatio = width / height;
+
+        // Start with original dimensions
+        let quality = 0.7;
+        canvas.width = width;
+        canvas.height = height;
+
+        // Draw image on canvas
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Function to convert canvas to file
+        const getCanvasBlob = (quality) => {
+          return new Promise((resolve) => {
+            canvas.toBlob(
+              (blob) => {
+                resolve(blob);
+              },
+              file.type,
+              quality
+            );
+          });
+        };
+
+        // Recursively reduce quality until file size is under maxSize
+        const reduceSize = async (currentQuality) => {
+          const blob = await getCanvasBlob(currentQuality);
+
+          if (blob.size <= maxSize || currentQuality <= 0.1) {
+            // Convert blob to file
+            const resizedFile = new File([blob], file.name, {
+              type: file.type,
+            });
+            resolve(resizedFile);
+          } else {
+            // Reduce quality and try again
+            await reduceSize(currentQuality - 0.1);
+          }
+        };
+
+        reduceSize(quality);
+      };
+    });
+  };
+
+
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
-    if (!file) return;
+    setError("");
+    if (file) {
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const dataUrl = reader.result;
+      try {
+        let processedFile = file;
+        const maxSize = 200 * 1024; // 200KB
+
+        // Check if file needs resizing
+        if (file.size > maxSize) {
+          processedFile = await resizeImage(file);
+        }
+
+        // Convert the processed file to blob
+        const blob = await imageToFileBlob(processedFile);
       setFormData({
         ...formData,
-        banner: { data: dataUrl, logo_type: "image" },
-      });
-      setBannerPreview(dataUrl);
+        banner: { data: blob, logo_type: file.type },
+      });// Set the banner preview
+      setBannerPreview(URL.createObjectURL(processedFile));
 
       // Reading the image as an ArrayBuffer for backend submission
-      const arrayBufferReader = new FileReader();
-      arrayBufferReader.onloadend = (event) => {
-        const arrayBuffer = event.target.result;
-        const uintArray = new Uint8Array(arrayBuffer);
-        const byteArray = Array.from(uintArray);
-        setImageArrayBuffer(byteArray);
-      };
-      arrayBufferReader.readAsArrayBuffer(file);
-    };
-
-    reader.readAsDataURL(file);
-  };
+    } catch (error) {
+      setError("Error processing image. Please try again.");
+      console.error("Error processing image:", error);
+    }
+  }
+};
 
   const handleCreateWahana = async () => {
     setIsSubmitting(true);
@@ -82,7 +155,7 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
       <div className="space-y-4">
         {/* Select Venue */}
         <div className="flex flex-col gap-1">
-          <label className="font-semibold">Select Venue</label>
+          <label className="font-semibold">Select Venue <span className="text-red-500">*</span></label>
           <select
             value={formData.venueId}
             onChange={(e) =>
@@ -102,7 +175,7 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
           </select>
         </div>
         <div className="flex flex-col flex-auto gap-1">
-          <label className="font-semibold">Wahana Name</label>
+          <label className="font-semibold">Wahana Name <span className="text-red-500">*</span></label>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border ">
             <input
               type="text"
@@ -118,7 +191,7 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
         </div>
 
         <div className="flex flex-col flex-auto gap-1">
-          <label className="font-semibold">Symbol</label>
+          <label className="font-semibold">Symbol <span className="text-red-500">*</span></label>
           <div className="border border-border rounded-lg pl-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               name="symbol"
@@ -133,7 +206,7 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="font-semibold">Description</label>
+          <label className="font-semibold">Description <span className="text-red-500">*</span></label>
           <div className="border border-border rounded-lg pl-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <textarea
               name="description"
@@ -149,7 +222,7 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="font-semibold">Price (IDR)</label>
+          <label className="font-semibold">Price (IDR)<span className="text-red-500">*</span></label>
           <div className="border border-border rounded-lg pl-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               value={formData.price}
@@ -163,7 +236,7 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="font-semibold">Banner</label>
+          <label className="font-semibold">Banner <span className="text-red-500">*</span></label>
           <div className="flex flex-col items-center justify-center border-dashed border-2 border-gray-300 p-4 rounded">
             <input
               type="file"
@@ -171,6 +244,7 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
               className="hidden"
               id="upload-image"
               onChange={handleFileChange}
+              required
             />
             <label
               htmlFor="upload-image"

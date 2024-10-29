@@ -9,6 +9,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
   const { createVenueLoader } = useSelector((state) => state.venues);
+  const [error, setError] = useState("");
   const [venueData, setVenueData] = useState({
     collection_args: {
       maxLimit: 500,
@@ -80,12 +81,13 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
           endDatePicker.set("minDate", newStartDate);
         }
       },
+      required: true,
     });
 
     // Initialize Flatpickr for end date
     const endDatePicker = flatpickr(endDateRef.current, {
       dateFormat: "Y-m-d",
-      minDate: startDate, // Set minimum date for end date
+      minDate: startDate,
       onChange: (selectedDates) => {
         const newEndDate = selectedDates[0] ? formatDate(selectedDates[0]) : "";
         setVenueData((prevState) => ({
@@ -96,6 +98,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
           },
         }));
       },
+      required: true,
     });
 
     // Initialize Flatpickr for times
@@ -114,6 +117,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
           },
         }));
       },
+      required: true,
     });
 
     flatpickr(endTimeRef.current, {
@@ -131,6 +135,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
           },
         }));
       },
+      required: true,
     });
 
     return () => {
@@ -170,45 +175,136 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
       reader.readAsDataURL(imageFile);
     });
   };
+  const resizeImage = (file) => {
+    return new Promise((resolve) => {
+      const maxSize = 200 * 1024; // 200KB
 
-  const handleFileChange = (e) => {
+      // Create image element to load the file
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+
+      img.onload = () => {
+        // Create canvas
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        // Calculate new dimensions while maintaining aspect ratio
+        const aspectRatio = width / height;
+
+        // Start with original dimensions
+        let quality = 0.7;
+        canvas.width = width;
+        canvas.height = height;
+
+        // Draw image on canvas
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Function to convert canvas to file
+        const getCanvasBlob = (quality) => {
+          return new Promise((resolve) => {
+            canvas.toBlob(
+              (blob) => {
+                resolve(blob);
+              },
+              file.type,
+              quality
+            );
+          });
+        };
+
+        // Recursively reduce quality until file size is under maxSize
+        const reduceSize = async (currentQuality) => {
+          const blob = await getCanvasBlob(currentQuality);
+
+          if (blob.size <= maxSize || currentQuality <= 0.1) {
+            // Convert blob to file
+            const resizedFile = new File([blob], file.name, {
+              type: file.type,
+            });
+            resolve(resizedFile);
+          } else {
+            // Reduce quality and try again
+            await reduceSize(currentQuality - 0.1);
+          }
+        };
+
+        reduceSize(quality);
+      };
+    });
+  };
+
+
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
+    setError("");
+
     if (file) {
-      const fileType = file.type;
 
-      // Create a Blob from the file
-      const reader = new FileReader();
+      try {
+        let processedFile = file;
+        const maxSize = 200 * 1024; // 200KB
 
-      reader.onloadend = async () => {
-        // Convert the file into a Blob
-        const blob = await imageToFileBlob(file);
-        console.log(blob);
+        // Check if file needs resizing
+        if (file.size > maxSize) {
+          processedFile = await resizeImage(file);
+        }
 
-        // Update state with the Blob
+        // Convert the processed file to blob
+        const blob = await imageToFileBlob(processedFile);
+
+        // Update state with the blob
         setVenueData((prevState) => ({
           ...prevState,
           collection_args: {
             ...prevState.collection_args,
             banner: {
-              data: blob, // Store the Blob here
-              logo_type: fileType,
+              data: blob,
+              logo_type: file.type,
             },
           },
         }));
 
-        // Set the banner preview (optional, for displaying image)
-        setBannerPreview(URL.createObjectURL(file)); // Create a URL for preview
-      };
+        // Set the banner preview
+        setBannerPreview(URL.createObjectURL(processedFile));
 
-      reader.readAsArrayBuffer(file); // Read the file as an ArrayBuffer for Blob conversion
+      } catch (error) {
+        setError("Error processing image. Please try again.");
+        console.error("Error processing image:", error);
+      }
     }
+  };
+
+  const validateForm = () => {
+    // Check if all required fields are filled
+    if (!venueData.collection_args.name ||
+      !venueData.collection_args.description ||
+      !venueData.eventDetails.StartDate ||
+      !venueData.eventDetails.EndDate ||
+      !venueData.eventDetails.StartTime ||
+      !venueData.eventDetails.EndTime ||
+      !venueData.eventDetails.Location ||
+      !venueData.title ||
+      !venueData.capacity ||
+      !venueData.collection_args.banner.data) {
+      setError("Please fill in all required fields");
+      return false;
+    }
+    return true;
   };
 
   // Handler form submit
   const handleVenueSubmit = (e) => {
     e.preventDefault();
+    setError("");
+
     if (createVenueLoader) return;
-    console.log(venueData);
+
+    if (!validateForm()) {
+      return;
+    }
+
     dispatch(
       createVenue({
         backend,
@@ -232,7 +328,9 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         onSubmit={createVenueLoader ? null : handleVenueSubmit}
       >
         <div className="flex flex-col flex-auto gap-1">
-          <label className="font-semibold">Venue Name</label>
+          <label className="font-semibold">
+            Venue Name <span className="text-red-500">*</span>
+          </label>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border ">
             <input
               type="text"
@@ -247,7 +345,9 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
           </div>
         </div>
         <div className="flex flex-col flex-auto gap-1">
-          <label className="font-semibold">Description</label>
+          <label className="font-semibold">
+            Description <span className="text-red-500">*</span>
+          </label>
           <div className="border border-border rounded-lg pl-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <textarea
               name="description"
@@ -263,21 +363,27 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         </div>
         <div className="flex space-x-4">
           <div className="w-1/2 flex flex-col flex-auto gap-1">
-            <label className="font-semibold">Start Date</label>
+            <label className="font-semibold">
+              Start Date <span className="text-red-500">*</span>
+            </label>
             <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
               <input
                 ref={startDateRef}
                 className="my-3 outline-none w-full bg-transparent"
+                required
               />
               <FcCalendar size={24} />
             </div>
           </div>
           <div className="w-1/2 flex flex-col flex-auto gap-1">
-            <label className="font-semibold">End Date</label>
+            <label className="font-semibold">
+              End Date <span className="text-red-500">*</span>
+            </label>
             <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
               <input
                 ref={endDateRef}
                 className="my-3 outline-none w-full bg-transparent"
+                required
               />
               <FcCalendar size={24} />
             </div>
@@ -285,28 +391,36 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         </div>
         <div className="flex space-x-4">
           <div className="w-1/2 flex flex-col flex-auto gap-1">
-            <label className="font-semibold">Start Time</label>
+            <label className="font-semibold">
+              Start Time <span className="text-red-500">*</span>
+            </label>
             <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
               <input
                 ref={startTimeRef}
                 className="my-3 outline-none w-full bg-transparent"
+                required
               />
               <FcAlarmClock size={24} />
             </div>
           </div>
           <div className="w-1/2 flex flex-col flex-auto gap-1">
-            <label className="font-semibold">End Time</label>
+            <label className="font-semibold">
+              End Time <span className="text-red-500">*</span>
+            </label>
             <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
               <input
                 ref={endTimeRef}
                 className="my-3 outline-none w-full bg-transparent"
+                required
               />
               <FcAlarmClock size={24} />
             </div>
           </div>
         </div>
         <div className="flex flex-col flex-auto gap-1">
-          <label className="font-semibold">Location</label>
+          <label className="font-semibold">
+            Location <span className="text-red-500">*</span>
+          </label>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               type="text"
@@ -321,7 +435,9 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
           </div>
         </div>
         <div className="flex flex-col flex-auto gap-1">
-          <label className="font-semibold">Title</label>
+          <label className="font-semibold">
+            Title <span className="text-red-500">*</span>
+          </label>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               type="text"
@@ -334,7 +450,9 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
           </div>
         </div>
         <div className="flex flex-col flex-auto gap-1">
-          <label className="font-semibold">Maximum number of people</label>
+          <label className="font-semibold">
+            Maximum number of people <span className="text-red-500">*</span>
+          </label>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               type="number"
@@ -349,7 +467,9 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         {/* Ticket Limits */}
         <div className="flex space-x-4">
           <div className="w-1/3">
-            <label className="font-semibold">General Ticket Limit</label>
+            <label className="font-semibold">
+              General Ticket Limit <span className="text-red-500">*</span>
+            </label>
             <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
               <input
                 type="number"
@@ -362,7 +482,9 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
             </div>
           </div>
           <div className="w-1/3">
-            <label className="font-semibold">Student Ticket Limit</label>
+            <label className="font-semibold">
+              Student Ticket Limit  <span className="text-red-500">*</span>
+            </label>
             <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
               <input
                 type="number"
@@ -375,7 +497,9 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
             </div>
           </div>
           <div className="w-1/3">
-            <label className="font-semibold">VIP Ticket Limit</label>
+            <label className="font-semibold">
+              VIP Ticket Limit  <span className="text-red-500">*</span>
+            </label>
             <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
               <input
                 type="number"
@@ -390,7 +514,9 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         </div>
 
         <div className="flex flex-col flex-auto gap-1">
-          <label className="font-semibold">Banner</label>
+          <label className="font-semibold">
+            Banner  <span className="text-red-500">*</span>
+          </label>
           <div className="flex flex-col items-center justify-center border-dashed border-2 border-border p-4 rounded">
             <input
               type="file"
@@ -398,6 +524,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
               className="hidden"
               id="upload-image"
               onChange={handleFileChange}
+              required
             />
             <label
               htmlFor="upload-image"

@@ -50,12 +50,13 @@ import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
 //   },
 // ];
 
+
 const MgtWahana = () => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
   const { wahanas, loading } = useSelector((state) => state.wahana);
   const { venues } = useSelector((state) => state.venues);
-
+  
   const [selectedVenue, setSelectedVenue] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -70,14 +71,12 @@ const MgtWahana = () => {
   }, [selectedVenue]);
 
   const fetchWahanas = (venueId) => {
-    dispatch(
-      getallWahanasbyVenue({
-        backend,
-        chunkSize: 100,
-        pageNo: 0,
-        venueId: venueId,
-      })
-    );
+    dispatch(getallWahanasbyVenue({
+      backend,
+      chunkSize: 100,
+      pageNo: 0,
+      venueId: venueId
+    }));
   };
 
   return (
@@ -134,14 +133,7 @@ const MgtWahana = () => {
   );
 };
 
-const WahanaMain = ({
-  wahanaData,
-  venues,
-  selectedVenue,
-  setSelectedVenue,
-  onCreateClick,
-  loading,
-}) => {
+const WahanaMain = ({ wahanaData, venues, selectedVenue, setSelectedVenue, onCreateClick, loading }) => {
   return (
     <div className="flex flex-auto p-6 sm:p-10">
       <div className="mx-auto flex w-full max-w-xs flex-auto flex-col sm:max-w-5xl">
@@ -176,21 +168,23 @@ const WahanaMain = ({
             </div>
           </button>
         </div>
+
         {loading ? (
           <div className="mt-8 text-center">Loading...</div>
-        ) : (
+        ) : wahanaData && wahanaData.length > 0 ? (
           <div className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3">
             {wahanaData?.map((wahana) => (
-              <WahanaCard
-                key={wahana.id}
-                wahana={{
-                  ...wahana,
-                  title: wahana.ride_title,
-                  price: wahana.priceinusd,
-                  image: wahana.banner?.data,
-                }}
-              />
+              <WahanaCard key={wahana.id} wahana={{
+                ...wahana,
+                title: wahana.ride_title,
+                price: wahana.priceinusd,
+                image: wahana.banner?.data,
+              }} />
             ))}
+          </div>
+        ) : (
+          <div className="mt-8 text-center text-gray-500">
+            No wahanas available
           </div>
         )}
       </div>

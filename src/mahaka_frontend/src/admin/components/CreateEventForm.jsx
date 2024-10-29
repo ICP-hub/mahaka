@@ -7,10 +7,10 @@ import { FcAlarmClock, FcCalendar } from "react-icons/fc";
 const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
-  const { loading, error, createEventLoader } = useSelector(
+  const { loading, createEventLoader } = useSelector(
     (state) => state.events
   );
-
+  const [error, setError] = useState("");
   useEffect(() => {
     console.log("venueId:", venueId);
   }, [venueId]);
@@ -49,7 +49,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
   });
 
   const [bannerPreview, setBannerPreview] = useState(null);
-  const [imageArrayBuffer, setImageArrayBuffer] = useState(null);
+
 
   const startDateRef = useRef(null);
   const endDateRef = useRef(null);
@@ -75,6 +75,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
           eventDetails: { ...prev.eventDetails, StartDate: newStartDate },
         }));
       },
+      required: true,
     });
 
     flatpickr(endDateRef.current, {
@@ -86,6 +87,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
           eventDetails: { ...prev.eventDetails, EndDate: newEndDate },
         }));
       },
+      required: true,
     });
 
     flatpickr(startTimeRef.current, {
@@ -104,6 +106,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
           },
         }));
       },
+      required: true,
     });
 
     flatpickr(endTimeRef.current, {
@@ -122,6 +125,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
           },
         }));
       },
+      required: true,
     });
   }, []);
 
@@ -145,33 +149,112 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
     }
   };
 
-  const handleFileChange = (e) => {
+  const imageToFileBlob = (imageFile) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        resolve(reader.result);
+      };
+      reader.onerror = (error) => {
+        reject(error);
+      };
+      reader.readAsDataURL(imageFile);
+    });
+  };
+  const resizeImage = (file) => {
+    return new Promise((resolve) => {
+      const maxSize = 200 * 1024; // 200KB
+
+      // Create image element to load the file
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+
+      img.onload = () => {
+        // Create canvas
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        // Calculate new dimensions while maintaining aspect ratio
+        const aspectRatio = width / height;
+
+        // Start with original dimensions
+        let quality = 0.7;
+        canvas.width = width;
+        canvas.height = height;
+
+        // Draw image on canvas
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Function to convert canvas to file
+        const getCanvasBlob = (quality) => {
+          return new Promise((resolve) => {
+            canvas.toBlob(
+              (blob) => {
+                resolve(blob);
+              },
+              file.type,
+              quality
+            );
+          });
+        };
+
+        // Recursively reduce quality until file size is under maxSize
+        const reduceSize = async (currentQuality) => {
+          const blob = await getCanvasBlob(currentQuality);
+
+          if (blob.size <= maxSize || currentQuality <= 0.1) {
+            // Convert blob to file
+            const resizedFile = new File([blob], file.name, {
+              type: file.type,
+            });
+            resolve(resizedFile);
+          } else {
+            // Reduce quality and try again
+            await reduceSize(currentQuality - 0.1);
+          }
+        };
+
+        reduceSize(quality);
+      };
+    });
+  };
+
+
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const fileType = file.type;
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const dataUrl = reader.result;
+      try {
+        let processedFile = file;
+        const maxSize = 200 * 1024; // 200KB
+
+        // Check if file needs resizing
+        if (file.size > maxSize) {
+          processedFile = await resizeImage(file);
+        }
+
+        // Convert the processed file to blob
+        const blob = await imageToFileBlob(processedFile);
+
+        // Update state with the blob
         setEventData((prevState) => ({
           ...prevState,
           collection_args: {
             ...prevState.collection_args,
-            banner: { data: dataUrl, logo_type: fileType },
+            banner: {
+              data: blob,
+              logo_type: file.type,
+            },
           },
         }));
-        setBannerPreview(dataUrl);
-        // Reading the image as an ArrayBuffer for backend submission
-        const arrayBufferReader = new FileReader();
-        arrayBufferReader.onloadend = (event) => {
-          const arrayBuffer = event.target.result;
-          const uintArray = new Uint8Array(arrayBuffer);
-          const byteArray = Array.from(uintArray);
-          setImageArrayBuffer(byteArray);
-        };
-        arrayBufferReader.readAsArrayBuffer(file);
-      };
+        // Set the banner preview
+        setBannerPreview(URL.createObjectURL(processedFile));
 
-      reader.readAsDataURL(file);
+      } catch (error) {
+        setError("Error processing image. Please try again.");
+        console.error("Error processing image:", error);
+      }
     }
   };
 
@@ -248,7 +331,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
     <form className="space-y-4 tracking-wider">
       {/* Event Title */}
       <div>
-        <label className="font-semibold">Event Title</label>
+        <label className="font-semibold">Event Title <span className="text-red-500">*</span></label>
         <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
           <input
             type="text"
@@ -264,7 +347,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
 
       {/* Event Description */}
       <div>
-        <label className="font-semibold">Event Description</label>
+        <label className="font-semibold">Event Description <span className="text-red-500">*</span></label>
         <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
           <textarea
             name="description"
@@ -281,22 +364,24 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
       {/* Event Dates */}
       <div className="flex space-x-4">
         <div className="w-1/2 flex flex-col flex-auto gap-1">
-          <label className="font-semibold">Start Date</label>
+          <label className="font-semibold">Start Date <span className="text-red-500">*</span></label>
           <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               ref={startDateRef}
               className="my-3 outline-none w-full bg-transparent"
+              required
             />
             <FcCalendar size={24} />
           </div>
         </div>
 
         <div className="w-1/2 flex flex-col flex-auto gap-1">
-          <label className="font-semibold">End Date</label>
+          <label className="font-semibold">End Date <span className="text-red-500">*</span></label>
           <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               ref={endDateRef}
               className="my-3 outline-none w-full bg-transparent"
+              required
             />
             <FcCalendar size={24} />
           </div>
@@ -306,21 +391,23 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
       {/* Event Times */}
       <div className="flex space-x-4">
         <div className="w-1/2 flex flex-col flex-auto gap-1">
-          <label className="font-semibold">Start Time</label>
+          <label className="font-semibold">Start Time <span className="text-red-500">*</span></label>
           <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               ref={startTimeRef}
               className="my-3 outline-none w-full bg-transparent"
+              required
             />
             <FcAlarmClock size={24} />
           </div>
         </div>
         <div className="w-1/2 flex flex-col flex-auto gap-1">
-          <label className="font-semibold">End Time</label>
+          <label className="font-semibold">End Time <span className="text-red-500">*</span></label>
           <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               ref={endTimeRef}
               className="my-3 outline-none w-full bg-transparent"
+              required
             />
             <FcAlarmClock size={24} />
           </div>
@@ -329,7 +416,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
 
       {/* Location */}
       <div>
-        <label className="font-semibold">Location</label>
+        <label className="font-semibold">Location <span className="text-red-500">*</span></label>
         <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
           <input
             type="text"
@@ -354,7 +441,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
       {/* Ticket Limits */}
       <div className="flex space-x-4">
         <div className="w-1/3">
-          <label className="font-semibold">General Ticket Limit</label>
+          <label className="font-semibold">General Ticket Limit <span className="text-red-500">*</span></label>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               type="number"
@@ -367,7 +454,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
           </div>
         </div>
         <div className="w-1/3">
-          <label className="font-semibold">Student Ticket Limit</label>
+          <label className="font-semibold">Student Ticket Limit <span className="text-red-500">*</span></label>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               type="number"
@@ -380,7 +467,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
           </div>
         </div>
         <div className="w-1/3">
-          <label className="font-semibold">VIP Ticket Limit</label>
+          <label className="font-semibold">VIP Ticket Limit <span className="text-red-500">*</span></label>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               type="number"
@@ -396,7 +483,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
 
       {/* Event Image */}
       <div>
-        <label className="font-semibold">Event Image</label>
+        <label className="font-semibold">Event Image <span className="text-red-500">*</span></label>
         <div className="mt-1 flex flex-col items-center justify-center border-dashed border-2 border-border p-4 rounded-lg">
           <input
             type="file"
@@ -404,6 +491,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
             onChange={handleFileChange}
             className="hidden"
             id="upload-image"
+            required
           />
           <label
             htmlFor="upload-image"
@@ -448,7 +536,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
       </div>
 
       {/* Error Message */}
-      {error && <div className="text-red-500 text-center">{error}</div>}
+      {/* {error && <div className="text-red-500 text-center">{error}</div>} */}
     </form>
   );
 };
