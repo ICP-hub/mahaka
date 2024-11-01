@@ -124,7 +124,6 @@ input[type="radio"]:checked::before {
 }
 
 .user_header {
-  background: ;
   color: white;
   min-height: 80px;
   max-height: 80px;
@@ -148,3 +147,44 @@ input[type="radio"]:checked::before {
 .no-scrollbar::-webkit-scrollbar {
   display: none; /* Safari and Chrome */
 }
+/* .texthint {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.texthint .texthinttext {
+  visibility: hidden;
+  min-width: 100px;
+  max-width: 100%;
+  background-color: white;
+  color: black;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 10px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: -150%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  white-space: normal;
+  word-wrap: break-word;
+}
+.texthint .texthinttext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: white transparent transparent transparent;
+}
+
+.texthint:hover .texthinttext {
+  visibility: visible;
+  opacity: 1;
+} */

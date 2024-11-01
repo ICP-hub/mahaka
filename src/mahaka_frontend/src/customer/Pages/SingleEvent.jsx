@@ -195,9 +195,9 @@ export default function SingleEvent() {
             <div className="lg:w-2/3 ">
               <div className="w-full  rounded-2xl">
                 <img
-                  src={currentEvent?.imageUrl || Frame13}
+                  src={currentEvent?.banner.data || Frame13}
                   alt={currentEvent?.title || "Event"}
-                  className="object-cover h-full"
+                  className=" h-90 w-full  rounded-2xl"
                 />
               </div>
               <>

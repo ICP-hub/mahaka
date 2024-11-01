@@ -44,7 +44,7 @@ const VenueCard = ({ venue, layout }) => (
     {layout.imageArea && (
       <div className={layout.imageArea}>
         <img
-          src={Frame10}
+          src={venue.banner.data}
           alt={venue.Title}
           className="object-cover object-center h-full w-full"
         />

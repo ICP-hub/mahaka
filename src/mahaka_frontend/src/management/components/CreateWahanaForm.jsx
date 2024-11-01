@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createWahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
+import TextHint from "../../customer/Components/TextHint";
 
 const CreateWahanaForm = ({ onClose, onSuccess }) => {
   const dispatch = useDispatch();
@@ -155,7 +156,10 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
       <div className="space-y-4">
         {/* Select Venue */}
         <div className="flex flex-col gap-1">
-          <label className="font-semibold">Select Venue <span className="text-red-500">*</span></label>
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">Select Venue </label>
+            <TextHint text="Select the venue for which wahana needs to be created." />
+            </div>
           <select
             value={formData.venueId}
             onChange={(e) =>
@@ -175,7 +179,10 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
           </select>
         </div>
         <div className="flex flex-col flex-auto gap-1">
-          <label className="font-semibold">Wahana Name <span className="text-red-500">*</span></label>
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">Wahana Name </label>
+            <TextHint text="Enter the name of the wahana." />
+            </div>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border ">
             <input
               type="text"
@@ -190,23 +197,11 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
           </div>
         </div>
 
-        <div className="flex flex-col flex-auto gap-1">
-          <label className="font-semibold">Symbol <span className="text-red-500">*</span></label>
-          <div className="border border-border rounded-lg pl-4 focus-within:border-indigo-600 dark:focus-within:border-border">
-            <input
-              name="symbol"
-              value={formData.symbol}
-              onChange={(e) =>
-                setFormData({ ...formData, symbol: e.target.value })
-              }
-              className="my-3 outline-none w-full bg-transparent"
-              required
-            />
-          </div>
-        </div>
-
         <div className="flex flex-col gap-1">
-          <label className="font-semibold">Description <span className="text-red-500">*</span></label>
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">Description </label>
+            <TextHint text="Enter the description of the wahana." />
+            </div>
           <div className="border border-border rounded-lg pl-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <textarea
               name="description"
@@ -222,7 +217,10 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="font-semibold">Price (IDR)<span className="text-red-500">*</span></label>
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">Price (IDR)</label>
+            <TextHint text="Enter the price of the wahana." />
+            </div>
           <div className="border border-border rounded-lg pl-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               value={formData.price}
@@ -236,7 +234,10 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="font-semibold">Banner <span className="text-red-500">*</span></label>
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">Banner </label>
+            <TextHint text="Upload the image of the wahana." />
+            </div>
           <div className="flex flex-col items-center justify-center border-dashed border-2 border-gray-300 p-4 rounded">
             <input
               type="file"
