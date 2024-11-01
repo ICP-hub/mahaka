@@ -44,6 +44,42 @@ export const createWahana = createAsyncThunk(
   }
 );
 
+// Edit wahana
+
+export const edit_wahana = createAsyncThunk(
+  "wahana/edit_wahana",
+  async ({
+    backend,
+    venueId,
+    wahanaId,
+    name,
+    symbol,
+    decimal,
+    totalSupply,
+    description,
+    banner,
+    price,
+  }) => {
+    try {
+      const response = await backend.editWahana(
+        wahanaId,
+        venueId,
+        name,
+        symbol,
+        decimal,
+        totalSupply,
+        description,
+        banner,
+        price
+      );
+      return response;
+    } catch (error) {
+      console.error("Error editing wahana:", error);
+      throw error;
+    }
+  }
+);
+
 // Getting all wahana by venue
 export const getallWahanasbyVenue = createAsyncThunk(
   "wahana/getallWahanasbyVenue",
@@ -85,6 +121,27 @@ const wahanaSlice = createSlice({
         state.createWahanaLoader = false;
         state.error = action.error.message;
         notificationManager.error("Failed to create wahana");
+      })
+
+
+      //Handle edit wahana
+      .addCase(edit_wahana.pending,(state)=>{
+        state.editWahanaLoader = true;
+      })
+
+      .addCase(edit_wahana.fulfilled,(state,action)=>{
+        state.editWahanaLoader = false;
+        console.log(action.payload, "Edited wahana")
+
+        state.wahanas.push(action.payload.ok);
+        state.error = null;
+        notificationManager.success("Wahana Edited successfully");
+      })
+
+      .addCase(edit_wahana.rejected,(state,action)=>{
+        state.createWahanaLoader = false;
+        state.error = action.error.message;
+        notificationManager.error("Failed to Edit wahana");
       })
 
       // Handle getallWahanasbyVenue

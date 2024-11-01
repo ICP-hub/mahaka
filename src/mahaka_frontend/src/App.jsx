@@ -277,43 +277,46 @@ function App() {
 
 
 
-   const createWahanaHandler = async () => {
-    try {
-      const response = await backend.createWahana(
-        "asara#br5f7-7uaaa-aaaaa-qaaca-cai",  
-        "Example Wahana",                     
-        "WAHANA",                              
-        8,                                     
-        1000000,                              
-        "An amazing wahana experience",       
-        {                                    
-          data: "example-banner-data",
-          logo_type: "image"
-        },
-        "99.99"                              
-      );
+  //  const createWahanaHandler = async () => {
+  //   try {
+  //     const response = await backend.createWahana(
+  //       "dasara#br5f7-7uaaa-aaaaa-qaaca-cai",  
+  //       "Example Wahana",                     
+  //       "WAHANA",                              
+  //       8,                                     
+  //       1000000,                              
+  //       "An amazing wahana experience",       
+  //       {                                    
+  //         data: "example-banner-data",
+  //         logo_type: "image"
+  //       },
+  //       BigInt(99)                               
+  //     );
   
-      console.log("Wahana created successfully:", response);
-    } catch (err) {
-      console.error("Error creating wahana:", err);
-    }
-  };
+  //     console.log("Wahana created successfully:", response);
+  //   } catch (err) {
+  //     console.error("Error creating wahana:", err);
+  //   }
+  // };
+
+
+  // EditWahana Handler
 
   const editWahanaHandler = async ()=>{
     try {
           const response = await backend.edit_wahana(
-             "bw4dl-smaaa-aaaaa-qaacq-cai",  
-             "Example edit Wahana",                     
+             "by6od-j4aaa-aaaaa-qaadq-cai",  
+             "dasara#br5f7-7uaaa-aaaaa-qaaca-cai",                     
            "EDIT WAHANA", 
            "Edit wahana",                             
             8,                                     
             1000000,                              
-          "An amazing wahana experience",       
+          "Explore the  wahana experience",       
            {                                    
              data: "example-banner-data",
              logo_type: "image"
              },
-            "143"                              
+             BigInt(99)                            
           );
       
            console.log("Wahana edited successfully:", response);
@@ -330,9 +333,9 @@ function App() {
         Edit wahana
       </button>
 
-      <button className="px-2 py-1 border rounded mr-2" onClick={createWahanaHandler}>
+      {/* <button className="px-2 py-1 border rounded mr-2" onClick={createWahanaHandler}>
         Create wahana
-      </button>
+      </button> */}
       {/* <button className="px-2 py-1 border rounded mr-2" onClick={updateVenueHandler}>
         Update Venue
       </button> */}

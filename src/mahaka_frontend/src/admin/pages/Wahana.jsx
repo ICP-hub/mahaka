@@ -4,6 +4,7 @@ import { HiMagnifyingGlass } from "react-icons/hi2";
 import { getallWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import ModalOverlay from "../../customer/Components/Modal-overlay";
 import CreateWahanaForm from "../components/CreateWahanaForm";
+import EditWahanaForm from "../components/EditWahanaForm";
 import wahanaDummy1 from "../../assets/images/Frame10.png";
 import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
 // import wahanaDummy2 from "../../assets/images/Frame11.png";
@@ -58,6 +59,11 @@ const AdminWahana = () => {
 
   const [selectedVenue, setSelectedVenue] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  console.log("edit modal open",editModalOpen)
+  // const [editModalOpen, setEditModalOpen] = useState(false);
+
+  // console.log("edit modal open",editModalOpen)
 
   useEffect(() => {
     dispatch(getAllVenues({ backend, pageLimit: 100, currPage: 0 }));
@@ -117,6 +123,7 @@ const AdminWahana = () => {
           setSelectedVenue={setSelectedVenue}
           onCreateClick={() => setIsModalOpen(true)}
           loading={loading}
+          onEditClick = {()=> setEditModalOpen(true)}
         />
 
         <ModalOverlay
@@ -127,6 +134,19 @@ const AdminWahana = () => {
           <CreateWahanaForm
             onClose={() => setIsModalOpen(false)}
             onSuccess={() => fetchWahanas(selectedVenue)}
+          />
+        </ModalOverlay>
+
+
+{/* edit modal */}
+        <ModalOverlay
+          isOpen={editModalOpen}
+          setIsOpen={setEditModalOpen}
+          title="Edit Wahana"
+        >
+          <EditWahanaForm
+            onClose={() => setEditModalOpen(false)}
+            // onSuccess={() => fetchWahanas(selectedVenue)}
           />
         </ModalOverlay>
       </div>
@@ -140,8 +160,10 @@ const WahanaMain = ({
   selectedVenue,
   setSelectedVenue,
   onCreateClick,
+  onEditClick,
   loading,
 }) => {
+ 
   return (
     <div className="flex flex-auto p-6 sm:p-10">
       <div className="mx-auto flex w-full max-w-xs flex-auto flex-col sm:max-w-5xl">
@@ -174,6 +196,14 @@ const WahanaMain = ({
             <div className="inline-flex items-center align-middle bg-secondary px-3 py-2 rounded-full text-white">
               + Add Wahana
             </div>
+           
+          </button>
+
+          <button className="mt-8 sm:ml-auto sm:mt-0" onClick={onEditClick}>
+            <div className="inline-flex items-center align-middle bg-secondary px-3 py-2 rounded-full text-white">
+              Edit Wahana
+            </div>
+           
           </button>
         </div>
         {loading ? (
@@ -228,6 +258,12 @@ const WahanaCard = ({ wahana }) => {
             {wahana.priceinusd}
           </div>
           <div className="text-secondary text-2xl">/person</div>
+          <button className="mt-8 sm:ml-auto sm:mt-0" onClick={onEditClick}>
+            <div className="inline-flex items-center align-middle bg-secondary px-3 py-2 rounded-full text-white">
+              Edit Wahana
+            </div>
+           
+          </button>
         </div>
       </div>
     </div>
