@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { edit_wahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
-import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
+// import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
 
 
 const EditWahanaForm = ({onClose})=>{
@@ -26,9 +26,9 @@ const EditWahanaForm = ({onClose})=>{
   const [imageArrayBuffer, setImageArrayBuffer] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    dispatch(getAllVenues({ backend, pageLimit: 100, currPage: 0 }));
-  }, [dispatch, backend]);
+  // useEffect(() => {
+  //   dispatch(getAllVenues({ backend, pageLimit: 100, currPage: 0 }));
+  // }, [dispatch, backend]);
 
   console.log("Fetched Venues:", venues);
 

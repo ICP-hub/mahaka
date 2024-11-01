@@ -86,6 +86,19 @@ const AdminWahana = () => {
     );
   };
 
+  // const editWahanas = (id)=>{
+  //   dispatch(
+  //     edit_wahana({
+  //       backend,
+  //       wahanaId: Id,
+  //       venueId: venueId
+
+
+
+  //     })
+  //   )
+  // }
+
   return (
     <div className="relative h-full">
       <div className="absolute inset-0 flex min-w-0 flex-col overflow-y-auto">
@@ -146,7 +159,7 @@ const AdminWahana = () => {
         >
           <EditWahanaForm
             onClose={() => setEditModalOpen(false)}
-            // onSuccess={() => fetchWahanas(selectedVenue)}
+            //  onSuccess={() => editWahanas(selectedWahana)}
           />
         </ModalOverlay>
       </div>

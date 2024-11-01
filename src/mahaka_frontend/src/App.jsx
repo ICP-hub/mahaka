@@ -305,7 +305,7 @@ function App() {
   const editWahanaHandler = async ()=>{
     try {
           const response = await backend.edit_wahana(
-             "by6od-j4aaa-aaaaa-qaadq-cai",  
+             "bw4dl-smaaa-aaaaa-qaacq-cai",  
              "dasara#br5f7-7uaaa-aaaaa-qaaca-cai",                     
            "EDIT WAHANA", 
            "Edit wahana",                             
