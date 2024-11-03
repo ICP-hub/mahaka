@@ -329,9 +329,9 @@ function App() {
 
   return (
     <div className="light bg-background no-scrollbar">
-       <button className="px-2 py-1 border rounded mr-2" onClick={editWahanaHandler}>
+       {/* <button className="px-2 py-1 border rounded mr-2" onClick={editWahanaHandler}>
         Edit wahana
-      </button>
+      </button> */}
 
       {/* <button className="px-2 py-1 border rounded mr-2" onClick={createWahanaHandler}>
         Create wahana

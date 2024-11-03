@@ -33,6 +33,7 @@ const MenuSection = () => {
       label: "User Activity",
       icon: <MdEvent size={24} />,
     },
+    { path: "/management/ticket", label: "Ticket", icon: <MdMap size={24} /> }
   ];
 
   // Check active path
