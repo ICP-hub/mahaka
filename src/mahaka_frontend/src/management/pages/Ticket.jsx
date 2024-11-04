@@ -73,6 +73,8 @@ const MgtTicket  = ()=>{
         {id:"12",name:"Live Concerts",image:"https://cdn.pixabay.com/photo/2016/11/23/15/48/audience-1853662_640.jpg",amount:600,icon:<IoCalendarNumberOutline />,discount:"50%"},
         {id:"13",name:"DJ Nights",image:"https://cdn.create.vista.com/api/media/small/121050536/stock-photo-crowd-at-concert",amount:750,icon:<IoCalendarNumberOutline/>,discount:"10%"},
         {id:"14",name:"Music Festivals",image:"https://5.imimg.com/data5/DB/WJ/MY-605509/music-concert.jpg",amount:700,icon:<IoCalendarNumberOutline />,discount:"70%"},
+        {id:"15",name:"Live Concerts",image:"https://cdn.pixabay.com/photo/2016/11/23/15/48/audience-1853662_640.jpg",amount:600,icon:<IoCalendarNumberOutline />,discount:"50%"},
+        {id:"16",name:"DJ Nights",image:"https://cdn.create.vista.com/api/media/small/121050536/stock-photo-crowd-at-concert",amount:750,icon:<IoCalendarNumberOutline/>,discount:"10%"},
     ]
 
 
@@ -108,7 +110,7 @@ const MgtTicket  = ()=>{
             </div>
 
             <div className="flex mt-1">  
-                <MdOutlineDiscount className="text-xl text-gray-400 mt-1 mx-1"/>
+                <MdOutlineDiscount className="text-xl text-gray-400 mt-1 mx-0.5"/>
                 <p className="text-xl text-gray-400 mx-1">{event.discount}</p>
                 </div>
             </div>
@@ -150,7 +152,7 @@ const MgtTicket  = ()=>{
             </div>
 
             <div className="flex mt-1">  
-                <MdOutlineDiscount className="text-xl text-gray-400 mt-1 mx-1"/>
+                <MdOutlineDiscount className="text-xl text-gray-400 mt-1 mx-0.5"/>
                 <p className="text-xl text-gray-400 mx-1">{event.discount}</p>
                 </div>
             </div>     
@@ -171,7 +173,7 @@ const MgtTicket  = ()=>{
     return (
         <>
          <div className={`${rightNav&&"w-full md:w-2/3 lg:w-3/5 lg:p-2"}`}>
-        <div className ="relative overflow-y-auto overflow-x-hidden flex-auto custom-scroll">
+        <div className ="">
        <div className = "max-h-fit relative p-4">
         {/* select the event types */}
         <div className ="rounded-lg mx-2 my-2 flex-1">
@@ -185,13 +187,13 @@ const MgtTicket  = ()=>{
 
             <div className = {`border hover:bg-slate-300 p-2 rounded-xl flex  my-2 ${filterEvents==="special"?"bg-slate-300":"bg-transparent"}`} onClick ={()=>setFilterEvents("special")}>  
                 <MdOutlineStarRate className ="text-3xl mx-3 bg-gray-400 rounded-full p-0.5" />
-                <h1 className ="font-bold text-slate-800">Special Events</h1>
+                <h1 className ="font-bold text-slate-800">Special </h1>
                 <FaAnglesRight className ="font-bold text-slate-800 ml-auto mt-1"/>
             </div>
 
             <div className = {`border p-2 rounded-xl flex hover:bg-slate-300  my-2 ${filterEvents==="regular"?"bg-slate-300":"bg-transparent"}`} onClick ={()=>setFilterEvents("regular")}>
             <IoCalendarNumberOutline className ="text-3xl mx-3 bg-gray-400 rounded-full p-0.5" size={25}/>
-                <h1 className ="font-bold text-slate-800">Regular Events</h1>
+                <h1 className ="font-bold text-slate-800">Regular</h1>
                 <FaAnglesRight className ="font-bold text-slate-800 ml-auto mt-1"/>
             </div>
           
@@ -234,7 +236,7 @@ const MgtTicket  = ()=>{
                 
              <div className = "flex">
                 <div>
-             <h1 className = "text-slate-700 my-2 text-lg font-bold">{event.name}</h1>
+             <h1 className = "text-slate-700 my-2 lg:text-lg text-lg font-bold">{event.name}</h1>
              <p className = "text-xl text-amber-950 flex font-bold"><FaRupeeSign className = "mt-0 " size={25}/> {event.amount}</p>
             </div>
 
@@ -245,8 +247,8 @@ const MgtTicket  = ()=>{
             </div>
 
             <div className="flex mt-1">  
-                <MdOutlineDiscount className="text-xl text-gray-400 mt-1 mx-1"/>
-                <p className="text-xl text-gray-400 mx-1">{event.discount}</p>
+                <MdOutlineDiscount className=" text-lg md:text-xl text-gray-400 mt-1 mx-0.5"/>
+                <p className="text-lg lg:text-xl text-gray-400">{event.discount}</p>
                 </div>
             </div>  
            </div>
@@ -284,12 +286,13 @@ const MgtTicket  = ()=>{
             </button>
 
             <div className ="flex flex-col">
+              <h1 className ="text-gray-800 text-xl font-bold my-2">Events for Booking</h1>
                 {sidebarItems.map((item)=>(
                     <div className = "bg-gray-300 p-2 rounded-lg shadow-lg my-2 text-center"> 
                     <div className ="flex">
                         <img src={item.image} className ="h-10 w-10 rounded-full"/>
                         <h1 className ="text-md text-gray-600 font-bold mt-2 mx-2">{item.name}</h1>
-                        <p className = "text-xl text-amber-950 flex font-bold ml-auto mt-1"><FaRupeeSign className = "mt-1" size={20}/> {item.amount}</p>
+                        <p className = " text-lg lg:text-xl text-amber-950 flex font-bold ml-auto mt-1"><FaRupeeSign className = "mt-1" size={20}/> {item.amount}</p>
                         <button onClick={() => removeItemFromSidebar(item)}>
                         <AiOutlineCloseCircle className="text-gray-800 mx-2 text-3xl"/>
                   </button>
@@ -304,7 +307,12 @@ const MgtTicket  = ()=>{
             <span>Subtotal :</span>
             <p className = "text-xl text-gray-800 ml-auto flex"><FaRupeeSign className = "mt-1" size={20}/> {totalAmount}</p>
             </div>
-                <h1 className ="font-bold text-slate-500 text-xl  bg-gray-300 rounded-lg p-2 my-2">Memberhip Discount</h1>
+
+            <div className = "text-md lg:text-lg text-gray-500 flex font-bold rounded-lg p-2 bg-gray-300 my-2">
+            <span>Membership Discount :</span>
+            <p className = "text-md lg:text-lg text-gray-800 ml-auto flex"><FaRupeeSign className = "mt-1" size={20}/> 0.00</p>
+            </div>
+                {/* <h1 className ="font-bold text-slate-500 text-lg lg:text-xl  bg-gray-300 rounded-lg p-2 my-2">Memberhip Discount: <FaRupeeSign className = "mt-1" size={20}/> 0.00</h1> */}
            
            <button className ="bg-blue-400 p-2 text-white rounded-lg flex justify-end hover:bg-blue-500">Book Now</button>
            </div>
