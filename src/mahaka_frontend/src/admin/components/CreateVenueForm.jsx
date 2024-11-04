@@ -4,6 +4,7 @@ import { createVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
 import flatpickr from "flatpickr";
 import { FcAlarmClock, FcCalendar } from "react-icons/fc";
 import { Principal } from "@dfinity/principal";
+import TextHint from "../../customer/Components/TextHint";
 
 const CreateVenueForm = ({ setIsModalOpen }) => {
   const dispatch = useDispatch();
@@ -328,9 +329,12 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         onSubmit={createVenueLoader ? null : handleVenueSubmit}
       >
         <div className="flex flex-col flex-auto gap-1">
-          <label className="font-semibold">
-            Venue Name <span className="text-red-500">*</span>
-          </label>
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">
+              Venue Name
+            </label>
+            <TextHint text="Enter the name of the venue." />
+          </div>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border ">
             <input
               type="text"
@@ -345,9 +349,12 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
           </div>
         </div>
         <div className="flex flex-col flex-auto gap-1">
-          <label className="font-semibold">
-            Description <span className="text-red-500">*</span>
-          </label>
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">
+              Description
+            </label>
+            <TextHint text="Enter the description of the venue." />
+          </div>
           <div className="border border-border rounded-lg pl-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <textarea
               name="description"
@@ -363,9 +370,12 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         </div>
         <div className="flex space-x-4">
           <div className="w-1/2 flex flex-col flex-auto gap-1">
-            <label className="font-semibold">
-              Start Date <span className="text-red-500">*</span>
-            </label>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold">
+                Start Date
+              </label>
+              <TextHint text="Enter the start date of the venue." />
+            </div>
             <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
               <input
                 ref={startDateRef}
@@ -376,9 +386,12 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
             </div>
           </div>
           <div className="w-1/2 flex flex-col flex-auto gap-1">
-            <label className="font-semibold">
-              End Date <span className="text-red-500">*</span>
-            </label>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold">
+                End Date
+              </label>
+              <TextHint text="Enter the end date of the venue." />
+            </div>
             <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
               <input
                 ref={endDateRef}
@@ -391,9 +404,12 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         </div>
         <div className="flex space-x-4">
           <div className="w-1/2 flex flex-col flex-auto gap-1">
-            <label className="font-semibold">
-              Start Time <span className="text-red-500">*</span>
-            </label>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold">
+                Start Time
+              </label>
+              <TextHint text="Enter the starting time of the venue." />
+            </div>
             <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
               <input
                 ref={startTimeRef}
@@ -404,9 +420,12 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
             </div>
           </div>
           <div className="w-1/2 flex flex-col flex-auto gap-1">
-            <label className="font-semibold">
-              End Time <span className="text-red-500">*</span>
-            </label>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold">
+                End Time
+              </label>
+              <TextHint text="Enter the ending time of the venue." />
+            </div>
             <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
               <input
                 ref={endTimeRef}
@@ -418,9 +437,12 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
           </div>
         </div>
         <div className="flex flex-col flex-auto gap-1">
-          <label className="font-semibold">
-            Location <span className="text-red-500">*</span>
-          </label>
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">
+              Location
+            </label>
+            <TextHint text="Enter the location of the venue." />
+          </div>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               type="text"
@@ -435,9 +457,12 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
           </div>
         </div>
         <div className="flex flex-col flex-auto gap-1">
-          <label className="font-semibold">
-            Title <span className="text-red-500">*</span>
-          </label>
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">
+              Title
+            </label>
+            <TextHint text="Enter the title of the venue." />
+          </div>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               type="text"
@@ -450,9 +475,12 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
           </div>
         </div>
         <div className="flex flex-col flex-auto gap-1">
-          <label className="font-semibold">
-            Maximum number of people <span className="text-red-500">*</span>
-          </label>
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">
+              Maximum number of people
+            </label>
+            <TextHint text="Enter the maximum number of people in the venue." />
+          </div>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               type="number"
@@ -467,97 +495,110 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         {/* Ticket Limits */}
         <div className="flex space-x-4">
           <div className="w-1/3">
+          <div className="flex items-center gap-2">
             <label className="font-semibold">
-              General Ticket Limit <span className="text-red-500">*</span>
+              General Ticket Limit
             </label>
-            <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
-              <input
-                type="number"
-                name="gTicket_limit"
-                value={venueData.gTicket_limit}
-                onChange={handleInputChange}
-                className="my-3 outline-none w-full bg-transparent"
-                required
-              />
-            </div>
+            <TextHint text="Enter general ticket limit of the venue." />
           </div>
-          <div className="w-1/3">
-            <label className="font-semibold">
-              Student Ticket Limit  <span className="text-red-500">*</span>
-            </label>
-            <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
-              <input
-                type="number"
-                name="sTicket_limit"
-                value={venueData.sTicket_limit}
-                onChange={handleInputChange}
-                className="my-3 outline-none w-full bg-transparent"
-                required
-              />
-            </div>
+          <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+            <input
+              type="number"
+              name="gTicket_limit"
+              value={venueData.gTicket_limit}
+              onChange={handleInputChange}
+              className="my-3 outline-none w-full bg-transparent"
+              required
+            />
           </div>
-          <div className="w-1/3">
+        </div>
+        <div className="w-1/3">
+          <div className="flex items-center gap-2">
             <label className="font-semibold">
-              VIP Ticket Limit  <span className="text-red-500">*</span>
+              Student Ticket Limit
             </label>
-            <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
-              <input
-                type="number"
-                name="vTicket_limit"
-                value={venueData.vTicket_limit}
-                onChange={handleInputChange}
-                className="my-3 outline-none w-full bg-transparent"
-                required
-              />
-            </div>
+            <TextHint text="Enter student ticket limit of the venue." />
+          </div>
+          <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+            <input
+              type="number"
+              name="sTicket_limit"
+              value={venueData.sTicket_limit}
+              onChange={handleInputChange}
+              className="my-3 outline-none w-full bg-transparent"
+              required
+            />
+          </div>
+        </div>
+        <div className="w-1/3">
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">
+              VIP Ticket Limit
+            </label>
+            <TextHint text="Enter VIP ticket limit of the venue." />
+
+          </div>
+          <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+            <input
+              type="number"
+              name="vTicket_limit"
+              value={venueData.vTicket_limit}
+              onChange={handleInputChange}
+              className="my-3 outline-none w-full bg-transparent"
+              required
+            />
+</div>
           </div>
         </div>
 
-        <div className="flex flex-col flex-auto gap-1">
+      <div className="flex flex-col flex-auto gap-1">
+        <div className="flex items-center gap-2">
           <label className="font-semibold">
-            Banner  <span className="text-red-500">*</span>
+            Banner
           </label>
-          <div className="flex flex-col items-center justify-center border-dashed border-2 border-border p-4 rounded">
-            <input
-              type="file"
-              accept=".jpg,.jpeg,.png"
-              className="hidden"
-              id="upload-image"
-              onChange={handleFileChange}
-              required
-            />
-            <label
-              htmlFor="upload-image"
-              className="cursor-pointer bg-card text-text py-2 px-4 rounded-md border border-border"
-            >
-              Upload Banner
-            </label>
-            {bannerPreview && (
-              <img
-                src={bannerPreview}
-                alt="Banner Preview"
-                className="mt-2 w-full h-auto rounded"
-                style={{
-                  maxWidth: "96px",
-                  maxHeight: "96px",
-                  minWidth: "96px",
-                  minHeight: "96px",
-                }}
-              />
-            )}
-          </div>
+          <TextHint text="Upload the image of the venue." />
         </div>
-        <div className="flex justify-center">
-          <button
-            type="submit"
-            className={`text-white py-2 px-4 rounded ${createVenueLoader ? "bg-gray-400" : "bg-secondary"
-              }`}
-            disabled={createVenueLoader}
+        <div className="flex flex-col items-center justify-center border-dashed border-2 border-border p-4 rounded">
+          <input
+            type="file"
+            accept=".jpg,.jpeg,.png"
+            className="hidden"
+            id="upload-image"
+            onChange={handleFileChange}
+            required
+          />
+          <label
+            htmlFor="upload-image"
+            className="cursor-pointer bg-card text-text py-2 px-4 rounded-md border border-border"
           >
-            {createVenueLoader ? "Creating..." : "Create Venue"}
-          </button>
+            Upload Banner
+          </label>
+          {bannerPreview && (
+            <img
+              src={bannerPreview}
+              alt="Banner Preview"
+              className="mt-2 w-full h-auto rounded"
+              style={{
+                maxWidth: "96px",
+                maxHeight: "96px",
+                minWidth: "96px",
+                minHeight: "96px",
+              }}
+            />
+          )}
         </div>
-      </form>
+      </div>
+      <div className="flex justify-center">
+        <button
+          type="submit"
+          className={`text-white py-2 px-4 rounded ${createVenueLoader ? "bg-gray-400" : "bg-secondary"
+            }`}
+          disabled={createVenueLoader}
+        >
+          {createVenueLoader ? "Creating..." : "Create Venue"}
+        </button>
+      </div>
+    </form >
     </>
   );
 };

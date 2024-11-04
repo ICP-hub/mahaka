@@ -137,6 +137,67 @@ function App() {
   //     }
   //   };
 
+//   const editEventHandler = async () => { 
+//     try {
+//       const response = await backend.edit_event(
+//         "Event1#bw4dl-smaaa-aaaaa-qaacq-cai", 
+//         "Venue1#br5f7-7uaaa-aaaaa-qaaca-cai",  
+//         {
+//           collection_args: {
+//             maxLimit: 100,
+//             sTicket_limit: 10,
+//             gTicket_price: 10,
+//             logo: {
+//               data: "collection-logo-data",
+//               logo_type: "image"
+//             },
+//             name: "Collection Name",
+//             vTicket_price: 50,
+//             banner: {
+//               data: "collection-banner-data",
+//               logo_type: "image"
+//             },
+//             description: "new description",
+//             created_at: Math.floor(Date.now() / 1000),  
+//             collection_type: { Event: null },  
+//             sTicket_price: 75,
+//             gTicket_limit: 100,
+//             symbol: "COL",
+//             vTicket_limit: 80,
+//           }
+//         },
+//         {
+//           id: "Venue1#br5f7-7uaaa-aaaaa-qaaca-cai",
+//           title: "Event Title",
+//           sTicket_limit: 50,
+//           description: "Event new Description",
+//           logo: {
+//             data: "example-logo-data",
+//             logo_type: "image"
+//           },
+//           banner: {
+//             data: "example-banner-data",
+//             logo_type: "image"
+//           },
+//           details: {
+//             StartDate: "2024-12-01",
+//             StartTime: 14,
+//             Location: "Event new Location",
+//             EndDate: "2024-12-01",
+//             EndTime: 18
+//           },
+//           gTicket_limit: 10,
+//           vTicket_limit: 10
+//         }
+//       );
+  
+//       console.log("Event edited successfully:", response);
+//     } catch (err) {
+//       console.error("Error editing event:", err);
+//     }
+// };
+
+
   // const deleteEventHandler = async () => {
   //   try {
   //     const response = await backend.deleteEvent(
@@ -344,6 +405,12 @@ function App() {
         onClick={createEventHandler}
       >
         Create Event
+      </button> */}
+       {/* <button
+        className="px-2 py-1 border rounded mr-2"
+        onClick={editEventHandler}
+      >
+        Edit Event
       </button> */}
       {/* <button className="px-2 py-1 border rounded" onClick={createVenueHandler}>
       Create Venue

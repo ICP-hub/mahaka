@@ -8,7 +8,7 @@ import VenueDemoImg from "@/assets/images/Frame10.png";
 import ModalOverlay from "../../customer/Components/Modal-overlay";
 import UpdateVenueForm from "../components/UpdateVenueForm";
 import CreateEventForm from "../components/CreateEventForm";
-import { HiArrowLongLeft } from "react-icons/hi2";
+import { HiArrowLongLeft, HiChevronDown } from "react-icons/hi2";
 
 const FormatTime = (timeString) => {
   const time = parseInt(timeString, 10);
@@ -164,8 +164,14 @@ const VenueDetailPage = () => {
           <h2 className="text-xl font-semibold mb-2">Venue ID</h2>
           <p>{venue.id}</p>
         </div>
-
-        <div className="mb-6">
+        <button
+            className="px-4 py-2 mb-3 bg-indigo-500 text-white rounded hover:bg-indigo-600"
+            onClick={() => setIsEventModalOpen(true)}
+          >
+            Create Event
+          </button>
+        <EventTable eventArr={events} />
+        {/* <div className="mb-6">
           <h2 className="text-xl font-semibold mb-2">Events</h2>
           {events.length > 0 ? (
             <div>
@@ -211,8 +217,8 @@ const VenueDetailPage = () => {
           >
             Create Event
           </button>
-        </div>
-      </div>
+        </div>*/}
+      </div> 
 
       {/* Modal for updating the venue */}
       {isUpdateModalOpen && (
@@ -244,6 +250,142 @@ const VenueDetailPage = () => {
         </ModalOverlay>
       )}
     </>
+  );
+};
+const EventTable = ({ eventArr }) => {
+  console.log("event is ", eventArr);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleView = () => {
+    setIsOpen((pv) => !pv);
+  };
+
+  return (
+    <div className="flex flex-auto overflow-hidden min-h-96">
+      <div className="flex flex-auto flex-col overflow-hidden sm:mb-18">
+        <div className="grid">
+          <div className="inventory-grid text-secondary top-0 z-10 grid gap-4 bg-gray-50 px-6 py-4 text-md font-semibold shadow dark:bg-black dark:bg-opacity-5 md:px-8">
+            <div></div>
+            <div className="hidden md:block">Name</div>
+            <div>Description</div>
+            <div className="hidden sm:block">Location</div>
+            <div className="hidden lg:block">Start Date</div>
+            <div className="hidden lg:block">Active</div>
+            <div className="hidden sm:block">Details</div>
+          </div>
+          {eventArr.length > 0 &&
+            eventArr.map((event, index) => (
+              <>
+                <div className="inventory-grid grid items-center gap-4 border-b px-6 py-3 md:px-8 border-b-border">
+                  <div className="flex items-center">
+                    <div className="relative mr-6 flex h-12 w-12 flex-0 items-center justify-center overflow-hidden rounded border border-border">
+                      <img  src={event.banner.data} alt="Event_img" />
+                    </div>
+                  </div>
+                  <div className="hidden truncate md:block">{event.title}</div>
+                  <div className="truncate">{event.description}</div>
+                  <div className="hidden truncate sm:block">
+                    {event.details.Location}
+                  </div>
+                  <div className="hidden lg:flex">
+                    {formatDate(event.details.StartDate)}
+                  </div>
+                  <div className="hidden lg:block">eventactive</div>
+                  <button
+                    className="hidden sm:block ml-2 cursor-pointer"
+                    onClick={toggleView}
+                  >
+                    <HiChevronDown size={20} />
+                  </button>
+                </div>
+
+                {isOpen && (
+                  <div key={index}>
+                    <div className="flex flex-col sm:flex-row p-6">
+                      <div className="mb-8 flex flex-col items-center sm:mb-0 sm:items-start">
+                        <div className="w-32 border h-44 rounded-md border-border">
+                          <img
+                             src={event.banner.data}
+                            alt="event_img"
+                            className="h-full w-full object-cover"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex flex-auto flex-wrap">
+                        <div className="flex w-full flex-col sm:pl-8 lg:w-2/4">
+                          <EventViewBlock
+                            label="Event Name"
+                            value={event.title}
+                          />
+                          <div className="flex">
+                            <div className="w-2/4 pr-2">
+                              <EventViewBlock
+                                label="Start From"
+                                value={formatDate(event.details.StartDate)}
+                              />
+                            </div>
+                            <div className="w-2/4 pl-2">
+                              <EventViewBlock
+                                label="Ends On"
+                                value={formatDate(event.details.EndDate)}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex w-full flex-col sm:pl-8 lg:w-2/4">
+                          <EventViewBlock label="Id" value={event.id} />
+                          <EventViewBlock
+                            label="Location"
+                            value={event.details.Location}
+                          />
+                        </div>
+                        <div className="flex w-full sm:pl-8 flex-col md:flex-row">
+                          <div className="md:w-1/3 md:pr-2">
+                            <EventViewBlock
+                              label="General Ticket Limit"
+                              value={parseInt(event.gTicket_limit)}
+                            />
+                          </div>
+                          <div className="md:w-1/3 md:pl-2">
+                            <EventViewBlock
+                              label="Student Ticket Limit"
+                              value={parseInt(event.sTicket_limit)}
+                            />
+                          </div>
+                          <div className="md:w-1/3 md:pl-2">
+                            <EventViewBlock
+                              label="Vip Ticket Limit"
+                              value={parseInt(event.vTicket_limit)}
+                            />
+                          </div>
+                        </div>
+                        <div className="flex w-full flex-col sm:pl-8">
+                          <EventViewBlock
+                            label="Description"
+                            value={event.description}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const EventViewBlock = ({ label, value }) => {
+  return (
+    <div className="inline-flex flex-col min-w-0 text-left w-full relative">
+      <div className="mt-6 border rounded-md border-border min-h-12 items-center flex">
+        <div className="px-4 box-border">{value}</div>
+      </div>
+      <div className="absolute font-medium capitalize">{label}</div>
+      <div className="hint-box"></div>
+    </div>
   );
 };
 
