@@ -85,7 +85,7 @@ export const getallWahanasbyVenue = createAsyncThunk(
   "wahana/getallWahanasbyVenue",
   async ({ backend, chunkSize, pageNo, venueId }) => {
     try {
-      const response = await backend.getallWahanasbyVenue(
+      const response = await backend.getAllWahanasbyVenue(
         chunkSize,
         pageNo,
         venueId

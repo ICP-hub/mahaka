@@ -100,7 +100,7 @@ const MgtTicket  = ()=>{
              <div className = "flex">
                 <div>
              <h1 className = "text-slate-700 my-2 text-lg font-bold">{event.name}</h1>
-             <p className = "text-xl text-amber-950 flex font-bold"><FaRupeeSign className = "mt-0 " size={25}/> {event.amount}</p>
+             <p className = "text-xl text-amber-950 flex font-bold">IDR /- {event.amount}</p>
             </div>
 
          <div className = "flex flex-col text-green-800 ml-auto mt-2"> 
@@ -142,7 +142,7 @@ const MgtTicket  = ()=>{
              <div className = "flex">
                 <div>
              <h1 className = "text-slate-700 my-2 text-lg font-bold">{event.name}</h1>
-             <p className = "text-xl text-amber-950 flex font-bold"><FaRupeeSign className = "mt-0 " size={25}/> {event.amount}</p>
+             <p className = "text-xl text-amber-950 flex font-bold">IDR /- {event.amount}</p>
             </div>
 
          <div className = "flex flex-col text-green-800 ml-auto mt-2"> 
@@ -237,7 +237,7 @@ const MgtTicket  = ()=>{
              <div className = "flex">
                 <div>
              <h1 className = "text-slate-700 my-2 lg:text-lg text-lg font-bold">{event.name}</h1>
-             <p className = "text-xl text-amber-950 flex font-bold"><FaRupeeSign className = "mt-0 " size={25}/> {event.amount}</p>
+             <p className = "text-xl text-amber-950 flex font-bold">IDR /- {event.amount}</p>
             </div>
 
          <div className = "flex flex-col text-green-800 ml-auto mt-2"> 
@@ -275,7 +275,7 @@ const MgtTicket  = ()=>{
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.5 }}
-            className="fixed right-0 top-0 md:top-0 h-full lg:h-130 w-full md:w-[25%] lg:w-1/3 bg-white rounded-lg shadow-lg p-4 z-50  overflow-y-auto"
+            className="fixed right-0 top-0 md:top-18 h-full lg:h-128 w-full md:w-[25%] lg:w-1/3 bg-white rounded-lg shadow-lg p-4 z-50  overflow-y-auto"
           >
              <div className ="">
             <button
@@ -292,7 +292,7 @@ const MgtTicket  = ()=>{
                     <div className ="flex">
                         <img src={item.image} className ="h-10 w-10 rounded-full"/>
                         <h1 className ="text-md text-gray-600 font-bold mt-2 mx-2">{item.name}</h1>
-                        <p className = " text-lg lg:text-xl text-amber-950 flex font-bold ml-auto mt-1"><FaRupeeSign className = "mt-1" size={20}/> {item.amount}</p>
+                        <p className = " text-lg lg:text-xl text-amber-950 flex font-bold ml-auto mt-1">IDR /- {item.amount}</p>
                         <button onClick={() => removeItemFromSidebar(item)}>
                         <AiOutlineCloseCircle className="text-gray-800 mx-2 text-3xl"/>
                   </button>
@@ -305,12 +305,12 @@ const MgtTicket  = ()=>{
 
            <div className = "text-xl text-gray-800 flex font-bold rounded-lg p-2 bg-gray-300">
             <span>Subtotal :</span>
-            <p className = "text-xl text-gray-800 ml-auto flex"><FaRupeeSign className = "mt-1" size={20}/> {totalAmount}</p>
+            <p className = "text-xl text-gray-800 ml-auto flex">IDR /- {totalAmount}</p>
             </div>
 
             <div className = "text-md lg:text-lg text-gray-500 flex font-bold rounded-lg p-2 bg-gray-300 my-2">
             <span>Membership Discount :</span>
-            <p className = "text-md lg:text-lg text-gray-800 ml-auto flex"><FaRupeeSign className = "mt-1" size={20}/> 0.00</p>
+            <p className = "text-md lg:text-lg text-gray-800 ml-auto flex">IDR /- 0.00</p>
             </div>
                 {/* <h1 className ="font-bold text-slate-500 text-lg lg:text-xl  bg-gray-300 rounded-lg p-2 my-2">Memberhip Discount: <FaRupeeSign className = "mt-1" size={20}/> 0.00</h1> */}
            

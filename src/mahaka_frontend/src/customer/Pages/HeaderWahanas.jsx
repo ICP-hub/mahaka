@@ -34,7 +34,7 @@ const HeaderWahanas = ()=>{
   const headerFetchWahanas = (venueId) => {
     // console.log("venue id is",venueId)
     dispatch(
-      getallWahanasbyVenue({
+      getAllWahanasbyVenue({
         backend,
         chunkSize: 100,
         pageNo: 0,
