@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { createEvent } from "../../redux/reducers/apiReducers/eventApiReducer";
 import flatpickr from "flatpickr";
 import { FcAlarmClock, FcCalendar } from "react-icons/fc";
+import TextHint from "../../customer/Components/TextHint";
 
 const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
   const dispatch = useDispatch();
@@ -11,6 +12,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
     (state) => state.events
   );
   const [error, setError] = useState("");
+  const [formErrors, setFormErrors] = useState({});
   useEffect(() => {
     console.log("venueId:", venueId);
   }, [venueId]);
@@ -48,6 +50,58 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
     },
   });
 
+  const validateForm = () => {
+    const errors = {};
+
+    // Validate title
+    if (!eventData.title.trim()) {
+      errors.title = "Event title is required";
+    }
+
+    // Validate description
+    if (!eventData.collection_args.description.trim()) {
+      errors.description = "Event description is required";
+    }
+
+    // Validate dates and times
+    if (!eventData.eventDetails.StartDate) {
+      errors.StartDate = "Start date is required";
+    }
+    if (!eventData.eventDetails.EndDate) {
+      errors.EndDate = "End date is required";
+    }
+    if (!eventData.eventDetails.StartTime) {
+      errors.StartTime = "Start time is required";
+    }
+    if (!eventData.eventDetails.EndTime) {
+      errors.EndTime = "End time is required";
+    }
+
+    // Validate location
+    if (!eventData.eventDetails.Location.trim()) {
+      errors.Location = "Location is required";
+    }
+
+    // Validate ticket limits
+    if (!eventData.collection_args.gTicket_limit) {
+      errors.gTicket_limit = "General ticket limit is required";
+    }
+    if (!eventData.collection_args.sTicket_limit) {
+      errors.sTicket_limit = "Student ticket limit is required";
+    }
+    if (!eventData.collection_args.vTicket_limit) {
+      errors.vTicket_limit = "VIP ticket limit is required";
+    }
+
+    // Validate banner image
+    if (!eventData.collection_args.banner.data) {
+      errors.banner = "Event image is required";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const [bannerPreview, setBannerPreview] = useState(null);
 
 
@@ -74,6 +128,9 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
           ...prev,
           eventDetails: { ...prev.eventDetails, StartDate: newStartDate },
         }));
+        if (newStartDate) {
+          setFormErrors((prev) => ({ ...prev, StartDate: "" }));
+        }
       },
       required: true,
     });
@@ -86,6 +143,9 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
           ...prev,
           eventDetails: { ...prev.eventDetails, EndDate: newEndDate },
         }));
+        if (newEndDate) {
+          setFormErrors((prev) => ({ ...prev, EndDate: "" }));
+        }
       },
       required: true,
     });
@@ -105,6 +165,9 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
             StartTime: newStartTime.toString(),
           },
         }));
+        if (newStartTime) {
+          setFormErrors((prev) => ({ ...prev, StartTime: "" }));
+        }
       },
       required: true,
     });
@@ -124,11 +187,13 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
             EndTime: newEndTime.toString(),
           },
         }));
+        if (newEndTime) {
+          setFormErrors((prev) => ({ ...prev, EndTime: "" }));
+        }
       },
       required: true,
     });
   }, []);
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (
@@ -260,6 +325,9 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) {
+      return;
+    }
     if (!venueId) {
       console.error("Venue ID is missing");
       return;
@@ -327,97 +395,143 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
     }
   };
 
+  const getInputClassName = (fieldName) => {
+    return `my-3 outline-none w-full bg-transparent ${formErrors[fieldName] ? "border-red-500" : ""
+      }`;
+  };
+
   return (
     <form className="space-y-4 tracking-wider">
       {/* Event Title */}
       <div>
-        <label className="font-semibold">Event Title <span className="text-red-500">*</span></label>
-        <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+        <div className="flex items-center gap-2">
+          <label className="font-semibold">
+            Event Title
+          </label>
+          <TextHint text="Enter the title of the event." />
+        </div>
+        <div className={`border ${formErrors.title ? "border-red-500" : "border-border"} rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}>
           <input
             type="text"
             name="title"
             value={eventData.title}
             onChange={handleInputChange}
-            className="my-3 outline-none w-full bg-transparent"
+            className={getInputClassName("title")}
             placeholder="Event title"
             required
           />
         </div>
+        {formErrors.title && <p className="text-red-500 text-sm mt-1">{formErrors.title}</p>}
       </div>
 
       {/* Event Description */}
       <div>
-        <label className="font-semibold">Event Description <span className="text-red-500">*</span></label>
-        <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+        <div className="flex items-center gap-2">
+          <label className="font-semibold">
+            Event Description
+          </label>
+          <TextHint text="Enter the description of the event." />
+        </div><div className={`border ${formErrors.description ? "border-red-500" : "border-border"} rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}>
           <textarea
             name="description"
             rows={5}
             value={eventData.collection_args.description}
             onChange={handleInputChange}
-            className="my-3 outline-none w-full bg-transparent"
+            className={getInputClassName("description")}
             placeholder="Event description"
             required
           />
         </div>
+        {formErrors.description && <p className="text-red-500 text-sm mt-1">{formErrors.description}</p>}
       </div>
 
       {/* Event Dates */}
       <div className="flex space-x-4">
         <div className="w-1/2 flex flex-col flex-auto gap-1">
-          <label className="font-semibold">Start Date <span className="text-red-500">*</span></label>
-          <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">
+              Start Date
+            </label>
+            <TextHint text="Enter the start date of the event." />
+          </div>
+          <div className={`flex items-center border ${formErrors.StartDate ? "border-red-500" : "border-border"} rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}>
             <input
               ref={startDateRef}
-              className="my-3 outline-none w-full bg-transparent"
+              className={getInputClassName("StartDate")}
               required
             />
             <FcCalendar size={24} />
           </div>
+          {formErrors.StartDate && <p className="text-red-500 text-sm mt-1">{formErrors.StartDate}</p>}
+
         </div>
 
         <div className="w-1/2 flex flex-col flex-auto gap-1">
-          <label className="font-semibold">End Date <span className="text-red-500">*</span></label>
-          <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">
+              End Date
+            </label>
+            <TextHint text="Enter the end date of the event." />
+          </div>
+          <div className={`flex items-center border ${formErrors.EndDate ? "border-red-500" : "border-border"} rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}>
             <input
               ref={endDateRef}
-              className="my-3 outline-none w-full bg-transparent"
+              className={getInputClassName("EndDate")}
               required
             />
             <FcCalendar size={24} />
           </div>
+          {formErrors.EndDate && <p className="text-red-500 text-sm mt-1">{formErrors.EndDate}</p>}
         </div>
       </div>
 
       {/* Event Times */}
       <div className="flex space-x-4">
         <div className="w-1/2 flex flex-col flex-auto gap-1">
-          <label className="font-semibold">Start Time <span className="text-red-500">*</span></label>
-          <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">
+              Start Time
+            </label>
+            <TextHint text="Enter the start time of the event." />
+          </div>
+          <div className={`flex items-center border ${formErrors.StartTime ? "border-red-500" : "border-border"} rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}>
             <input
               ref={startTimeRef}
-              className="my-3 outline-none w-full bg-transparent"
+              className={getInputClassName("StartTime")}
               required
             />
             <FcAlarmClock size={24} />
           </div>
+          {formErrors.StartTime && <p className="text-red-500 text-sm mt-1">{formErrors.StartTime}</p>}
         </div>
         <div className="w-1/2 flex flex-col flex-auto gap-1">
-          <label className="font-semibold">End Time <span className="text-red-500">*</span></label>
-          <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">
+              End Time
+            </label>
+            <TextHint text="Enter the end time of the event." />
+          </div>
+          <div className={`flex items-center border ${formErrors.EndTime ? "border-red-500" : "border-border"} rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}>
             <input
               ref={endTimeRef}
-              className="my-3 outline-none w-full bg-transparent"
+              className={getInputClassName("EndTime")}
               required
             />
             <FcAlarmClock size={24} />
           </div>
+          {formErrors.EndTime && <p className="text-red-500 text-sm mt-1">{formErrors.EndTime}</p>}
         </div>
       </div>
 
       {/* Location */}
       <div>
-        <label className="font-semibold">Location <span className="text-red-500">*</span></label>
-        <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+        <div className="flex items-center gap-2">
+          <label className="font-semibold">
+            Location
+          </label>
+          <TextHint text="Enter the location of the event." />
+        </div>
+        <div className={`border ${formErrors.Location ? "border-red-500" : "border-border"} rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}>
           <input
             type="text"
             name="Location"
@@ -431,17 +545,23 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
                 },
               }))
             }
-            className="my-3 outline-none w-full bg-transparent"
+            className={getInputClassName("Location")}
             placeholder="Event location"
             required
           />
         </div>
+        {formErrors.Location && <p className="text-red-500 text-sm mt-1">{formErrors.Location}</p>}
       </div>
 
       {/* Ticket Limits */}
       <div className="flex space-x-4">
         <div className="w-1/3">
-          <label className="font-semibold">General Ticket Limit <span className="text-red-500">*</span></label>
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">
+              General Ticket Limit
+            </label>
+            <TextHint text="Enter the General Ticket Limit of the event." />
+          </div>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               type="number"
@@ -452,9 +572,15 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
               required
             />
           </div>
+          {formErrors.gTicket_limit && <p className="text-red-500 text-sm mt-1">{formErrors.gTicket_limit}</p>}
         </div>
         <div className="w-1/3">
-          <label className="font-semibold">Student Ticket Limit <span className="text-red-500">*</span></label>
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">
+              Student Ticket Limit
+            </label>
+            <TextHint text="Enter the Student Ticket Limit of the event." />
+          </div>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               type="number"
@@ -465,9 +591,15 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
               required
             />
           </div>
+          {formErrors.sTicket_limit && <p className="text-red-500 text-sm mt-1">{formErrors.sTicket_limit}</p>}
         </div>
         <div className="w-1/3">
-          <label className="font-semibold">VIP Ticket Limit <span className="text-red-500">*</span></label>
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">
+              VIP Ticket Limit
+            </label>
+            <TextHint text="Enter the VIP Ticket Limit of the event." />
+          </div>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               type="number"
@@ -478,12 +610,18 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
               required
             />
           </div>
+          {formErrors.vTicket_limit && <p className="text-red-500 text-sm mt-1">{formErrors.vTicket_limit}</p>}
         </div>
       </div>
 
       {/* Event Image */}
       <div>
-        <label className="font-semibold">Event Image <span className="text-red-500">*</span></label>
+        <div className="flex items-center gap-2">
+          <label className="font-semibold">
+            Event Image
+          </label>
+          <TextHint text="Upload the image of the event." />
+        </div>
         <div className="mt-1 flex flex-col items-center justify-center border-dashed border-2 border-border p-4 rounded-lg">
           <input
             type="file"
@@ -514,6 +652,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
           )}
           {/* <p className="text-sm text-gray-500 mt-2">JPEG, PNG less than 5MB</p> */}
         </div>
+        {formErrors.banner && <p className="text-red-500 text-sm mt-1">{formErrors.banner}</p>}
       </div>
 
       {/* Submit Button */}
