@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { Principal } from "@dfinity/principal";
 
 // Initial state
 const initialState = {
@@ -30,7 +31,8 @@ export const getUserDetailsById = createAsyncThunk(
   "users/getUserDetailsById",
   async ({ backend, userId }) => {
     const response = await backend.getUserdetailsbyid(userId);
-    return response.data;
+    console.log(response);
+    return response;
   }
 );
 
@@ -44,15 +46,33 @@ export const listUsers = createAsyncThunk(
 
 export const updateUser = createAsyncThunk(
   "users/updateUser",
-  async ({ backend, user, setIsModalOpen }) => {
+  async ({ backend, user, onToggle }) => {
+    console.log(user.role);
     const response = await backend.updateUser(
+      user.principal,
+      user.email,
       user.firstName,
       user.lastName,
-      user.email,
       user.role,
-      user.principal
+      "one"
     );
-    if (response.ok);
+    if (response.ok) {
+      onToggle(false); // Close the modal after successful update if required
+      return response;
+    }
+    throw new Error("Failed to update user");
+  }
+);
+
+export const createUser = createAsyncThunk(
+  "users/createUser",
+  async ({ backend, user }) => {
+    const response = await backend.createUser(
+      user.email,
+      user.firstName,
+      user.lastName,
+      user.role
+    );
     return response;
   }
 );
@@ -81,7 +101,7 @@ const userSlice = createSlice({
       })
       .addCase(getUserDetailsById.fulfilled, (state, action) => {
         state.userLoading = false;
-        state.currentUser = action.payload;
+        state.currentUser = action.payload.ok;
         state.error = null;
       })
       .addCase(getUserDetailsById.rejected, (state, action) => {
@@ -107,17 +127,38 @@ const userSlice = createSlice({
       })
       .addCase(updateUser.fulfilled, (state, action) => {
         state.userLoading = false;
-        state.currentUser = {
-          ...state.currentUser,
-          firstName: action.payload.ok[0].firstName,
-          lastName: action.payload.ok[0].lastName,
-          email: action.payload.ok[0].email,
-          role: action.payload.ok[0].role,
-          principal: action.payload.ok[0].principal,
-        };
+        const updatedUser = action.payload.ok;
+        const userIndex = state.users.findIndex(
+          (user) => user.principal === updatedUser.principal
+        );
+
+        if (userIndex !== -1) {
+          state.users[userIndex] = {
+            ...state.users[userIndex],
+            ...updatedUser,
+          };
+        } else {
+          state.users.push(updatedUser); // If it's a new user, add them
+        }
+
+        state.currentUser = updatedUser;
         state.error = null;
       })
       .addCase(updateUser.rejected, (state, action) => {
+        state.userLoading = false;
+        state.error = action.error.message;
+      })
+      .addCase(createUser.pending, (state) => {
+        state.userLoading = true;
+      })
+      .addCase(createUser.fulfilled, (state, action) => {
+        state.userLoading = false;
+        const newUser = action.payload.ok;
+        console.log(newUser, "new user");
+        state.users.push(newUser); // Directly add new user to the list
+        state.error = null;
+      })
+      .addCase(createUser.rejected, (state, action) => {
         state.userLoading = false;
         state.error = action.error.message;
       });

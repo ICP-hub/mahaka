@@ -209,6 +209,44 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
       };
     });
   };
+  const [logoPreview, setLogoPreview] = useState(null);
+  const handleFileChange2 = async (e) => {
+    const file = e.target.files[0];
+    setError("");
+
+    if (file) {
+      try {
+        let processedFile = file;
+        const maxSize = 200 * 1024; // 200KB
+
+        // Check if file needs resizing
+        if (file.size > maxSize) {
+          processedFile = await resizeImage(file);
+        }
+
+        // Convert the processed file to blob
+        const blob = await imageToFileBlob(processedFile);
+
+        // Update state with the blob
+        setVenueData((prevState) => ({
+          ...prevState,
+          collection_args: {
+            ...prevState.collection_args,
+            logo: {
+              data: blob,
+              logo_type: file.type,
+            },
+          },
+        }));
+
+        // Set the banner preview
+        setLogoPreview(URL.createObjectURL(processedFile));
+      } catch (error) {
+        setError("Error processing image. Please try again.");
+        console.error("Error processing image:", error);
+      }
+    }
+  };
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -420,6 +458,40 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
           {bannerPreview && (
             <img
               src={bannerPreview}
+              alt="Banner Preview"
+              className="mt-2 w-full h-auto rounded"
+              style={{
+                maxWidth: "96px",
+                maxHeight: "96px",
+                minWidth: "96px",
+                minHeight: "96px",
+              }}
+            />
+          )}
+        </div>
+      </div>
+      <div className="flex flex-col flex-auto gap-1">
+        <label className="font-semibold">
+          Logo <span className="text-red-500">*</span>
+        </label>
+        <div className="flex flex-col items-center justify-center border-dashed border-2 border-border p-4 rounded">
+          <input
+            type="file"
+            accept=".jpg,.jpeg,.png"
+            className="hidden"
+            id="upload-image1"
+            onChange={handleFileChange2}
+            required
+          />
+          <label
+            htmlFor="upload-image1"
+            className="cursor-pointer bg-card text-text py-2 px-4 rounded-md border border-border"
+          >
+            Upload logo
+          </label>
+          {logoPreview && (
+            <img
+              src={logoPreview}
               alt="Banner Preview"
               className="mt-2 w-full h-auto rounded"
               style={{

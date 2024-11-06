@@ -106,7 +106,7 @@ const VenueDetailPage = () => {
             className="px-4 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600"
             onClick={() => navigate("/admin/venues")}
           >
-             <HiArrowLongLeft size={20} />
+            <HiArrowLongLeft size={20} />
           </button>
         </div>
         <div className="flex flex-col md:flex-row items-start md:items-center mb-6 ">
@@ -165,11 +165,11 @@ const VenueDetailPage = () => {
           <p>{venue.id}</p>
         </div>
         <button
-            className="px-4 py-2 mb-3 bg-indigo-500 text-white rounded hover:bg-indigo-600"
-            onClick={() => setIsEventModalOpen(true)}
-          >
-            Create Event
-          </button>
+          className="px-4 py-2 mb-3 bg-indigo-500 text-white rounded hover:bg-indigo-600"
+          onClick={() => setIsEventModalOpen(true)}
+        >
+          Create Event
+        </button>
         <EventTable eventArr={events} />
         {/* <div className="mb-6">
           <h2 className="text-xl font-semibold mb-2">Events</h2>
@@ -218,7 +218,7 @@ const VenueDetailPage = () => {
             Create Event
           </button>
         </div>*/}
-      </div> 
+      </div>
 
       {/* Modal for updating the venue */}
       {isUpdateModalOpen && (
@@ -273,13 +273,13 @@ const EventTable = ({ eventArr }) => {
             <div className="hidden lg:block">Active</div>
             <div className="hidden sm:block">Details</div>
           </div>
-          {eventArr.length > 0 &&
+          {eventArr?.length > 0 &&
             eventArr.map((event, index) => (
               <>
                 <div className="inventory-grid grid items-center gap-4 border-b px-6 py-3 md:px-8 border-b-border">
                   <div className="flex items-center">
                     <div className="relative mr-6 flex h-12 w-12 flex-0 items-center justify-center overflow-hidden rounded border border-border">
-                      <img  src={event.banner.data} alt="Event_img" />
+                      <img src={event.logo.data} alt="Event_img" />
                     </div>
                   </div>
                   <div className="hidden truncate md:block">{event.title}</div>
@@ -305,7 +305,7 @@ const EventTable = ({ eventArr }) => {
                       <div className="mb-8 flex flex-col items-center sm:mb-0 sm:items-start">
                         <div className="w-32 border h-44 rounded-md border-border">
                           <img
-                             src={event.banner.data}
+                            src={event.banner.data}
                             alt="event_img"
                             className="h-full w-full object-cover"
                           />

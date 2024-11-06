@@ -16,7 +16,11 @@ import NavigationRight from "../../common/components/NavigationRight";
 import { useSelector, useDispatch } from "react-redux";
 import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
 import { updateUser } from "../../redux/reducers/apiReducers/userApiReducer";
-
+import { listUsers } from "../../redux/reducers/apiReducers/userApiReducer";
+import { useEffect } from "react";
+import { object } from "prop-types";
+import { getUserDetailsById } from "../../redux/reducers/apiReducers/userApiReducer";
+import { Principal } from "@dfinity/principal";
 const teamData = [
   {
     id: 3,
@@ -112,11 +116,11 @@ const teamData = [
 
 // Permissions
 const rolePermissions = {
-  Admin: ["Create", "Read", "Write", "Edit"],
-  Staff: ["Create"],
-  Manager: ["Read"],
-  BOD: ["Read"],
-  Supervisor: ["Edit"],
+  admin: ["Create", "Read", "Write", "Edit"],
+  staff: ["Create"],
+  manager: ["Read"],
+  bod: ["Read"],
+  supervisor: ["Edit"],
 };
 
 const MemberManager = () => {
@@ -124,14 +128,21 @@ const MemberManager = () => {
   const [isRtNavOpen, setIsRtNavOpen] = useState(false);
   const [members, setMembers] = useState(teamData);
   const [currentMember, setCurrentMember] = useState(null);
+  const { users } = useSelector((state) => state.users);
+  const { backend } = useSelector((state) => state.authentication);
+  const { currentUser, userLoading } = useSelector((state) => state.users);
   const [isEditing, setIsEditing] = useState(false);
+  console.log(users, "users");
 
   const toggleNav = (isOpen) => {
     setIsRtNavOpen(isOpen);
   };
 
   const openDetailView = (member) => {
-    setCurrentMember(member);
+    console.log(member);
+    dispatch(getUserDetailsById({ backend, userId: member }));
+
+    setCurrentMember(currentUser);
     setIsEditing(false);
     toggleNav(true);
   };
@@ -141,6 +152,10 @@ const MemberManager = () => {
     setCurrentMember(null);
     toggleNav(false);
   };
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(listUsers({ backend, pageLimit: 10, currPage: 0 }));
+  }, [backend]);
 
   return (
     <div className="flex flex-auto flex-col">
@@ -184,9 +199,10 @@ const MemberManager = () => {
               </div>
             </div>
             <MemberList
-              members={members}
+              members={users}
               onMemberClick={openDetailView}
               isRtNavOpen={isRtNavOpen}
+              userLoading={userLoading}
             />
           </div>
           <NavigationRight isOpen={isRtNavOpen}>
@@ -206,32 +222,40 @@ const MemberManager = () => {
   );
 };
 
-const MemberList = ({ members, onMemberClick, isRtNavOpen }) => {
+const MemberList = ({ members, onMemberClick, isRtNavOpen, userLoading }) => {
   return (
-    <div>
-      {members.map((member) => (
-        <div
-          key={member.id}
-          className="z-20 flex cursor-pointer items-center border-b px-6 py-4 md:px-8 dark:hover:bg-hover hover:bg-gray-100 border-b-border bg-card justify-start"
-          onClick={() => {
-            if (!isRtNavOpen) onMemberClick(member);
-          }}
-        >
-          <div className="flex h-10 w-10 flex-0 items-center justify-center overflow-hidden rounded-full">
-            <Avvvatars value={member.name} size={48} shadow={true} />
-          </div>
-          <div className="ml-4 min-w-0">
-            <div className="truncate font-medium leading-5">{member.name}</div>
-            <div className="flex items-center justify-center rounded-full bg-gray-100 px-2 py-0.5 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300 max-w-fit">
-              <span className="whitespace-nowrap text-sm font-medium">
-                {member.role}
-              </span>
+    <>
+      {userLoading ? (
+        <div>loading....</div>
+      ) : (
+        <div>
+          {members.map((member) => (
+            <div
+              key={member?.id.toText()}
+              className="z-20 flex cursor-pointer items-center border-b px-6 py-4 md:px-8 dark:hover:bg-hover hover:bg-gray-100 border-b-border bg-card justify-start"
+              onClick={() => {
+                if (!isRtNavOpen) onMemberClick(member?.id);
+              }}
+            >
+              <div className="flex h-10 w-10 flex-0 items-center justify-center overflow-hidden rounded-full">
+                <Avvvatars value={member.firstName} size={48} shadow={true} />
+              </div>
+              <div className="ml-4 min-w-0">
+                <div className="truncate font-medium leading-5">
+                  {`${member.firstName} ${member.lastName}`}
+                </div>
+                <div className="flex items-center justify-center rounded-full bg-gray-100 px-2 py-0.5 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300 max-w-fit">
+                  <span className="whitespace-nowrap text-sm font-medium">
+                    {/* {Object.keys(member.role)} role */}
+                  </span>
+                </div>
+              </div>
+              <FaArrowRight className="flex items-end ml-auto opacity-90" />
             </div>
-          </div>
-          <FaArrowRight className="flex items-end ml-auto opacity-90" />
+          ))}
         </div>
-      ))}
-    </div>
+      )}
+    </>
   );
 };
 
@@ -244,29 +268,41 @@ const UpdateMember = ({
   members,
   setMembers,
 }) => {
-  const [name, setName] = useState(member ? member.name : "");
-  const [email, setEmail] = useState(member ? member.email : "");
-  const [role, setRole] = useState(member ? member.role : "");
-  const [principalId, setPrincipalId] = useState(
-    member ? member.principalId : ""
-  );
-  const { backend } = useSelector((state) => state.authentication);
-  const { venues } = useSelector((state) => state.venues);
   const isNewMember = !member;
+  const { backend } = useSelector((state) => state.authentication);
+
   const dispatch = useDispatch();
 
+  const { currentUser, userLoading } = useSelector((state) => state.users);
+  const [name, setName] = useState(!isNewMember ? currentUser.firstName : "");
+  const [email, setEmail] = useState(!isNewMember ? currentUser.email : "");
+  const [role, setRole] = useState(!isNewMember ? currentUser.role : "");
+  const [principalId, setPrincipalId] = useState(
+    !isNewMember ? currentUser.id : ""
+  );
+  const [lastName, setLastName] = useState(
+    !isNewMember ? currentUser.lastName : ""
+  );
+  const [venue, setVenue] = useState("");
+
+  const { venues } = useSelector((state) => state.venues);
+
   const handleSubmit = () => {
+    const Id = Principal.fromText(
+      "zj52k-qpwud-qn5zv-4qkry-is7qv-f7vkd-eonxw-os33j-kwgfi-d67wf-2ae"
+    );
+    const roles = { role: null };
     // Create user object from form data
     const user = {
       firstName: name,
-      lastName: "user name",
+      lastName: lastName,
       email: email,
-      role: { manager: null },
-      principal: principalId,
+      role: { [`${role}`]: null },
+      principal: Id,
     };
 
     // Dispatch the updateUser action with necessary arguments
-    dispatch(updateUser({ backend, user }));
+    dispatch(updateUser({ backend, user, onToggle }));
   };
 
   return (
@@ -286,7 +322,7 @@ const UpdateMember = ({
           <div className="-mt-16 flex flex-auto items-end">
             <div className="ring-bg-card flex h-32 w-32 items-center justify-center overflow-hidden rounded-full ring-4">
               <div className="flex h-full w-full items-center justify-center overflow-hidden rounded bg-gray-200 text-8xl font-bold uppercase leading-none text-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                {name.charAt(0)}
+                {isNewMember ? " " : currentUser?.firstName}
               </div>
             </div>
             <div
@@ -300,13 +336,15 @@ const UpdateMember = ({
             </div>
           </div>
           <div className="mt-3 truncate text-4xl font-bold">
-            {member ? member.name : "New Member"}
+            {!isNewMember ? member.name : "New Member"}
           </div>
           <div className="mt-2">
             {isEditing ? (
               <EditDetails
                 name={name}
                 setName={setName}
+                lastName={lastName}
+                setLastName={setLastName}
                 email={email}
                 setEmail={setEmail}
                 role={role}
@@ -316,9 +354,16 @@ const UpdateMember = ({
                 onSubmit={handleSubmit}
                 onDelete={() => onDelete(member.id)}
                 venues={venues}
+                venue={venue}
+                setVenue={setVenue}
               />
             ) : (
-              <ViewDetails member={member} venues={venues} />
+              !isNewMember && (
+                <ViewDetails
+                  member={userLoading ? "" : currentUser}
+                  venues={venues}
+                />
+              )
             )}
           </div>
         </div>
@@ -330,6 +375,8 @@ const UpdateMember = ({
 const EditDetails = ({
   name,
   setName,
+  lastName,
+  setLastName,
   email,
   setEmail,
   role,
@@ -339,8 +386,18 @@ const EditDetails = ({
   onSubmit,
   onDelete,
   venues,
+  venue,
+  setVenue,
 }) => {
-  const availableRoles = ["Staff", "manager", "Supervisor", "BOD", "Admin"];
+  const availableRoles = [
+    "staff",
+    "manager",
+    "supervisor",
+    "bod",
+    "admin",
+    "user",
+    "vendor",
+  ];
 
   const availableVenues = venues.map((venue) => venue.Title);
 
@@ -361,12 +418,24 @@ const EditDetails = ({
         </div>
       </div>
       <div className="mt-4">
-        <div className="font-medium">Name</div>
+        <div className="font-medium"> First Name</div>
         <div className="w-full border border-border flex items-center px-2 sm:px-4 min-h-12 rounded-md focus-within:border-secondary">
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            placeholder="Enter Name"
+            className="min-h-12 w-full border-0 bg-transparent px-0 py-2 text-text focus:outline-none focus:ring-0"
+          />
+        </div>
+      </div>
+      <div className="mt-4">
+        <div className="font-medium"> Last Name</div>
+        <div className="w-full border border-border flex items-center px-2 sm:px-4 min-h-12 rounded-md focus-within:border-secondary">
+          <input
+            type="text"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
             placeholder="Enter Name"
             className="min-h-12 w-full border-0 bg-transparent px-0 py-2 text-text focus:outline-none focus:ring-0"
           />
@@ -422,7 +491,11 @@ const EditDetails = ({
       </div>
       <div className="mt-4">
         <div className="font-medium">Assigned Venue*</div>
-        <select className="w-full border border-border rounded-md px-2 min-h-12 bg-card focus-within:border-secondary">
+        <select
+          className="w-full border border-border rounded-md px-2 min-h-12 bg-card focus-within:border-secondary"
+          value={venue}
+          onChange={(e) => setVenue(e.target.value)}
+        >
           {availableVenues.map((venue) => (
             <option key={venue} value={venue} className="bg-card">
               {venue}
@@ -458,13 +531,14 @@ const ViewDetails = ({ member, venues }) => {
   if (!member) return null;
 
   const permissions = rolePermissions[member.role] || [];
+  console.log(member);
 
   return (
     <div>
       <div className="mt-2 flex flex-wrap items-center">
         <div className="mb-3 mr-3 flex items-center justify-center rounded-full bg-gray-100 px-3 py-1 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300">
           <span className="whitespace-nowrap text-sm font-medium">
-            {member.role}
+            {Object.keys(member.role)}
           </span>
         </div>
       </div>
@@ -484,7 +558,7 @@ const ViewDetails = ({ member, venues }) => {
       <div className="mt-4 flex flex-col space-y-8 border-t pt-6 border-t-border">
         <div className="flex items-center">
           <HiMiniShieldCheck size={24} />
-          <div className="ml-6 leading-6">{member.principalId}</div>
+          <div className="ml-6 leading-6">{member.id.toText()}</div>
         </div>
         <div className="flex items-center">
           <HiOutlineEnvelope size={24} />
@@ -495,14 +569,15 @@ const ViewDetails = ({ member, venues }) => {
         <div className="flex">
           <HiOutlineFlag size={24} />
           <div className="ml-6 min-w-0 space-y-1">
-            {member.assignedVenues.map((v, index) => (
+            {member.assignedVenue}
+            {/* {member?.assignedVenues?.map((v, index) => (
               <div
                 key={index}
                 className="flex items-center leading-6 cursor-pointer"
               >
                 <div>{v}</div>
               </div>
-            ))}
+            ))} */}
           </div>
         </div>
       </div>
