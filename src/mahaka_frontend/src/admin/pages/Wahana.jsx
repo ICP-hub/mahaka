@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { HiMagnifyingGlass } from "react-icons/hi2";
-import { getallWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApiReducer";
+
+import { getAllWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import ModalOverlay from "../../customer/Components/Modal-overlay";
 import CreateWahanaForm from "../components/CreateWahanaForm";
 import EditWahanaForm from "../components/EditWahanaForm";
@@ -55,6 +56,7 @@ const AdminWahana = () => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
   const { wahanas, loading } = useSelector((state) => state.wahana);
+  console.log("logging the wahanas are",wahanas.length)
   const { venues } = useSelector((state) => state.venues);
 
   const [selectedVenue, setSelectedVenue] = useState(null);
@@ -77,7 +79,7 @@ const AdminWahana = () => {
 
   const fetchWahanas = (venueId) => {
     dispatch(
-      getallWahanasbyVenue({
+      getAllWahanasbyVenue({
         backend,
         chunkSize: 100,
         pageNo: 0,
@@ -212,12 +214,12 @@ const WahanaMain = ({
            
           </button>
 
-          <button className="mt-8 sm:ml-auto sm:mt-0" onClick={onEditClick}>
+          {/* <button className="mt-8 sm:ml-auto sm:mt-0" onClick={onEditClick}>
             <div className="inline-flex items-center align-middle bg-secondary px-3 py-2 rounded-full text-white">
               Edit Wahana
             </div>
            
-          </button>
+          </button> */}
         </div>
         {loading ? (
           <div className="mt-8 text-center">Loading...</div>
@@ -271,12 +273,12 @@ const WahanaCard = ({ wahana }) => {
             {wahana.priceinusd}
           </div>
           <div className="text-secondary text-2xl">/person</div>
-          <button className="mt-8 sm:ml-auto sm:mt-0" onClick={onEditClick}>
+          {/* <button className="mt-8 sm:ml-auto sm:mt-0" onClick={onEditClick}>
             <div className="inline-flex items-center align-middle bg-secondary px-3 py-2 rounded-full text-white">
               Edit Wahana
             </div>
            
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

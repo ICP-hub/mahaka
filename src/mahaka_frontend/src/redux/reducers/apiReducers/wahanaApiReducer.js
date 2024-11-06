@@ -81,8 +81,8 @@ export const edit_wahana = createAsyncThunk(
 );
 
 // Getting all wahana by venue
-export const getallWahanasbyVenue = createAsyncThunk(
-  "wahana/getallWahanasbyVenue",
+export const getAllWahanasbyVenue = createAsyncThunk(
+  "wahana/getAllWahanasbyVenue",
   async ({ backend, chunkSize, pageNo, venueId }) => {
     try {
       const response = await backend.getAllWahanasbyVenue(
@@ -145,18 +145,18 @@ const wahanaSlice = createSlice({
       })
 
       // Handle getallWahanasbyVenue
-      .addCase(getallWahanasbyVenue.pending, (state) => {
+      .addCase(getAllWahanasbyVenue.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(getallWahanasbyVenue.fulfilled, (state, action) => {
+      .addCase(getAllWahanasbyVenue.fulfilled, (state, action) => {
         state.loading = false;
-        if (action.payload && action.payload.data) {
+        if (action.payload && action.payload.ok.data) {
           if (action.meta.arg.pageNo > 1) {
             // Append new page of wahanas to the existing list
             state.wahanas = [...state.wahanas, ...action.payload.data];
           } else {
-            state.wahanas = action.payload.data;
+            state.wahanas = action.payload.ok.data;
           }
           state.currentPage = action.payload.current_page || 1;
           state.totalPages = action.payload.Total_pages || 1;
@@ -168,7 +168,7 @@ const wahanaSlice = createSlice({
         }
         state.error = null;
       })
-      .addCase(getallWahanasbyVenue.rejected, (state, action) => {
+      .addCase(getAllWahanasbyVenue.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
         notificationManager.error("Failed to fetch wahanas");

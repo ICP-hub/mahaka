@@ -225,7 +225,7 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
             <input
               value={formData.price}
               onChange={(e) =>
-                setFormData({ ...formData, price: e.target.value })
+                setFormData({ ...formData, price: parseInt(e.target.value) })
               }
               className="my-3 outline-none w-full bg-transparent"
               required

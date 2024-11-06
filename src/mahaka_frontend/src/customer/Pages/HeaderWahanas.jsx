@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { HiMagnifyingGlass } from "react-icons/hi2";
-import { getallWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApiReducer";
+import { getAllWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import ModalOverlay from "../../customer/Components/Modal-overlay";
 import wahanaDummy1 from "../../assets/images/Frame10.png";
 import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
