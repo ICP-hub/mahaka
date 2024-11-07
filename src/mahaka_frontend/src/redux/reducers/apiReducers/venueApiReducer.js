@@ -59,6 +59,8 @@ export const updateVenue = createAsyncThunk(
         venueId,
         [],
         [],
+        [],
+        [],
         updatedTitle,
         updatedDescription,
         eventDetails,
@@ -70,6 +72,7 @@ export const updateVenue = createAsyncThunk(
       return response;
     } catch (err) {
       console.error("Error while updating venue", err);
+      action(false);
     }
   }
 );
