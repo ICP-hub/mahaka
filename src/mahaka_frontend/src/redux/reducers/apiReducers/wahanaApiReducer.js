@@ -98,6 +98,24 @@ export const getAllWahanasbyVenue = createAsyncThunk(
   }
 );
 
+// Getting all wahanas
+
+export const getAllWahanas = createAsyncThunk(
+  "/wahana/getAllWahanas",
+  async({backend, chunkSize, pageNo}) =>{
+    try{
+      const response = await backend.getAllWahanas(
+        chunkSize,
+        pageNo
+      );
+      return response;
+    }catch(error){
+      console.error("error fetching all wahanas",e);
+      throw error;
+    }
+  }
+)
+
 // Create slice for Wahana API
 const wahanaSlice = createSlice({
   name: "wahana",
@@ -143,6 +161,43 @@ const wahanaSlice = createSlice({
         state.error = action.error.message;
         notificationManager.error("Failed to Edit wahana");
       })
+
+      //Getting all wahanas 
+      .addCase(getAllWahanas.pending,(state)=>{
+        state.loading = true;
+        state.error = null
+
+      })
+      .addCase(getAllWahanas.fulfilled,(state, action)=>{
+        state.loading = false;
+        if (action.payload && action.payload.ok.data) {
+          if (action.meta.arg.pageNo > 1) {
+            // Append new page of wahanas to the existing list
+            state.wahanas = [...state.wahanas, ...action.payload.data];
+          } else {
+            state.wahanas = action.payload.ok.data;
+          }
+          state.currentPage = action.payload.current_page || 1;
+          state.totalPages = action.payload.Total_pages || 1;
+        } else {
+          console.warn("Received empty or invalid response from API");
+          state.wahanas = [];
+          state.currentPage = 1;
+          state.totalPages = 1;
+        }
+        state.error = null;
+
+      })
+      .addCase(getAllWahanas.rejected, (state,action)=>{
+        state.loading = false,
+        state.error = action.error.message;
+        notificationManager.error("Failed to fetch wahanas");
+      })
+
+
+
+
+
 
       // Handle getallWahanasbyVenue
       .addCase(getAllWahanasbyVenue.pending, (state) => {

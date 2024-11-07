@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { HiMagnifyingGlass } from "react-icons/hi2";
-
+import { ImSpinner9 } from "react-icons/im";
 import { getAllWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApiReducer";
+import { getAllWahanas } from "../../redux/reducers/apiReducers/wahanaApiReducer";
+import { edit_wahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import ModalOverlay from "../../customer/Components/Modal-overlay";
 import CreateWahanaForm from "../components/CreateWahanaForm";
 import EditWahanaForm from "../components/EditWahanaForm";
 import wahanaDummy1 from "../../assets/images/Frame10.png";
 import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
+import { FaEdit } from "react-icons/fa";
 // import wahanaDummy2 from "../../assets/images/Frame11.png";
 // import wahanaDummy3 from "../../assets/images/Frame7.png";
 // import wahanaDummy4 from "../../assets/images/Frame8.png";
@@ -56,7 +59,7 @@ const AdminWahana = () => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
   const { wahanas, loading } = useSelector((state) => state.wahana);
-  console.log("logging the wahanas are",wahanas.length)
+  console.log("logging the loadign for wahanas are",loading)
   const { venues } = useSelector((state) => state.venues);
 
   const [selectedVenue, setSelectedVenue] = useState(null);
@@ -65,16 +68,23 @@ const AdminWahana = () => {
   console.log("edit modal open",editModalOpen)
   // const [editModalOpen, setEditModalOpen] = useState(false);
 
-  // console.log("edit modal open",editModalOpen)
+  console.log("selected venue is",selectedVenue)
 
   useEffect(() => {
     dispatch(getAllVenues({ backend, pageLimit: 100, currPage: 0 }));
   }, [dispatch, backend]);
 
+  
   useEffect(() => {
+   
     if (selectedVenue) {
       fetchWahanas(selectedVenue);
+    }else{
+      
+      fetchAllWahanas()
+
     }
+  
   }, [selectedVenue]);
 
   const fetchWahanas = (venueId) => {
@@ -88,18 +98,26 @@ const AdminWahana = () => {
     );
   };
 
-  // const editWahanas = (id)=>{
-  //   dispatch(
-  //     edit_wahana({
-  //       backend,
-  //       wahanaId: Id,
-  //       venueId: venueId
+  // fetching all wahanas
+
+  const fetchAllWahanas = ()=>{
+    dispatch(getAllWahanas({backend, chunkSize:100, pageNo:0}))
+  }
+
+
+  // edit wahana
+  const editWahanas = (id)=>{
+    dispatch(
+      edit_wahana({
+        backend,
+        wahanaId: Id,
+        venueId: venueId
 
 
 
-  //     })
-  //   )
-  // }
+      })
+    )
+  }
 
   return (
     <div className="relative h-full">
@@ -161,7 +179,7 @@ const AdminWahana = () => {
         >
           <EditWahanaForm
             onClose={() => setEditModalOpen(false)}
-            //  onSuccess={() => editWahanas(selectedWahana)}
+              // onSuccess={() => editWahanas(selectedWahana)}
           />
         </ModalOverlay>
       </div>
@@ -188,8 +206,9 @@ const WahanaMain = ({
             onChange={(e) => setSelectedVenue(e.target.value)}
             className="bg-card text-icon px-4 min-h-12 rounded-md border border-border sm:w-36"
           >
+           
             <option value="" className="min-h-12">
-              Select Venue
+              All Wahanas
             </option>
             {venues?.map((venues) => (
               <option key={venues.id} value={venues.id} className="min-h-12">
@@ -222,7 +241,10 @@ const WahanaMain = ({
           </button> */}
         </div>
         {loading ? (
-          <div className="mt-8 text-center">Loading...</div>
+          <div className="mt-8 text-center">
+
+      <div className="flex justify-center mt-30"><ImSpinner9 className = "animate-spin text-7xl opacity-80"/></div>
+          </div>
         ) : (
           <div className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3">
             {wahanaData?.map((wahana) => (
@@ -234,6 +256,9 @@ const WahanaMain = ({
                   price: wahana.priceinusd,
                   image: wahana.banner?.data,
                 }}
+                onEditClick ={onEditClick}
+                wahanaData = {wahanaData}
+                venues ={venues}
               />
             ))}
           </div>
@@ -243,7 +268,7 @@ const WahanaMain = ({
   );
 };
 
-const WahanaCard = ({ wahana }) => {
+const WahanaCard = ({ wahana,onEditClick,venues }) => {
   const bannerImage = wahana.image || wahanaDummy1;
   return (
     <div className="bg-card flex h-96 flex-col overflow-hidden rounded-2xl shadow relative group">
@@ -251,7 +276,11 @@ const WahanaCard = ({ wahana }) => {
         <div className="flex items-center justify-between p-6 z-10">
           <div className="rounded-full px-3 py-0.5 text-sm font-semibold bg-blue-100 text-blue-800 dark:bg-blue-500 dark:text-blue-50">
             {wahana.title}
+          
           </div>
+          
+          
+          <button className =""  onClick={onEditClick}><FaEdit clasName ="opacity-80" size={25} onClick={()=>editWahanas(wahana.id)}/></button>
         </div>
         <div
           className="absolute h-60 w-full inset-0 group-hover:scale-110 transition-all duration-500"

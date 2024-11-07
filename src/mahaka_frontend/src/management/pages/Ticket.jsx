@@ -179,20 +179,20 @@ const MgtTicket  = ()=>{
         <div className ="rounded-lg mx-2 my-2 flex-1">
         <div className ="grid grid-cols-1 md:grid-cols-3 md:gap-2 ">
        
-            <div className = {`border hover:bg-slate-300 p-2 rounded-xl flex  my-2 ${filterEvents==="allevents"?"bg-slate-300":"bg-transparent"}`} onClick ={()=>setFilterEvents("allevents")}>
-            <FaRegCalendarAlt  className ="text-3xl mx-3 bg-gray-400 rounded-full p-0.5" size={25}/>
+            <div className = {`shadow-lg hover:bg-slate-300 p-2 rounded-xl flex  my-2 ${filterEvents==="allevents"?"bg-slate-300":"bg-transparent"}`} onClick ={()=>setFilterEvents("allevents")}>
+            <FaRegCalendarAlt  className ="text-3xl mx-3 rounded-full p-0.5" size={25}/>
                 <h1 className ="font-bold text-slate-800">All Events</h1>
                 <FaAnglesRight className ="font-bold text-slate-800 ml-auto mt-1"/>
             </div>
 
-            <div className = {`border hover:bg-slate-300 p-2 rounded-xl flex  my-2 ${filterEvents==="special"?"bg-slate-300":"bg-transparent"}`} onClick ={()=>setFilterEvents("special")}>  
-                <MdOutlineStarRate className ="text-3xl mx-3 bg-gray-400 rounded-full p-0.5" />
+            <div className = {`shadow-lg hover:bg-slate-300 p-2 rounded-xl flex  my-2 ${filterEvents==="special"?"bg-slate-300":"bg-transparent"}`} onClick ={()=>setFilterEvents("special")}>  
+                <MdOutlineStarRate className ="text-3xl mx-3 rounded-full p-0.5" />
                 <h1 className ="font-bold text-slate-800">Special </h1>
                 <FaAnglesRight className ="font-bold text-slate-800 ml-auto mt-1"/>
             </div>
 
-            <div className = {`border p-2 rounded-xl flex hover:bg-slate-300  my-2 ${filterEvents==="regular"?"bg-slate-300":"bg-transparent"}`} onClick ={()=>setFilterEvents("regular")}>
-            <IoCalendarNumberOutline className ="text-3xl mx-3 bg-gray-400 rounded-full p-0.5" size={25}/>
+            <div className = {`shadow-lg p-2 rounded-xl flex hover:bg-slate-300  my-2 ${filterEvents==="regular"?"bg-slate-300":"bg-transparent"}`} onClick ={()=>setFilterEvents("regular")}>
+            <IoCalendarNumberOutline className ="text-3xl mx-3 rounded-full p-0.5" size={25}/>
                 <h1 className ="font-bold text-slate-800">Regular</h1>
                 <FaAnglesRight className ="font-bold text-slate-800 ml-auto mt-1"/>
             </div>
@@ -275,7 +275,7 @@ const MgtTicket  = ()=>{
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.5 }}
-            className="fixed right-0 top-0 md:top-18 h-full lg:h-128 w-full md:w-[25%] lg:w-1/3 bg-white rounded-lg shadow-lg p-4 z-50  overflow-y-auto"
+            className="fixed right-0 top-0 md:top-18 h-full lg:h-128 w-full md:w-[25%] lg:w-1/3 bg-gray-100 rounded-lg shadow-lg p-4 z-50  overflow-y-auto"
           >
              <div className ="">
             <button
@@ -288,7 +288,7 @@ const MgtTicket  = ()=>{
             <div className ="flex flex-col">
               <h1 className ="text-gray-800 text-xl font-bold my-2">Events for Booking</h1>
                 {sidebarItems.map((item)=>(
-                    <div className = "bg-gray-300 p-2 rounded-lg shadow-lg my-2 text-center"> 
+                    <div className = "bg-white p-2 rounded-lg shadow-lg my-2 text-center"> 
                     <div className ="flex">
                         <img src={item.image} className ="h-10 w-10 rounded-full"/>
                         <h1 className ="text-md text-gray-600 font-bold mt-2 mx-2">{item.name}</h1>
@@ -303,12 +303,12 @@ const MgtTicket  = ()=>{
                 ))}
             </div>
 
-           <div className = "text-xl text-gray-800 flex font-bold rounded-lg p-2 bg-gray-300">
+           <div className = "text-xl text-gray-800 flex font-bold rounded-lg p-2 bg-white shadow-lg">
             <span>Subtotal :</span>
             <p className = "text-xl text-gray-800 ml-auto flex">IDR /- {totalAmount}</p>
             </div>
 
-            <div className = "text-md lg:text-lg text-gray-500 flex font-bold rounded-lg p-2 bg-gray-300 my-2">
+            <div className = "text-md lg:text-lg text-gray-500 flex font-bold rounded-lg p-2 bg-white shadow-lg my-2">
             <span>Membership Discount :</span>
             <p className = "text-md lg:text-lg text-gray-800 ml-auto flex">IDR /- 0.00</p>
             </div>
