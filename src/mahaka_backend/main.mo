@@ -166,7 +166,13 @@ actor mahaka {
 //     --------------------------------------------------------------------------------------------------------------------
 
      
-     public shared ({caller = user}) func createVenue(collection_details : Types.venueCollectionParams, _title : Text,_capacity : Nat, _details : Types.venueDetails , _description : Text) : async Result.Result<(id : Text,  venue :Types.Venue),Types.UpdateUserError> {
+     public shared ({caller = user}) func createVenue(
+          collection_details : Types.venueCollectionParams, 
+          _title : Text,
+          _capacity : Nat, 
+          _details : Types.venueDetails , 
+          _description : Text
+     ) : async Result.Result<(id : Text,  venue :Types.Venue),Types.UpdateUserError> {
           // if (Principal.isAnonymous(user)) {
           //      return #err(#UserNotAuthenticated); 
           // }; 
@@ -230,7 +236,12 @@ actor mahaka {
           };
      };
 
-     public shared ({caller}) func updateVenue( Venue_id : Text, events : [Text], event : [Types.Events],wahanas : [Text] , wahana:[Types.Wahana_details], Title : Text,
+     public shared ({caller}) func updateVenue( 
+        collection_details : Types.venueCollectionParams, 
+        Venue_id : Text, 
+        events : [Text], event : [Types.Events],
+        wahanas : [Text] , wahana:[Types.Wahana_details], 
+        Title : Text,
         Description : Text,
         Details : Types.venueDetails,
         capacity : Nat,
@@ -256,8 +267,15 @@ actor mahaka {
                     throw Error.reject("Venue not found");
                };
                case (?v){
-                    let collection_id = await Utils.extractCanisterId(Venue_id);
-                    let venue_id =  Title # "#" # collection_id ;
+                    Cycles.add<system>(500_500_000_000);
+                    let venueCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), collection_details.collection_args);
+                    ignore await venueCollection.wallet_receive();
+                    let new_custodian = await venueCollection.addcustodians(caller);
+                    Debug.print(" New added custodian is : " # debug_show (new_custodian));
+                    let nftcustodians = await venueCollection.showcustodians();
+                    Debug.print("These are the list of current custodians : " #debug_show (nftcustodians));
+                    let collection_id = await venueCollection.getCanisterId();
+                    let venue_id =  Title # "#" # Principal.toText(collection_id) ;
                     let Venue : Types.Venue = {
                          id = venue_id;
                          Title = Title;
@@ -268,12 +286,13 @@ actor mahaka {
                          Events = List.fromArray(events);
                          Wahanas = List.fromArray(wahanas);
                          capacity = capacity;
-                         Collection_id = Principal.fromText(collection_id);
+                         Collection_id = collection_id;
                          creator = caller;
                     };
                     let venue_blob = to_candid(Venue);
                     let Venue_index = await update_stable(v, venue_blob, Venue_state);
-                    _venueMap.put(Venue_id, Venue_index);
+                    _venueMap.put(venue_id, Venue_index);
+                    _venueMap.delete(Venue_id);
                     return #ok(caller, Venue);
                };
           };
@@ -682,9 +701,9 @@ actor mahaka {
                                         Debug.print("These are the list of current custodians : " #debug_show (nftcustodians));
                                         ignore await eventCollection.wallet_receive();
                                         let eventCollectionId = await eventCollection.getCanisterId();
-                                        let eventId =  _event.title # "#" # Principal.toText(eventCollectionId);
+                                        let event_id =  _event.title # "#" # Principal.toText(eventCollectionId);
                                         let updated_event : Types.completeEvent = {
-                                             id = eventId;
+                                             id = event_id;
                                              description = _event.description;
                                              details =_event.details;
                                              logo = _event.logo;
@@ -1819,7 +1838,7 @@ actor mahaka {
                                    ignore await Wahanatokens.wallet_receive();
 
                                    let updated_wahana: Types.Wahana_details = {
-                                        id = Principal.toText(wahana_id); 
+                                        id = _name # "#" # Principal.toText(wahana_id); 
                                         banner = banner;
                                         description = description;
                                         price = price;
