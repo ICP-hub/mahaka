@@ -41,7 +41,7 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
   const endTimeRef = useRef(null);
 
   useEffect(() => {
-    // Initialize Flatpickr for dates
+    // Helper to format date in "YYYY-MM-DD"
     const formatDate = (date) => {
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -49,6 +49,7 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
       return `${year}-${month}-${day}`;
     };
 
+    // Initialize Flatpickr for start date
     flatpickr(startDateRef.current, {
       dateFormat: "Y-m-d",
       defaultDate: venueData.Details.StartDate,
@@ -64,6 +65,7 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
       required: true,
     });
 
+    // Initialize Flatpickr for end date
     flatpickr(endDateRef.current, {
       dateFormat: "Y-m-d",
       defaultDate: venueData.Details.EndDate,
@@ -77,40 +79,37 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
       required: true,
     });
 
-    // Initialize Flatpickr for times
+    // Initialize Flatpickr for start time with seconds
     flatpickr(startTimeRef.current, {
       enableTime: true,
       noCalendar: true,
-      dateFormat: "H:i",
-      defaultDate: `1970-01-01 ${Math.floor(
-        Number(venueData.Details.StartTime) / 60
-      )}:${Number(venueData.Details.StartTime) % 60}`,
+      dateFormat: "H:i:S",
+      defaultDate: venueData.Details.StartTime,
       onChange: (selectedDates) => {
         const newStartTime = selectedDates[0]
-          ? selectedDates[0].getHours() * 60 + selectedDates[0].getMinutes()
-          : 0;
+          ? selectedDates[0].toTimeString().slice(0, 8) // format as "HH:mm:ss"
+          : "09:00:00"; // fallback time with seconds
         setVenueData((prev) => ({
           ...prev,
-          Details: { ...prev.Details, StartTime: newStartTime.toString() },
+          Details: { ...prev.Details, StartTime: newStartTime },
         }));
       },
       required: true,
     });
 
+    // Initialize Flatpickr for end time with seconds
     flatpickr(endTimeRef.current, {
       enableTime: true,
       noCalendar: true,
-      dateFormat: "H:i",
-      defaultDate: `1970-01-01 ${Math.floor(
-        Number(venueData.Details.EndTime) / 60
-      )}:${Number(venueData.Details.EndTime) % 60}`,
+      dateFormat: "H:i:S",
+      defaultDate: venueData.Details.EndTime,
       onChange: (selectedDates) => {
         const newEndTime = selectedDates[0]
-          ? selectedDates[0].getHours() * 60 + selectedDates[0].getMinutes()
-          : 0;
+          ? selectedDates[0].toTimeString().slice(0, 8) // format as "HH:mm:ss"
+          : "17:00:00"; // fallback time with seconds
         setVenueData((prev) => ({
           ...prev,
-          Details: { ...prev.Details, EndTime: newEndTime.toString() },
+          Details: { ...prev.Details, EndTime: newEndTime },
         }));
       },
       required: true,
@@ -121,6 +120,7 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
     venueData.Details.StartTime,
     venueData.Details.EndTime,
   ]);
+
   const validateForm = () => {
     const errors = {};
 
