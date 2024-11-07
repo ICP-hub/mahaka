@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
 import flatpickr from "flatpickr";
 import { FcAlarmClock, FcCalendar } from "react-icons/fc";
+import { Principal } from "@dfinity/principal";
 
 const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
   const dispatch = useDispatch();
@@ -14,6 +15,29 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
   const [logoPreview, setLogoPreview] = useState(venue.logo.data);
   console.log(venue);
   const [venueData, setVenueData] = useState({
+    collection_args: {
+      maxLimit: 500,
+      sTicket_limit: 100,
+      gTicket_price: 50,
+      logo: {
+        data: "",
+        logo_type: "image",
+      },
+      name: venue.Title || "",
+      vTicket_price: 30,
+      banner: {
+        data: "",
+        logo_type: "image",
+      },
+      description: venue.Description || "",
+      created_at: BigInt(Date.now()),
+      collection_type: { Venue: null },
+      sTicket_price: 25,
+      gTicket_limit: 200,
+      symbol: "VENUE",
+      vTicket_limit: 150,
+    },
+
     Title: venue.Title || "",
     Description: venue.Description || "",
     capacity: parseInt(venue.capacity) || "",
@@ -32,6 +56,7 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
       data: venue.banner.data,
       logo_type: "image",
     },
+    custodian: Principal.fromText("2vxsx-fae"),
   });
 
   // Refs for Flatpickr
@@ -174,6 +199,12 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
     setVenueData((prev) => ({
       ...prev,
       [name]: value,
+      collection_args: {
+        ...prev.collection_args,
+        name: name === "Title" ? value : prev.collection_args.name,
+        description:
+          name === "Description" ? value : prev.collection_args.description,
+      },
     }));
   };
 
@@ -281,9 +312,16 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
         // Update state with the blob
         setVenueData((prevState) => ({
           ...prevState,
+          collection_args: {
+            ...prevState.collection_args,
+            logo: {
+              data: blob,
+              logo_type: file.type,
+            },
+          },
           logo: {
-            data: blob, // Store the Blob here
-            logo_type: file.type, // Set the correct logo type
+            data: blob,
+            logo_type: file.type,
           },
         }));
 
@@ -315,9 +353,16 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
         // Update state with the Blob directly in banner
         setVenueData((prevState) => ({
           ...prevState,
+          collection_args: {
+            ...prevState.collection_args,
+            banner: {
+              data: blob,
+              logo_type: file.type,
+            },
+          },
           banner: {
-            data: blob, // Store the Blob here
-            logo_type: file.type, // Set the correct logo type
+            data: blob,
+            logo_type: file.type,
           },
         }));
 
@@ -350,6 +395,10 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
     dispatch(
       updateVenue({
         backend,
+        collectionDetails: {
+          collection_args: venueData.collection_args,
+          custodian: venueData.custodian,
+        },
         venueId,
         updatedTitle: venueData.Title,
         updatedDescription: venueData.Description,
