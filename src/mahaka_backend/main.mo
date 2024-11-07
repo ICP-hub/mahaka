@@ -239,15 +239,13 @@ actor mahaka {
      public shared ({caller}) func updateVenue( 
         collection_details : Types.venueCollectionParams, 
         Venue_id : Text, 
-        events : [Text], event : [Types.Events],
-        wahanas : [Text] , wahana:[Types.Wahana_details], 
         Title : Text,
         Description : Text,
         Details : Types.venueDetails,
         capacity : Nat,
         logo : Types.LogoResult,
         banner : Types.LogoResult
-        ) : async Result.Result<(Principal, Types.Venue), Types.UpdateUserError> {
+     ) : async Result.Result<(Principal, Types.Venue), Types.UpdateUserError> {
           // if (Principal.isAnonymous(caller)) {
           //      return #err(#UserNotAuthenticated); 
           // }; 
@@ -267,33 +265,61 @@ actor mahaka {
                     throw Error.reject("Venue not found");
                };
                case (?v){
-                    Cycles.add<system>(500_500_000_000);
-                    let venueCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), collection_details.collection_args);
-                    ignore await venueCollection.wallet_receive();
-                    let new_custodian = await venueCollection.addcustodians(caller);
-                    Debug.print(" New added custodian is : " # debug_show (new_custodian));
-                    let nftcustodians = await venueCollection.showcustodians();
-                    Debug.print("These are the list of current custodians : " #debug_show (nftcustodians));
-                    let collection_id = await venueCollection.getCanisterId();
-                    let venue_id =  Title # "#" # Principal.toText(collection_id) ;
-                    let Venue : Types.Venue = {
-                         id = venue_id;
-                         Title = Title;
-                         logo = logo;
-                         banner = banner;
-                         Description : Text;
-                         Details = Details;
-                         Events = List.fromArray(events);
-                         Wahanas = List.fromArray(wahanas);
-                         capacity = capacity;
-                         Collection_id = collection_id;
-                         creator = caller;
+                    let venues_object_blob = await stable_get(v,Venue_state);
+                    let venues_object : ?Types.Venue = from_candid(venues_object_blob);
+                    switch(venues_object){
+                         case null{
+                              throw (Error.reject("No object found in the memory"));
+                         };
+                         case (?obj){
+                              Cycles.add<system>(500_500_000_000);
+                              let venueCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), collection_details.collection_args);
+                              ignore await venueCollection.wallet_receive();
+                              let new_custodian = await venueCollection.addcustodians(caller);
+                              Debug.print(" New added custodian is : " # debug_show (new_custodian));
+                              let nftcustodians = await venueCollection.showcustodians();
+                              Debug.print("These are the list of current custodians : " #debug_show (nftcustodians));
+                              let collection_id = await venueCollection.getCanisterId();
+                              let venue_id =  Title # "#" # Principal.toText(collection_id) ;
+                              let Venue : Types.Venue = {
+                                   id = venue_id;
+                                   Title = Title;
+                                   logo = logo;
+                                   banner = banner;
+                                   Description : Text;
+                                   Details = Details;
+                                   Events = obj.Events;
+                                   Wahanas = obj.Wahanas;
+                                   capacity = capacity;
+                                   Collection_id = collection_id;
+                                   creator = caller;
+                              };
+                              let venue_blob = to_candid(Venue);
+                              let Venue_index = await update_stable(v, venue_blob, Venue_state);
+                              _venueMap.put(venue_id, Venue_index);
+                              _venueMap.delete(Venue_id);
+                              switch(_EventsMap.get(Venue_id)){
+                                   case null{
+
+                                   };
+                                   case (?index) {
+                                        _EventsMap.put(venue_id,index);
+                                        _EventsMap.delete(Venue_id); 
+                                   }
+                              };
+                              switch(_WahanaMap.get(Venue_id)){
+                                   case null{
+                                        
+                                   };
+                                   case (?index) {
+                                        _WahanaMap.put(venue_id, index);
+                                        _WahanaMap.delete(Venue_id);
+                                   }
+                              };
+                              return #ok(caller, Venue);
+                         };
                     };
-                    let venue_blob = to_candid(Venue);
-                    let Venue_index = await update_stable(v, venue_blob, Venue_state);
-                    _venueMap.put(venue_id, Venue_index);
-                    _venueMap.delete(Venue_id);
-                    return #ok(caller, Venue);
+                    
                };
           };
      };
