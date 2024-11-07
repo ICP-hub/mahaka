@@ -8,12 +8,15 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
   const { createVenueLoader } = useSelector((state) => state.venues);
-  const [bannerPreview, setBannerPreview] = useState("");
+  const [bannerPreview, setBannerPreview] = useState(venue.banner.data);
   const [error, setError] = useState("");
+  const [formErrors, setFormErrors] = useState({});
+  const [logoPreview, setLogoPreview] = useState(venue.logo.data);
+  console.log(venue);
   const [venueData, setVenueData] = useState({
     Title: venue.Title || "",
     Description: venue.Description || "",
-    capacity: venue.capacity || "",
+    capacity: parseInt(venue.capacity) || "",
     Details: {
       StartDate: venue.Details?.StartDate || "",
       EndDate: venue.Details?.EndDate || "",
@@ -22,11 +25,11 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
       Location: venue.Details?.Location || "",
     },
     logo: {
-      data: "",
+      data: venue.logo.data,
       logo_type: "image",
     },
     banner: {
-      data: "",
+      data: venue.banner.data,
       logo_type: "image",
     },
   });
@@ -118,6 +121,53 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
     venueData.Details.StartTime,
     venueData.Details.EndTime,
   ]);
+  const validateForm = () => {
+    const errors = {};
+
+    // Validate title
+    if (!venueData.Title.trim()) {
+      errors.title = "venue title is required";
+    }
+
+    // Validate description
+    if (!venueData.Description.trim()) {
+      errors.description = "venue description is required";
+    }
+
+    // Validate dates and times
+    if (!venueData.Details.StartDate) {
+      errors.StartDate = "Start date is required";
+    }
+    if (!venueData.Details.EndDate) {
+      errors.EndDate = "End date is required";
+    }
+    if (!venueData.Details.StartTime) {
+      errors.StartTime = "Start time is required";
+    }
+    if (!venueData.Details.EndTime) {
+      errors.EndTime = "End time is required";
+    }
+
+    // Validate location
+    if (!venueData.Details.Location.trim()) {
+      errors.Location = "Location is required";
+    }
+
+    if (!venueData.capacity) {
+      errors.Capacity = "Capacity is required";
+    }
+
+    // Validate banner image
+    if (!venueData.banner.data.trim()) {
+      errors.banner = "venue banner is required";
+    }
+    if (!venueData.logo.data.trim()) {
+      errors.logo = "venue logo is required";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -160,7 +210,7 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
 
       img.onload = () => {
         // Create canvas
-        const canvas = document.createElement('canvas');
+        const canvas = document.createElement("canvas");
         let width = img.width;
         let height = img.height;
 
@@ -173,7 +223,7 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
         canvas.height = height;
 
         // Draw image on canvas
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, width, height);
 
         // Function to convert canvas to file
@@ -209,7 +259,7 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
       };
     });
   };
-  const [logoPreview, setLogoPreview] = useState(null);
+
   const handleFileChange2 = async (e) => {
     const file = e.target.files[0];
     setError("");
@@ -226,16 +276,14 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
 
         // Convert the processed file to blob
         const blob = await imageToFileBlob(processedFile);
+        console.log(blob, "logo");
 
         // Update state with the blob
         setVenueData((prevState) => ({
           ...prevState,
-          collection_args: {
-            ...prevState.collection_args,
-            logo: {
-              data: blob,
-              logo_type: file.type,
-            },
+          logo: {
+            data: blob, // Store the Blob here
+            logo_type: file.type, // Set the correct logo type
           },
         }));
 
@@ -275,7 +323,6 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
 
         // Set the banner preview (optional, for displaying image)
         setBannerPreview(URL.createObjectURL(processedFile));
-
       } catch (error) {
         setError("Error processing image. Please try again.");
         console.error("Error processing image:", error);
@@ -285,6 +332,9 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!validateForm()) {
+      return;
+    }
     const venueId = venue.id;
     console.log(venueId);
     setError("");
@@ -295,7 +345,7 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
       EndTime: venueData.Details.EndTime,
       Location: venueData.Details.Location,
     };
-
+    console.log(venueData.logo, "logo");
 
     dispatch(
       updateVenue({
@@ -331,6 +381,9 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
           />
         </div>
       </div>
+      {formErrors.title && (
+        <p className="text-red-500 text-sm mt-1">{formErrors.title}</p>
+      )}
 
       <div className="flex flex-col flex-auto gap-1">
         <label className="font-semibold">
@@ -347,6 +400,9 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
           ></textarea>
         </div>
       </div>
+      {formErrors.description && (
+        <p className="text-red-500 text-sm mt-1">{formErrors.description}</p>
+      )}
 
       <div className="flex space-x-4">
         <div className="w-1/2 flex flex-col flex-auto gap-1">
@@ -420,6 +476,9 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
           />
         </div>
       </div>
+      {formErrors.Location && (
+        <p className="text-red-500 text-sm mt-1">{formErrors.Location}</p>
+      )}
       <div className="flex flex-col flex-auto gap-1">
         <label className="font-semibold">
           Maximum number of people <span className="text-red-500">*</span>
@@ -435,10 +494,13 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
           />
         </div>
       </div>
+      {formErrors.Capacity && (
+        <p className="text-red-500 text-sm mt-1">{formErrors.Capacity}</p>
+      )}
 
       <div className="flex flex-col flex-auto gap-1">
         <label className="font-semibold">
-          Banner  <span className="text-red-500">*</span>
+          Banner <span className="text-red-500">*</span>
         </label>
         <div className="flex flex-col items-center justify-center border-dashed border-2 border-border p-4 rounded">
           <input
@@ -470,6 +532,9 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
           )}
         </div>
       </div>
+      {formErrors.banner && (
+        <p className="text-red-500 text-sm mt-1">{formErrors.banner}</p>
+      )}
       <div className="flex flex-col flex-auto gap-1">
         <label className="font-semibold">
           Logo <span className="text-red-500">*</span>
@@ -492,7 +557,7 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
           {logoPreview && (
             <img
               src={logoPreview}
-              alt="Banner Preview"
+              alt="logo Preview"
               className="mt-2 w-full h-auto rounded"
               style={{
                 maxWidth: "96px",
@@ -504,6 +569,9 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
           )}
         </div>
       </div>
+      {formErrors.logo && (
+        <p className="text-red-500 text-sm mt-1">{formErrors.logo}</p>
+      )}
 
       <div className="flex justify-end space-x-2">
         {/* <button
@@ -516,10 +584,11 @@ const UpdateVenueForm = ({ venue, setIsModalOpen }) => {
         <button
           //   type="submit"
           onClick={(e) => (createVenueLoader ? null : handleSubmit(e))}
-          className={`px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${createVenueLoader
+          className={`px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
+            createVenueLoader
               ? "bg-gray-600"
               : "bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
-            }`}
+          }`}
         >
           {createVenueLoader ? "Updating..." : "Update Venue"}
         </button>
