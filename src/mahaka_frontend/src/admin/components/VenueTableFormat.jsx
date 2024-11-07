@@ -102,8 +102,8 @@ const VenueTableFormat = ({ filteredVenues }) => {
                       key={index}
                       venue={venue}
                       onDelete={() => handleDeleteClick(venue.id)}
-                    // isExpanded={expandedVenue === index}
-                    // onToggleDetail={() => handleToggleDetail(index)}
+                      // isExpanded={expandedVenue === index}
+                      // onToggleDetail={() => handleToggleDetail(index)}
                     />
                   </motion.div>
                 ))}
@@ -135,7 +135,7 @@ const VenueTableData = ({ venue, onDelete }) => {
         <div className="flex items-center">
           <div className="relative mr-6 flex h-12 w-12 flex-0 items-center justify-center overflow-hidden rounded border border-border">
             <img
-              src={venue?.banner?.data ? venue?.banner?.data : VenueDemoImg}
+              src={venue?.logo?.data ? venue?.logo?.data : VenueDemoImg}
               alt="Venue_img"
               className="w-8"
             />
@@ -149,7 +149,9 @@ const VenueTableData = ({ venue, onDelete }) => {
         <div className="hidden lg:block">
           {formatDate(venue?.Details?.EndDate)}
         </div>
-        <div className="hidden lg:block">{venue?.Details?.StartTime}-{venue?.Details?.EndTime}</div>
+        <div className="hidden lg:block">
+          {venue?.Details?.StartTime}-{venue?.Details?.EndTime}
+        </div>
         <div className="truncate">{venue?.Details?.Location}</div>
 
         {/* Wrap both icons inside a flex container */}

@@ -186,7 +186,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
 
       img.onload = () => {
         // Create canvas
-        const canvas = document.createElement('canvas');
+        const canvas = document.createElement("canvas");
         let width = img.width;
         let height = img.height;
 
@@ -199,7 +199,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         canvas.height = height;
 
         // Draw image on canvas
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, width, height);
 
         // Function to convert canvas to file
@@ -236,13 +236,11 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
     });
   };
 
-
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     setError("");
 
     if (file) {
-
       try {
         let processedFile = file;
         const maxSize = 200 * 1024; // 200KB
@@ -269,7 +267,44 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
 
         // Set the banner preview
         setBannerPreview(URL.createObjectURL(processedFile));
+      } catch (error) {
+        setError("Error processing image. Please try again.");
+        console.error("Error processing image:", error);
+      }
+    }
+  };
+  const [logoPreview, setLogoPreview] = useState(null);
+  const handleFileChange2 = async (e) => {
+    const file = e.target.files[0];
+    setError("");
 
+    if (file) {
+      try {
+        let processedFile = file;
+        const maxSize = 200 * 1024; // 200KB
+
+        // Check if file needs resizing
+        if (file.size > maxSize) {
+          processedFile = await resizeImage(file);
+        }
+
+        // Convert the processed file to blob
+        const blob = await imageToFileBlob(processedFile);
+
+        // Update state with the blob
+        setVenueData((prevState) => ({
+          ...prevState,
+          collection_args: {
+            ...prevState.collection_args,
+            logo: {
+              data: blob,
+              logo_type: file.type,
+            },
+          },
+        }));
+
+        // Set the banner preview
+        setLogoPreview(URL.createObjectURL(processedFile));
       } catch (error) {
         setError("Error processing image. Please try again.");
         console.error("Error processing image:", error);
@@ -279,7 +314,8 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
 
   const validateForm = () => {
     // Check if all required fields are filled
-    if (!venueData.collection_args.name ||
+    if (
+      !venueData.collection_args.name ||
       !venueData.collection_args.description ||
       !venueData.eventDetails.StartDate ||
       !venueData.eventDetails.EndDate ||
@@ -288,7 +324,8 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
       !venueData.eventDetails.Location ||
       !venueData.title ||
       !venueData.capacity ||
-      !venueData.collection_args.banner.data) {
+      !venueData.collection_args.banner.data
+    ) {
       setError("Please fill in all required fields");
       return false;
     }
@@ -330,9 +367,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
       >
         <div className="flex flex-col flex-auto gap-1">
           <div className="flex items-center gap-2">
-            <label className="font-semibold">
-              Venue Name
-            </label>
+            <label className="font-semibold">Venue Name</label>
             <TextHint text="Enter the name of the venue." />
           </div>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border ">
@@ -350,9 +385,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         </div>
         <div className="flex flex-col flex-auto gap-1">
           <div className="flex items-center gap-2">
-            <label className="font-semibold">
-              Description
-            </label>
+            <label className="font-semibold">Description</label>
             <TextHint text="Enter the description of the venue." />
           </div>
           <div className="border border-border rounded-lg pl-4 focus-within:border-indigo-600 dark:focus-within:border-border">
@@ -371,9 +404,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         <div className="flex space-x-4">
           <div className="w-1/2 flex flex-col flex-auto gap-1">
             <div className="flex items-center gap-2">
-              <label className="font-semibold">
-                Start Date
-              </label>
+              <label className="font-semibold">Start Date</label>
               <TextHint text="Enter the start date of the venue." />
             </div>
             <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
@@ -387,9 +418,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
           </div>
           <div className="w-1/2 flex flex-col flex-auto gap-1">
             <div className="flex items-center gap-2">
-              <label className="font-semibold">
-                End Date
-              </label>
+              <label className="font-semibold">End Date</label>
               <TextHint text="Enter the end date of the venue." />
             </div>
             <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
@@ -405,9 +434,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         <div className="flex space-x-4">
           <div className="w-1/2 flex flex-col flex-auto gap-1">
             <div className="flex items-center gap-2">
-              <label className="font-semibold">
-                Start Time
-              </label>
+              <label className="font-semibold">Start Time</label>
               <TextHint text="Enter the starting time of the venue." />
             </div>
             <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
@@ -421,9 +448,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
           </div>
           <div className="w-1/2 flex flex-col flex-auto gap-1">
             <div className="flex items-center gap-2">
-              <label className="font-semibold">
-                End Time
-              </label>
+              <label className="font-semibold">End Time</label>
               <TextHint text="Enter the ending time of the venue." />
             </div>
             <div className="flex items-center border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
@@ -438,9 +463,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         </div>
         <div className="flex flex-col flex-auto gap-1">
           <div className="flex items-center gap-2">
-            <label className="font-semibold">
-              Location
-            </label>
+            <label className="font-semibold">Location</label>
             <TextHint text="Enter the location of the venue." />
           </div>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
@@ -458,9 +481,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         </div>
         <div className="flex flex-col flex-auto gap-1">
           <div className="flex items-center gap-2">
-            <label className="font-semibold">
-              Title
-            </label>
+            <label className="font-semibold">Title</label>
             <TextHint text="Enter the title of the venue." />
           </div>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
@@ -476,9 +497,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         </div>
         <div className="flex flex-col flex-auto gap-1">
           <div className="flex items-center gap-2">
-            <label className="font-semibold">
-              Maximum number of people
-            </label>
+            <label className="font-semibold">Maximum number of people</label>
             <TextHint text="Enter the maximum number of people in the venue." />
           </div>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
@@ -495,110 +514,137 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         {/* Ticket Limits */}
         <div className="flex space-x-4">
           <div className="w-1/3">
-          <div className="flex items-center gap-2">
-            <label className="font-semibold">
-              General Ticket Limit
-            </label>
-            <TextHint text="Enter general ticket limit of the venue." />
+            <div className="flex items-center gap-2">
+              <label className="font-semibold">General Ticket Limit</label>
+              <TextHint text="Enter general ticket limit of the venue." />
+            </div>
+            <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+              <input
+                type="number"
+                name="gTicket_limit"
+                value={venueData.gTicket_limit}
+                onChange={handleInputChange}
+                className="my-3 outline-none w-full bg-transparent"
+                required
+              />
+            </div>
           </div>
-          <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
-            <input
-              type="number"
-              name="gTicket_limit"
-              value={venueData.gTicket_limit}
-              onChange={handleInputChange}
-              className="my-3 outline-none w-full bg-transparent"
-              required
-            />
+          <div className="w-1/3">
+            <div className="flex items-center gap-2">
+              <label className="font-semibold">Student Ticket Limit</label>
+              <TextHint text="Enter student ticket limit of the venue." />
+            </div>
+            <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+              <input
+                type="number"
+                name="sTicket_limit"
+                value={venueData.sTicket_limit}
+                onChange={handleInputChange}
+                className="my-3 outline-none w-full bg-transparent"
+                required
+              />
+            </div>
           </div>
-        </div>
-        <div className="w-1/3">
-          <div className="flex items-center gap-2">
-            <label className="font-semibold">
-              Student Ticket Limit
-            </label>
-            <TextHint text="Enter student ticket limit of the venue." />
-          </div>
-          <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
-            <input
-              type="number"
-              name="sTicket_limit"
-              value={venueData.sTicket_limit}
-              onChange={handleInputChange}
-              className="my-3 outline-none w-full bg-transparent"
-              required
-            />
-          </div>
-        </div>
-        <div className="w-1/3">
-          <div className="flex items-center gap-2">
-            <label className="font-semibold">
-              VIP Ticket Limit
-            </label>
-            <TextHint text="Enter VIP ticket limit of the venue." />
-
-          </div>
-          <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
-            <input
-              type="number"
-              name="vTicket_limit"
-              value={venueData.vTicket_limit}
-              onChange={handleInputChange}
-              className="my-3 outline-none w-full bg-transparent"
-              required
-            />
-</div>
+          <div className="w-1/3">
+            <div className="flex items-center gap-2">
+              <label className="font-semibold">VIP Ticket Limit</label>
+              <TextHint text="Enter VIP ticket limit of the venue." />
+            </div>
+            <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+              <input
+                type="number"
+                name="vTicket_limit"
+                value={venueData.vTicket_limit}
+                onChange={handleInputChange}
+                className="my-3 outline-none w-full bg-transparent"
+                required
+              />
+            </div>
           </div>
         </div>
 
-      <div className="flex flex-col flex-auto gap-1">
-        <div className="flex items-center gap-2">
-          <label className="font-semibold">
-            Banner
-          </label>
-          <TextHint text="Upload the image of the venue." />
-        </div>
-        <div className="flex flex-col items-center justify-center border-dashed border-2 border-border p-4 rounded">
-          <input
-            type="file"
-            accept=".jpg,.jpeg,.png"
-            className="hidden"
-            id="upload-image"
-            onChange={handleFileChange}
-            required
-          />
-          <label
-            htmlFor="upload-image"
-            className="cursor-pointer bg-card text-text py-2 px-4 rounded-md border border-border"
-          >
-            Upload Banner
-          </label>
-          {bannerPreview && (
-            <img
-              src={bannerPreview}
-              alt="Banner Preview"
-              className="mt-2 w-full h-auto rounded"
-              style={{
-                maxWidth: "96px",
-                maxHeight: "96px",
-                minWidth: "96px",
-                minHeight: "96px",
-              }}
+        <div className="flex flex-col flex-auto gap-1">
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">Banner</label>
+            <TextHint text="Upload the image of the venue." />
+          </div>
+          <div className="flex flex-col items-center justify-center border-dashed border-2 border-border p-4 rounded">
+            <input
+              type="file"
+              accept=".jpg,.jpeg,.png"
+              className="hidden"
+              id="upload-image"
+              onChange={handleFileChange}
+              required
             />
-          )}
+            <label
+              htmlFor="upload-image"
+              className="cursor-pointer bg-card text-text py-2 px-4 rounded-md border border-border"
+            >
+              Upload Banner
+            </label>
+            {bannerPreview && (
+              <img
+                src={bannerPreview}
+                alt="Banner Preview"
+                className="mt-2 w-full h-auto rounded"
+                style={{
+                  maxWidth: "96px",
+                  maxHeight: "96px",
+                  minWidth: "96px",
+                  minHeight: "96px",
+                }}
+              />
+            )}
+          </div>
         </div>
-      </div>
-      <div className="flex justify-center">
-        <button
-          type="submit"
-          className={`text-white py-2 px-4 rounded ${createVenueLoader ? "bg-gray-400" : "bg-secondary"
+        <div className="flex flex-col flex-auto gap-1">
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">Logo</label>
+            <TextHint text="Upload the image of the venue." />
+          </div>
+          <div className="flex flex-col items-center justify-center border-dashed border-2 border-border p-4 rounded">
+            <input
+              type="file"
+              accept=".jpg,.jpeg,.png"
+              className="hidden"
+              id="upload-image1"
+              onChange={handleFileChange2}
+              required
+            />
+            <label
+              htmlFor="upload-image1"
+              className="cursor-pointer bg-card text-text py-2 px-4 rounded-md border border-border"
+            >
+              Upload logo
+            </label>
+            {logoPreview && (
+              <img
+                src={logoPreview}
+                alt="Banner Preview"
+                className="mt-2 w-full h-auto rounded"
+                style={{
+                  maxWidth: "96px",
+                  maxHeight: "96px",
+                  minWidth: "96px",
+                  minHeight: "96px",
+                }}
+              />
+            )}
+          </div>
+        </div>
+        <div className="flex justify-center">
+          <button
+            type="submit"
+            className={`text-white py-2 px-4 rounded ${
+              createVenueLoader ? "bg-gray-400" : "bg-secondary"
             }`}
-          disabled={createVenueLoader}
-        >
-          {createVenueLoader ? "Creating..." : "Create Venue"}
-        </button>
-      </div>
-    </form >
+            disabled={createVenueLoader}
+          >
+            {createVenueLoader ? "Creating..." : "Create Venue"}
+          </button>
+        </div>
+      </form>
     </>
   );
 };

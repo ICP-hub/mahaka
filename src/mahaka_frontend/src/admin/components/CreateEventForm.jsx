@@ -4,18 +4,19 @@ import { createEvent } from "../../redux/reducers/apiReducers/eventApiReducer";
 import flatpickr from "flatpickr";
 import { FcAlarmClock, FcCalendar } from "react-icons/fc";
 import TextHint from "../../customer/Components/TextHint";
+import { Principal } from "@dfinity/principal";
 
 const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
-  const { loading, createEventLoader } = useSelector(
-    (state) => state.events
-  );
+  const { loading, createEventLoader } = useSelector((state) => state.events);
+  const { principal } = useSelector((state) => state.authentication);
   const [error, setError] = useState("");
   const [formErrors, setFormErrors] = useState({});
   useEffect(() => {
     console.log("venueId:", venueId);
   }, [venueId]);
+  const [logoPreview, setLogoPreview] = useState(null);
 
   const [eventData, setEventData] = useState({
     title: "",
@@ -95,7 +96,10 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
 
     // Validate banner image
     if (!eventData.collection_args.banner.data) {
-      errors.banner = "Event image is required";
+      errors.banner = "Event banner is required";
+    }
+    if (!eventData.collection_args.logo.data) {
+      errors.banner = "Event logo is required";
     }
 
     setFormErrors(errors);
@@ -103,7 +107,6 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
   };
 
   const [bannerPreview, setBannerPreview] = useState(null);
-
 
   const startDateRef = useRef(null);
   const endDateRef = useRef(null);
@@ -236,7 +239,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
 
       img.onload = () => {
         // Create canvas
-        const canvas = document.createElement('canvas');
+        const canvas = document.createElement("canvas");
         let width = img.width;
         let height = img.height;
 
@@ -249,7 +252,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
         canvas.height = height;
 
         // Draw image on canvas
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, width, height);
 
         // Function to convert canvas to file
@@ -286,7 +289,40 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
     });
   };
 
+  const handleFileChange2 = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      try {
+        let processedFile = file;
+        const maxSize = 200 * 1024; // 200KB
 
+        // Check if file needs resizing
+        if (file.size > maxSize) {
+          processedFile = await resizeImage(file);
+        }
+
+        // Convert the processed file to blob
+        const blob = await imageToFileBlob(processedFile);
+
+        // Update state with the blob
+        setEventData((prevState) => ({
+          ...prevState,
+          collection_args: {
+            ...prevState.collection_args,
+            logo: {
+              data: blob,
+              logo_type: file.type,
+            },
+          },
+        }));
+        // Set the banner preview
+        setLogoPreview(URL.createObjectURL(processedFile));
+      } catch (error) {
+        setError("Error processing image. Please try again.");
+        console.error("Error processing image:", error);
+      }
+    }
+  };
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -315,7 +351,6 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
         }));
         // Set the banner preview
         setBannerPreview(URL.createObjectURL(processedFile));
-
       } catch (error) {
         setError("Error processing image. Please try again.");
         console.error("Error processing image:", error);
@@ -333,15 +368,19 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
       return;
     }
     const fullVenueId = venueId;
+    const Id = Principal.fromText(principal);
+    console.log(fullVenueId, "venue id");
 
     try {
       await dispatch(
         createEvent({
           backend,
-          text: fullVenueId,
+          id: fullVenueId,
           record: {
-            id: fullVenueId,
+            id: "",
+            venueId: fullVenueId,
             title: eventData.title,
+            creator: Id,
             sTicket_limit: eventData.collection_args.sTicket_limit,
             description: eventData.collection_args.description,
             logo: {
@@ -396,8 +435,9 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
   };
 
   const getInputClassName = (fieldName) => {
-    return `my-3 outline-none w-full bg-transparent ${formErrors[fieldName] ? "border-red-500" : ""
-      }`;
+    return `my-3 outline-none w-full bg-transparent ${
+      formErrors[fieldName] ? "border-red-500" : ""
+    }`;
   };
 
   return (
@@ -405,12 +445,14 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
       {/* Event Title */}
       <div>
         <div className="flex items-center gap-2">
-          <label className="font-semibold">
-            Event Title
-          </label>
+          <label className="font-semibold">Event Title</label>
           <TextHint text="Enter the title of the event." />
         </div>
-        <div className={`border ${formErrors.title ? "border-red-500" : "border-border"} rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}>
+        <div
+          className={`border ${
+            formErrors.title ? "border-red-500" : "border-border"
+          } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+        >
           <input
             type="text"
             name="title"
@@ -421,17 +463,22 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
             required
           />
         </div>
-        {formErrors.title && <p className="text-red-500 text-sm mt-1">{formErrors.title}</p>}
+        {formErrors.title && (
+          <p className="text-red-500 text-sm mt-1">{formErrors.title}</p>
+        )}
       </div>
 
       {/* Event Description */}
       <div>
         <div className="flex items-center gap-2">
-          <label className="font-semibold">
-            Event Description
-          </label>
+          <label className="font-semibold">Event Description</label>
           <TextHint text="Enter the description of the event." />
-        </div><div className={`border ${formErrors.description ? "border-red-500" : "border-border"} rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}>
+        </div>
+        <div
+          className={`border ${
+            formErrors.description ? "border-red-500" : "border-border"
+          } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+        >
           <textarea
             name="description"
             rows={5}
@@ -442,19 +489,23 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
             required
           />
         </div>
-        {formErrors.description && <p className="text-red-500 text-sm mt-1">{formErrors.description}</p>}
+        {formErrors.description && (
+          <p className="text-red-500 text-sm mt-1">{formErrors.description}</p>
+        )}
       </div>
 
       {/* Event Dates */}
       <div className="flex space-x-4">
         <div className="w-1/2 flex flex-col flex-auto gap-1">
           <div className="flex items-center gap-2">
-            <label className="font-semibold">
-              Start Date
-            </label>
+            <label className="font-semibold">Start Date</label>
             <TextHint text="Enter the start date of the event." />
           </div>
-          <div className={`flex items-center border ${formErrors.StartDate ? "border-red-500" : "border-border"} rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}>
+          <div
+            className={`flex items-center border ${
+              formErrors.StartDate ? "border-red-500" : "border-border"
+            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+          >
             <input
               ref={startDateRef}
               className={getInputClassName("StartDate")}
@@ -462,18 +513,21 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
             />
             <FcCalendar size={24} />
           </div>
-          {formErrors.StartDate && <p className="text-red-500 text-sm mt-1">{formErrors.StartDate}</p>}
-
+          {formErrors.StartDate && (
+            <p className="text-red-500 text-sm mt-1">{formErrors.StartDate}</p>
+          )}
         </div>
 
         <div className="w-1/2 flex flex-col flex-auto gap-1">
           <div className="flex items-center gap-2">
-            <label className="font-semibold">
-              End Date
-            </label>
+            <label className="font-semibold">End Date</label>
             <TextHint text="Enter the end date of the event." />
           </div>
-          <div className={`flex items-center border ${formErrors.EndDate ? "border-red-500" : "border-border"} rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}>
+          <div
+            className={`flex items-center border ${
+              formErrors.EndDate ? "border-red-500" : "border-border"
+            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+          >
             <input
               ref={endDateRef}
               className={getInputClassName("EndDate")}
@@ -481,7 +535,9 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
             />
             <FcCalendar size={24} />
           </div>
-          {formErrors.EndDate && <p className="text-red-500 text-sm mt-1">{formErrors.EndDate}</p>}
+          {formErrors.EndDate && (
+            <p className="text-red-500 text-sm mt-1">{formErrors.EndDate}</p>
+          )}
         </div>
       </div>
 
@@ -489,12 +545,14 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
       <div className="flex space-x-4">
         <div className="w-1/2 flex flex-col flex-auto gap-1">
           <div className="flex items-center gap-2">
-            <label className="font-semibold">
-              Start Time
-            </label>
+            <label className="font-semibold">Start Time</label>
             <TextHint text="Enter the start time of the event." />
           </div>
-          <div className={`flex items-center border ${formErrors.StartTime ? "border-red-500" : "border-border"} rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}>
+          <div
+            className={`flex items-center border ${
+              formErrors.StartTime ? "border-red-500" : "border-border"
+            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+          >
             <input
               ref={startTimeRef}
               className={getInputClassName("StartTime")}
@@ -502,16 +560,20 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
             />
             <FcAlarmClock size={24} />
           </div>
-          {formErrors.StartTime && <p className="text-red-500 text-sm mt-1">{formErrors.StartTime}</p>}
+          {formErrors.StartTime && (
+            <p className="text-red-500 text-sm mt-1">{formErrors.StartTime}</p>
+          )}
         </div>
         <div className="w-1/2 flex flex-col flex-auto gap-1">
           <div className="flex items-center gap-2">
-            <label className="font-semibold">
-              End Time
-            </label>
+            <label className="font-semibold">End Time</label>
             <TextHint text="Enter the end time of the event." />
           </div>
-          <div className={`flex items-center border ${formErrors.EndTime ? "border-red-500" : "border-border"} rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}>
+          <div
+            className={`flex items-center border ${
+              formErrors.EndTime ? "border-red-500" : "border-border"
+            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+          >
             <input
               ref={endTimeRef}
               className={getInputClassName("EndTime")}
@@ -519,19 +581,23 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
             />
             <FcAlarmClock size={24} />
           </div>
-          {formErrors.EndTime && <p className="text-red-500 text-sm mt-1">{formErrors.EndTime}</p>}
+          {formErrors.EndTime && (
+            <p className="text-red-500 text-sm mt-1">{formErrors.EndTime}</p>
+          )}
         </div>
       </div>
 
       {/* Location */}
       <div>
         <div className="flex items-center gap-2">
-          <label className="font-semibold">
-            Location
-          </label>
+          <label className="font-semibold">Location</label>
           <TextHint text="Enter the location of the event." />
         </div>
-        <div className={`border ${formErrors.Location ? "border-red-500" : "border-border"} rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}>
+        <div
+          className={`border ${
+            formErrors.Location ? "border-red-500" : "border-border"
+          } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+        >
           <input
             type="text"
             name="Location"
@@ -550,16 +616,16 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
             required
           />
         </div>
-        {formErrors.Location && <p className="text-red-500 text-sm mt-1">{formErrors.Location}</p>}
+        {formErrors.Location && (
+          <p className="text-red-500 text-sm mt-1">{formErrors.Location}</p>
+        )}
       </div>
 
       {/* Ticket Limits */}
       <div className="flex space-x-4">
         <div className="w-1/3">
           <div className="flex items-center gap-2">
-            <label className="font-semibold">
-              General Ticket Limit
-            </label>
+            <label className="font-semibold">General Ticket Limit</label>
             <TextHint text="Enter the General Ticket Limit of the event." />
           </div>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
@@ -572,13 +638,15 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
               required
             />
           </div>
-          {formErrors.gTicket_limit && <p className="text-red-500 text-sm mt-1">{formErrors.gTicket_limit}</p>}
+          {formErrors.gTicket_limit && (
+            <p className="text-red-500 text-sm mt-1">
+              {formErrors.gTicket_limit}
+            </p>
+          )}
         </div>
         <div className="w-1/3">
           <div className="flex items-center gap-2">
-            <label className="font-semibold">
-              Student Ticket Limit
-            </label>
+            <label className="font-semibold">Student Ticket Limit</label>
             <TextHint text="Enter the Student Ticket Limit of the event." />
           </div>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
@@ -591,13 +659,15 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
               required
             />
           </div>
-          {formErrors.sTicket_limit && <p className="text-red-500 text-sm mt-1">{formErrors.sTicket_limit}</p>}
+          {formErrors.sTicket_limit && (
+            <p className="text-red-500 text-sm mt-1">
+              {formErrors.sTicket_limit}
+            </p>
+          )}
         </div>
         <div className="w-1/3">
           <div className="flex items-center gap-2">
-            <label className="font-semibold">
-              VIP Ticket Limit
-            </label>
+            <label className="font-semibold">VIP Ticket Limit</label>
             <TextHint text="Enter the VIP Ticket Limit of the event." />
           </div>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
@@ -610,17 +680,19 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
               required
             />
           </div>
-          {formErrors.vTicket_limit && <p className="text-red-500 text-sm mt-1">{formErrors.vTicket_limit}</p>}
+          {formErrors.vTicket_limit && (
+            <p className="text-red-500 text-sm mt-1">
+              {formErrors.vTicket_limit}
+            </p>
+          )}
         </div>
       </div>
 
       {/* Event Image */}
       <div>
         <div className="flex items-center gap-2">
-          <label className="font-semibold">
-            Event Image
-          </label>
-          <TextHint text="Upload the image of the event." />
+          <label className="font-semibold">Event Banner</label>
+          <TextHint text="Upload the Banner of the event." />
         </div>
         <div className="mt-1 flex flex-col items-center justify-center border-dashed border-2 border-border p-4 rounded-lg">
           <input
@@ -628,11 +700,11 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
             accept=".jpg,.jpeg,.png"
             onChange={handleFileChange}
             className="hidden"
-            id="upload-image"
+            id="upload-image1"
             required
           />
           <label
-            htmlFor="upload-image"
+            htmlFor="upload-image1"
             className="cursor-pointer bg-card text-text py-2 px-4 rounded-md border border-border"
           >
             Upload Image
@@ -652,7 +724,48 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
           )}
           {/* <p className="text-sm text-gray-500 mt-2">JPEG, PNG less than 5MB</p> */}
         </div>
-        {formErrors.banner && <p className="text-red-500 text-sm mt-1">{formErrors.banner}</p>}
+        {formErrors.banner && (
+          <p className="text-red-500 text-sm mt-1">{formErrors.banner}</p>
+        )}
+      </div>
+      <div>
+        <div className="flex items-center gap-2">
+          <label className="font-semibold">Event Logo</label>
+          <TextHint text="Upload the logo of the event." />
+        </div>
+        <div className="mt-1 flex flex-col items-center justify-center border-dashed border-2 border-border p-4 rounded-lg">
+          <input
+            type="file"
+            accept=".jpg,.jpeg,.png"
+            onChange={handleFileChange2}
+            className="hidden"
+            id="upload-image"
+            required
+          />
+          <label
+            htmlFor="upload-image"
+            className="cursor-pointer bg-card text-text py-2 px-4 rounded-md border border-border"
+          >
+            Upload Image
+          </label>
+          {logoPreview && (
+            <img
+              src={logoPreview}
+              alt="Banner Preview"
+              className="mt-2 w-full h-auto rounded"
+              style={{
+                maxWidth: "96px",
+                maxHeight: "96px",
+                minWidth: "96px",
+                minHeight: "96px",
+              }}
+            />
+          )}
+          {/* <p className="text-sm text-gray-500 mt-2">JPEG, PNG less than 5MB</p> */}
+        </div>
+        {formErrors.logo && (
+          <p className="text-red-500 text-sm mt-1">{formErrors.logo}</p>
+        )}
       </div>
 
       {/* Submit Button */}
@@ -665,8 +778,9 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
           Cancel
         </button> */}
         <button
-          className={`text-white py-2 px-4 rounded ${createEventLoader ? "bg-gray-600" : "bg-secondary"
-            }`}
+          className={`text-white py-2 px-4 rounded ${
+            createEventLoader ? "bg-gray-600" : "bg-secondary"
+          }`}
           disabled={createEventLoader}
           onClick={(e) => (createEventLoader ? null : handleSubmit(e))}
         >

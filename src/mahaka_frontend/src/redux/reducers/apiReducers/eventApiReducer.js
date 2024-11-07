@@ -17,8 +17,8 @@ const initialState = {
 // creating an event
 export const createEvent = createAsyncThunk(
   "events/createEvent",
-  async ({ backend, text, record, collection_args }) => {
-    const response = await backend.createEvent(text, record, collection_args);
+  async ({ backend, id, record, collection_args }) => {
+    const response = await backend.createEvent(id, record, collection_args);
     return response;
   }
 );
@@ -119,9 +119,9 @@ const eventSlice = createSlice({
         state.eventsLoading = false;
         if (action.meta.arg.pageNo > 1) {
           // Append new page of events to the existing list
-          state.events = [...state.events, ...action.payload.data];
+          state.events = [...state.events, ...action.payload.ok];
         } else {
-          state.events = action.payload.data;
+          state.events = action.payload.ok.data;
         }
         state.currentPage = action.payload.current_page;
         state.totalPages = action.payload.Total_pages;
