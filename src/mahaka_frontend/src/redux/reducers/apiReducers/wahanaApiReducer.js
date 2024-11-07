@@ -50,8 +50,8 @@ export const edit_wahana = createAsyncThunk(
   "wahana/edit_wahana",
   async ({
     backend,
-    venueId,
-    wahanaId,
+    selectedWahana,
+    selectedVenue,
     name,
     symbol,
     decimal,
@@ -59,11 +59,12 @@ export const edit_wahana = createAsyncThunk(
     description,
     banner,
     price,
+   
   }) => {
     try {
       const response = await backend.editWahana(
-        wahanaId,
-        venueId,
+        selectedWahana,
+        selectedVenue,
         name,
         symbol,
         decimal,
@@ -93,6 +94,23 @@ export const getAllWahanasbyVenue = createAsyncThunk(
       return response;
     } catch (error) {
       console.error("Error fetching wahanas:", error);
+      throw error;
+    }
+  }
+);
+
+// getting the wahana
+export const getWahana = createAsyncThunk(
+  "wahana/getWahana",
+  async ({ backend, selectedWahana,  selectedVenue }) => {
+    try {
+      const response = await backend.getWahana(
+        selectedWahana,
+       selectedVenue
+      );
+      return response;
+    } catch (error) {
+      console.error("Error getting wahanas:", error);
       throw error;
     }
   }
@@ -162,6 +180,7 @@ const wahanaSlice = createSlice({
         notificationManager.error("Failed to Edit wahana");
       })
 
+
       //Getting all wahanas 
       .addCase(getAllWahanas.pending,(state)=>{
         state.loading = true;
@@ -195,6 +214,37 @@ const wahanaSlice = createSlice({
       })
 
 
+    // handle getting single wahana
+    .addCase(getWahana.pending,(state)=>{
+      state.loading = true;
+      state.error = null
+
+    })
+    .addCase(getWahana.fulfilled,(state, action)=>{
+      state.loading = false;
+      if (action.payload && action.payload.ok.data) {
+        if (action.meta.arg.pageNo > 1) {
+          // Append new page of wahanas to the existing list
+          state.wahanas = [...state.wahanas, ...action.payload.data];
+        } else {
+          state.wahanas = action.payload.ok.data;
+        }
+        state.currentPage = action.payload.current_page || 1;
+        state.totalPages = action.payload.Total_pages || 1;
+      } else {
+        console.warn("Received empty or invalid response from API");
+        state.wahanas = [];
+        state.currentPage = 1;
+        state.totalPages = 1;
+      }
+      state.error = null;
+
+    })
+    .addCase(getWahana.rejected, (state,action)=>{
+      state.loading = false,
+      state.error = action.error.message;
+      notificationManager.error("Failed to fetch wahana");
+    })
 
 
 

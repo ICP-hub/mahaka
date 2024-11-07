@@ -5,6 +5,7 @@ import { ImSpinner9 } from "react-icons/im";
 import { getAllWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import { getAllWahanas } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import { edit_wahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
+import { getWahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import ModalOverlay from "../../customer/Components/Modal-overlay";
 import CreateWahanaForm from "../components/CreateWahanaForm";
 import EditWahanaForm from "../components/EditWahanaForm";
@@ -59,21 +60,30 @@ const AdminWahana = () => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
   const { wahanas, loading } = useSelector((state) => state.wahana);
-  console.log("logging the loadign for wahanas are",loading)
+  console.log("logging the loadign for wahanas are", wahanas)
   const { venues } = useSelector((state) => state.venues);
 
   const [selectedVenue, setSelectedVenue] = useState(null);
+  const [selectedWahana, setSelectedWahana] = useState(null)
+  console.log("logging the selected wahana is", selectedWahana)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   console.log("edit modal open",editModalOpen)
   // const [editModalOpen, setEditModalOpen] = useState(false);
 
-  console.log("selected venue is",selectedVenue)
+  // console.log("selected venue is",selectedVenue)
 
   useEffect(() => {
     dispatch(getAllVenues({ backend, pageLimit: 100, currPage: 0 }));
   }, [dispatch, backend]);
 
+  useEffect(()=>{
+    if(selectedWahana){
+      dispatch(getWahana(backend,selectedWahana,selectedVenue))
+      console.log("editin g wahana", wahanas)
+    }
+
+  },[selectedWahana])
   
   useEffect(() => {
    
@@ -106,18 +116,18 @@ const AdminWahana = () => {
 
 
   // edit wahana
-  const editWahanas = (id)=>{
-    dispatch(
-      edit_wahana({
-        backend,
-        wahanaId: Id,
-        venueId: venueId
+  // const editWahanas = (id)=>{
+  //   dispatch(
+  //     edit_wahana({
+  //       backend,
+  //       wahanaId: Id,
+  //       venueId: venueId
 
 
 
-      })
-    )
-  }
+  //     })
+  //   )
+  // }
 
   return (
     <div className="relative h-full">
@@ -157,6 +167,8 @@ const AdminWahana = () => {
           onCreateClick={() => setIsModalOpen(true)}
           loading={loading}
           onEditClick = {()=> setEditModalOpen(true)}
+          setSelectedWahana = {setSelectedWahana}
+         
         />
 
         <ModalOverlay
@@ -172,6 +184,9 @@ const AdminWahana = () => {
 
 
 {/* edit modal */}
+
+{editModalOpen && 
+
         <ModalOverlay
           isOpen={editModalOpen}
           setIsOpen={setEditModalOpen}
@@ -179,9 +194,14 @@ const AdminWahana = () => {
         >
           <EditWahanaForm
             onClose={() => setEditModalOpen(false)}
-              // onSuccess={() => editWahanas(selectedWahana)}
+            selectedVenue ={selectedVenue}
+            selectedWahana = {selectedWahana}
+            wahanas = {wahanas}
+
+            // onSuccess={() => editWahanas(selectedWahana)}
           />
         </ModalOverlay>
+}
       </div>
     </div>
   );
@@ -195,6 +215,7 @@ const WahanaMain = ({
   onCreateClick,
   onEditClick,
   loading,
+  setSelectedWahana
 }) => {
  
   return (
@@ -257,8 +278,11 @@ const WahanaMain = ({
                   image: wahana.banner?.data,
                 }}
                 onEditClick ={onEditClick}
-                wahanaData = {wahanaData}
-                venues ={venues}
+                wahanaId = {wahana.id}
+                venueId = {wahana.venueId}
+                setSelectedWahana = {setSelectedWahana}
+                setSelectedVenue = {setSelectedVenue}
+               
               />
             ))}
           </div>
@@ -268,7 +292,10 @@ const WahanaMain = ({
   );
 };
 
-const WahanaCard = ({ wahana,onEditClick,venues }) => {
+const WahanaCard = ({ wahana,onEditClick, wahanaId , venueId, setSelectedWahana, setSelectedVenue}) => {
+  // console.log("logging edited wahana id is",wahanaId)
+  // console.log("logging edited venue id is", venueId)
+
   const bannerImage = wahana.image || wahanaDummy1;
   return (
     <div className="bg-card flex h-96 flex-col overflow-hidden rounded-2xl shadow relative group">
@@ -279,8 +306,10 @@ const WahanaCard = ({ wahana,onEditClick,venues }) => {
           
           </div>
           
-          
-          <button className =""  onClick={onEditClick}><FaEdit clasName ="opacity-80" size={25} onClick={()=>editWahanas(wahana.id)}/></button>
+      <div className = "p-1" onClick={()=> setSelectedWahana(wahanaId)}>
+          <button className =""  onClick={onEditClick}><FaEdit clasName ="opacity-80" size={25} onClick ={()=>setSelectedVenue(venueId)}/></button>
+          </div>
+
         </div>
         <div
           className="absolute h-60 w-full inset-0 group-hover:scale-110 transition-all duration-500"
