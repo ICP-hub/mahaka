@@ -137,12 +137,12 @@ const VenueDetailPage = () => {
                 <strong>Location:</strong> {venue.Details.Location}
               </p>
             </div>
-            <button
+            {/* <button
               className="px-4 py-2 mt-2 bg-orange-500 text-white rounded-full hover:bg-orange-600"
               onClick={() => setIsUpdateModalOpen(true)}
             >
               Update Venue
-            </button>
+            </button> */}
           </div>
         </div>
         <hr className="border-gray-300 my-6" />

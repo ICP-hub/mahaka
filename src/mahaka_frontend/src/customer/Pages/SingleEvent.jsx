@@ -94,15 +94,19 @@ export default function SingleEvent() {
   const {
     currentVenue,
     loading: venueLoading,
-    error: venueError,
+    error,
   } = useSelector((state) => state.venues);
+  console.log(currentVenue);
   const {
     events,
-    loading: eventLoading,
+
+    eventsLoading: eventLoading,
     error: eventError,
   } = useSelector((state) => state.events);
   const { backend } = useSelector((state) => state.authentication);
   const [localError, setLocalError] = useState(null);
+  const venue =
+    currentVenue && Array.isArray(currentVenue) ? currentVenue[1] : null;
 
   useEffect(() => {
     if (!venueId) {
@@ -130,16 +134,15 @@ export default function SingleEvent() {
       });
   }, [dispatch, venueId, backend]);
 
+  console.log(eventLoading, "eventLoading");
+  console.log(venueLoading, "venueLoading");
+
   // Assuming the first event is the main event for this venue
-  const currentEvent = events[0];
-  const otherEvents = events.slice(1);
+  const event = events && Array.isArray(events) ? events : null;
 
   const duration =
-    currentEvent?.details.StartDate && currentEvent?.details.EndDate
-      ? calculateDuration(
-          currentEvent.details.StartDate,
-          currentEvent.details.EndDate
-        )
+    venue?.Details.StartDate && venue?.Details.EndDate
+      ? calculateDuration(venue.Details.StartDate, venue.Details.EndDate)
       : "";
 
   const formatDate = (dateString) => {
@@ -187,18 +190,29 @@ export default function SingleEvent() {
       </div>
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-black pb-10">
-            {currentEvent?.title || "Event Name"}
-          </h1>
+          {venueLoading ? (
+            <h1 className=" animate-pulse bg-gray-300 rounded-2xl w-32 h-12 font-black mb-10"></h1>
+          ) : (
+            <h1 className="text-4xl font-black pb-10">{venue?.Title || ""}</h1>
+          )}
           <div className="flex flex-col lg:flex-row gap-8">
             {/* left side section  */}
             <div className="lg:w-2/3 ">
-              <div className="w-full  rounded-2xl">
-                <img
-                  src={currentEvent?.banner.data || Frame13}
-                  alt={currentEvent?.title || "Event"}
-                  className=" h-90 w-full  rounded-2xl"
-                />
+              <div className="w-full rounded-2xl relative">
+                {venueLoading ? (
+                  <div className="flex items-center justify-center h-full w-full">
+                    <div className="animate-pulse bg-gray-300 rounded-2xl h-90 w-full"></div>
+                  </div>
+                ) : (
+                  <img
+                    src={venue?.banner?.data || Frame13}
+                    alt={venue?.title || "Event"}
+                    className={`h-90 w-full rounded-2xl ${
+                      venueLoading ? "hidden" : "block"
+                    }`}
+                    onLoad={() => setIsLoading(false)}
+                  />
+                )}
               </div>
               <>
                 {/* tabs navlink */}
@@ -300,14 +314,13 @@ export default function SingleEvent() {
                           </li>
                           <li>
                             <strong>Location:</strong>{" "}
-                            {currentEvent?.details.Location || "Indonesia"}
+                            {venue?.Details.Location || "Indonesia"}
                           </li>
                           <li>
                             <strong>Last Entry:</strong>{" "}
-                            {currentEvent?.details.EndTime &&
-                              formatTime(
-                                currentEvent.details.EndTime || "4:00 PM"
-                              )}
+                            {(venue?.Details.EndTime &&
+                              venue.Details.EndTime) ||
+                              "4:00 PM"}
                           </li>
                         </ul>
                         <p className="mb-4">
@@ -368,86 +381,111 @@ export default function SingleEvent() {
               </>
             </div>
             {/* right side section  */}
-            <div className="lg:w-1/3 h-[340px] w-full shadow-lg rounded-lg sticky top-0">
-              <div className="p-8">
-                <h1 className="text-2xl font-black">Event Details</h1>
-                <h3 className="text-lg font-normal">
-                  {" "}
-                  {currentEvent?.details.StartDate &&
-                    formatDate(currentEvent.details.StartDate)}{" "}
-                  -
-                  {(currentEvent?.details.EndDate &&
-                    formatDate(currentEvent.details.EndDate)) ||
-                    "13 Jul- 17 Jul 2024"}
-                </h3>
-                <h3 className="text-lg font-normal">
-                  {currentEvent?.details.StartTime &&
-                    formatTime(currentEvent.details.StartTime)}{" "}
-                  -
-                  {(currentEvent?.details.EndTime &&
-                    formatTime(currentEvent.details.EndTime)) ||
-                    "12:00AM - 3:00PM"}
-                </h3>
-                <h3 className="text-lg font-normal">
-                  Location of the Event - {currentEvent?.details.Location}
-                </h3>
+            {venueLoading ? (
+              <div className="lg:w-1/3 h-[340px] w-full shadow-lg rounded-lg sticky top-0">
+                <div className="p-8 animate-pulse">
+                  <div className="h-8 bg-gray-300 rounded w-3/4 mb-4"></div>{" "}
+                  {/* Title skeleton */}
+                  <div className="h-6 bg-gray-300 rounded w-1/2 mb-2"></div>{" "}
+                  {/* Date skeleton */}
+                  <div className="h-6 bg-gray-300 rounded w-1/3 mb-2"></div>{" "}
+                  {/* Time skeleton */}
+                  <div className="h-6 bg-gray-300 rounded w-full mb-4"></div>{" "}
+                  {/* Location skeleton */}
+                </div>
+                <div className="pl-8">
+                  <div className="h-6 bg-gray-300 rounded w-1/2 mb-2"></div>{" "}
+                  {/* Event end date skeleton */}
+                </div>
               </div>
-              <h2 className="text-2xl font-normal pl-8">
-                Event ends on :{" "}
-                <span className="text-red-600">
-                  {(currentEvent?.details.EndDate &&
-                    formatDate(currentEvent.details.EndDate)) ||
-                    "17 July, 2024"}
-                </span>
-              </h2>
-            </div>
+            ) : (
+              <div className="lg:w-1/3 h-[340px] w-full shadow-lg rounded-lg sticky top-0">
+                <div className="p-8">
+                  <h1 className="text-2xl font-black">Venue Details</h1>
+                  <h3 className="text-lg font-normal">
+                    {" "}
+                    {venue?.Details.StartDate &&
+                      formatDate(venue.Details.StartDate)}{" "}
+                    -
+                    {(venue?.Details.EndDate &&
+                      formatDate(venue.Details.EndDate)) ||
+                      "13 Jul- 17 Jul 2024"}
+                  </h3>
+                  <h3 className="text-lg font-normal">
+                    {venue?.Details.StartTime && venue.Details.StartTime} -
+                    {(venue?.Details.EndTime && venue.Details.EndTime) ||
+                      "12:00AM - 3:00PM"}
+                  </h3>
+                  <h3 className="text-lg font-normal">
+                    Location of the Venue - {venue?.Details.Location}
+                  </h3>
+                </div>
+                <h2 className="text-2xl font-normal pl-8">
+                  Venue ends on :{" "}
+                  <span className="text-red-600">
+                    {(venue?.Details.EndDate &&
+                      formatDate(venue.Details.EndDate)) ||
+                      "17 July, 2024"}
+                  </span>
+                </h2>
+              </div>
+            )}
           </div>
         </div>
 
         {/* bottom crousel section  */}
         <div className="py-12 mx-auto px-4 sm:px-6 lg:px-8">
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
-            <h1 className="text-4xl font-black">Check other events</h1>
+            <h1 className="text-4xl font-black">Check Events</h1>
           </section>
 
-          <div className="max-w-7xl mx-auto ">
-            <Swiper
-              spaceBetween={40}
-              slidesPerView={1}
-              breakpoints={{
-                640: {
-                  slidesPerView: 1,
-                },
-                768: {
-                  slidesPerView: 1,
-                },
-                1024: {
-                  slidesPerView: 2,
-                },
-              }}
-              autoplay={{
-                delay: 3000,
-                disableOnInteraction: false,
-              }}
-              pagination={{
-                clickable: true,
-              }}
-              modules={[Autoplay, Pagination]}
-              className="mySwiper px-4 sm:px-6 lg:px-8 mx-auto"
-            >
-              <SwiperSlide>
-                <MoreEventCard color="#E2AF4E" image={Frame15} />
-              </SwiperSlide>
-              <SwiperSlide>
-                <MoreEventCard color="#FF5733" image={Frame15} />
-              </SwiperSlide>
-              <SwiperSlide>
-                <MoreEventCard color="#E2AF4E" image={Frame15} />
-              </SwiperSlide>
-              <SwiperSlide>
-                <MoreEventCard color="#FF5733" image={Frame15} />
-              </SwiperSlide>
-            </Swiper>
+          <div className="max-w-7xl mx-auto">
+            {eventLoading ? (
+              <div className="flex my-18 space-x-4 px-4 sm:px-6 lg:px-8 mx-auto">
+                {/* Skeleton Loader for each card */}
+                {[...Array(2)].map((_, index) => (
+                  <div
+                    key={index}
+                    className="w-full lg:w-1/2 h-64 bg-gray-200 animate-pulse rounded-lg"
+                  ></div>
+                ))}
+              </div>
+            ) : (
+              <Swiper
+                spaceBetween={40}
+                slidesPerView={1}
+                breakpoints={{
+                  640: {
+                    slidesPerView: 1,
+                  },
+                  768: {
+                    slidesPerView: 1,
+                  },
+                  1024: {
+                    slidesPerView: 2,
+                  },
+                }}
+                autoplay={{
+                  delay: 3000,
+                  disableOnInteraction: false,
+                }}
+                pagination={{
+                  clickable: true,
+                }}
+                modules={[Autoplay, Pagination]}
+                className="mySwiper px-4 sm:px-6 lg:px-8 mx-auto"
+              >
+                {event?.map((event, index) => (
+                  <SwiperSlide key={index}>
+                    <MoreEventCard
+                      event={event}
+                      index={index}
+                      image={event?.banner?.data}
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            )}
           </div>
         </div>
       </section>

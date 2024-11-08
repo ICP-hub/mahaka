@@ -54,18 +54,9 @@ const VenueCard = ({ venue, layout }) => (
 );
 
 export default function Home() {
-  const { venues } = useSelector((state) => state.venues);
-  const [loading, setLoading] = useState(false);
-  // console.log("Venues home are",venues)
+  const { venues, loading } = useSelector((state) => state.venues);
 
-  useEffect(() => {
-    console.log("useeffect log");
-    if (venues?.length === 0) {
-      setLoading(true);
-    } else {
-      setLoading(false);
-    }
-  });
+  // console.log("Venues home are",venues)
 
   const layoutConfigs = [
     {
@@ -142,13 +133,11 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-5xl font-bold text-center mb-8">Our Venues</h2>
           {loading ? (
-            <div className="rounded-lg m-2 md:flex ml-3 text-center">
-              Loading...
-              {/* Skeleton Cards */}
-              {/* <Skeleton height={200} width={350} count={1} className="bg-gray-300 md:w-1/3 mx-2" />
-          <Skeleton height={200} width={350} count={1} className="bg-gray-300 md:w-1/3 mx-2" />
-          <Skeleton height={200} width={350} count={1} className="bg-gray-300 md:w-1/3 mx-2" /> */}
-              {/* <Skeleton height={200} width={300} count={1} className="bg-gray-300 md:w-1/3" /> */}
+            <div className="rounded-lg m-2 md:flex   text-center">
+              <div className="w-full lg:w-1/2 h-90 m-2 bg-gray-400 animate-pulse rounded-lg"></div>
+              <div className="w-full lg:w-1/2 h-90 m-2 bg-gray-400 animate-pulse rounded-lg"></div>
+
+              <div className="w-full lg:w-1/2 h-90 m-2 bg-gray-400 animate-pulse rounded-lg"></div>
             </div>
           ) : (
             <div>

@@ -129,6 +129,7 @@ const eventSlice = createSlice({
       })
       .addCase(getAllEventsByVenue.rejected, (state, action) => {
         state.eventsLoading = false;
+        state.events = [];
         state.error = action.error.message;
       })
       .addCase(buyEventTicket.pending, (state) => {
