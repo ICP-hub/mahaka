@@ -224,7 +224,7 @@ const WahanaMain = ({
   return (
     <div className="flex flex-auto p-6 sm:p-10">
       <div className="mx-auto flex w-full max-w-xs flex-auto flex-col sm:max-w-5xl">
-        <div className="flex w-full max-w-xs flex-col justify-between sm:max-w-none sm:flex-row">
+        <div className="flex w-full max-w-xs flex-col justify-center sm:max-w-none sm:flex-row">
           <select
             value={selectedVenue || ""}
             onChange={(e) => setSelectedVenue(e.target.value)}
@@ -241,12 +241,12 @@ const WahanaMain = ({
             ))}
           </select>
 
-          <div className="px-4 mt-4 w-full sm:ml-4 sm:mt-0 sm:w-72 min-h-12 rounded-md border border-border flex items-center bg-card text-icon">
+          <div className="px-4 mt-4 sm:ml-4 sm:mt-0 sm:w-72 min-h-12 lg:min-w-[68%] md:min-w-[55%] rounded-md border border-border flex items-center bg-card text-icon">
             <HiMagnifyingGlass size={20} />
             <input
               type="text"
               placeholder="Search wahanas"
-              className=" bg-transparent outline-none ml-4"
+              className=" bg-transparent outline-none ml-4 lg:w-1000px"
             />
           </div>
 
