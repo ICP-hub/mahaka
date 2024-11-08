@@ -77,13 +77,13 @@ const AdminWahana = () => {
     dispatch(getAllVenues({ backend, pageLimit: 100, currPage: 0 }));
   }, [dispatch, backend]);
 
-  useEffect(()=>{
-    if(selectedWahana){
-      dispatch(getWahana(backend,selectedWahana,selectedVenue))
-      console.log("editin g wahana", wahanas)
-    }
+  // useEffect(()=>{
+  //   if(selectedWahana){
+  //     dispatch(getWahana(backend,selectedWahana,selectedVenue))
+  //     console.log("editin g wahana", wahanas)
+  //   }
 
-  },[selectedWahana])
+  // },[selectedWahana])
   
   useEffect(() => {
    
@@ -243,7 +243,7 @@ const WahanaMain = ({
             <input
               type="text"
               placeholder="Search wahanas"
-              className="w-full bg-transparent outline-none ml-4"
+              className=" bg-transparent outline-none ml-4"
             />
           </div>
 

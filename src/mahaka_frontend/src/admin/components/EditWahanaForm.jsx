@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { edit_wahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
- import { getWahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
+  // import { getWahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
  import TextHint from "../../customer/Components/TextHint";
 // import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
 
@@ -71,7 +71,7 @@ console.log('Filtered Wahana:', editWahana);
         data: "",
         logo_type: "image",
       },
-      price: editWahana[0]?.price ? String(editWahana[0]?.price) : "" ,
+      price: editWahana[0]?.price ? Number(String(editWahana[0]?.price)) : "" ,
     });
 
   const [bannerPreview, setBannerPreview] = useState("");

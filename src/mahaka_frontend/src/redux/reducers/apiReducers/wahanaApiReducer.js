@@ -62,7 +62,7 @@ export const edit_wahana = createAsyncThunk(
    
   }) => {
     try {
-      const response = await backend.editWahana(
+      const response = await backend.edit_wahana(
         selectedWahana,
         selectedVenue,
         name,
