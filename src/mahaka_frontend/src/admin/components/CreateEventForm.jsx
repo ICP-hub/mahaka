@@ -99,7 +99,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
       errors.banner = "Event banner is required";
     }
     if (!eventData.collection_args.logo.data) {
-      errors.banner = "Event logo is required";
+      errors.logo = "Event logo is required";
     }
 
     setFormErrors(errors);
@@ -435,9 +435,8 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
   };
 
   const getInputClassName = (fieldName) => {
-    return `my-3 outline-none w-full bg-transparent ${
-      formErrors[fieldName] ? "border-red-500" : ""
-    }`;
+    return `my-3 outline-none w-full bg-transparent ${formErrors[fieldName] ? "border-red-500" : ""
+      }`;
   };
 
   return (
@@ -449,9 +448,8 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
           <TextHint text="Enter the title of the event." />
         </div>
         <div
-          className={`border ${
-            formErrors.title ? "border-red-500" : "border-border"
-          } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+          className={`border ${formErrors.title ? "border-red-500" : "border-border"
+            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
         >
           <input
             type="text"
@@ -475,9 +473,8 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
           <TextHint text="Enter the description of the event." />
         </div>
         <div
-          className={`border ${
-            formErrors.description ? "border-red-500" : "border-border"
-          } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+          className={`border ${formErrors.description ? "border-red-500" : "border-border"
+            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
         >
           <textarea
             name="description"
@@ -502,9 +499,8 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
             <TextHint text="Enter the start date of the event." />
           </div>
           <div
-            className={`flex items-center border ${
-              formErrors.StartDate ? "border-red-500" : "border-border"
-            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+            className={`flex items-center border ${formErrors.StartDate ? "border-red-500" : "border-border"
+              } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
           >
             <input
               ref={startDateRef}
@@ -524,9 +520,8 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
             <TextHint text="Enter the end date of the event." />
           </div>
           <div
-            className={`flex items-center border ${
-              formErrors.EndDate ? "border-red-500" : "border-border"
-            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+            className={`flex items-center border ${formErrors.EndDate ? "border-red-500" : "border-border"
+              } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
           >
             <input
               ref={endDateRef}
@@ -549,9 +544,8 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
             <TextHint text="Enter the start time of the event." />
           </div>
           <div
-            className={`flex items-center border ${
-              formErrors.StartTime ? "border-red-500" : "border-border"
-            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+            className={`flex items-center border ${formErrors.StartTime ? "border-red-500" : "border-border"
+              } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
           >
             <input
               ref={startTimeRef}
@@ -570,9 +564,8 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
             <TextHint text="Enter the end time of the event." />
           </div>
           <div
-            className={`flex items-center border ${
-              formErrors.EndTime ? "border-red-500" : "border-border"
-            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+            className={`flex items-center border ${formErrors.EndTime ? "border-red-500" : "border-border"
+              } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
           >
             <input
               ref={endTimeRef}
@@ -594,9 +587,8 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
           <TextHint text="Enter the location of the event." />
         </div>
         <div
-          className={`border ${
-            formErrors.Location ? "border-red-500" : "border-border"
-          } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+          className={`border ${formErrors.Location ? "border-red-500" : "border-border"
+            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
         >
           <input
             type="text"
@@ -689,83 +681,85 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
       </div>
 
       {/* Event Image */}
-      <div>
-        <div className="flex items-center gap-2">
-          <label className="font-semibold">Event Banner</label>
-          <TextHint text="Upload the Banner of the event." />
-        </div>
-        <div className="mt-1 flex flex-col items-center justify-center border-dashed border-2 border-border p-4 rounded-lg">
-          <input
-            type="file"
-            accept=".jpg,.jpeg,.png"
-            onChange={handleFileChange}
-            className="hidden"
-            id="upload-image1"
-            required
-          />
-          <label
-            htmlFor="upload-image1"
-            className="cursor-pointer bg-card text-text py-2 px-4 rounded-md border border-border"
-          >
-            Upload Image
-          </label>
-          {bannerPreview && (
-            <img
-              src={bannerPreview}
-              alt="Banner Preview"
-              className="mt-2 w-full h-auto rounded"
-              style={{
-                maxWidth: "96px",
-                maxHeight: "96px",
-                minWidth: "96px",
-                minHeight: "96px",
-              }}
+      <div className="flex space-x-4">
+        <div className="w-1/2">
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">Event Banner</label>
+            <TextHint text="Upload the Banner of the event." />
+          </div>
+          <div className="mt-1 flex flex-col items-center justify-center border-dashed border-2 border-border p-4 rounded-lg">
+            <input
+              type="file"
+              accept=".jpg,.jpeg,.png"
+              onChange={handleFileChange}
+              className="hidden"
+              id="upload-image1"
+              required
             />
+            <label
+              htmlFor="upload-image1"
+              className="cursor-pointer bg-card text-text py-2 px-4 rounded-md border border-border"
+            >
+              Upload Image
+            </label>
+            {bannerPreview && (
+              <img
+                src={bannerPreview}
+                alt="Banner Preview"
+                className="mt-2 w-full h-auto rounded"
+                style={{
+                  maxWidth: "96px",
+                  maxHeight: "96px",
+                  minWidth: "96px",
+                  minHeight: "96px",
+                }}
+              />
+            )}
+            {/* <p className="text-sm text-gray-500 mt-2">JPEG, PNG less than 5MB</p> */}
+          </div>
+          {formErrors.banner && (
+            <p className="text-red-500 text-sm mt-1">{formErrors.banner}</p>
           )}
-          {/* <p className="text-sm text-gray-500 mt-2">JPEG, PNG less than 5MB</p> */}
         </div>
-        {formErrors.banner && (
-          <p className="text-red-500 text-sm mt-1">{formErrors.banner}</p>
-        )}
-      </div>
-      <div>
-        <div className="flex items-center gap-2">
-          <label className="font-semibold">Event Logo</label>
-          <TextHint text="Upload the logo of the event." />
-        </div>
-        <div className="mt-1 flex flex-col items-center justify-center border-dashed border-2 border-border p-4 rounded-lg">
-          <input
-            type="file"
-            accept=".jpg,.jpeg,.png"
-            onChange={handleFileChange2}
-            className="hidden"
-            id="upload-image"
-            required
-          />
-          <label
-            htmlFor="upload-image"
-            className="cursor-pointer bg-card text-text py-2 px-4 rounded-md border border-border"
-          >
-            Upload Image
-          </label>
-          {logoPreview && (
-            <img
-              src={logoPreview}
-              alt="Banner Preview"
-              className="mt-2 w-full h-auto rounded"
-              style={{
-                maxWidth: "96px",
-                maxHeight: "96px",
-                minWidth: "96px",
-                minHeight: "96px",
-              }}
+        <div className="w-1/2">
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">Event Logo</label>
+            <TextHint text="Upload the logo of the event." />
+          </div>
+          <div className="mt-1 flex flex-col items-center justify-center border-dashed border-2 border-border p-4 rounded-lg">
+            <input
+              type="file"
+              accept=".jpg,.jpeg,.png"
+              onChange={handleFileChange2}
+              className="hidden"
+              id="upload-image"
+              required
             />
+            <label
+              htmlFor="upload-image"
+              className="cursor-pointer bg-card text-text py-2 px-4 rounded-md border border-border"
+            >
+              Upload Image
+            </label>
+            {logoPreview && (
+              <img
+                src={logoPreview}
+                alt="Banner Preview"
+                className="mt-2 w-full h-auto rounded"
+                style={{
+                  maxWidth: "96px",
+                  maxHeight: "96px",
+                  minWidth: "96px",
+                  minHeight: "96px",
+                }}
+              />
+            )}
+            {/* <p className="text-sm text-gray-500 mt-2">JPEG, PNG less than 5MB</p> */}
+          </div>
+          {formErrors.logo && (
+            <p className="text-red-500 text-sm mt-1">{formErrors.logo}</p>
           )}
-          {/* <p className="text-sm text-gray-500 mt-2">JPEG, PNG less than 5MB</p> */}
         </div>
-        {formErrors.logo && (
-          <p className="text-red-500 text-sm mt-1">{formErrors.logo}</p>
-        )}
       </div>
 
       {/* Submit Button */}
@@ -778,9 +772,8 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
           Cancel
         </button> */}
         <button
-          className={`text-white py-2 px-4 rounded ${
-            createEventLoader ? "bg-gray-600" : "bg-secondary"
-          }`}
+          className={`text-white py-2 px-4 rounded ${createEventLoader ? "bg-gray-600" : "bg-secondary"
+            }`}
           disabled={createEventLoader}
           onClick={(e) => (createEventLoader ? null : handleSubmit(e))}
         >
