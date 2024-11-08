@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
 import notificationManager from "../../../common/utils/notificationManager";
+import { NotEqualStencilFunc } from "three";
 
 // initial states
 const initialState = {
@@ -45,6 +46,7 @@ export const updateVenue = createAsyncThunk(
   "venues/updateVenue",
   async ({
     backend,
+    collectionDetails,
     venueId,
     updatedTitle,
     updatedDescription,
@@ -56,11 +58,8 @@ export const updateVenue = createAsyncThunk(
   }) => {
     try {
       const response = await backend.updateVenue(
+        collectionDetails,
         venueId,
-        [],
-        [],
-        [],
-        [],
         updatedTitle,
         updatedDescription,
         eventDetails,
