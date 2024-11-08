@@ -9,6 +9,7 @@ const initialState = {
   currentPage: 1,
   totalPages: 1,
   createWahanaLoader: false,
+  
 };
 
 // Creating a wahana
@@ -134,6 +135,15 @@ export const getAllWahanas = createAsyncThunk(
   }
 )
 
+// delete wahana
+export const deleteWahana = createAsyncThunk(
+  "wahana/deleteWahana",
+  async ({ backend, venueId, wahanaId }) => {
+    await backend.deleteWahana(venueId, wahanaId);
+    return wahanaId;
+  }
+);
+
 // Create slice for Wahana API
 const wahanaSlice = createSlice({
   name: "wahana",
@@ -183,11 +193,13 @@ const wahanaSlice = createSlice({
 
       //Getting all wahanas 
       .addCase(getAllWahanas.pending,(state)=>{
+        state.status = 'loading';
         state.loading = true;
         state.error = null
 
       })
       .addCase(getAllWahanas.fulfilled,(state, action)=>{
+        
         state.loading = false;
         if (action.payload && action.payload.ok.data) {
           if (action.meta.arg.pageNo > 1) {
@@ -205,9 +217,11 @@ const wahanaSlice = createSlice({
           state.totalPages = 1;
         }
         state.error = null;
+        state.status = 'succeeded';
 
       })
       .addCase(getAllWahanas.rejected, (state,action)=>{
+        state.status = 'failed';
         state.loading = false,
         state.error = action.error.message;
         notificationManager.error("Failed to fetch wahanas");
@@ -217,11 +231,13 @@ const wahanaSlice = createSlice({
     // handle getting single wahana
     .addCase(getWahana.pending,(state)=>{
       state.loading = true;
-      state.error = null
+      state.error = null,
+      state.status = 'loading';
 
     })
     .addCase(getWahana.fulfilled,(state, action)=>{
       state.loading = false;
+      state.status = 'succeeded';
       if (action.payload && action.payload.ok.data) {
         if (action.meta.arg.pageNo > 1) {
           // Append new page of wahanas to the existing list
@@ -246,6 +262,25 @@ const wahanaSlice = createSlice({
       notificationManager.error("Failed to fetch wahana");
     })
 
+ 
+// delete wahana
+
+.addCase(deleteWahana.pending, (state) => {
+  state.loading = true;
+})
+.addCase(deleteWahana.fulfilled, (state, action) => {
+  console.log("Deleted wahana ID:", action.payload);
+  state.loading = false;
+  state.wahanas = state.wahanas.filter(
+    (wahana) => wahana.id !== action.payload
+  );
+  state.error = null;
+})
+.addCase(deleteWahana.rejected, (state, action) => {
+  console.log("Deleted wahana rejected:", action.payload);
+  state.loading = false;
+  state.error = action.error.message;
+})
 
 
 

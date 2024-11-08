@@ -388,6 +388,24 @@ function App() {
     
   }
 
+
+  // get single wahana
+
+   // const getWahana = async()=>{
+  //     try{
+  //       const response = await backend.getWahana(
+  //         selectedWahana,
+  //         selectedVenue
+
+         
+  //       );
+  //       console.log("Wahana fetched successfully:", response);
+  //     } catch (err) {
+  //       console.error("Error fetching wahana:", err);
+  //     }
+  //   };
+
+
   return (
     <div className="light bg-background no-scrollbar">
        {/* <button className="px-2 py-1 border rounded mr-2" onClick={editWahanaHandler}>

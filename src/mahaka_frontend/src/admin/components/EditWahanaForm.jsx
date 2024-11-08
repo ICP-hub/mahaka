@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { edit_wahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
   // import { getWahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
  import TextHint from "../../customer/Components/TextHint";
-// import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
+
 
 
 const EditWahanaForm = ({onClose,  selectedWahana, selectedVenue})=>{
@@ -11,26 +11,13 @@ const EditWahanaForm = ({onClose,  selectedWahana, selectedVenue})=>{
   console.log("logging the selected wahana is", selectedWahana)
   console.log("logging the selected venue is", selectedVenue)
   const dispatch = useDispatch();
-  // const wahana = useSelector((state) => state.wahana.wahanas.selectedWahana);
-  
   
     const { backend } = useSelector((state) => state.authentication);
     const { wahanas, loading } = useSelector((state) => state.wahana);
     console.log("editiggg", wahanas)
-//   const title = wahanas[0]?.ride_title;
-// const price = wahanas[0]?.price;
-// const description = wahanas[0]?.description
 
-// console.log("Title:", title);
-// console.log("Price:", price);
 
-// useEffect(() => {
-//   if (selectedWahana) {
-   
-//       dispatch(getWahana(backend, selectedWahana, selectedVenue));  // Fetch the wahana if it's not in the Redux store
-    
-//   }
-// }, [dispatch, selectedWahana, selectedVenue]);
+
     
 // const wahana = useSelector((state) => state.wahana.wahanas);
 // const editWahana = wahana.filter((wahana) => wahana[0]?.id !== selectedWahana)
@@ -47,17 +34,6 @@ const editWahana = useSelector((state) =>
 
 
 console.log('Filtered Wahana:', editWahana);
-
-
-
-    //  const wahanas = useSelector((state) => state.wahana.wahanas);
-  //  console.log("edit wahana",wahanas?.price || "no ")
-   
-      //  const getWahana = dispatch(getWahana( selectedWahana,selectedVenue))
-      //   console.log("edit wahana", getWahana)
-        
-  
-  
 
    
     const [formData, setFormData] = useState({
@@ -85,20 +61,7 @@ console.log('Filtered Wahana:', editWahana);
 
 
  
-  // const getWahana = async()=>{
-  //     try{
-  //       const response = await backend.getWahana(
-  //         selectedWahana,
-  //         selectedVenue
-
-         
-  //       );
-  //       console.log("Wahana fetched successfully:", response);
-  //     } catch (err) {
-  //       console.error("Error fetching wahana:", err);
-  //     }
-  //   };
-
+ 
 
 
   const handleFileChange = (e) => {

@@ -171,6 +171,7 @@ const venueSlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
       })
+      
       .addCase(deleteVenue.pending, (state) => {
         state.loading = true;
       })
