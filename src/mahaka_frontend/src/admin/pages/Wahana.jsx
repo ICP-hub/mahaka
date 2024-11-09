@@ -13,6 +13,8 @@ import wahanaDummy1 from "../../assets/images/Frame10.png";
 import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import { FaArrowRight } from "react-icons/fa";
+import { IoCloseCircle } from "react-icons/io5";
 // import wahanaDummy2 from "../../assets/images/Frame11.png";
 // import wahanaDummy3 from "../../assets/images/Frame7.png";
 // import wahanaDummy4 from "../../assets/images/Frame8.png";
@@ -70,11 +72,30 @@ const AdminWahana = () => {
   console.log("logging the selected wahana is", selectedWahana)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [spinner, setSpinner] = useState(false)
+  const [initialLoad, setInitialLoad] = useState(true)
   console.log("edit modal open",editModalOpen)
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [deleteWahanaId,setDeleteWahanaId] = useState(null)
+  const [deleteVenueId,setDeleteVenueId] = useState(null)
+  const [wahanaDescription, setWahanaDescription] = useState("")
+  const [descriptionModal, setDescriptionModal] = useState(false);
   // const [editModalOpen, setEditModalOpen] = useState(false);
 
   // console.log("selected venue is",selectedVenue)
+
+
+
+  useEffect(() => {
+    if (loading && initialLoad) {
+     
+      setInitialLoad(true);
+    } else if (!loading && initialLoad) {
+    
+      setInitialLoad(false);
+    }
+  }, [loading]);
+
+
 
   useEffect(() => {
     dispatch(getAllVenues({ backend, pageLimit: 100, currPage: 0 }));
@@ -91,11 +112,12 @@ const AdminWahana = () => {
   useEffect(() => {
    
     if (selectedVenue) {
-      setSpinner(true)
+      // setSpinner(true)
       fetchWahanas(selectedVenue);
     }else{
       
       dispatch(getAllWahanas({backend, chunkSize:100, pageNo:0}))
+      setInitialLoad(false)
 
     }
   
@@ -112,6 +134,18 @@ const AdminWahana = () => {
     );
   };
 
+
+  const handleDescription = (description)=>{
+    console.log("wahana description is ", description)
+
+    setDescriptionModal(true)
+    setWahanaDescription(description)
+  }
+
+  const closeDescription = ()=>{
+    setDescriptionModal(false)
+  }
+
   // fetching all wahanas
 
   // const fetchAllWahanas = ()=>{
@@ -120,15 +154,71 @@ const AdminWahana = () => {
 
 
   const delete_Wahana = (wahanaId, venueId)=>{
-    // console.log("handle delete ids are", wahanaId)
-    // console.log("handle delete ids are", venueId)
+     
     // console.log("handle delete",selectedWahana)
-    dispatch(deleteWahana({backend, wahanaId, venueId}))
+   
+    setDeleteWahanaId(wahanaId)
+    setDeleteVenueId(venueId)
+    setDeleteModalVisible(true)
 
   }
 
+  const confirmDeleteWahana = () => {
+    console.log("handle delete ids are", deleteWahanaId)
+     console.log("handle delete ids are", deleteVenueId)
+     dispatch(deleteWahana({backend, deleteVenueId, deleteWahanaId}))
+     setDeleteModalVisible(false); // Close the modal
+  };
+
   return (
+    
     <div className="relative h-full">
+
+{descriptionModal &&
+    <div className="fixed inset-0 z-40 min-h-60 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="bg-white p-4 rounded-lg shadow-lg min-h-50 min-w-80 lg:min-h-50 lg:max-w-100 mx-4">
+   <div className ="flex">
+    <h1 className ="text-gray-900 text-3xl mb-2 font-md">Description</h1>
+      <div onClick = {closeDescription} className ="ml-auto flex justify-end hover:opacity-100 opacity-75">
+      <IoCloseCircle size ={35}/>
+      </div>
+      </div>
+      <p className="text-lg text-slate-500">
+       {wahanaDescription}
+      
+      </p>
+      
+    </div>
+  </div>
+  
+  
+  }
+
+      {/* delete modal */}
+         {deleteModalVisible && (
+        <div className="fixed inset-0 z-50 flex items-center rounded justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded shadow-lg">
+            <h2 className="text-xl mb-4">
+              Are you sure you want to delete this wahana?
+            </h2>
+            <div className="flex justify-end">
+              <button
+                className="bg-red-600 text-white px-4 py-2 rounded mr-4"
+                onClick={()=>confirmDeleteWahana()}
+              >
+                Delete
+              </button>
+              <button
+                className="bg-gray-300 px-4 py-2 rounded"
+                onClick={() => setDeleteModalVisible(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="absolute inset-0 flex min-w-0 flex-col overflow-y-auto">
         <div className="dark relative flex-0 overflow-hidden bg-gray-800 px-4 py-8 sm:p-16">
           <svg
@@ -166,9 +256,10 @@ const AdminWahana = () => {
           loading={loading}
           onEditClick = {()=> setEditModalOpen(true)}
           setSelectedWahana = {setSelectedWahana}
-          spinner = {spinner}
+          initialLoad={initialLoad}
           delete_Wahana = {delete_Wahana}
           selectedWahana = {selectedWahana}
+          handleDescription = {handleDescription }
          
         />
 
@@ -218,17 +309,39 @@ const WahanaMain = ({
   onEditClick,
   loading,
   setSelectedWahana,
-  delete_Wahana
+  delete_Wahana,
+  initialLoad,
+  handleDescription 
 }) => {
  
+
+const SkeletonLoader = () => {
+  return (
+    <div className="animate-pulse flex flex-col p-4 bg-gray-300 rounded-lg shadow-md min-w-65 min-h-80 mt-8 mx-3">
+    {/* title and delete btn */}
+    <div className="flex items-center justify-between mb-4">
+      <div className="bg-gray-400 h-4 w-[25%] rounded"></div> 
+      <div className="bg-gray-400 h-4 w-8 rounded"></div>    
+    </div>
+
+    {/* Bottom section*/}
+    <div className="space-y-2 mt-auto">
+      <div className="h-3 bg-gray-400 rounded w-1/2"></div>
+      <div className="h-5 bg-gray-400 rounded w-1/2"></div>
+      <div className="h-3 bg-gray-400 rounded w-1/2"></div>
+    </div>
+  </div>
+   
+  );
+};
   return (
     <div className="flex flex-auto p-6 sm:p-10">
       <div className="mx-auto flex w-full max-w-xs flex-auto flex-col sm:max-w-5xl">
-        <div className="flex w-full max-w-xs flex-col justify-center sm:max-w-none sm:flex-row">
+        <div className="flex w-full max-w-xs flex-col justify-center sm:max-w-none sm:flex-row ">
           <select
             value={selectedVenue || ""}
             onChange={(e) => setSelectedVenue(e.target.value)}
-            className="bg-card text-icon px-4 min-h-12 rounded-md border border-border sm:w-36"
+            className="bg-card text-icon px-4 min-h-12 rounded-full border border-border sm:w-36"
           >
            
             <option value="" className="min-h-12">
@@ -241,7 +354,7 @@ const WahanaMain = ({
             ))}
           </select>
 
-          <div className="px-4 mt-4 sm:ml-4 sm:mt-0 sm:w-72 min-h-12 lg:min-w-[68%] md:min-w-[55%] rounded-md border border-border flex items-center bg-card text-icon">
+          <div className="px-4 mt-4 sm:ml-4 sm:mt-0 sm:w-72 min-h-12 lg:min-w-[68%] md:min-w-[55%] rounded-full border border-border flex items-center bg-card text-icon">
             <HiMagnifyingGlass size={20} />
             <input
               type="text"
@@ -259,12 +372,20 @@ const WahanaMain = ({
 
          
         </div>
-        {loading ? (
+        {loading && initialLoad ? (
+          <div className ="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <SkeletonLoader/>
+          <SkeletonLoader/>
+          <SkeletonLoader/>
+        </div>
+        
+        ):loading?
+        (
           <div className="mt-8 text-center">
 
       <div className="flex justify-center mt-30"><ImSpinner9 className = "animate-spin text-7xl opacity-80"/></div>
           </div>
-        ) : (
+        ) :  (
           <div className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3">
             {wahanaData?.map((wahana) => (
               <WahanaCard
@@ -272,7 +393,7 @@ const WahanaMain = ({
                 wahana={{
                   ...wahana,
                   title: wahana.ride_title,
-                  price: wahana.priceinusd,
+                  price: wahana.price,
                   image: wahana.banner?.data,
                 }}
                 onEditClick ={onEditClick}
@@ -284,6 +405,7 @@ const WahanaMain = ({
                 selectedWahana = {selectedWahana}
                 delete_Wahana = {delete_Wahana}
                 loading = {loading}
+                handleDescription = {handleDescription}
               />
             ))}
           </div>
@@ -293,8 +415,15 @@ const WahanaMain = ({
   );
 };
 
-const WahanaCard = ({ wahana,onEditClick, wahanaId , venueId, setSelectedWahana, setSelectedVenue, selectedVenue, selectedWahana, delete_Wahana, loading}) => {
-  console.log("logging edited wahana id is",wahana)
+const WahanaCard = ({ wahana, delete_Wahana, loading, handleDescription }) => {
+
+  const name = wahana.venueId.split('#')[0];
+  console.log("venue name is", name)
+
+ 
+
+  console.log("loginggg wahana check venue id ", wahana.venueId)
+  // console.log("logging wahana price is",wahana?.price)
   // console.log("logging edited venue id is", venueId)
 //  console.log("wahana price is ", wahana.price)
   const bannerImage = wahana.image || wahanaDummy1;
@@ -303,7 +432,7 @@ const WahanaCard = ({ wahana,onEditClick, wahanaId , venueId, setSelectedWahana,
       <div className="flex flex-col relative">
         <div className="flex items-center justify-between p-6 z-10">
           <div className="rounded-full px-3 py-0.5 text-sm font-semibold bg-blue-100 text-blue-800 dark:bg-blue-500 dark:text-blue-50">
-            {wahana.ride_title}
+            {name}
           
           </div>
           
@@ -313,10 +442,12 @@ const WahanaCard = ({ wahana,onEditClick, wahanaId , venueId, setSelectedWahana,
 
           {/* <div className = " " onClick={()=> setSelectedWahana(wahana.id)}>
             <div className = "" onClick ={()=>setSelectedVenue(wahana.venueId)}> */}
+            <div className ="bg-blue-100 rounded-full h-7 w-7 text-center pt-1">
             <button onClick = {()=>delete_Wahana(wahana.id, wahana.venueId)} disabled = {loading}>
             
-            {loading ? "Deleting..." : <MdDelete className = "" size ={25}/>}
+            {loading ? "Deleting..." : <MdDelete className = "text-blue-700" size ={23}/>}
             </button>
+            </div>
             {/* </div>
          </div> */}
 
@@ -333,12 +464,15 @@ const WahanaCard = ({ wahana,onEditClick, wahanaId , venueId, setSelectedWahana,
       <div className="mt-auto flex w-full flex-col p-6">
         <div className="text-lg font-medium">{wahana.ride_title}</div>
         <div className="text-secondary mt-0.5 line-clamp-1">
-          {wahana.description}
+        <div className ="flex" onClick ={()=>handleDescription(wahana.description)}>
+          <p className ="text-red-500 font-md">View description</p>
+          <FaArrowRight className ="mt-1 ml-1 text-red-500"/>
+          </div>
         </div>
         <div className="flex items-baseline whitespace-nowrap">
           <div className="mr-2 text-2xl">IDR</div>
           <div className="text-6xl font-semibold leading-tight tracking-tight">
-          {wahana?.price}
+         {parseInt(wahana?.price)}
           </div>
           <div className="text-secondary text-2xl">/person</div>
           {/* <button className="mt-8 sm:ml-auto sm:mt-0" onClick={onEditClick}>

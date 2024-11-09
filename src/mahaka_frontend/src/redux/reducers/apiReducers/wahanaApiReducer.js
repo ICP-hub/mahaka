@@ -138,9 +138,9 @@ export const getAllWahanas = createAsyncThunk(
 // delete wahana
 export const deleteWahana = createAsyncThunk(
   "wahana/deleteWahana",
-  async ({ backend, venueId, wahanaId }) => {
-    await backend.deleteWahana(venueId, wahanaId);
-    return wahanaId;
+  async ({ backend, deleteVenueId, deleteWahanaId }) => {
+    await backend.deleteWahana(deleteVenueId, deleteWahanaId);
+    return deleteWahanaId;
   }
 );
 
