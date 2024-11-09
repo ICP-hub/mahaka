@@ -246,6 +246,8 @@ const VenueDetailPage = () => {
             setIsModalOpen={setIsEventModalOpen}
             venueId={id}
             venueTitle={venue.Title} // Pass venue title for use in event creation
+            venueStartDate={venue.Details.StartDate}
+            venueEndDate={venue.Details.EndDate}
           />
         </ModalOverlay>
       )}

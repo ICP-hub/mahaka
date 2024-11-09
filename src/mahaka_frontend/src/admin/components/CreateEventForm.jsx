@@ -6,7 +6,7 @@ import { FcAlarmClock, FcCalendar } from "react-icons/fc";
 import TextHint from "../../customer/Components/TextHint";
 import { Principal } from "@dfinity/principal";
 
-const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
+const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, venueEndDate }) => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
   const { loading, createEventLoader } = useSelector((state) => state.events);
@@ -17,7 +17,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
     console.log("venueId:", venueId);
   }, [venueId]);
   const [logoPreview, setLogoPreview] = useState(null);
-
+  const [startDate, setStartDate] = useState("");
   const [eventData, setEventData] = useState({
     title: "",
     collection_args: {
@@ -120,13 +120,25 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
       const day = String(date.getDate()).padStart(2, "0");
       return `${year}-${month}-${day}`;
     };
+    const minDate = venueStartDate ? new Date(venueStartDate) : null;
+    const maxDate = venueEndDate ? new Date(venueEndDate) : null;
 
-    flatpickr(startDateRef.current, {
+    if (minDate) {
+      minDate.setHours(0, 0, 0, 0);
+    }
+    if (maxDate) {
+      maxDate.setHours(23, 59, 59, 999);
+    }
+
+    const startDatePicker = flatpickr(startDateRef.current, {
       dateFormat: "Y-m-d",
+      minDate: minDate,
+      maxDate: maxDate,
       onChange: (selectedDates) => {
         const newStartDate = selectedDates[0]
           ? formatDate(selectedDates[0])
           : "";
+        setStartDate(newStartDate);
         setEventData((prev) => ({
           ...prev,
           eventDetails: { ...prev.eventDetails, StartDate: newStartDate },
@@ -134,12 +146,30 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
         if (newStartDate) {
           setFormErrors((prev) => ({ ...prev, StartDate: "" }));
         }
+        if (endDateRef.current._flatpickr) {
+          endDateRef.current._flatpickr.set('minDate', newStartDate);
+        }
       },
       required: true,
-    });
+      disable: [
+        function (date) {
+          const normalizedDate = new Date(date);
+          normalizedDate.setHours(0, 0, 0, 0);
 
-    flatpickr(endDateRef.current, {
+          const normalizedMin = minDate && new Date(minDate);
+          if (normalizedMin) normalizedMin.setHours(0, 0, 0, 0);
+
+          const normalizedMax = maxDate && new Date(maxDate);
+          if (normalizedMax) normalizedMax.setHours(0, 0, 0, 0);
+          return (normalizedMin && normalizedDate < normalizedMin) ||
+            (normalizedMax && normalizedDate > normalizedMax);
+        }
+      ],
+    });
+    const endDatePicker = flatpickr(endDateRef.current, {
       dateFormat: "Y-m-d",
+      minDate: startDate || minDate,
+      maxDate: maxDate,
       onChange: (selectedDates) => {
         const newEndDate = selectedDates[0] ? formatDate(selectedDates[0]) : "";
         setEventData((prev) => ({
@@ -151,6 +181,25 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
         }
       },
       required: true,
+      disable: [
+        function (date) {
+          const normalizedDate = new Date(date);
+          normalizedDate.setHours(0, 0, 0, 0);
+
+          const normalizedMin = minDate && new Date(minDate);
+          if (normalizedMin) normalizedMin.setHours(0, 0, 0, 0);
+
+          const normalizedMax = maxDate && new Date(maxDate);
+          if (normalizedMax) normalizedMax.setHours(0, 0, 0, 0);
+
+          const normalizedStart = startDate ? new Date(startDate) : null;
+          if (normalizedStart) normalizedStart.setHours(0, 0, 0, 0);
+
+          return (normalizedMin && normalizedDate < normalizedMin) ||
+            (normalizedMax && normalizedDate > normalizedMax) ||
+            (normalizedStart && normalizedDate < normalizedStart);
+        }
+      ],
     });
 
     flatpickr(startTimeRef.current, {
@@ -196,9 +245,23 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
       },
       required: true,
     });
-  }, []);
+
+    // Cleanup
+    return () => {
+      startDatePicker.destroy();
+      endDatePicker.destroy();
+    };
+  }, [venueStartDate, venueEndDate, startDate]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    let updatedValue = value;
+
+    if (name.includes("Ticket_limit")) {
+      updatedValue = parseInt(value) || 0;
+    }
+
+    // Update state based on whether the field is nested or not
     if (
       name === "description" ||
       name === "maxLimit" ||
@@ -207,13 +270,29 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
     ) {
       setEventData((prevState) => ({
         ...prevState,
-        collection_args: { ...prevState.collection_args, [name]: value },
+        collection_args: { ...prevState.collection_args, [name]: updatedValue },
       }));
+
+      // Clear errors for nested fields
+      if (formErrors[`collection_args_${name}`]) {
+        setFormErrors((prevErrors) => ({
+          ...prevErrors,
+          [`collection_args_${name}`]: undefined,
+        }));
+      }
     } else {
       setEventData((prevState) => ({
         ...prevState,
-        [name]: name.includes("Ticket_limit") ? parseInt(value) : value,
+        [name]: updatedValue,
       }));
+
+      // Clear errors for top-level fields
+      if (formErrors[name]) {
+        setFormErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: undefined,
+        }));
+      }
     }
   };
 
@@ -617,7 +696,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
       <div className="flex space-x-4">
         <div className="w-1/3">
           <div className="flex items-center gap-2">
-            <label className="font-semibold">General Ticket Limit</label>
+            <label className="font-semibold text-sm">General Ticket Limit</label>
             <TextHint text="Enter the General Ticket Limit of the event." />
           </div>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
@@ -638,7 +717,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
         </div>
         <div className="w-1/3">
           <div className="flex items-center gap-2">
-            <label className="font-semibold">Student Ticket Limit</label>
+            <label className="font-semibold text-sm">Student Ticket Limit</label>
             <TextHint text="Enter the Student Ticket Limit of the event." />
           </div>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
@@ -659,7 +738,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
         </div>
         <div className="w-1/3">
           <div className="flex items-center gap-2">
-            <label className="font-semibold">VIP Ticket Limit</label>
+            <label className="font-semibold text-sm">VIP Ticket Limit</label>
             <TextHint text="Enter the VIP Ticket Limit of the event." />
           </div>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">

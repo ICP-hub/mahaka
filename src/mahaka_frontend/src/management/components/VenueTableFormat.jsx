@@ -135,7 +135,7 @@ const VenueTableData = ({ venue, onDelete }) => {
         <div className="flex items-center">
           <div className="relative mr-6 flex h-12 w-12 flex-0 items-center justify-center overflow-hidden rounded border border-border">
           <img
-              src={venue.banner && venue.banner.data ? venue.banner.data : VenueDemoImg}
+              src={venue.logo && venue.logo.data ? venue.logo.data : VenueDemoImg}
               alt="Venue_img"
               className="w-8"
             />
