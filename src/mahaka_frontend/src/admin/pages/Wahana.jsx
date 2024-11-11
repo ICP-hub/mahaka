@@ -176,7 +176,7 @@ const AdminWahana = () => {
 
 {descriptionModal &&
     <div className="fixed inset-0 z-40 min-h-60 flex items-center justify-center bg-black bg-opacity-50">
-    <div className="bg-white p-4 rounded-lg shadow-lg min-h-50 min-w-80 lg:min-h-50 lg:max-w-100 mx-4">
+    <div className="bg-white p-4 rounded-lg shadow-lg min-h-50 min-w-80 lg:min-h-50 lg:max-w-100 mx-4 overflow-y-auto">
    <div className ="flex">
     <h1 className ="text-gray-900 text-3xl mb-2 font-md">Description</h1>
       <div onClick = {closeDescription} className ="ml-auto flex justify-end hover:opacity-100 opacity-75">

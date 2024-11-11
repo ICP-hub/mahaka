@@ -119,13 +119,10 @@ console.log("create wahana errors are", errors)
     errors.description = "wahana description is required";
   }
 
-
- 
-  // Validate price
+  // Validte price
   if (!formData.price) {
     errors.price = "price is required";
   }
-
 
   // Validate banner image
   if (!formData.banner.data) {
@@ -135,7 +132,6 @@ console.log("create wahana errors are", errors)
     errors.logo = "Event logo is required";
   }
  
-
   setFormErrors(errors);
   return Object.keys(errors).length === 0;
 };

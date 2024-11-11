@@ -17,9 +17,9 @@ import TranslationForCustomer from "../../TranslationForCustomer";
 const NavLinks = [
   { title: "HOME", url: "/" },
   { title: "ABOUT MAHAKA", url: "/about-us" },
-  // { title: "SERVICES", url: "/our-services" },
+   { title: "SERVICES", url: "/our-services" },
   { title: "CONTACT US", url: "/contact-us" },
-  { title: "WAHANAS", url: "/wahanas" },
+  // { title: "WAHANAS", url: "/wahanas" },
 ];
 
 export default function Header() {
