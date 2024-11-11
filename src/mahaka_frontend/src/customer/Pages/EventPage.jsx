@@ -7,7 +7,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { getVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
-import { getAllEventsByVenue } from "../../redux/reducers/apiReducers/eventApiReducer";
+import { getEvent } from "../../redux/reducers/apiReducers/eventApiReducer";
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/pagination";
@@ -21,7 +21,6 @@ import { motion } from "framer-motion";
 import ModalPopup from "../../common/ModalPopup";
 import DatePicker from "../../common/DatePicker";
 import VisitorPicker from "../Components/single-event/VisitorPicker";
-
 const ticketData = [
   {
     type: "PREMIUM",
@@ -53,16 +52,6 @@ const ticketData = [
     availability: "3 TICKETS LEFT",
     highlightClass: "bg-blue-500",
   },
-  {
-    type: "REGULAR",
-    gradientClass: "bg-gradient-to-r from-gray-200 to-gray-300",
-    name: "John Doe",
-    description:
-      "Lorem ipsum dolor sit amet consectetur. Bibendum est vitae urna pharetra",
-    price: "Rp. 1,500",
-    availability: "AVAILABLE",
-    highlightClass: "bg-gray-500",
-  },
 ];
 const calculateDuration = (StartDate, EndDate) => {
   const start = new Date(StartDate);
@@ -75,7 +64,7 @@ const calculateDuration = (StartDate, EndDate) => {
   return `${days + 1} days`;
 };
 
-export default function SingleEvent() {
+const EventPage = () => {
   const [activeTab, setActiveTab] = useState("profile");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { ModalOne } = ModalPopup();
@@ -86,27 +75,30 @@ export default function SingleEvent() {
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   };
-  const { id } = useParams();
+  const { id, eventId } = useParams();
+  const eventIds = `${decodeURIComponent(eventId)}${window.location.hash}`;
   const venueId = `${decodeURIComponent(id)}${window.location.hash}`;
   console.log(venueId);
 
   const dispatch = useDispatch();
   const {
     currentVenue,
-    loading: venueLoading,
+
     error,
   } = useSelector((state) => state.venues);
-  console.log(currentVenue);
-  const {
-    events,
 
-    eventsLoading: eventLoading,
+  const ids = currentVenue[1]?.id;
+
+  const {
+    currentEvent,
+
+    eventsLoading: venueLoading,
     error: eventError,
   } = useSelector((state) => state.events);
+
   const { backend } = useSelector((state) => state.authentication);
   const [localError, setLocalError] = useState(null);
-  const venue =
-    currentVenue && Array.isArray(currentVenue) ? currentVenue[1] : null;
+  const venue = currentEvent ? currentEvent : null;
 
   useEffect(() => {
     if (!venueId) {
@@ -119,30 +111,18 @@ export default function SingleEvent() {
       return;
     }
 
-    dispatch(getVenue({ backend, venueId }))
-      .unwrap()
-      .catch((err) => {
-        setLocalError(err.message || "Failed to fetch venue details");
-      });
-
-    dispatch(
-      getAllEventsByVenue({ backend, chunkSize: 100, pageNo: 0, venueId })
-    )
+    dispatch(getEvent({ backend, eventIds, ids }))
       .unwrap()
       .catch((err) => {
         setLocalError(err.message || "Failed to fetch events for the venue");
       });
   }, [dispatch, venueId, backend]);
 
-  console.log(eventLoading, "eventLoading");
-  console.log(venueLoading, "venueLoading");
-
   // Assuming the first event is the main event for this venue
-  const event = events && Array.isArray(events) ? events : null;
 
   const duration =
-    venue?.Details.StartDate && venue?.Details.EndDate
-      ? calculateDuration(venue.Details.StartDate, venue.Details.EndDate)
+    venue?.details.StartDate && venue?.details.EndDate
+      ? calculateDuration(venue.details.StartDate, venue.details.EndDate)
       : "";
 
   const formatDate = (dateString) => {
@@ -193,7 +173,7 @@ export default function SingleEvent() {
           {venueLoading ? (
             <h1 className=" animate-pulse bg-gray-300 rounded-2xl w-32 h-12 font-black mb-10"></h1>
           ) : (
-            <h1 className="text-4xl font-black pb-10">{venue?.Title || ""}</h1>
+            <h1 className="text-4xl font-black pb-10">{venue?.title || ""}</h1>
           )}
           <div className="flex flex-col lg:flex-row gap-8">
             {/* left side section  */}
@@ -314,12 +294,12 @@ export default function SingleEvent() {
                           </li>
                           <li>
                             <strong>Location:</strong>{" "}
-                            {venue?.Details.Location || "Indonesia"}
+                            {venue?.details.Location || "Indonesia"}
                           </li>
                           <li>
                             <strong>Last Entry:</strong>{" "}
-                            {(venue?.Details.EndTime &&
-                              venue.Details.EndTime) ||
+                            {(venue?.details.EndTime &&
+                              venue.details.EndTime) ||
                               "4:00 PM"}
                           </li>
                         </ul>
@@ -401,30 +381,30 @@ export default function SingleEvent() {
             ) : (
               <div className="lg:w-1/3 h-[340px] w-full shadow-lg rounded-lg sticky top-0">
                 <div className="p-8">
-                  <h1 className="text-2xl font-black">Venue Details</h1>
+                  <h1 className="text-2xl font-black">Event Details</h1>
                   <h3 className="text-lg font-normal">
                     {" "}
-                    {venue?.Details.StartDate &&
-                      formatDate(venue.Details.StartDate)}{" "}
+                    {venue?.details.StartDate &&
+                      formatDate(venue.details.StartDate)}{" "}
                     -
-                    {(venue?.Details.EndDate &&
-                      formatDate(venue.Details.EndDate)) ||
+                    {(venue?.details.EndDate &&
+                      formatDate(venue.details.EndDate)) ||
                       "13 Jul- 17 Jul 2024"}
                   </h3>
                   <h3 className="text-lg font-normal">
-                    {venue?.Details.StartTime && venue.Details.StartTime} -
-                    {(venue?.Details.EndTime && venue.Details.EndTime) ||
+                    {venue?.details.StartTime && venue.details.StartTime} -
+                    {(venue?.details.EndTime && venue.details.EndTime) ||
                       "12:00AM - 3:00PM"}
                   </h3>
                   <h3 className="text-lg font-normal">
-                    Location of the Venue - {venue?.Details.Location}
+                    Location of the Venue - {venue?.details.Location}
                   </h3>
                 </div>
                 <h2 className="text-2xl font-normal pl-8">
                   Venue ends on :{" "}
                   <span className="text-red-600">
-                    {(venue?.Details.EndDate &&
-                      formatDate(venue.Details.EndDate)) ||
+                    {(venue?.details.EndDate &&
+                      formatDate(venue.details.EndDate)) ||
                       "17 July, 2024"}
                   </span>
                 </h2>
@@ -434,63 +414,9 @@ export default function SingleEvent() {
         </div>
 
         {/* bottom crousel section  */}
-        <div className="py-12 mx-auto px-4 sm:px-6 lg:px-8">
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
-            <h1 className="text-4xl font-black">Check Events</h1>
-          </section>
-
-          <div className="max-w-7xl mx-auto">
-            {eventLoading ? (
-              <div className="flex my-18 space-x-4 px-4 sm:px-6 lg:px-8 mx-auto">
-                {/* Skeleton Loader for each card */}
-                {[...Array(2)].map((_, index) => (
-                  <div
-                    key={index}
-                    className="w-full lg:w-1/2 h-64 bg-gray-200 animate-pulse rounded-lg"
-                  ></div>
-                ))}
-              </div>
-            ) : (
-              <Swiper
-                spaceBetween={40}
-                slidesPerView={1}
-                breakpoints={{
-                  640: {
-                    slidesPerView: 1,
-                  },
-                  768: {
-                    slidesPerView: 1,
-                  },
-                  1024: {
-                    slidesPerView: 2,
-                  },
-                }}
-                autoplay={{
-                  delay: 3000,
-                  disableOnInteraction: false,
-                }}
-                pagination={{
-                  clickable: true,
-                }}
-                modules={[Autoplay, Pagination]}
-                className="mySwiper px-4 sm:px-6 lg:px-8 mx-auto"
-              >
-                {event?.map((event, index) => (
-                  <SwiperSlide key={index}>
-                    <Link to={`/${venueId}/events/${event.id}`}>
-                      <MoreEventCard
-                        event={event}
-                        index={index}
-                        image={event?.banner?.data}
-                      />
-                    </Link>
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-            )}
-          </div>
-        </div>
       </section>
     </>
   );
-}
+};
+
+export default EventPage;

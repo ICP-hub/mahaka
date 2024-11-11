@@ -70,6 +70,20 @@ export const buyEventTicket = createAsyncThunk(
     }
   }
 );
+// fetching a specific event
+export const getEvent = createAsyncThunk(
+  "events/getEvent",
+  async ({ backend, eventIds, ids }) => {
+    try {
+      const response = await backend.getEvent(eventIds, ids);
+      console.log("Event fetched:", response);
+      return response;
+    } catch (error) {
+      console.error("Error fetching event:", error);
+      throw error;
+    }
+  }
+);
 
 // Create slice
 const eventSlice = createSlice({
@@ -145,6 +159,20 @@ const eventSlice = createSlice({
         state.buyTicketLoading = false;
         state.error = action.error.message;
         notificationManager.error("Failed to purchase event ticket");
+      })
+      .addCase(getEvent.pending, (state) => {
+        state.eventsLoading = true;
+      })
+      .addCase(getEvent.fulfilled, (state, action) => {
+        state.eventsLoading = false;
+        state.currentEvent = action.payload.ok;
+        state.error = null;
+        notificationManager.success("Event fetched successfully");
+      })
+      .addCase(getEvent.rejected, (state, action) => {
+        state.eventsLoading = false;
+        state.error = action.error.message;
+        notificationManager.error("Failed to fetch event");
       });
   },
 });

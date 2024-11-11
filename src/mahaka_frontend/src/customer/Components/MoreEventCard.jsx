@@ -2,16 +2,19 @@ import React from "react";
 import fram1 from "../../assets/images/fram1.png";
 import fram2 from "../../assets/images/fram2.png";
 import { GoArrowUpRight } from "react-icons/go";
+import { Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 export default function MoreEventCard({ image, event, index }) {
   // Define an array of colors
   const colors = ["#E2AF4E", "#FF5733", "#28A745", "#3498DB", "#9B59B6"];
+  console.log(event, "event details");
 
   // Choose color based on index (cycles through colors if there are more events than colors)
   const color = colors[index % colors.length];
 
   return (
-    <div className="my-18 ">
+    <Link to={`/events/${event.id}`} className="my-18">
       <div className="shadow-lg h-64 rounded-2xl overflow-hidden flex">
         <div
           className="pr-6 w-1/2 text-white"
@@ -36,6 +39,6 @@ export default function MoreEventCard({ image, event, index }) {
           />
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

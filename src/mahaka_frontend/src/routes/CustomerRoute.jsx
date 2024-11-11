@@ -8,6 +8,7 @@ import SingleEvent from "../customer/Pages/SingleEvent";
 import UserProfile from "../customer/Pages/UserProfile";
 import Ticket from "../customer/Pages/Ticket";
 import HeaderWahanas from "../customer/Pages/HeaderWahanas";
+import EventPage from "../customer/Pages/EventPage";
 
 export const customerRoutes = [
   {
@@ -16,14 +17,15 @@ export const customerRoutes = [
     children: [
       { index: true, element: <Home /> },
       { path: "venues/:id", element: <SingleEvent /> },
+      { path: "events/:eventId", element: <EventPage /> },
       { path: "payment", element: <PaymentComponent /> },
       { path: "user-profile", element: <UserProfile /> },
       { path: "about-us", element: <AboutMahaka /> },
       { path: "our-services", element: <ServicesMahaka /> },
       { path: "contact-us", element: <ContactMahaka /> },
       { path: "ticket", element: <Ticket /> },
-      { path: "wahanas", element: <HeaderWahanas /> }
-      
+      { path: "wahanas", element: <HeaderWahanas /> },
     ],
   },
+  
 ];
