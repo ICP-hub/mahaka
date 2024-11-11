@@ -8,6 +8,8 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
   const { venues } = useSelector((state) => state.venues);
+  // const [formErrors, setFormErrors] = useState({});
+  // console.log("create wahana errors are", formErrors)
   const [formData, setFormData] = useState({
     name: "",
     symbol: "",
@@ -28,6 +30,47 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
   useEffect(() => {
     dispatch(getAllVenues({ backend, pageLimit: 100, currPage: 0 }));
   }, [dispatch, backend]);
+
+
+// // validation form
+//   const validateForm = () => {
+//     const errors = {};
+// console.log("create wahana errors are", errors)
+//     // Validate title
+//     if (!formData.name.trim()) {
+//       errors.title = "wahana title is required";
+//     }
+
+//     // Validate description
+//     if (!formData.description.trim()) {
+//       errors.description = "wahana description is required";
+//     }
+
+ 
+   
+//     // Validate price
+//     if (!formData.price) {
+//       errors.price = "price is required";
+//     }
+
+  
+    
+
+//     // Validate banner image
+//     if (!formData.banner.data) {
+//       errors.banner = "wahana banner is required";
+//     }
+//     if (!formData.banner.logo_type) {
+//       errors.logo = "Event logo is required";
+//     }
+   
+
+//     setFormErrors(errors);
+//     return Object.keys(errors).length === 0;
+//   };
+
+
+
 
   const imageToFileBlob = (imageFile) => {
     return new Promise((resolve, reject) => {
@@ -133,6 +176,11 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
 };
 
   const handleCreateWahana = async () => {
+     e.preventDefault();
+    // // setIsSubmitting(true);
+    // if (!validateForm()) {
+    //   return;
+    // }
     setIsSubmitting(true);
     try {
       await dispatch(
@@ -166,7 +214,7 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
               setFormData({ ...formData, venueId: e.target.value })
             }
             className="border border-border rounded-lg px-4 py-2 bg-card"
-            required
+            required 
           >
             <option value="" disabled>
               Select a venue
