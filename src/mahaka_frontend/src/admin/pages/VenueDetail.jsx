@@ -170,7 +170,7 @@ const VenueDetailPage = () => {
         >
           Create Event
         </button>
-        <EventTable eventArr={events} />
+        <EventCardGrid eventArr={events} />
         {/* <div className="mb-6">
           <h2 className="text-xl font-semibold mb-2">Events</h2>
           {events.length > 0 ? (
@@ -254,141 +254,124 @@ const VenueDetailPage = () => {
     </>
   );
 };
-const EventTable = ({ eventArr }) => {
-  console.log("event is ", eventArr);
-  const [isOpen, setIsOpen] = useState(false);
+const EventCardGrid = ({ eventArr }) => {
+  return (
+    <div className="p-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
+        {eventArr?.length > 0 && eventArr.map((event, index) => (
+          <EventCard key={index} event={event} />
+        ))}
+      </div>
+    </div>
+  );
+};
 
-  const toggleView = () => {
-    setIsOpen((pv) => !pv);
-  };
+const EventCard = ({ event }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="flex flex-auto overflow-hidden min-h-96">
-      <div className="flex flex-auto flex-col overflow-hidden sm:mb-18">
-        <div className="grid">
-          <div className="inventory-grid text-secondary top-0 z-10 grid gap-4 bg-gray-50 px-6 py-4 text-md font-semibold shadow dark:bg-black dark:bg-opacity-5 md:px-8">
-            <div></div>
-            <div className="hidden md:block">Name</div>
-            <div>Description</div>
-            <div className="hidden sm:block">Location</div>
-            <div className="hidden lg:block">Start Date</div>
-            <div className="hidden lg:block">Active</div>
-            <div className="hidden sm:block">Details</div>
+    <div className=" rounded-lg shadow-md overflow-hidden border border-gray-300">
+      <div className="relative h-48 w-full">
+        <img
+          src={event.banner.data}
+          alt={`${event.title} banner`}
+          className="h-full w-full object-cover"
+        />
+        <div className="absolute top-4 left-4">
+          <div className="h-12 w-12 rounded-full  p-1">
+            <img
+              src={event.logo.data}
+              alt={`${event.title} logo`}
+              className="h-full w-full rounded-full object-cover"
+            />
           </div>
-          {eventArr?.length > 0 &&
-            eventArr.map((event, index) => (
-              <>
-                <div className="inventory-grid grid items-center gap-4 border-b px-6 py-3 md:px-8 border-b-border">
-                  <div className="flex items-center">
-                    <div className="relative mr-6 flex h-12 w-12 flex-0 items-center justify-center overflow-hidden rounded border border-border">
-                      <img src={event.logo.data} alt="Event_img" />
-                    </div>
-                  </div>
-                  <div className="hidden truncate md:block">{event.title}</div>
-                  <div className="truncate">{event.description}</div>
-                  <div className="hidden truncate sm:block">
-                    {event.details.Location}
-                  </div>
-                  <div className="hidden lg:flex">
-                    {formatDate(event.details.StartDate)}
-                  </div>
-                  <div className="hidden lg:block">eventactive</div>
-                  <button
-                    className="hidden sm:block ml-2 cursor-pointer"
-                    onClick={toggleView}
-                  >
-                    <HiChevronDown size={20} />
-                  </button>
-                </div>
-
-                {isOpen && (
-                  <div key={index}>
-                    <div className="flex flex-col sm:flex-row p-6">
-                      <div className="mb-8 flex flex-col items-center sm:mb-0 sm:items-start">
-                        <div className="w-32 border h-44 rounded-md border-border">
-                          <img
-                            src={event.banner.data}
-                            alt="event_img"
-                            className="h-full w-full object-cover"
-                          />
-                        </div>
-                      </div>
-                      <div className="flex flex-auto flex-wrap">
-                        <div className="flex w-full flex-col sm:pl-8 lg:w-2/4">
-                          <EventViewBlock
-                            label="Event Name"
-                            value={event.title}
-                          />
-                          <div className="flex">
-                            <div className="w-2/4 pr-2">
-                              <EventViewBlock
-                                label="Start From"
-                                value={formatDate(event.details.StartDate)}
-                              />
-                            </div>
-                            <div className="w-2/4 pl-2">
-                              <EventViewBlock
-                                label="Ends On"
-                                value={formatDate(event.details.EndDate)}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex w-full flex-col sm:pl-8 lg:w-2/4">
-                          <EventViewBlock label="Id" value={event.id} />
-                          <EventViewBlock
-                            label="Location"
-                            value={event.details.Location}
-                          />
-                        </div>
-                        <div className="flex w-full sm:pl-8 flex-col md:flex-row">
-                          <div className="md:w-1/3 md:pr-2">
-                            <EventViewBlock
-                              label="General Ticket Limit"
-                              value={parseInt(event.gTicket_limit)}
-                            />
-                          </div>
-                          <div className="md:w-1/3 md:pl-2">
-                            <EventViewBlock
-                              label="Student Ticket Limit"
-                              value={parseInt(event.sTicket_limit)}
-                            />
-                          </div>
-                          <div className="md:w-1/3 md:pl-2">
-                            <EventViewBlock
-                              label="Vip Ticket Limit"
-                              value={parseInt(event.vTicket_limit)}
-                            />
-                          </div>
-                        </div>
-                        <div className="flex w-full flex-col sm:pl-8">
-                          <EventViewBlock
-                            label="Description"
-                            value={event.description}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </>
-            ))}
         </div>
       </div>
+
+      <div className="p-4">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-lg font-semibold ">{event.title}</h3>
+            <p className="text-sm ">{event.details.Location}</p>
+          </div>
+          <span className={`px-2 py-1 text-sm rounded-full ${
+            event.active 
+              ? 'bg-green-100 text-green-800' 
+              : 'bg-gray-100 text-green-800'
+          }`}>
+            {event.active ? "Active" : "Active"}
+          </span>
+        </div>
+
+        <p className="text-sm  line-clamp-2 mb-4">
+          {event.description}
+        </p>
+        
+        <div className="flex justify-between items-center mb-2">
+          <div>
+            <p className="text-sm font-medium ">Start Date</p>
+            <p className="text-sm ">{formatDate(event.details.StartDate)}</p>
+          </div>
+          <button
+            className="p-2 hover:bg-gray-700 rounded-full transition-colors"
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            <svg
+              className={`w-5 h-5 transform transition-transform ${
+                isExpanded ? "rotate-180" : ""
+              }`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+        </div>
+
+        {isExpanded && (
+          <div className="space-y-4 pt-4 border-t border-gray-200">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm font-medium ">End Date</p>
+                <p className="text-sm ">
+                  {formatDate(event.details.EndDate)}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium ">Event ID</p>
+                <p className="text-sm ">{event.id}</p>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-sm font-medium mb-2">Ticket Limits</p>
+              <div className="grid grid-cols-3 gap-2">
+                <div className="p-2 bg-card rounded">
+                  <p className="text-sm font-medium">General</p>
+                  <p className="text-sm">{parseInt(event.gTicket_limit)}</p>
+                </div>
+                <div className="p-2 bg-card rounded">
+                  <p className="text-sm font-medium">Student</p>
+                  <p className="text-sm">{parseInt(event.sTicket_limit)}</p>
+                </div>
+                <div className="p-2 bg-card rounded">
+                  <p className="text-sm font-medium">VIP</p>
+                  <p className="text-sm">{parseInt(event.vTicket_limit)}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-const EventViewBlock = ({ label, value }) => {
-  return (
-    <div className="inline-flex flex-col min-w-0 text-left w-full relative">
-      <div className="mt-6 border rounded-md border-border min-h-12 items-center flex">
-        <div className="px-4 box-border">{value}</div>
-      </div>
-      <div className="absolute font-medium capitalize">{label}</div>
-      <div className="hint-box"></div>
-    </div>
-  );
-};
 
 export default VenueDetailPage;

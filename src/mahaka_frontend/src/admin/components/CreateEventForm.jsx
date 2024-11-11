@@ -120,8 +120,8 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
       const day = String(date.getDate()).padStart(2, "0");
       return `${year}-${month}-${day}`;
     };
-    const minDate = venueStartDate ? new Date(venueStartDate) : null;
-    const maxDate = venueEndDate ? new Date(venueEndDate) : null;
+    const minDate = venueStartDate ? new Date(venueStartDate) :"";
+    const maxDate = venueEndDate ? new Date(venueEndDate) : "";
 
     if (minDate) {
       minDate.setHours(0, 0, 0, 0);
@@ -192,7 +192,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
           const normalizedMax = maxDate && new Date(maxDate);
           if (normalizedMax) normalizedMax.setHours(0, 0, 0, 0);
 
-          const normalizedStart = startDate ? new Date(startDate) : null;
+          const normalizedStart = startDate ? new Date(startDate) : "";
           if (normalizedStart) normalizedStart.setHours(0, 0, 0, 0);
 
           return (normalizedMin && normalizedDate < normalizedMin) ||
@@ -256,37 +256,79 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     let updatedValue = value;
-
+  
+    // Handle ticket limit fields specifically
     if (name.includes("Ticket_limit")) {
       updatedValue = parseInt(value) || 0;
+      setEventData((prevState) => ({
+        ...prevState,
+        collection_args: {
+          ...prevState.collection_args,
+          [name]: updatedValue
+        }
+      }));
+  
+      // Clear errors for ticket limit fields
+      if (formErrors[name]) {
+        setFormErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: undefined,
+        }));
+      }
+      return;
     }
-
-    // Update state based on whether the field is nested or not
+  
+    // Handle nested collection_args fields
     if (
       name === "description" ||
       name === "maxLimit" ||
       name === "symbol" ||
-      name === "name"
+      name === "name" ||
+      name.includes("Ticket_price")
     ) {
+      // Handle maxLimit as number
+      if (name === "maxLimit") {
+        updatedValue = parseInt(value) || 0;
+      }
+      
+      // Handle ticket prices as number
+      if (name.includes("Ticket_price")) {
+        updatedValue = parseFloat(value) || 0;
+      }
+  
       setEventData((prevState) => ({
         ...prevState,
-        collection_args: { ...prevState.collection_args, [name]: updatedValue },
+        collection_args: {
+          ...prevState.collection_args,
+          [name]: updatedValue
+        }
       }));
-
+  
       // Clear errors for nested fields
-      if (formErrors[`collection_args_${name}`]) {
+      if (formErrors[name]) {
         setFormErrors((prevErrors) => ({
           ...prevErrors,
-          [`collection_args_${name}`]: undefined,
+          [name]: undefined,
         }));
       }
-    } else {
-      setEventData((prevState) => ({
-        ...prevState,
-        [name]: updatedValue,
-      }));
-
-      // Clear errors for top-level fields
+    } else if (name.includes("Location") || name === "title") {
+      // Handle top-level fields and eventDetails fields
+      if (name === "Location") {
+        setEventData((prevState) => ({
+          ...prevState,
+          eventDetails: {
+            ...prevState.eventDetails,
+            Location: updatedValue
+          }
+        }));
+      } else {
+        setEventData((prevState) => ({
+          ...prevState,
+          [name]: updatedValue,
+        }));
+      }
+  
+      // Clear errors for these fields
       if (formErrors[name]) {
         setFormErrors((prevErrors) => ({
           ...prevErrors,
