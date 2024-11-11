@@ -255,10 +255,20 @@ const VenueDetailPage = () => {
   );
 };
 const EventCardGrid = ({ eventArr }) => {
+  if (!eventArr?.length) {
+    return (
+      <div className="p-6">
+        <div className="text-center p-8 bg-card rounded-lg border border-gray-200">
+          <p className="text-lg ">No events available for this venue.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
-        {eventArr?.length > 0 && eventArr.map((event, index) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {eventArr.map((event, index) => (
           <EventCard key={index} event={event} />
         ))}
       </div>
