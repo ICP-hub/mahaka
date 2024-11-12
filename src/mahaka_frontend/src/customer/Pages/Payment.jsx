@@ -14,7 +14,7 @@ const PaymentComponent = () => {
   // console.log("backend events are",events)
   const coffeeAmount = 0.0001;
   const [ticketType, setTicketType] = useState("SinglePass");
-  const [price, setPrice] = useState(100);
+  const [price, setPrice] = useState(1);
   const [processing, setProcessing] = useState(false);
   const [message, setMessage] = useState("Pay Now");
   const [loading, setLoading] = useState(false);
@@ -22,7 +22,7 @@ const PaymentComponent = () => {
   const [paymentStatus, setPaymentStatus] = useState("");
   const authenticatedAgent = useAgent();
   const { balance, wallet, backend } = useAuth();
-  const { agent } = useIdentityKit();
+  console.log(authenticatedAgent);
 
   const buyEventTicketHandler = async () => {
     if (processing) {
@@ -31,8 +31,6 @@ const PaymentComponent = () => {
     setProcessing(true);
 
     try {
-      const venueId = "dasara#br5f7-7uaaa-aaaaa-qaaca-cai";
-      const eventId = "dasara event#b77ix-eeaaa-aaaaa-qaada-cai";
       const ticketTypeVariant = { [ticketType]: null };
       const record = [
         {
@@ -52,11 +50,17 @@ const PaymentComponent = () => {
         },
       ];
 
-      const response = await backend.buyEventTicket(
-        venueId,
-        eventId,
-        { ticket_type: ticketTypeVariant, price: price },
-        record
+      const response = await backend.buyVenueTicket(
+        "current venue#br5f7-7uaaa-aaaaa-qaaca-cai",
+        { ticket_type: ticketTypeVariant, price: 1 },
+        record,
+        [
+          Principal.fromText(
+            "h7yxq-n6yb2-6js2j-af5hk-h4inj-edrce-oevyj-kbs7a-76kft-vrqrw-nqe"
+          ),
+        ],
+        { ICP: null },
+        1
       );
 
       console.log("Event ticket purchased successfully:", response);
@@ -76,10 +80,10 @@ const PaymentComponent = () => {
 
   const handlePayment = async (e) => {
     setLoading(true);
-    console.log(agent, "agent");
+    console.log(authenticatedAgent, "agent");
 
     const actor = Actor.createActor(idlFactory, {
-      agent,
+      agent: authenticatedAgent,
       canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
     });
     console.log("actor", actor);
@@ -110,6 +114,7 @@ const PaymentComponent = () => {
       }
     } catch (error) {
       setMessage("Payment failed");
+      buyEventTicketHandler();
 
       setPaymentStatus("Payment failed");
       console.error("Payment error:", error);
