@@ -158,6 +158,13 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
       ...prevState,
       [name]: value,
     }));
+
+    if (formErrors[name]) {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: undefined,
+      }));
+    }
   };
 
   const handleNestedInputChange = (e, section, field) => {
@@ -169,7 +176,15 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         [field]: value,
       },
     }));
+
+    if (formErrors[field]) {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        [field]: undefined,
+      }));
+    }
   };
+
 
   const imageToFileBlob = (imageFile) => {
     return new Promise((resolve, reject) => {
@@ -319,17 +334,22 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
     }
   };
 
+
   const validateForm = () => {
     // Check if all required fields are filled
     const errors = {};
     if (
-      !venueData.collection_args.description ||
-      !venueData.eventDetails.Location ||
-      !venueData.title ||
-      !venueData.capacity
-    ) {
-      setError("Please fill in all required fields");
-      return false;
+      !venueData.collection_args.description) {
+      errors.description = "Venue description is required";
+    }
+    if (!venueData.eventDetails.Location) {
+      errors.Location = "Location is required";
+    }
+    if (!venueData.title.trim()) {
+      errors.title = "Venue name is required";
+    }
+    if (!venueData.capacity) {
+      errors.Capacity = "Maximun no. of people is required";
     }
     if (!venueData.eventDetails.StartDate) {
       errors.StartDate = "Start date is required";
@@ -343,11 +363,20 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
     if (!venueData.eventDetails.EndTime) {
       errors.EndTime = "End time is required";
     }
+    if (!venueData.vTicket_limit) {
+      errors.vTicket_limit = "VIP ticket limit is required";
+    }
+    if (!venueData.gTicket_limit) {
+      errors.gTicket_limit = "General ticket limit is required";
+    }
+    if (!venueData.sTicket_limit) {
+      errors.sTicket_limit = "Student ticket limit is required";
+    }
 
-    if (!venueData.collection_args.banner.data.trim()) {
+    if (!venueData.collection_args.banner.data) {
       errors.banner = "Venue banner is required";
     }
-    if (!venueData.collection_args.logo.data.trim()) {
+    if (!venueData.collection_args.logo.data) {
       errors.logo = "Venue logo is required";
     }
     setFormErrors(errors);
@@ -405,10 +434,13 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
               value={venueData.title}
               onChange={handleInputChange}
               className="my-3 outline-none w-full bg-transparent"
-              required
+
             />
           </div>
         </div>
+        {formErrors.title && (
+          <p className="text-red-500 text-sm mt-1">{formErrors.title}</p>
+        )}
         <div className="flex flex-col flex-auto gap-1">
           <div className="flex items-center gap-2">
             <label className="font-semibold">Description</label>
@@ -423,10 +455,13 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
                 handleNestedInputChange(e, "collection_args", "description")
               }
               className="mt-3 outline-none w-full bg-transparent"
-              required
+
             />
           </div>
         </div>
+        {formErrors.description && (
+          <p className="text-red-500 text-sm mt-1">{formErrors.description}</p>
+        )}
         <div className="flex space-x-4">
           <div className="w-1/2 flex flex-col flex-auto gap-1">
             <div className="flex items-center gap-2">
@@ -441,7 +476,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
               <input
                 ref={startDateRef}
                 className={getInputClassName("StartDate")}
-                required
+
               />
               <FcCalendar size={24} />
             </div>
@@ -464,7 +499,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
               <input
                 ref={endDateRef}
                 className={getInputClassName("EndDate")}
-                required
+
               />
               <FcCalendar size={24} />
             </div>
@@ -487,7 +522,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
               <input
                 ref={startTimeRef}
                 className={getInputClassName("StartTime")}
-                required
+
               />
               <FcAlarmClock size={24} />
             </div>
@@ -510,7 +545,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
               <input
                 ref={endTimeRef}
                 className={getInputClassName("EndTime")}
-                required
+
               />
               <FcAlarmClock size={24} />
             </div>
@@ -533,10 +568,13 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
                 handleNestedInputChange(e, "eventDetails", "Location")
               }
               className="my-3 outline-none w-full bg-transparent"
-              required
+
             />
           </div>
         </div>
+        {formErrors.Location && (
+          <p className="text-red-500 text-sm mt-1">{formErrors.Location}</p>
+        )}
         <div className="flex flex-col flex-auto gap-1">
           <div className="flex items-center gap-2">
             <label className="font-semibold">Maximum number of people</label>
@@ -549,10 +587,13 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
               value={venueData.capacity}
               onChange={handleInputChange}
               className="my-3 outline-none w-full bg-transparent"
-              required
+
             />
           </div>
         </div>
+        {formErrors.Capacity && (
+          <p className="text-red-500 text-sm mt-1">{formErrors.Capacity}</p>
+        )}
         {/* Ticket Limits */}
         <div className="flex space-x-4">
           <div className="w-1/3">
@@ -567,9 +608,14 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
                 value={venueData.gTicket_limit}
                 onChange={handleInputChange}
                 className="my-3 outline-none w-full bg-transparent"
-                required
+
               />
             </div>
+            {formErrors.gTicket_limit && (
+              <p className="text-red-500 text-sm mt-1">
+                {formErrors.gTicket_limit}
+              </p>
+            )}
           </div>
           <div className="w-1/3">
             <div className="flex items-center gap-2">
@@ -583,9 +629,14 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
                 value={venueData.sTicket_limit}
                 onChange={handleInputChange}
                 className="my-3 outline-none w-full bg-transparent"
-                required
+
               />
             </div>
+            {formErrors.sTicket_limit && (
+              <p className="text-red-500 text-sm mt-1">
+                {formErrors.sTicket_limit}
+              </p>
+            )}
           </div>
           <div className="w-1/3">
             <div className="flex items-center gap-2">
@@ -599,9 +650,14 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
                 value={venueData.vTicket_limit}
                 onChange={handleInputChange}
                 className="my-3 outline-none w-full bg-transparent"
-                required
+
               />
             </div>
+            {formErrors.vTicket_limit && (
+              <p className="text-red-500 text-sm mt-1">
+                {formErrors.vTicket_limit}
+              </p>
+            )}
           </div>
         </div>
 
@@ -618,7 +674,6 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
                 className="hidden"
                 id="upload-image"
                 onChange={handleFileChange}
-                required
               />
               <label
                 htmlFor="upload-image"
@@ -640,10 +695,11 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
                 />
               )}
             </div>
+            {formErrors.banner && (
+              <p className="text-red-500 text-sm mt-1">{formErrors.banner}</p>
+            )}
           </div>
-          {formErrors.banner && (
-            <p className="text-red-500 text-sm mt-1">{formErrors.banner}</p>
-          )}
+
           <div className="w-1/2">
             <div className="flex items-center gap-2">
               <label className="font-semibold">Logo</label>
@@ -656,7 +712,6 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
                 className="hidden"
                 id="upload-image1"
                 onChange={handleFileChange2}
-                required
               />
               <label
                 htmlFor="upload-image1"
@@ -678,10 +733,11 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
                 />
               )}
             </div>
+            {formErrors.logo && (
+              <p className="text-red-500 text-sm mt-1">{formErrors.logo}</p>
+            )}
           </div>
-          {formErrors.logo && (
-            <p className="text-red-500 text-sm mt-1">{formErrors.logo}</p>
-          )}
+
         </div>
         <div className="flex justify-center">
           <button

@@ -2,7 +2,7 @@ import React from "react";
 import { GoArrowUpRight } from "react-icons/go";
 import { Link } from "react-router-dom";
 
-export default function MoreEventCard({ image, event, index }) {
+export default function MoreWahanaCard({ image, event, index }) {
   // Define an array of colors
   const colors = ["#E2AF4E", "#FF5733", "#28A745", "#3498DB", "#9B59B6"];
   console.log(event, "event details");
@@ -23,7 +23,7 @@ export default function MoreEventCard({ image, event, index }) {
           style={{ backgroundColor: color }}
         >
           <div className="pt-10 pl-7">
-            <h3 className="text-3xl font-black mb-2">{event.title}</h3>
+            <h3 className="text-3xl font-black mb-2">{event.ride_title}</h3>
             <p className="mb-4 text-[14px] font-normal">{event.description}</p>
             <div className="py-12">
               <GoArrowUpRight

@@ -17,7 +17,7 @@ export const customerRoutes = [
     children: [
       { index: true, element: <Home /> },
       { path: "venues/:id", element: <SingleEvent /> },
-      { path: "events/:eventId", element: <EventPage /> },
+      { path: ":ids/events/:eventId", element: <EventPage /> },
       { path: "payment", element: <PaymentComponent /> },
       { path: "user-profile", element: <UserProfile /> },
       { path: "about-us", element: <AboutMahaka /> },
@@ -27,5 +27,4 @@ export const customerRoutes = [
       { path: "wahanas", element: <HeaderWahanas /> },
     ],
   },
-  
 ];

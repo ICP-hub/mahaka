@@ -8,6 +8,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { getVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
 import { getAllEventsByVenue } from "../../redux/reducers/apiReducers/eventApiReducer";
+import { getAllWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApiReducer";
+import MoreWahanaCard from "../Components/MoreWahanaCard";
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/pagination";
@@ -96,6 +98,10 @@ export default function SingleEvent() {
     loading: venueLoading,
     error,
   } = useSelector((state) => state.venues);
+  const { wahanas, loading: wahanaLoading } = useSelector(
+    (state) => state.wahana
+  );
+  console.log(wahanas, "wahanas");
   console.log(currentVenue);
   const {
     events,
@@ -131,6 +137,13 @@ export default function SingleEvent() {
       .unwrap()
       .catch((err) => {
         setLocalError(err.message || "Failed to fetch events for the venue");
+      });
+    dispatch(
+      getAllWahanasbyVenue({ backend, chunkSize: 100, pageNo: 0, venueId })
+    )
+      .unwrap()
+      .catch((err) => {
+        setLocalError(err.message || "Failed to fetch venue details");
       });
   }, [dispatch, venueId, backend]);
 
@@ -477,13 +490,63 @@ export default function SingleEvent() {
               >
                 {event?.map((event, index) => (
                   <SwiperSlide key={index}>
-                    <Link to={`/${venueId}/events/${event.id}`}>
-                      <MoreEventCard
-                        event={event}
-                        index={index}
-                        image={event?.banner?.data}
-                      />
-                    </Link>
+                    <MoreEventCard
+                      event={event}
+                      index={index}
+                      image={event?.banner?.data}
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            )}
+          </div>
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
+            <h1 className="text-4xl font-black">Check wahana</h1>
+          </section>
+
+          <div className="max-w-7xl mx-auto">
+            {wahanaLoading ? (
+              <div className="flex my-18 space-x-4 px-4 sm:px-6 lg:px-8 mx-auto">
+                {/* Skeleton Loader for each card */}
+                {[...Array(2)].map((_, index) => (
+                  <div
+                    key={index}
+                    className="w-full lg:w-1/2 h-64 bg-gray-200 animate-pulse rounded-lg"
+                  ></div>
+                ))}
+              </div>
+            ) : (
+              <Swiper
+                spaceBetween={40}
+                slidesPerView={1}
+                breakpoints={{
+                  640: {
+                    slidesPerView: 1,
+                  },
+                  768: {
+                    slidesPerView: 1,
+                  },
+                  1024: {
+                    slidesPerView: 2,
+                  },
+                }}
+                autoplay={{
+                  delay: 3000,
+                  disableOnInteraction: false,
+                }}
+                pagination={{
+                  clickable: true,
+                }}
+                modules={[Autoplay, Pagination]}
+                className="mySwiper px-4 sm:px-6 lg:px-8 mx-auto"
+              >
+                {wahanas?.map((event, index) => (
+                  <SwiperSlide key={index}>
+                    <MoreWahanaCard
+                      event={event}
+                      index={index}
+                      image={event?.banner?.data}
+                    />
                   </SwiperSlide>
                 ))}
               </Swiper>

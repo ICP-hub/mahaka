@@ -75,10 +75,17 @@ const EventPage = () => {
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   };
-  const { id, eventId } = useParams();
-  const eventIds = `${decodeURIComponent(eventId)}${window.location.hash}`;
-  const venueId = `${decodeURIComponent(id)}${window.location.hash}`;
-  console.log(venueId);
+  const { ids, eventId } = useParams();
+
+  // Replace _ with # and append the hash from window.location.hash
+  const eventIds = `${decodeURIComponent(eventId).replace(/_/g, "#")}${
+    window.location.hash
+  }`;
+  const venueId = `${decodeURIComponent(ids).replace(/_/g, "#")}${
+    window.location.hash
+  }`;
+
+  console.log(venueId, eventIds);
 
   const dispatch = useDispatch();
   const {
@@ -86,8 +93,6 @@ const EventPage = () => {
 
     error,
   } = useSelector((state) => state.venues);
-
-  const ids = currentVenue[1]?.id;
 
   const {
     currentEvent,
@@ -111,7 +116,7 @@ const EventPage = () => {
       return;
     }
 
-    dispatch(getEvent({ backend, eventIds, ids }))
+    dispatch(getEvent({ backend, eventIds, venueId }))
       .unwrap()
       .catch((err) => {
         setLocalError(err.message || "Failed to fetch events for the venue");

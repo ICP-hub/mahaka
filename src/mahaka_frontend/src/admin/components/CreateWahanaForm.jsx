@@ -8,6 +8,8 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
   const { venues } = useSelector((state) => state.venues);
+  const [formErrors, setFormErrors] = useState({});
+  console.log("create wahana errors are", formErrors)
   const [formData, setFormData] = useState({
     name: "",
     symbol: "",
@@ -102,6 +104,40 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
   };
 
 
+  
+// validation form
+const validateForm = () => {
+  const errors = {};
+console.log("create wahana errors are", errors)
+  // Validate title
+  if (!formData.name.trim()) {
+    errors.title = "wahana title is required";
+  }
+
+  // Validate description
+  if (!formData.description.trim()) {
+    errors.description = "wahana description is required";
+  }
+
+  // Validte price
+  if (!formData.price) {
+    errors.price = "price is required";
+  }
+
+  // Validate banner image
+  if (!formData.banner.data) {
+    errors.banner = "wahana banner is required";
+  }
+  if (!formData.banner.logo_type) {
+    errors.logo = "Event logo is required";
+  }
+ 
+  setFormErrors(errors);
+  return Object.keys(errors).length === 0;
+};
+
+
+
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     setError("");
@@ -132,7 +168,12 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
   }
 };
 
-  const handleCreateWahana = async () => {
+  const handleCreateWahana = async (e) => {
+    e.preventDefault();
+    // setIsSubmitting(true);
+    if (!validateForm()) {
+      return;
+    }
     setIsSubmitting(true);
     try {
       await dispatch(
@@ -183,7 +224,10 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
             <label className="font-semibold">Wahana Name </label>
             <TextHint text="Enter the name of the wahana." />
             </div>
-          <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border ">
+          <div 
+           className={`border ${formErrors.title ? "border-red-500" : "border-border"
+           } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+          >
             <input
               type="text"
               name="name"
@@ -195,6 +239,9 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
               required
             />
           </div>
+          {formErrors.title && (
+          <p className="text-red-500 text-sm mt-1">{formErrors.title}</p>
+        )}
         </div>
 
         <div className="flex flex-col gap-1">
@@ -202,7 +249,11 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
             <label className="font-semibold">Description </label>
             <TextHint text="Enter the description of the wahana." />
             </div>
-          <div className="border border-border rounded-lg pl-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+          <div 
+           className={`border ${formErrors.description ? "border-red-500" : "border-border"
+           } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+          >
+         
             <textarea
               name="description"
               rows={5}
@@ -213,7 +264,11 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
               className="mt-3 outline-none w-full bg-transparent"
               required
             />
+            
           </div>
+          {formErrors.description && (
+          <p className="text-red-500 text-sm mt-1">{formErrors.description}</p>)}
+         
         </div>
 
         <div className="flex flex-col gap-1">
@@ -221,7 +276,10 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
             <label className="font-semibold">Price (IDR)</label>
             <TextHint text="Enter the price of the wahana." />
             </div>
-          <div className="border border-border rounded-lg pl-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+          <div
+           className={`border ${formErrors.description ? "border-red-500" : "border-border"
+           } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+          >
             <input
               value={formData.price}
               onChange={(e) =>
@@ -231,6 +289,8 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
               required
             />
           </div>
+          {formErrors.price && (
+          <p className="text-red-500 text-sm mt-1">{formErrors.price}</p>)}
         </div>
 
         <div className="flex flex-col gap-1">
@@ -238,7 +298,7 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
             <label className="font-semibold">Banner </label>
             <TextHint text="Upload the image of the wahana." />
             </div>
-          <div className="flex flex-col items-center justify-center border-dashed border-2 border-gray-300 p-4 rounded">
+          <div className={`flex flex-col items-center justify-center border border-gray-300 p-4 rounded ${formErrors.banner?"border-red-500":"border-border"}`}>
             <input
               type="file"
               accept=".jpg,.jpeg,.png"
@@ -267,6 +327,8 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
               />
             )}
           </div>
+         {formErrors.banner && (
+          <p className="text-red-500 text-sm mt-1">{formErrors.banner}</p>)} 
         </div>
       </div>
 

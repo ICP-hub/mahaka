@@ -73,9 +73,9 @@ export const buyEventTicket = createAsyncThunk(
 // fetching a specific event
 export const getEvent = createAsyncThunk(
   "events/getEvent",
-  async ({ backend, eventIds, ids }) => {
+  async ({ backend, eventIds, venueId }) => {
     try {
-      const response = await backend.getEvent(eventIds, ids);
+      const response = await backend.getEvent(eventIds, venueId);
       console.log("Event fetched:", response);
       return response;
     } catch (error) {
