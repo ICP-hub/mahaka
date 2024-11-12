@@ -135,6 +135,27 @@ export const getAllWahanas = createAsyncThunk(
   }
 )
 
+
+// search wahana
+export const searchWahanas = createAsyncThunk(
+  "wahana/searchWahanas",
+  async ({backend, searchText,  chunkSize, pageNo})=>{
+    try{
+      const response = await  backend.searchWahanas(
+        searchText,
+        chunkSize,
+        pageNo
+
+      );
+      return response.data;
+    } catch(error) {
+      console.error("error searching the wahanas",error);
+      throw error;
+
+    }
+  }
+)
+
 // delete wahana
 export const deleteWahana = createAsyncThunk(
   "wahana/deleteWahana",
@@ -167,6 +188,22 @@ const wahanaSlice = createSlice({
         state.createWahanaLoader = false;
         state.error = action.error.message;
         notificationManager.error("Failed to create wahana");
+      })
+
+
+      // search wahana
+      .addCase(searchWahanas.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(searchWahanas.fulfilled, (state, action) => {
+        state.loading = false;
+        state.wahanas = action.payload;
+        state.error = null;
+      })
+      .addCase(searchWahanas.rejected, (state, action) => {
+        state.loading = false;
+        // state.error = action.error.message;
+        state.error = action.error.message || 'An error occurred';
       })
 
 
@@ -262,7 +299,7 @@ const wahanaSlice = createSlice({
       notificationManager.error("Failed to fetch wahana");
     })
 
- 
+
 // delete wahana
 
 .addCase(deleteWahana.pending, (state) => {
@@ -313,6 +350,8 @@ const wahanaSlice = createSlice({
         state.error = action.error.message;
         notificationManager.error("Failed to fetch wahanas");
       });
+
+   
   },
 });
 

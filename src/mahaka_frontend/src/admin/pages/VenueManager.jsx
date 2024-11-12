@@ -19,6 +19,8 @@ const VenueManager = () => {
 
   const [searchInput, setSearchInput] = useState("");
 
+ 
+
   useEffect(() => {
     // Trigger the search whenever the user types in the search input
     if (searchInput) {

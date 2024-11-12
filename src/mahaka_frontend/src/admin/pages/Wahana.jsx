@@ -4,8 +4,9 @@ import { HiMagnifyingGlass } from "react-icons/hi2";
 import { ImSpinner9 } from "react-icons/im";
 import { getAllWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import { getAllWahanas } from "../../redux/reducers/apiReducers/wahanaApiReducer";
+import { searchWahanas } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import { deleteWahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
-import { getWahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
+// import { getWahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import ModalOverlay from "../../customer/Components/Modal-overlay";
 import CreateWahanaForm from "../components/CreateWahanaForm";
 import EditWahanaForm from "../components/EditWahanaForm";
@@ -79,10 +80,20 @@ const AdminWahana = () => {
   const [deleteVenueId,setDeleteVenueId] = useState(null)
   const [wahanaDescription, setWahanaDescription] = useState("")
   const [descriptionModal, setDescriptionModal] = useState(false);
+  const [searchInput, setSearchInput] = useState("")
+
+  console.log("search wahanas is", searchInput)
   // const [editModalOpen, setEditModalOpen] = useState(false);
 
   // console.log("selected venue is",selectedVenue)
 
+  useEffect(()=>{
+    if(searchInput){
+      dispatch(searchWahanas({backend, searchText:searchInput, chunkSize:10, pageNo:0}))
+    }else{
+      dispatch(getAllWahanas({backend, chunkSize:10, pageNo:0}))
+    }
+  },[searchInput,dispatch])
 
 
   useEffect(() => {
@@ -203,13 +214,13 @@ const AdminWahana = () => {
             </h2>
             <div className="flex justify-end">
               <button
-                className="bg-red-600 text-white px-4 py-2 rounded mr-4"
+                className="bg-red-600 text-white px-4 py-2 mr-4 rounded-full"
                 onClick={()=>confirmDeleteWahana()}
               >
                 Delete
               </button>
               <button
-                className="bg-gray-300 px-4 py-2 rounded"
+                className="bg-gray-300 px-4 py-2 rounded-full"
                 onClick={() => setDeleteModalVisible(false)}
               >
                 Cancel
@@ -260,6 +271,8 @@ const AdminWahana = () => {
           delete_Wahana = {delete_Wahana}
           selectedWahana = {selectedWahana}
           handleDescription = {handleDescription }
+          searchInput = {searchInput}
+          setSearchInput = {setSearchInput}
          
         />
 
@@ -311,7 +324,9 @@ const WahanaMain = ({
   setSelectedWahana,
   delete_Wahana,
   initialLoad,
-  handleDescription 
+  handleDescription,
+  searchInput,
+  setSearchInput
 }) => {
  
 
@@ -360,6 +375,11 @@ const SkeletonLoader = () => {
               type="text"
               placeholder="Search wahanas"
               className=" bg-transparent outline-none ml-4 lg:w-1000px"
+              search = {searchInput}
+              // setSearchInput = {setSearchInput}
+              onChange = {(e)=>setSearchInput(e.target.value)}
+              
+
             />
           </div>
 
@@ -385,7 +405,10 @@ const SkeletonLoader = () => {
 
       <div className="flex justify-center mt-30"><ImSpinner9 className = "animate-spin text-7xl opacity-80"/></div>
           </div>
-        ) :  (
+        ) :  wahanaData && wahanaData.length === 0?
+        <div className = "text-center text-gray-800 md:text-5xl text-3xl font-bold mt-10">
+        No wahanas found!
+        </div> : (
           <div className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3">
             {wahanaData?.map((wahana) => (
               <WahanaCard
