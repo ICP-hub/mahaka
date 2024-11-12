@@ -941,123 +941,123 @@ actor mahaka {
      /*********************************************************/
 
     
-     public shared ({caller}) func buyVenueTicket(venueId : Types.venueId, _ticket_type : Types.ticket_info, _metadata : nftTypes.MetadataDesc ) : async Result.Result<nftTypes.MintReceipt, Types.UpdateUserError> {
-          // if (Principal.isAnonymous(caller)) {
-          //      return #err(#UserNotAuthenticated); 
-          // }; 
-          // let roleResult = await getRoleByPrincipal(caller);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
-          let collection_id = await Utils.extractCanisterId(venueId);
-          let collection_actor = actor (collection_id) : actor {
-               logoDip721 : () -> async Types.LogoResult;
-               mintDip721 : (to : Principal, metadata : Types.MetadataDesc ,ticket_details : nftTypes.ticket_type, logo : Types.LogoResult) -> async nftTypes.MintReceipt;
-          };
-          let _logo = await collection_actor.logoDip721();
-          let _ticket = await collection_actor.mintDip721(caller,_metadata,_ticket_type.ticket_type,_logo);
+     // public shared ({caller}) func buyVenueTicket(venueId : Types.venueId, _ticket_type : Types.ticket_info, _metadata : nftTypes.MetadataDesc ) : async Result.Result<nftTypes.MintReceipt, Types.UpdateUserError> {
+     //      // if (Principal.isAnonymous(caller)) {
+     //      //      return #err(#UserNotAuthenticated); 
+     //      // }; 
+     //      // let roleResult = await getRoleByPrincipal(caller);
+     //      // switch (roleResult) {
+     //      //      case (#err(error)) {
+     //      //           return #err(#RoleError);
+     //      //      };
+     //      //      case (#ok(role)) {
+     //      //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+     //      //                return #err(#UserNotAuthorized);
+     //      //           };
+     //      //      };
+     //      // };
+     //      let collection_id = await Utils.extractCanisterId(venueId);
+     //      let collection_actor = actor (collection_id) : actor {
+     //           logoDip721 : () -> async Types.LogoResult;
+     //           mintDip721 : (to : Principal, metadata : Types.MetadataDesc ,ticket_details : nftTypes.ticket_type, logo : Types.LogoResult) -> async nftTypes.MintReceipt;
+     //      };
+     //      let _logo = await collection_actor.logoDip721();
+     //      let _ticket = await collection_actor.mintDip721(caller,_metadata,_ticket_type.ticket_type,_logo);
      
-          return #ok(_ticket);
-     };
+     //      return #ok(_ticket);
+     // };
 
-     public shared ({caller}) func buyEventTicket(_venueId : Text,_eventId : Text, _ticket_type : Types.ticket_info, _metadata : nftTypes.MetadataDesc) : async Result.Result<nftTypes.MintReceipt, Types.UpdateUserError> {
-          // if (Principal.isAnonymous(caller)) {
-          //      return #err(#UserNotAuthenticated); 
-          // }; 
-          // let roleResult = await getRoleByPrincipal(caller);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
-          switch(_EventsMap.get(_venueId)){
-               case null {
-                    throw(Error.reject("No venue found for the events"));
-               };
-               case (?Event_index){
-                    let event_blob = await stable_get(Event_index,Events_state);
-                    let event_object :?Types.Events_data = from_candid(event_blob);
-                    switch(event_object){
-                         case null {
-                              throw(Error.reject("No object found for this blob in the memory"));
-                         };
+     // public shared ({caller}) func buyEventTicket(_venueId : Text,_eventId : Text, _ticket_type : Types.ticket_info, _metadata : nftTypes.MetadataDesc) : async Result.Result<nftTypes.MintReceipt, Types.UpdateUserError> {
+     //      // if (Principal.isAnonymous(caller)) {
+     //      //      return #err(#UserNotAuthenticated); 
+     //      // }; 
+     //      // let roleResult = await getRoleByPrincipal(caller);
+     //      // switch (roleResult) {
+     //      //      case (#err(error)) {
+     //      //           return #err(#RoleError);
+     //      //      };
+     //      //      case (#ok(role)) {
+     //      //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+     //      //                return #err(#UserNotAuthorized);
+     //      //           };
+     //      //      };
+     //      // };
+     //      switch(_EventsMap.get(_venueId)){
+     //           case null {
+     //                throw(Error.reject("No venue found for the events"));
+     //           };
+     //           case (?Event_index){
+     //                let event_blob = await stable_get(Event_index,Events_state);
+     //                let event_object :?Types.Events_data = from_candid(event_blob);
+     //                switch(event_object){
+     //                     case null {
+     //                          throw(Error.reject("No object found for this blob in the memory"));
+     //                     };
 
-                         case (?e){
-                              let events_list = e.Events;
-                              let event = List.find<Types.completeEvent>(
-                                   events_list,
-                                   func x {x.id == _eventId}
-                              );
-                              switch (event){
-                                   case null (
-                                        throw (Error.reject("No Event found")) 
-                                   );
-                                   case (?_event){
-                                        let collection_actor = actor (Principal.toText(_event.event_collectionid)) : actor {
-                                        logoDip721 : () -> async Types.LogoResult;
-                                        mintDip721 : (to : Principal, metadata : Types.MetadataDesc ,ticket_details : nftTypes.ticket_type, logo : Types.LogoResult) -> async nftTypes.MintReceipt;                                        
-                                        };
-                                        let _logo = await collection_actor.logoDip721();
-                                        let _ticket = await collection_actor.mintDip721(caller,_metadata,_ticket_type.ticket_type,_logo);
-                                        return #ok(_ticket);
-                                   };
-                              };                           
-                         };
-                    };
-               };
-          };
-     };
+     //                     case (?e){
+     //                          let events_list = e.Events;
+     //                          let event = List.find<Types.completeEvent>(
+     //                               events_list,
+     //                               func x {x.id == _eventId}
+     //                          );
+     //                          switch (event){
+     //                               case null (
+     //                                    throw (Error.reject("No Event found")) 
+     //                               );
+     //                               case (?_event){
+     //                                    let collection_actor = actor (Principal.toText(_event.event_collectionid)) : actor {
+     //                                    logoDip721 : () -> async Types.LogoResult;
+     //                                    mintDip721 : (to : Principal, metadata : Types.MetadataDesc ,ticket_details : nftTypes.ticket_type, logo : Types.LogoResult) -> async nftTypes.MintReceipt;                                        
+     //                                    };
+     //                                    let _logo = await collection_actor.logoDip721();
+     //                                    let _ticket = await collection_actor.mintDip721(caller,_metadata,_ticket_type.ticket_type,_logo);
+     //                                    return #ok(_ticket);
+     //                               };
+     //                          };                           
+     //                     };
+     //                };
+     //           };
+     //      };
+     // };
 
-     public shared ({caller}) func buyWahanaToken(wahanaId : Text, receiver : Principal )  {
-          // if (Principal.isAnonymous(caller)) {
-          //      return #err(#UserNotAuthenticated); 
-          // }; 
-          // let roleResult = await getRoleByPrincipal(caller);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
-          let collection_actor = actor (wahanaId) : actor {
-               icrc1_transfer : ({
-                    from_subaccount : ?TypesICRC.Subaccount;
-                    to : TypesICRC.Account;
-                    amount : TypesICRC.Tokens;
-                    fee : ?TypesICRC.Tokens;
-                    memo : ?TypesICRC.Memo;
-                    created_at_time : ?TypesICRC.Timestamp;
-                    }) -> async TypesICRC.Result<TypesICRC.TxIndex, TypesICRC.TransferError>
-          };
-          let transferObj = {
-               from_subaccount = null : ?TypesICRC.Subaccount;
-               to = { owner = receiver; subaccount = null } : TypesICRC.Account;
-               amount = 1 : TypesICRC.Tokens;
-               memo = null : ?TypesICRC.Memo;
-               created_at_time = null : ?TypesICRC.Timestamp;
-               fee = null : ?TypesICRC.Tokens;
-          };
+     // public shared ({caller}) func buyWahanaToken(wahanaId : Text, receiver : Principal )  {
+     //      // if (Principal.isAnonymous(caller)) {
+     //      //      return #err(#UserNotAuthenticated); 
+     //      // }; 
+     //      // let roleResult = await getRoleByPrincipal(caller);
+     //      // switch (roleResult) {
+     //      //      case (#err(error)) {
+     //      //           return #err(#RoleError);
+     //      //      };
+     //      //      case (#ok(role)) {
+     //      //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+     //      //                return #err(#UserNotAuthorized);
+     //      //           };
+     //      //      };
+     //      // };
+     //      let collection_actor = actor (wahanaId) : actor {
+     //           icrc1_transfer : ({
+     //                from_subaccount : ?TypesICRC.Subaccount;
+     //                to : TypesICRC.Account;
+     //                amount : TypesICRC.Tokens;
+     //                fee : ?TypesICRC.Tokens;
+     //                memo : ?TypesICRC.Memo;
+     //                created_at_time : ?TypesICRC.Timestamp;
+     //                }) -> async TypesICRC.Result<TypesICRC.TxIndex, TypesICRC.TransferError>
+     //      };
+     //      let transferObj = {
+     //           from_subaccount = null : ?TypesICRC.Subaccount;
+     //           to = { owner = receiver; subaccount = null } : TypesICRC.Account;
+     //           amount = 1 : TypesICRC.Tokens;
+     //           memo = null : ?TypesICRC.Memo;
+     //           created_at_time = null : ?TypesICRC.Timestamp;
+     //           fee = null : ?TypesICRC.Tokens;
+     //      };
 
-          let response = await  collection_actor.icrc1_transfer(transferObj);
-          Debug.print(debug_show(response));
+     //      let response = await  collection_actor.icrc1_transfer(transferObj);
+     //      Debug.print(debug_show(response));
 
-     };
+     // };
 
      /*********************************************************/
      /*                 Offline  Tickets Handlig              */
@@ -1212,6 +1212,136 @@ actor mahaka {
         let transferResponse = await LedgerCanister.icrc2_transfer_from(transferArgs);
         transferResponse
      };
+
+     public shared ({caller}) func buyVenueTicket(
+          venueId: Types.venueId,
+          _ticket_type: Types.ticket_info,
+          _metadata: nftTypes.MetadataDesc,
+          receivers: [Principal],
+          paymentType: Types.PaymentType,
+          numOfVisitors: Nat
+     ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError or Text> {
+          let collectionId = await Utils.extractCanisterId(venueId);
+          let collectionActor = actor (collectionId) : actor {
+               logoDip721: () -> async Types.LogoResult;
+               mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
+          };
+          switch (paymentType) {
+               case (#Cash) {
+                    throw Error.reject("Cash option is not available");
+                    // await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receivers, numOfVisitors, venueId, paymentType, _ticket_type.price, "venue", caller);
+               };
+               case (#ICP) {
+                    let transferResult = await performICPTransfer(caller, _ticket_type.price * numOfVisitors);
+                    switch (transferResult) {
+                         case (#Ok(_)) {
+                              await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receivers, numOfVisitors, venueId, paymentType, _ticket_type.price, "venue", caller);
+                         };
+                         case (#Err(error)) {
+                              throw Error.reject(debug_show ("Transfer Error", error));
+                              return #err(handleTransferError(error));
+                         };
+                    };
+               };
+               case (#Card) {
+                    // No operation for card payment at this time
+                    return #ok([]);
+               };
+          };
+     };
+
+
+      public shared ({caller}) func buyEventTicket(
+          _venueId: Text,
+          _eventId: Text,
+          _ticket_type: Types.ticket_info,
+          _metadata: nftTypes.MetadataDesc,
+          receivers: [Principal],
+          numOfVisitors: Nat,
+          paymentType: Types.PaymentType
+     ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError or Text> {
+          let eventResult = await getEvent(_eventId, _venueId);
+          switch (eventResult) {
+               case (#ok(event)) {
+                    let collectionActor = actor (Principal.toText(event.event_collectionid)) : actor {
+                         logoDip721: () -> async Types.LogoResult;
+                         mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
+                    };
+                    switch (paymentType) {
+                         case (#Cash) {
+                              throw Error.reject("Cash option is not available");
+                              // await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receivers, numOfVisitors, _eventId, paymentType, _ticket_type.price, "event", caller);
+                         };
+                         case (#ICP) {
+                              let transferResult = await performICPTransfer(caller, _ticket_type.price * numOfVisitors);
+                              switch (transferResult) {
+                                   case (#Ok(_)) {
+                                        await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receivers, numOfVisitors, _eventId, paymentType, _ticket_type.price, "venue", caller);
+                                   };
+                                   case (#Err(error)) {
+                                        throw Error.reject(debug_show ("Transfer Error", error));
+                                        return #err(handleTransferError(error));
+                                   };
+                              };
+                         };
+                         case (#Card) {
+                              // No operation for card payment at this time
+                              return #ok([]);
+                         };
+                    };
+               };
+               case (#err(e)) { return #err(#EventError); };
+          };
+     };
+
+     public shared ({caller}) func buyWahanaToken(
+          venueId: Text,
+          wahanaId: Text,
+          receivers: [Principal],
+          numOfVisitors: Nat,
+          paymentType: Types.PaymentType
+     ) : async Result.Result<[icrcTypes.TxIndex], icrcTypes.TransferError or Types.MintError or Text> {
+          let wahanaResult = await getWahana(wahanaId, venueId);
+          switch (wahanaResult) {
+               case (#ok(wahana)) {
+                    let collectionActor = actor (wahana.id) : actor {
+                         icrc1_transfer: ({
+                              from_subaccount: ?TypesICRC.Subaccount;
+                              to: TypesICRC.Account;
+                              amount: TypesICRC.Tokens;
+                              fee: ?TypesICRC.Tokens;
+                              memo: ?TypesICRC.Memo;
+                              created_at_time: ?TypesICRC.Timestamp;
+                         }) -> async TypesICRC.Result<TypesICRC.TxIndex, TypesICRC.TransferError>;
+                    };
+                    switch (paymentType) {
+                         case (#Cash) {
+                              throw Error.reject("Cash option is not available");
+                              // await processTransfer(collectionActor, receivers, numOfVisitors, wahanaId, paymentType, wahana.price,caller);
+                         };
+                         case (#ICP) {
+                              let transferResult = await performICPTransfer(caller, wahana.price * numOfVisitors);
+                              switch (transferResult) {
+                                   case (#Ok(_)) {
+                                        await processTransfer(collectionActor, receivers, numOfVisitors, wahanaId, paymentType, wahana.price,caller);
+                                   };
+                                   case (#Err(error)) {
+                                        throw Error.reject(debug_show ("Transfer Error", error));
+                                        return #err(handleTransferError(error));
+                                   };
+                              };
+                         };
+                         case (#Card) {
+                              // No operation for card payment at this time
+                              return #ok([]);
+                         };
+                    };
+                    // await processTransfer(collectionActor, receivers, numOfVisitors, wahanaId, paymentType, wahana.price,caller);
+               };
+               case (#err(e)) { return #err(#WahanaError); };
+          };
+     };
+
 
 
      public shared ({caller}) func buyOfflineVenueTicket(
