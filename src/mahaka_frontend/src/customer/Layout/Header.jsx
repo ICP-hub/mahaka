@@ -7,6 +7,8 @@ import { getUserDetailsByCaller } from "../../redux/reducers/apiReducers/userApi
 import useLogin from "../../common/hooks/useLogin";
 import ProfileDemoImg from "../../assets/images/profile-demo.png";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../redux/reducers/auth/authReducer";
+import { ConnectWallet } from "@nfid/identitykit/react";
 import {
   NFIDLogin,
   NFIDLogout,
@@ -17,7 +19,7 @@ import TranslationForCustomer from "../../TranslationForCustomer";
 const NavLinks = [
   { title: "HOME", url: "/" },
   { title: "ABOUT MAHAKA", url: "/about-us" },
-   { title: "SERVICES", url: "/our-services" },
+  { title: "SERVICES", url: "/our-services" },
   { title: "CONTACT US", url: "/contact-us" },
   // { title: "WAHANAS", url: "/wahanas" },
 ];
@@ -25,6 +27,7 @@ const NavLinks = [
 export default function Header() {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const toggleNavigation = () => setIsNavOpen((prev) => !prev);
+  const { isConnected, login, logout } = useAuth();
 
   // Effect if sidenav open overflow hidden
 
@@ -155,12 +158,19 @@ const NavVertical = ({ isNavOpen, onNavOpen }) => {
     </AnimatePresence>
   );
 };
+const ConnectBtn = ({ onClick }) => (
+  <button
+    onClick={onClick}
+    className="p-4 bg-secondary text-white font-medium rounded-lg hover:bg-orange-600 min-w-max"
+  >
+    Connect wallet
+  </button>
+);
 
 const ConnectWalletBtn = ({ onNavOpen }) => {
-  const { isConnected, NFIDInstance, principal } = useSelector(
-    (state) => state.authentication
-  );
+  const { isConnected, login, logout, principal } = useAuth();
   const dispatch = useDispatch();
+
   // const { loginWithPlug } = useLogin();
 
   if (isConnected)
@@ -180,12 +190,10 @@ const ConnectWalletBtn = ({ onNavOpen }) => {
     );
 
   return (
-    <button
-      className="p-4 bg-secondary text-white font-medium rounded-lg hover:bg-orange-600 min-w-max"
-      onClick={() => dispatch(NFIDLogin(NFIDInstance))}
-    >
-      Connect Wallet
-    </button>
+    <ConnectWallet
+      connectButtonComponent={ConnectBtn}
+      className="rounded-full bg-black"
+    />
   );
 };
 

@@ -30,7 +30,6 @@ dfx start --clean
 ```
 
 - all commands for deploy locally
-
 ```bash
 dfx generate
 cp src/declarations/mahaka_backend/* .dfx/local/canisters/mahaka_backend/

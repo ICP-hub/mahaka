@@ -5,12 +5,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUserDetailsByCaller } from "../../../redux/reducers/apiReducers/userApiReducer";
 import { useEffect } from "react";
 import Avvvatars from "avvvatars-react";
+import { useAuth } from "../../../redux/reducers/auth/authReducer";
 
 const UserProfileData = () => {
   const dispatch = useDispatch();
   const logoutAndRedirect = useLogout();
   const { currentUser, userLoading } = useSelector((state) => state.users);
-  const { backend, principal } = useSelector((state) => state.authentication);
+  const { backend, principal } = useAuth();
 
   useEffect(() => {
     dispatch(getUserDetailsByCaller({ backend: backend }));
@@ -69,7 +70,7 @@ const UserProfileData = () => {
           <label className="block text-gray-700 font-semibold w-32">
             Principal ID
           </label>
-          <p className="font-semibold break-all">{principal}</p>
+          <p className="font-semibold break-all">{principal.toText()}</p>
         </div>
       </div>
     </div>
