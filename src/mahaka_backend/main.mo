@@ -17,6 +17,7 @@ import Iter "mo:base/Iter";
 import Debug "mo:base/Debug";
 import Time "mo:base/Time";
 import Array "mo:base/Array";
+import Nat "mo:base/Nat";
 // import Uuid "mo:uuid/UUID";
 import Utils "./Utils";
 import nftTypes "../DIP721-NFT/Types";
@@ -81,6 +82,32 @@ actor mahaka {
           elems = Region.new ();
           var elems_count : Nat64 = 0;
      };
+
+     // Payment recepient
+     private stable var recepient : Principal = Principal.fromText("7yywi-leri6-n33rr-vskr6-yb4nd-dvj6j-xg2b4-reiw6-dljs7-slclz-2ae");
+
+     public shared ({ caller }) func getRecepient() : async Result.Result<Principal, Text> {
+          if (not Principal.isController(caller)) {
+               throw Error.reject("You cannot control this canister");
+               return #err("You cannot control this canister");
+          };
+          return #ok(recepient);
+     };
+
+     public shared ({ caller }) func setRecepient(recepientPrincipal : Principal) : async Result.Result<Principal, Text> {
+          if (not Principal.isController(caller)) {
+               throw Error.reject("You cannot control this canister");
+               return #err("You cannot control this canister");
+          };
+          recepient := recepientPrincipal;
+          return #ok(recepient);
+     };
+
+
+     let LedgerCanister = actor "ryjl3-tyaaa-aaaaa-aaaba-cai" : actor {
+        account_balance : shared query Types.BinaryAccountBalanceArgs -> async Types.Tokens;
+        icrc2_transfer_from : shared Types.TransferFromArgs -> async Types.Result_3;
+    };
 
      system func preupgrade(){
           _stableVenueArray := Iter.toArray(_venueMap.entries());
@@ -163,6 +190,39 @@ actor mahaka {
      };
 
 
+     func handleTransferError(error : Types.TransferFromError) : Text {
+        switch (error) {
+            case (#GenericError(record)) {
+                return "Generic error: " # record.message # " (code: " # Nat.toText(record.error_code) # ")";
+            };
+            case (#InsufficientAllowance(record)) {
+                return "Insufficient allowance: " # Nat.toText(record.allowance);
+            };
+            case (#BadBurn(record)) {
+                return "Bad burn amount, minimum required: " # Nat.toText(record.min_burn_amount);
+            };
+            case (#Duplicate(record)) {
+                return "Duplicate transaction of: " # Nat.toText(record.duplicate_of);
+            };
+            case (#BadFee(record)) {
+                return "Bad fee, expected fee: " # Nat.toText(record.expected_fee);
+            };
+            case (#CreatedInFuture(record)) {
+                return "Transaction created in the future. Ledger time: " # Nat.toText(Nat64.toNat(record.ledger_time));
+            };
+            case (#TooOld) {
+                return "Transaction is too old.";
+            };
+            case (#InsufficientFunds(record)) {
+                return "Insufficient funds. Available balance: " # Nat.toText(record.balance);
+            };
+            case (#TemporarilyUnavailable) {
+                return "The system is temporarily unavailable. Please try again later.";
+            };
+        };
+    };
+
+
 //     --------------------------------------------------------------------------------------------------------------------
 
      
@@ -236,93 +296,93 @@ actor mahaka {
           };
      };
 
-     public shared ({caller}) func updateVenue( 
-        collection_details : Types.venueCollectionParams, 
-        Venue_id : Text, 
-        Title : Text,
-        Description : Text,
-        Details : Types.venueDetails,
-        capacity : Nat,
-        logo : Types.LogoResult,
-        banner : Types.LogoResult
-     ) : async Result.Result<(Principal, Types.Venue), Types.UpdateUserError> {
-          // if (Principal.isAnonymous(caller)) {
-          //      return #err(#UserNotAuthenticated); 
-          // }; 
-          // let roleResult = await getRoleByPrincipal(caller);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
-          switch(_venueMap.get(Venue_id)){
-               case null {
-                    throw Error.reject("Venue not found");
-               };
-               case (?v){
-                    let venues_object_blob = await stable_get(v,Venue_state);
-                    let venues_object : ?Types.Venue = from_candid(venues_object_blob);
-                    switch(venues_object){
-                         case null{
-                              throw (Error.reject("No object found in the memory"));
-                         };
-                         case (?obj){
-                              Cycles.add<system>(500_500_000_000);
-                              let venueCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), collection_details.collection_args);
-                              ignore await venueCollection.wallet_receive();
-                              let new_custodian = await venueCollection.addcustodians(caller);
-                              Debug.print(" New added custodian is : " # debug_show (new_custodian));
-                              let nftcustodians = await venueCollection.showcustodians();
-                              Debug.print("These are the list of current custodians : " #debug_show (nftcustodians));
-                              let collection_id = await venueCollection.getCanisterId();
-                              let venue_id =  Title # "#" # Principal.toText(collection_id) ;
-                              let Venue : Types.Venue = {
-                                   id = venue_id;
-                                   Title = Title;
-                                   logo = logo;
-                                   banner = banner;
-                                   Description : Text;
-                                   Details = Details;
-                                   Events = obj.Events;
-                                   Wahanas = obj.Wahanas;
-                                   capacity = capacity;
-                                   Collection_id = collection_id;
-                                   creator = caller;
-                              };
-                              let venue_blob = to_candid(Venue);
-                              let Venue_index = await update_stable(v, venue_blob, Venue_state);
-                              _venueMap.put(venue_id, Venue_index);
-                              _venueMap.delete(Venue_id);
-                              switch(_EventsMap.get(Venue_id)){
-                                   case null{
+     // public shared ({caller}) func updateVenue( 
+     //    collection_details : Types.venueCollectionParams, 
+     //    Venue_id : Text, 
+     //    Title : Text,
+     //    Description : Text,
+     //    Details : Types.venueDetails,
+     //    capacity : Nat,
+     //    logo : Types.LogoResult,
+     //    banner : Types.LogoResult
+     // ) : async Result.Result<(Principal, Types.Venue), Types.UpdateUserError> {
+     //      // if (Principal.isAnonymous(caller)) {
+     //      //      return #err(#UserNotAuthenticated); 
+     //      // }; 
+     //      // let roleResult = await getRoleByPrincipal(caller);
+     //      // switch (roleResult) {
+     //      //      case (#err(error)) {
+     //      //           return #err(#RoleError);
+     //      //      };
+     //      //      case (#ok(role)) {
+     //      //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+     //      //                return #err(#UserNotAuthorized);
+     //      //           };
+     //      //      };
+     //      // };
+     //      switch(_venueMap.get(Venue_id)){
+     //           case null {
+     //                throw Error.reject("Venue not found");
+     //           };
+     //           case (?v){
+     //                let venues_object_blob = await stable_get(v,Venue_state);
+     //                let venues_object : ?Types.Venue = from_candid(venues_object_blob);
+     //                switch(venues_object){
+     //                     case null{
+     //                          throw (Error.reject("No object found in the memory"));
+     //                     };
+     //                     case (?obj){
+     //                          Cycles.add<system>(500_500_000_000);
+     //                          let venueCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), collection_details.collection_args);
+     //                          ignore await venueCollection.wallet_receive();
+     //                          let new_custodian = await venueCollection.addcustodians(caller);
+     //                          Debug.print(" New added custodian is : " # debug_show (new_custodian));
+     //                          let nftcustodians = await venueCollection.showcustodians();
+     //                          Debug.print("These are the list of current custodians : " #debug_show (nftcustodians));
+     //                          let collection_id = await venueCollection.getCanisterId();
+     //                          let venue_id =  Title # "#" # Principal.toText(collection_id) ;
+     //                          let Venue : Types.Venue = {
+     //                               id = venue_id;
+     //                               Title = Title;
+     //                               logo = logo;
+     //                               banner = banner;
+     //                               Description : Text;
+     //                               Details = Details;
+     //                               Events = obj.Events;
+     //                               Wahanas = obj.Wahanas;
+     //                               capacity = capacity;
+     //                               Collection_id = collection_id;
+     //                               creator = caller;
+     //                          };
+     //                          let venue_blob = to_candid(Venue);
+     //                          let Venue_index = await update_stable(v, venue_blob, Venue_state);
+     //                          _venueMap.put(venue_id, Venue_index);
+     //                          _venueMap.delete(Venue_id);
+     //                          switch(_EventsMap.get(Venue_id)){
+     //                               case null{
 
-                                   };
-                                   case (?index) {
-                                        _EventsMap.put(venue_id,index);
-                                        _EventsMap.delete(Venue_id); 
-                                   }
-                              };
-                              switch(_WahanaMap.get(Venue_id)){
-                                   case null{
+     //                               };
+     //                               case (?index) {
+     //                                    _EventsMap.put(venue_id,index);
+     //                                    _EventsMap.delete(Venue_id); 
+     //                               }
+     //                          };
+     //                          switch(_WahanaMap.get(Venue_id)){
+     //                               case null{
                                         
-                                   };
-                                   case (?index) {
-                                        _WahanaMap.put(venue_id, index);
-                                        _WahanaMap.delete(Venue_id);
-                                   }
-                              };
-                              return #ok(caller, Venue);
-                         };
-                    };
+     //                               };
+     //                               case (?index) {
+     //                                    _WahanaMap.put(venue_id, index);
+     //                                    _WahanaMap.delete(Venue_id);
+     //                               }
+     //                          };
+     //                          return #ok(caller, Venue);
+     //                     };
+     //                };
                     
-               };
-          };
-     };
+     //           };
+     //      };
+     // };
 
      func updateVenuewithEvents( Venue_id : Text, events : [Text]) : async Types.Venue {
           switch(_venueMap.get(Venue_id)){
@@ -670,117 +730,117 @@ actor mahaka {
           }
      };
 
-     public shared ({caller = user}) func edit_event(eventId : Text, venueId : Types.venueId ,  _eCollection : Types.eventCollectionParams , _event : Types.Events) : async Result.Result<(Types.completeEvent, Text), Types.UpdateUserError> {
-          // if (Principal.isAnonymous(user)) {
-          //      return #err(#UserNotAuthenticated); 
-          // }; 
-          // let roleResult = await getRoleByPrincipal(user);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not (
-          //                (await Validation.check_for_sysAdmin(role)) or 
-          //                (await Validation.check_for_Admin(role)) or
-          //                (await Validation.check_for_SuperVisor(role))
-          //           )) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
-          let events_object = _EventsMap.get(venueId);
-          switch (events_object){
-               case null {
-                    throw (Error.reject("No Events Found in the Venue"));
-               };
-               case (?v){
-                    let events_object_blob = await stable_get(v,Events_state);
-                    let events_object : ?Types.Events_data = from_candid(events_object_blob);
-                    switch (events_object) {
-                         case null {
-                              throw (Error.reject("No object found in the memory"));
-                         };
-                         case (?val){
-                              var events_list = val.Events;
-                              let event = List.find<Types.completeEvent>(
-                                   events_list,
-                                   func x {x.id == eventId}
-                              );
-                              var eventIds_list = val.EventIds;
-                              let exists_eventId = List.find<Text>(
-                                   eventIds_list,
-                                   func x {x == eventId}
-                              );
-                              switch(event){
-                                   case null {
-                                        throw (Error.reject("Event not found in the list"));
-                                   };
-                                   case (?event){
-                                        let result = await Utils.is_event_editable(event);
-                                        assert( result == true);
-                                        Cycles.add<system>(500_500_000_000);
-                                        let eventCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), _eCollection.collection_args);
-                                        let new_custodian = await eventCollection.addcustodians(user);
-                                        Debug.print(" New added custodian is : " # debug_show (new_custodian));
-                                        let nftcustodians = await eventCollection.showcustodians();
-                                        Debug.print("These are the list of current custodians : " #debug_show (nftcustodians));
-                                        ignore await eventCollection.wallet_receive();
-                                        let eventCollectionId = await eventCollection.getCanisterId();
-                                        let event_id =  _event.title # "#" # Principal.toText(eventCollectionId);
-                                        let updated_event : Types.completeEvent = {
-                                             id = event_id;
-                                             description = _event.description;
-                                             details =_event.details;
-                                             logo = _event.logo;
-                                             banner =_event.banner ;
-                                             gTicket_limit = _event.gTicket_limit;
-                                             sTicket_limit = _event.sTicket_limit;
-                                             title = _event.title;
-                                             vTicket_limit = _event.vTicket_limit;
-                                             event_collectionid = await eventCollection.getCanisterId();
-                                             creator = user;
-                                             venueId = venueId;
-                                        };
-                                        let updated_events_list = List.map<Types.completeEvent, Types.completeEvent>(
-                                             events_list,
-                                             func(existing_event) {
-                                                  if (existing_event.id == eventId) {
-                                                       updated_event
-                                                  } else {
-                                                       existing_event
-                                                  }
-                                             }
-                                        );
-                                        let updated_eventId_list = List.map<Text, Text>(
-                                             eventIds_list,
-                                             func(existing_eventId) {
-                                                  if (existing_eventId == eventId) {
-                                                       updated_event.id
-                                                  } else {
-                                                       existing_eventId
-                                                  }
-                                             }
-                                        );
-                                        let updated_events_data: Types.Events_data = {
-                                             Events = updated_events_list;
-                                             EventIds = updated_eventId_list;
-                                        };
+     // public shared ({caller = user}) func edit_event(eventId : Text, venueId : Types.venueId ,  _eCollection : Types.eventCollectionParams , _event : Types.Events) : async Result.Result<(Types.completeEvent, Text), Types.UpdateUserError> {
+     //      // if (Principal.isAnonymous(user)) {
+     //      //      return #err(#UserNotAuthenticated); 
+     //      // }; 
+     //      // let roleResult = await getRoleByPrincipal(user);
+     //      // switch (roleResult) {
+     //      //      case (#err(error)) {
+     //      //           return #err(#RoleError);
+     //      //      };
+     //      //      case (#ok(role)) {
+     //      //           if (not (
+     //      //                (await Validation.check_for_sysAdmin(role)) or 
+     //      //                (await Validation.check_for_Admin(role)) or
+     //      //                (await Validation.check_for_SuperVisor(role))
+     //      //           )) {
+     //      //                return #err(#UserNotAuthorized);
+     //      //           };
+     //      //      };
+     //      // };
+     //      let events_object = _EventsMap.get(venueId);
+     //      switch (events_object){
+     //           case null {
+     //                throw (Error.reject("No Events Found in the Venue"));
+     //           };
+     //           case (?v){
+     //                let events_object_blob = await stable_get(v,Events_state);
+     //                let events_object : ?Types.Events_data = from_candid(events_object_blob);
+     //                switch (events_object) {
+     //                     case null {
+     //                          throw (Error.reject("No object found in the memory"));
+     //                     };
+     //                     case (?val){
+     //                          var events_list = val.Events;
+     //                          let event = List.find<Types.completeEvent>(
+     //                               events_list,
+     //                               func x {x.id == eventId}
+     //                          );
+     //                          var eventIds_list = val.EventIds;
+     //                          let exists_eventId = List.find<Text>(
+     //                               eventIds_list,
+     //                               func x {x == eventId}
+     //                          );
+     //                          switch(event){
+     //                               case null {
+     //                                    throw (Error.reject("Event not found in the list"));
+     //                               };
+     //                               case (?event){
+     //                                    let result = await Utils.is_event_editable(event);
+     //                                    assert( result == true);
+     //                                    Cycles.add<system>(500_500_000_000);
+     //                                    let eventCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), _eCollection.collection_args);
+     //                                    let new_custodian = await eventCollection.addcustodians(user);
+     //                                    Debug.print(" New added custodian is : " # debug_show (new_custodian));
+     //                                    let nftcustodians = await eventCollection.showcustodians();
+     //                                    Debug.print("These are the list of current custodians : " #debug_show (nftcustodians));
+     //                                    ignore await eventCollection.wallet_receive();
+     //                                    let eventCollectionId = await eventCollection.getCanisterId();
+     //                                    let event_id =  _event.title # "#" # Principal.toText(eventCollectionId);
+     //                                    let updated_event : Types.completeEvent = {
+     //                                         id = event_id;
+     //                                         description = _event.description;
+     //                                         details =_event.details;
+     //                                         logo = _event.logo;
+     //                                         banner =_event.banner ;
+     //                                         gTicket_limit = _event.gTicket_limit;
+     //                                         sTicket_limit = _event.sTicket_limit;
+     //                                         title = _event.title;
+     //                                         vTicket_limit = _event.vTicket_limit;
+     //                                         event_collectionid = await eventCollection.getCanisterId();
+     //                                         creator = user;
+     //                                         venueId = venueId;
+     //                                    };
+     //                                    let updated_events_list = List.map<Types.completeEvent, Types.completeEvent>(
+     //                                         events_list,
+     //                                         func(existing_event) {
+     //                                              if (existing_event.id == eventId) {
+     //                                                   updated_event
+     //                                              } else {
+     //                                                   existing_event
+     //                                              }
+     //                                         }
+     //                                    );
+     //                                    let updated_eventId_list = List.map<Text, Text>(
+     //                                         eventIds_list,
+     //                                         func(existing_eventId) {
+     //                                              if (existing_eventId == eventId) {
+     //                                                   updated_event.id
+     //                                              } else {
+     //                                                   existing_eventId
+     //                                              }
+     //                                         }
+     //                                    );
+     //                                    let updated_events_data: Types.Events_data = {
+     //                                         Events = updated_events_list;
+     //                                         EventIds = updated_eventId_list;
+     //                                    };
 
-                                        let updatedVenue = await updateVenuewithEvents(venueId,List.toArray(updated_events_data.EventIds));
-                                        let eventBlob = to_candid(updated_events_data);
-                                        let eventIndex = await update_stable(v,eventBlob, Events_state);
-                                        _EventsMap.put(venueId, eventIndex);
+     //                                    let updatedVenue = await updateVenuewithEvents(venueId,List.toArray(updated_events_data.EventIds));
+     //                                    let eventBlob = to_candid(updated_events_data);
+     //                                    let eventIndex = await update_stable(v,eventBlob, Events_state);
+     //                                    _EventsMap.put(venueId, eventIndex);
 
-                                        return #ok(updated_event,"Event Edited");
+     //                                    return #ok(updated_event,"Event Edited");
 
-                                   };
-                              };
-                         };
-                    };
-               };
-          };
-     };
+     //                               };
+     //                          };
+     //                     };
+     //                };
+     //           };
+     //      };
+     // };
 
      public shared ({caller = user}) func deleteEvent (venue_id : Types.venueId, eventId : Text) : async Result.Result<(Bool, Types.Index), Types.UpdateUserError> {
           // if (Principal.isAnonymous(user)) {
@@ -881,181 +941,167 @@ actor mahaka {
      /*********************************************************/
 
     
-     public shared ({caller}) func buyVenueTicket(venueId : Types.venueId, _ticket_type : Types.ticket_info, _metadata : nftTypes.MetadataDesc ) : async Result.Result<nftTypes.MintReceipt, Types.UpdateUserError> {
-          // if (Principal.isAnonymous(caller)) {
-          //      return #err(#UserNotAuthenticated); 
-          // }; 
-          // let roleResult = await getRoleByPrincipal(caller);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
-          let collection_id = await Utils.extractCanisterId(venueId);
-          let collection_actor = actor (collection_id) : actor {
-               logoDip721 : () -> async Types.LogoResult;
-               mintDip721 : (to : Principal, metadata : Types.MetadataDesc ,ticket_details : nftTypes.ticket_type, logo : Types.LogoResult) -> async nftTypes.MintReceipt;
-          };
-          let _logo = await collection_actor.logoDip721();
-          let _ticket = await collection_actor.mintDip721(caller,_metadata,_ticket_type.ticket_type,_logo);
+     // public shared ({caller}) func buyVenueTicket(venueId : Types.venueId, _ticket_type : Types.ticket_info, _metadata : nftTypes.MetadataDesc ) : async Result.Result<nftTypes.MintReceipt, Types.UpdateUserError> {
+     //      // if (Principal.isAnonymous(caller)) {
+     //      //      return #err(#UserNotAuthenticated); 
+     //      // }; 
+     //      // let roleResult = await getRoleByPrincipal(caller);
+     //      // switch (roleResult) {
+     //      //      case (#err(error)) {
+     //      //           return #err(#RoleError);
+     //      //      };
+     //      //      case (#ok(role)) {
+     //      //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+     //      //                return #err(#UserNotAuthorized);
+     //      //           };
+     //      //      };
+     //      // };
+     //      let collection_id = await Utils.extractCanisterId(venueId);
+     //      let collection_actor = actor (collection_id) : actor {
+     //           logoDip721 : () -> async Types.LogoResult;
+     //           mintDip721 : (to : Principal, metadata : Types.MetadataDesc ,ticket_details : nftTypes.ticket_type, logo : Types.LogoResult) -> async nftTypes.MintReceipt;
+     //      };
+     //      let _logo = await collection_actor.logoDip721();
+     //      let _ticket = await collection_actor.mintDip721(caller,_metadata,_ticket_type.ticket_type,_logo);
      
-          return #ok(_ticket);
-     };
+     //      return #ok(_ticket);
+     // };
 
-     public shared ({caller}) func buyEventTicket(_venueId : Text,_eventId : Text, _ticket_type : Types.ticket_info, _metadata : nftTypes.MetadataDesc) : async Result.Result<nftTypes.MintReceipt, Types.UpdateUserError> {
-          // if (Principal.isAnonymous(caller)) {
-          //      return #err(#UserNotAuthenticated); 
-          // }; 
-          // let roleResult = await getRoleByPrincipal(caller);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
-          switch(_EventsMap.get(_venueId)){
-               case null {
-                    throw(Error.reject("No venue found for the events"));
-               };
-               case (?Event_index){
-                    let event_blob = await stable_get(Event_index,Events_state);
-                    let event_object :?Types.Events_data = from_candid(event_blob);
-                    switch(event_object){
-                         case null {
-                              throw(Error.reject("No object found for this blob in the memory"));
-                         };
+     // public shared ({caller}) func buyEventTicket(_venueId : Text,_eventId : Text, _ticket_type : Types.ticket_info, _metadata : nftTypes.MetadataDesc) : async Result.Result<nftTypes.MintReceipt, Types.UpdateUserError> {
+     //      // if (Principal.isAnonymous(caller)) {
+     //      //      return #err(#UserNotAuthenticated); 
+     //      // }; 
+     //      // let roleResult = await getRoleByPrincipal(caller);
+     //      // switch (roleResult) {
+     //      //      case (#err(error)) {
+     //      //           return #err(#RoleError);
+     //      //      };
+     //      //      case (#ok(role)) {
+     //      //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+     //      //                return #err(#UserNotAuthorized);
+     //      //           };
+     //      //      };
+     //      // };
+     //      switch(_EventsMap.get(_venueId)){
+     //           case null {
+     //                throw(Error.reject("No venue found for the events"));
+     //           };
+     //           case (?Event_index){
+     //                let event_blob = await stable_get(Event_index,Events_state);
+     //                let event_object :?Types.Events_data = from_candid(event_blob);
+     //                switch(event_object){
+     //                     case null {
+     //                          throw(Error.reject("No object found for this blob in the memory"));
+     //                     };
 
-                         case (?e){
-                              let events_list = e.Events;
-                              let event = List.find<Types.completeEvent>(
-                                   events_list,
-                                   func x {x.id == _eventId}
-                              );
-                              switch (event){
-                                   case null (
-                                        throw (Error.reject("No Event found")) 
-                                   );
-                                   case (?_event){
-                                        let collection_actor = actor (Principal.toText(_event.event_collectionid)) : actor {
-                                        logoDip721 : () -> async Types.LogoResult;
-                                        mintDip721 : (to : Principal, metadata : Types.MetadataDesc ,ticket_details : nftTypes.ticket_type, logo : Types.LogoResult) -> async nftTypes.MintReceipt;                                        
-                                        };
-                                        let _logo = await collection_actor.logoDip721();
-                                        let _ticket = await collection_actor.mintDip721(caller,_metadata,_ticket_type.ticket_type,_logo);
-                                        return #ok(_ticket);
-                                   };
-                              };                           
-                         };
-                    };
-               };
-          };
-     };
+     //                     case (?e){
+     //                          let events_list = e.Events;
+     //                          let event = List.find<Types.completeEvent>(
+     //                               events_list,
+     //                               func x {x.id == _eventId}
+     //                          );
+     //                          switch (event){
+     //                               case null (
+     //                                    throw (Error.reject("No Event found")) 
+     //                               );
+     //                               case (?_event){
+     //                                    let collection_actor = actor (Principal.toText(_event.event_collectionid)) : actor {
+     //                                    logoDip721 : () -> async Types.LogoResult;
+     //                                    mintDip721 : (to : Principal, metadata : Types.MetadataDesc ,ticket_details : nftTypes.ticket_type, logo : Types.LogoResult) -> async nftTypes.MintReceipt;                                        
+     //                                    };
+     //                                    let _logo = await collection_actor.logoDip721();
+     //                                    let _ticket = await collection_actor.mintDip721(caller,_metadata,_ticket_type.ticket_type,_logo);
+     //                                    return #ok(_ticket);
+     //                               };
+     //                          };                           
+     //                     };
+     //                };
+     //           };
+     //      };
+     // };
 
-     public shared ({caller}) func buyWahanaToken(wahanaId : Text, receiver : Principal )  {
-          // if (Principal.isAnonymous(caller)) {
-          //      return #err(#UserNotAuthenticated); 
-          // }; 
-          // let roleResult = await getRoleByPrincipal(caller);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
-          let collection_actor = actor (wahanaId) : actor {
-               icrc1_transfer : ({
-                    from_subaccount : ?TypesICRC.Subaccount;
-                    to : TypesICRC.Account;
-                    amount : TypesICRC.Tokens;
-                    fee : ?TypesICRC.Tokens;
-                    memo : ?TypesICRC.Memo;
-                    created_at_time : ?TypesICRC.Timestamp;
-                    }) -> async TypesICRC.Result<TypesICRC.TxIndex, TypesICRC.TransferError>
-          };
-          let transferObj = {
-               from_subaccount = null : ?TypesICRC.Subaccount;
-               to = { owner = receiver; subaccount = null } : TypesICRC.Account;
-               amount = 1 : TypesICRC.Tokens;
-               memo = null : ?TypesICRC.Memo;
-               created_at_time = null : ?TypesICRC.Timestamp;
-               fee = null : ?TypesICRC.Tokens;
-          };
+     // public shared ({caller}) func buyWahanaToken(wahanaId : Text, receiver : Principal )  {
+     //      // if (Principal.isAnonymous(caller)) {
+     //      //      return #err(#UserNotAuthenticated); 
+     //      // }; 
+     //      // let roleResult = await getRoleByPrincipal(caller);
+     //      // switch (roleResult) {
+     //      //      case (#err(error)) {
+     //      //           return #err(#RoleError);
+     //      //      };
+     //      //      case (#ok(role)) {
+     //      //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+     //      //                return #err(#UserNotAuthorized);
+     //      //           };
+     //      //      };
+     //      // };
+     //      let collection_actor = actor (wahanaId) : actor {
+     //           icrc1_transfer : ({
+     //                from_subaccount : ?TypesICRC.Subaccount;
+     //                to : TypesICRC.Account;
+     //                amount : TypesICRC.Tokens;
+     //                fee : ?TypesICRC.Tokens;
+     //                memo : ?TypesICRC.Memo;
+     //                created_at_time : ?TypesICRC.Timestamp;
+     //                }) -> async TypesICRC.Result<TypesICRC.TxIndex, TypesICRC.TransferError>
+     //      };
+     //      let transferObj = {
+     //           from_subaccount = null : ?TypesICRC.Subaccount;
+     //           to = { owner = receiver; subaccount = null } : TypesICRC.Account;
+     //           amount = 1 : TypesICRC.Tokens;
+     //           memo = null : ?TypesICRC.Memo;
+     //           created_at_time = null : ?TypesICRC.Timestamp;
+     //           fee = null : ?TypesICRC.Tokens;
+     //      };
 
-          let response = await  collection_actor.icrc1_transfer(transferObj);
-          Debug.print(debug_show(response));
+     //      let response = await  collection_actor.icrc1_transfer(transferObj);
+     //      Debug.print(debug_show(response));
 
-     };
+     // };
 
      /*********************************************************/
      /*                 Offline  Tickets Handlig              */
      /*********************************************************/
 
-    
-
-     public shared ({caller}) func buyOfflineVenueTicket(
-          venueId: Types.venueId,
-          _ticket_type: Types.ticket_info,
-          _metadata: nftTypes.MetadataDesc,
-          receivers : [Principal],
-          paymentType: Types.PaymentType,
-          numOfVisitors: Nat
-     ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError> {
-          // if (Principal.isAnonymous(caller)) {
-          //      return #err(#UserNotAuthenticated); 
-          // }; 
-          // let roleResult = await getRoleByPrincipal(caller);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
-          let collection_id = await Utils.extractCanisterId(venueId);
-          let collection_actor = actor (collection_id) : actor {
+     private func processMint(
+          collectionActor: actor {
                logoDip721: () -> async Types.LogoResult;
                mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
-          };
-          let _logo = await collection_actor.logoDip721();
+          },
+          metadata: nftTypes.MetadataDesc,
+          ticketType: nftTypes.ticket_type,
+          receivers: [Principal],
+          numOfVisitors: Nat,
+          categoryId: Text,
+          paymentType: Types.PaymentType,
+          ticketPrice: Nat,
+          saleType: Text,
+          caller : Principal
+     ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError> {
+          let _logo = await collectionActor.logoDip721();
           var mintReceipts: List.List<nftTypes.MintReceiptPart> = List.nil();
+
+          if (numOfVisitors > Array.size(receivers)) {
+               throw Error.reject("Receivers Count doesnot match number of visitors");
+               return #err(#ReceiversCountError);
+          };
+
           for (i in Iter.range(0, numOfVisitors - 1)) {
-               if (numOfVisitors > Array.size(receivers)) {
-                    throw Error.reject("Receivers Count doesnot match number of visitors");
-                    return #err(#ReceiversCountError);
-               };
-               let _ticketResult = await collection_actor.mintDip721(receivers[i], _metadata, _ticket_type.ticket_type, _logo);
+               let _ticketResult = await collectionActor.mintDip721(receivers[i], metadata, ticketType, _logo);
                
                switch (_ticketResult) {
                     case (#Ok(mintReceipt)) {
-
                          mintReceipts := List.push(mintReceipt, mintReceipts);
                          let ticketSaleInfo: Types.TicketSaleInfo = {
                               ticketId = Nat64.toNat(mintReceipt.token_id);
-                              category = "venue";
+                              category = saleType;
                               paymentType = paymentType;
                               numOfVisitors = 1;
                               saleDate = Time.now();
                               ticketIssuer = caller;
-                              price = _ticket_type.price;
+                              price = ticketPrice;
                          };
-
-                         let res = await recordTicketSale(venueId, ticketSaleInfo, "venue");
+                         let res = await recordTicketSale(categoryId, ticketSaleInfo, saleType);
                          Debug.print(debug_show(res));
                     };
                     case (#Err(e)) {
@@ -1067,137 +1113,559 @@ actor mahaka {
           return #ok(List.toArray(mintReceipts));
      };
 
-     
+     // Helper to perform ICRC transfer for wahana tokens
+     private func processTransfer(
+          collectionActor: actor {
+               icrc1_transfer: ({
+                    from_subaccount: ?TypesICRC.Subaccount;
+                    to: TypesICRC.Account;
+                    amount: TypesICRC.Tokens;
+                    fee: ?TypesICRC.Tokens;
+                    memo: ?TypesICRC.Memo;
+                    created_at_time: ?TypesICRC.Timestamp;
+               }) -> async TypesICRC.Result<TypesICRC.TxIndex, TypesICRC.TransferError>
+          },
+          receivers: [Principal],
+          numOfVisitors: Nat,
+          wahanaId: Text,
+          paymentType: Types.PaymentType,
+          price: Nat,
+          caller : Principal
+     ) : async Result.Result<[icrcTypes.TxIndex], icrcTypes.TransferError or Types.MintError> {
+          var transferReceipts: List.List<icrcTypes.TxIndex> = List.nil();
+
+          if (numOfVisitors > Array.size(receivers)) {
+               throw Error.reject("Receivers Count doesnot match number of visitors");
+               return #err(#ReceiversCountError);
+          };
+
+          for (i in Iter.range(0, numOfVisitors - 1)) {
+               let transferObj = {
+                    from_subaccount = null;
+                    to = { owner = receivers[i]; subaccount = null };
+                    amount = 1;
+                    memo = null;
+                    created_at_time = null;
+                    fee = null;
+               };
+               
+               let _ticketResult = await collectionActor.icrc1_transfer(transferObj);
+               switch (_ticketResult) {
+                    case (#Ok(transferReceipt)) {
+                         transferReceipts := List.push(transferReceipt, transferReceipts);
+                         let ticketSaleInfo: Types.TicketSaleInfo = {
+                              ticketId = transferReceipt;
+                              category = "wahana";
+                              paymentType = paymentType;
+                              numOfVisitors = 1;
+                              saleDate = Time.now();
+                              ticketIssuer = caller;
+                              price = price;
+                         };
+                         let res = await recordTicketSale(wahanaId, ticketSaleInfo, "wahana");
+                         Debug.print(debug_show(res));
+                    };
+                    case (#Err(e)) {
+                         Debug.print(debug_show(e));
+                         return #err(e);
+                    };
+               };
+          };
+          return #ok(List.toArray(transferReceipts));
+     };
+
+     private func performICPTransfer(
+          user : Principal,
+          amount : Nat,
+     ) : async Types.Result_3 {
+
+          let fromAccount : Types.Account = {
+               owner = user;
+               subaccount = null;
+          };
+
+          let toAccount : Types.Account = {
+               owner = recepient;
+               subaccount = null;
+          };
+          let balanceCheck = Principal.toLedgerAccount(user, null);
+          let balanceResult = await LedgerCanister.account_balance({
+               account = balanceCheck;
+          });
+          Debug.print(
+               "Transferring "
+               # " balance "
+               # debug_show (balanceResult)
+          );
+          if (Nat64.toNat(balanceResult.e8s) < amount) {
+               throw Error.reject("Insufficient balance to create collection. Please ensure you have enough ICP.");
+          };
+          let transferArgs : Types.TransferFromArgs = {
+            to = toAccount;
+            fee = null;
+            spender_subaccount = null;
+            from = fromAccount;
+            memo = null;
+            created_at_time = null;
+            amount = amount;
+        };
+        let transferResponse = await LedgerCanister.icrc2_transfer_from(transferArgs);
+        transferResponse
+     };
+
+     public shared ({caller}) func buyVenueTicket(
+          venueId: Types.venueId,
+          _ticket_type: Types.ticket_info,
+          _metadata: nftTypes.MetadataDesc,
+          receivers: [Principal],
+          paymentType: Types.PaymentType,
+          numOfVisitors: Nat
+     ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError or Text> {
+          let collectionId = await Utils.extractCanisterId(venueId);
+          let collectionActor = actor (collectionId) : actor {
+               logoDip721: () -> async Types.LogoResult;
+               mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
+          };
+          switch (paymentType) {
+               case (#Cash) {
+                    throw Error.reject("Cash option is not available");
+                    // await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receivers, numOfVisitors, venueId, paymentType, _ticket_type.price, "venue", caller);
+               };
+               case (#ICP) {
+                    let transferResult = await performICPTransfer(caller, _ticket_type.price * numOfVisitors);
+                    switch (transferResult) {
+                         case (#Ok(_)) {
+                              await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receivers, numOfVisitors, venueId, paymentType, _ticket_type.price, "venue", caller);
+                         };
+                         case (#Err(error)) {
+                              throw Error.reject(debug_show ("Transfer Error", error));
+                              return #err(handleTransferError(error));
+                         };
+                    };
+               };
+               case (#Card) {
+                    // No operation for card payment at this time
+                    return #ok([]);
+               };
+          };
+     };
 
 
-     public shared ({caller}) func buyOfflineEventTicket(
-          _venueId : Text,
-          _eventId : Text,
-          _ticket_type : Types.ticket_info,
-          _metadata : nftTypes.MetadataDesc,
-          receivers : [Principal],
-          numOfVisitors : Nat, 
-          paymentType : Types.PaymentType
-     ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError> {
-          
+      public shared ({caller}) func buyEventTicket(
+          _venueId: Text,
+          _eventId: Text,
+          _ticket_type: Types.ticket_info,
+          _metadata: nftTypes.MetadataDesc,
+          receivers: [Principal],
+          numOfVisitors: Nat,
+          paymentType: Types.PaymentType
+     ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError or Text> {
           let eventResult = await getEvent(_eventId, _venueId);
-          
           switch (eventResult) {
-               case (#err(e)) {
-                    return #err(#EventError);
-               };
-               case (#ok(_event)) {
-                    let collection_actor = actor (Principal.toText(_event.event_collectionid)) : actor {
-                         logoDip721 : () -> async Types.LogoResult;
-                         mintDip721 : (to : Principal, metadata : Types.MetadataDesc, ticket_details : nftTypes.ticket_type, logo : Types.LogoResult) -> async nftTypes.MintReceipt;                                        
+               case (#ok(event)) {
+                    let collectionActor = actor (Principal.toText(event.event_collectionid)) : actor {
+                         logoDip721: () -> async Types.LogoResult;
+                         mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
                     };
-
-                    let _logo = await collection_actor.logoDip721();
-                    var mintReceipts: List.List<nftTypes.MintReceiptPart> = List.nil();
-
-                    for (i in Iter.range(0, numOfVisitors - 1)) {
-                         if (numOfVisitors > Array.size(receivers)) {
-                              throw Error.reject("Receivers Count doesnot match number of visitors");
-                              return #err(#ReceiversCountError);
+                    switch (paymentType) {
+                         case (#Cash) {
+                              throw Error.reject("Cash option is not available");
+                              // await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receivers, numOfVisitors, _eventId, paymentType, _ticket_type.price, "event", caller);
                          };
-
-                         let _ticketResult = await collection_actor.mintDip721(receivers[i], _metadata, _ticket_type.ticket_type, _logo);
-                         switch (_ticketResult) {
-                              case (#Ok(mintReceipt)) {
-                                   mintReceipts := List.push(mintReceipt, mintReceipts);
-                                   let ticketSaleInfo: Types.TicketSaleInfo = {
-                                        ticketId = Nat64.toNat(mintReceipt.token_id);
-                                        category = "event";
-                                        paymentType = paymentType;
-                                        numOfVisitors = 1;
-                                        saleDate = Time.now();
-                                        ticketIssuer = caller;
-                                        price = _ticket_type.price;
+                         case (#ICP) {
+                              let transferResult = await performICPTransfer(caller, _ticket_type.price * numOfVisitors);
+                              switch (transferResult) {
+                                   case (#Ok(_)) {
+                                        await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receivers, numOfVisitors, _eventId, paymentType, _ticket_type.price, "venue", caller);
                                    };
-                                   let res = await recordTicketSale(_eventId, ticketSaleInfo, "event");
-                              };
-                              case (#Err(e)) {
-                                   Debug.print(debug_show(e));
-                                   return #err(#MintErr);
+                                   case (#Err(error)) {
+                                        throw Error.reject(debug_show ("Transfer Error", error));
+                                        return #err(handleTransferError(error));
+                                   };
                               };
                          };
+                         case (#Card) {
+                              // No operation for card payment at this time
+                              return #ok([]);
+                         };
                     };
-
-                    return #ok(List.toArray(mintReceipts));
                };
+               case (#err(e)) { return #err(#EventError); };
+          };
+     };
+
+     public shared ({caller}) func buyWahanaToken(
+          venueId: Text,
+          wahanaId: Text,
+          receivers: [Principal],
+          numOfVisitors: Nat,
+          paymentType: Types.PaymentType
+     ) : async Result.Result<[icrcTypes.TxIndex], icrcTypes.TransferError or Types.MintError or Text> {
+          let wahanaResult = await getWahana(wahanaId, venueId);
+          switch (wahanaResult) {
+               case (#ok(wahana)) {
+                    let collectionActor = actor (wahana.id) : actor {
+                         icrc1_transfer: ({
+                              from_subaccount: ?TypesICRC.Subaccount;
+                              to: TypesICRC.Account;
+                              amount: TypesICRC.Tokens;
+                              fee: ?TypesICRC.Tokens;
+                              memo: ?TypesICRC.Memo;
+                              created_at_time: ?TypesICRC.Timestamp;
+                         }) -> async TypesICRC.Result<TypesICRC.TxIndex, TypesICRC.TransferError>;
+                    };
+                    switch (paymentType) {
+                         case (#Cash) {
+                              throw Error.reject("Cash option is not available");
+                              // await processTransfer(collectionActor, receivers, numOfVisitors, wahanaId, paymentType, wahana.price,caller);
+                         };
+                         case (#ICP) {
+                              let transferResult = await performICPTransfer(caller, wahana.price * numOfVisitors);
+                              switch (transferResult) {
+                                   case (#Ok(_)) {
+                                        await processTransfer(collectionActor, receivers, numOfVisitors, wahanaId, paymentType, wahana.price,caller);
+                                   };
+                                   case (#Err(error)) {
+                                        throw Error.reject(debug_show ("Transfer Error", error));
+                                        return #err(handleTransferError(error));
+                                   };
+                              };
+                         };
+                         case (#Card) {
+                              // No operation for card payment at this time
+                              return #ok([]);
+                         };
+                    };
+                    // await processTransfer(collectionActor, receivers, numOfVisitors, wahanaId, paymentType, wahana.price,caller);
+               };
+               case (#err(e)) { return #err(#WahanaError); };
+          };
+     };
+
+
+
+     public shared ({caller}) func buyOfflineVenueTicket(
+          venueId: Types.venueId,
+          _ticket_type: Types.ticket_info,
+          _metadata: nftTypes.MetadataDesc,
+          receivers: [Principal],
+          paymentType: Types.PaymentType,
+          numOfVisitors: Nat
+     ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError or Text> {
+          let collectionId = await Utils.extractCanisterId(venueId);
+          let collectionActor = actor (collectionId) : actor {
+               logoDip721: () -> async Types.LogoResult;
+               mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
+          };
+          switch (paymentType) {
+               case (#Cash) {
+                    await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receivers, numOfVisitors, venueId, paymentType, _ticket_type.price, "venue", caller);
+               };
+               case (#ICP) {
+                    let transferResult = await performICPTransfer(caller, _ticket_type.price * numOfVisitors);
+                    switch (transferResult) {
+                         case (#Ok(_)) {
+                              await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receivers, numOfVisitors, venueId, paymentType, _ticket_type.price, "venue", caller);
+                         };
+                         case (#Err(error)) {
+                              throw Error.reject(debug_show ("Transfer Error", error));
+                              return #err(handleTransferError(error));
+                         };
+                    };
+               };
+               case (#Card) {
+                    // No operation for card payment at this time
+                    return #ok([]);
+               };
+          };
+     };
+
+
+      public shared ({caller}) func buyOfflineEventTicket(
+          _venueId: Text,
+          _eventId: Text,
+          _ticket_type: Types.ticket_info,
+          _metadata: nftTypes.MetadataDesc,
+          receivers: [Principal],
+          numOfVisitors: Nat,
+          paymentType: Types.PaymentType
+     ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError or Text> {
+          let eventResult = await getEvent(_eventId, _venueId);
+          switch (eventResult) {
+               case (#ok(event)) {
+                    let collectionActor = actor (Principal.toText(event.event_collectionid)) : actor {
+                         logoDip721: () -> async Types.LogoResult;
+                         mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
+                    };
+                    switch (paymentType) {
+                         case (#Cash) {
+                              await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receivers, numOfVisitors, _eventId, paymentType, _ticket_type.price, "event", caller);
+                         };
+                         case (#ICP) {
+                              let transferResult = await performICPTransfer(caller, _ticket_type.price * numOfVisitors);
+                              switch (transferResult) {
+                                   case (#Ok(_)) {
+                                        await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receivers, numOfVisitors, _eventId, paymentType, _ticket_type.price, "venue", caller);
+                                   };
+                                   case (#Err(error)) {
+                                        throw Error.reject(debug_show ("Transfer Error", error));
+                                        return #err(handleTransferError(error));
+                                   };
+                              };
+                         };
+                         case (#Card) {
+                              // No operation for card payment at this time
+                              return #ok([]);
+                         };
+                    };
+               };
+               case (#err(e)) { return #err(#EventError); };
           };
      };
 
      public shared ({caller}) func buyOfflineWahanaToken(
-          venueId : Text, 
-          wahanaId : Text, 
-          receivers : [Principal], 
-          numOfVisitors : Nat, 
-          paymentType : Types.PaymentType 
-     ) : async Result.Result<[icrcTypes.TxIndex], icrcTypes.TransferError or Types.MintError> {
-
+          venueId: Text,
+          wahanaId: Text,
+          receivers: [Principal],
+          numOfVisitors: Nat,
+          paymentType: Types.PaymentType
+     ) : async Result.Result<[icrcTypes.TxIndex], icrcTypes.TransferError or Types.MintError or Text> {
           let wahanaResult = await getWahana(wahanaId, venueId);
-          
           switch (wahanaResult) {
-               case (#err(e)) {
-                    return #err(#WahanaError);
-               };
-               case (#ok(_wahana)) {
-                    let collection_actor = actor (_wahana.id) : actor {
-                         icrc1_transfer : ({
-                              from_subaccount : ?TypesICRC.Subaccount;
-                              to : TypesICRC.Account;
-                              amount : TypesICRC.Tokens;
-                              fee : ?TypesICRC.Tokens;
-                              memo : ?TypesICRC.Memo;
-                              created_at_time : ?TypesICRC.Timestamp;
-                         }) -> async TypesICRC.Result<TypesICRC.TxIndex, TypesICRC.TransferError>
+               case (#ok(wahana)) {
+                    let collectionActor = actor (wahana.id) : actor {
+                         icrc1_transfer: ({
+                              from_subaccount: ?TypesICRC.Subaccount;
+                              to: TypesICRC.Account;
+                              amount: TypesICRC.Tokens;
+                              fee: ?TypesICRC.Tokens;
+                              memo: ?TypesICRC.Memo;
+                              created_at_time: ?TypesICRC.Timestamp;
+                         }) -> async TypesICRC.Result<TypesICRC.TxIndex, TypesICRC.TransferError>;
                     };
-
-                    var transferReceipts: List.List<icrcTypes.TxIndex> = List.nil();
-
-                    for (i in Iter.range(0, numOfVisitors - 1)) {
-                         if (numOfVisitors > Array.size(receivers)) {
-                              throw Error.reject("Receivers Count doesnot match number of visitors");
-                              return #err(#ReceiversCountError);
+                    switch (paymentType) {
+                         case (#Cash) {
+                              await processTransfer(collectionActor, receivers, numOfVisitors, wahanaId, paymentType, wahana.price,caller);
                          };
-
-                         let transferObj = {
-                              from_subaccount = null : ?TypesICRC.Subaccount;
-                              to = { owner = receivers[i]; subaccount = null } : TypesICRC.Account;
-                              amount = 1 : TypesICRC.Tokens;
-                              memo = null : ?TypesICRC.Memo;
-                              created_at_time = null : ?TypesICRC.Timestamp;
-                              fee = null : ?TypesICRC.Tokens;
-                         };
-
-                         let _ticketResult = await collection_actor.icrc1_transfer(transferObj);
-                         switch (_ticketResult) {
-                              case (#Ok(transferReceipt)) {
-                                   transferReceipts := List.push(transferReceipt, transferReceipts);
-                                   let ticketSaleInfo: Types.TicketSaleInfo = {
-                                        ticketId = transferReceipt;
-                                        category = "wahana";
-                                        paymentType = paymentType;
-                                        numOfVisitors = 1;
-                                        saleDate = Time.now();
-                                        ticketIssuer = caller;
-                                        price = _wahana.price
+                         case (#ICP) {
+                              let transferResult = await performICPTransfer(caller, wahana.price * numOfVisitors);
+                              switch (transferResult) {
+                                   case (#Ok(_)) {
+                                        await processTransfer(collectionActor, receivers, numOfVisitors, wahanaId, paymentType, wahana.price,caller);
                                    };
-                                   let res = await recordTicketSale(wahanaId, ticketSaleInfo, "wahana");
-                                   Debug.print(debug_show(res));
-                              };
-                              case (#Err(e)) {
-                                   Debug.print(debug_show(e));
-                                   return #err(e);
+                                   case (#Err(error)) {
+                                        throw Error.reject(debug_show ("Transfer Error", error));
+                                        return #err(handleTransferError(error));
+                                   };
                               };
                          };
+                         case (#Card) {
+                              // No operation for card payment at this time
+                              return #ok([]);
+                         };
                     };
-
-                    return #ok(List.toArray(transferReceipts));
+                    // await processTransfer(collectionActor, receivers, numOfVisitors, wahanaId, paymentType, wahana.price,caller);
                };
+               case (#err(e)) { return #err(#WahanaError); };
           };
      };
+
+
+    
+
+     // public shared ({caller}) func buyOfflineVenueTicket(
+     //      venueId: Types.venueId,
+     //      _ticket_type: Types.ticket_info,
+     //      _metadata: nftTypes.MetadataDesc,
+     //      receivers : [Principal],
+     //      paymentType: Types.PaymentType,
+     //      numOfVisitors: Nat
+     // ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError> {
+     //      // if (Principal.isAnonymous(caller)) {
+     //      //      return #err(#UserNotAuthenticated); 
+     //      // }; 
+     //      // let roleResult = await getRoleByPrincipal(caller);
+     //      // switch (roleResult) {
+     //      //      case (#err(error)) {
+     //      //           return #err(#RoleError);
+     //      //      };
+     //      //      case (#ok(role)) {
+     //      //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+     //      //                return #err(#UserNotAuthorized);
+     //      //           };
+     //      //      };
+     //      // };
+     //      let collection_id = await Utils.extractCanisterId(venueId);
+     //      let collection_actor = actor (collection_id) : actor {
+     //           logoDip721: () -> async Types.LogoResult;
+     //           mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
+     //      };
+     //      let _logo = await collection_actor.logoDip721();
+     //      var mintReceipts: List.List<nftTypes.MintReceiptPart> = List.nil();
+     //      for (i in Iter.range(0, numOfVisitors - 1)) {
+     //           if (numOfVisitors > Array.size(receivers)) {
+     //                throw Error.reject("Receivers Count doesnot match number of visitors");
+     //                return #err(#ReceiversCountError);
+     //           };
+     //           let _ticketResult = await collection_actor.mintDip721(receivers[i], _metadata, _ticket_type.ticket_type, _logo);
+               
+     //           switch (_ticketResult) {
+     //                case (#Ok(mintReceipt)) {
+
+     //                     mintReceipts := List.push(mintReceipt, mintReceipts);
+     //                     let ticketSaleInfo: Types.TicketSaleInfo = {
+     //                          ticketId = Nat64.toNat(mintReceipt.token_id);
+     //                          category = "venue";
+     //                          paymentType = paymentType;
+     //                          numOfVisitors = 1;
+     //                          saleDate = Time.now();
+     //                          ticketIssuer = caller;
+     //                          price = _ticket_type.price;
+     //                     };
+
+     //                     let res = await recordTicketSale(venueId, ticketSaleInfo, "venue");
+     //                     Debug.print(debug_show(res));
+     //                };
+     //                case (#Err(e)) {
+     //                     Debug.print(debug_show(e));
+     //                     return #err(#MintErr);
+     //                };
+     //           };
+     //      };
+     //      return #ok(List.toArray(mintReceipts));
+     // };
+
+     
+
+
+     // public shared ({caller}) func buyOfflineEventTicket(
+     //      _venueId : Text,
+     //      _eventId : Text,
+     //      _ticket_type : Types.ticket_info,
+     //      _metadata : nftTypes.MetadataDesc,
+     //      receivers : [Principal],
+     //      numOfVisitors : Nat, 
+     //      paymentType : Types.PaymentType
+     // ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError> {
+          
+     //      let eventResult = await getEvent(_eventId, _venueId);
+          
+     //      switch (eventResult) {
+     //           case (#err(e)) {
+     //                return #err(#EventError);
+     //           };
+     //           case (#ok(_event)) {
+     //                let collection_actor = actor (Principal.toText(_event.event_collectionid)) : actor {
+     //                     logoDip721 : () -> async Types.LogoResult;
+     //                     mintDip721 : (to : Principal, metadata : Types.MetadataDesc, ticket_details : nftTypes.ticket_type, logo : Types.LogoResult) -> async nftTypes.MintReceipt;                                        
+     //                };
+
+     //                let _logo = await collection_actor.logoDip721();
+     //                var mintReceipts: List.List<nftTypes.MintReceiptPart> = List.nil();
+
+     //                for (i in Iter.range(0, numOfVisitors - 1)) {
+     //                     if (numOfVisitors > Array.size(receivers)) {
+     //                          throw Error.reject("Receivers Count doesnot match number of visitors");
+     //                          return #err(#ReceiversCountError);
+     //                     };
+
+     //                     let _ticketResult = await collection_actor.mintDip721(receivers[i], _metadata, _ticket_type.ticket_type, _logo);
+     //                     switch (_ticketResult) {
+     //                          case (#Ok(mintReceipt)) {
+     //                               mintReceipts := List.push(mintReceipt, mintReceipts);
+     //                               let ticketSaleInfo: Types.TicketSaleInfo = {
+     //                                    ticketId = Nat64.toNat(mintReceipt.token_id);
+     //                                    category = "event";
+     //                                    paymentType = paymentType;
+     //                                    numOfVisitors = 1;
+     //                                    saleDate = Time.now();
+     //                                    ticketIssuer = caller;
+     //                                    price = _ticket_type.price;
+     //                               };
+     //                               let res = await recordTicketSale(_eventId, ticketSaleInfo, "event");
+     //                          };
+     //                          case (#Err(e)) {
+     //                               Debug.print(debug_show(e));
+     //                               return #err(#MintErr);
+     //                          };
+     //                     };
+     //                };
+
+     //                return #ok(List.toArray(mintReceipts));
+     //           };
+     //      };
+     // };
+
+     // public shared ({caller}) func buyOfflineWahanaToken(
+     //      venueId : Text, 
+     //      wahanaId : Text, 
+     //      receivers : [Principal], 
+     //      numOfVisitors : Nat, 
+     //      paymentType : Types.PaymentType 
+     // ) : async Result.Result<[icrcTypes.TxIndex], icrcTypes.TransferError or Types.MintError> {
+
+     //      let wahanaResult = await getWahana(wahanaId, venueId);
+          
+     //      switch (wahanaResult) {
+     //           case (#err(e)) {
+     //                return #err(#WahanaError);
+     //           };
+     //           case (#ok(_wahana)) {
+     //                let collection_actor = actor (_wahana.id) : actor {
+     //                     icrc1_transfer : ({
+     //                          from_subaccount : ?TypesICRC.Subaccount;
+     //                          to : TypesICRC.Account;
+     //                          amount : TypesICRC.Tokens;
+     //                          fee : ?TypesICRC.Tokens;
+     //                          memo : ?TypesICRC.Memo;
+     //                          created_at_time : ?TypesICRC.Timestamp;
+     //                     }) -> async TypesICRC.Result<TypesICRC.TxIndex, TypesICRC.TransferError>
+     //                };
+
+     //                var transferReceipts: List.List<icrcTypes.TxIndex> = List.nil();
+
+     //                for (i in Iter.range(0, numOfVisitors - 1)) {
+     //                     if (numOfVisitors > Array.size(receivers)) {
+     //                          throw Error.reject("Receivers Count doesnot match number of visitors");
+     //                          return #err(#ReceiversCountError);
+     //                     };
+
+     //                     let transferObj = {
+     //                          from_subaccount = null : ?TypesICRC.Subaccount;
+     //                          to = { owner = receivers[i]; subaccount = null } : TypesICRC.Account;
+     //                          amount = 1 : TypesICRC.Tokens;
+     //                          memo = null : ?TypesICRC.Memo;
+     //                          created_at_time = null : ?TypesICRC.Timestamp;
+     //                          fee = null : ?TypesICRC.Tokens;
+     //                     };
+
+     //                     let _ticketResult = await collection_actor.icrc1_transfer(transferObj);
+     //                     switch (_ticketResult) {
+     //                          case (#Ok(transferReceipt)) {
+     //                               transferReceipts := List.push(transferReceipt, transferReceipts);
+     //                               let ticketSaleInfo: Types.TicketSaleInfo = {
+     //                                    ticketId = transferReceipt;
+     //                                    category = "wahana";
+     //                                    paymentType = paymentType;
+     //                                    numOfVisitors = 1;
+     //                                    saleDate = Time.now();
+     //                                    ticketIssuer = caller;
+     //                                    price = _wahana.price
+     //                               };
+     //                               let res = await recordTicketSale(wahanaId, ticketSaleInfo, "wahana");
+     //                               Debug.print(debug_show(res));
+     //                          };
+     //                          case (#Err(e)) {
+     //                               Debug.print(debug_show(e));
+     //                               return #err(e);
+     //                          };
+     //                     };
+     //                };
+
+     //                return #ok(List.toArray(transferReceipts));
+     //           };
+     //      };
+     // };
 
      public shared ({caller}) func getVenueTickets(venueId : Text) : async Result.Result<List.List<Types.TicketSaleInfo>, Text> {
           switch (_VenueTicketsMap.get(venueId)) {
@@ -1607,7 +2075,7 @@ actor mahaka {
           ignore await Wahanatokens.wallet_receive();
           
           let new_wahana : Types.Wahana_details = {
-               id = Principal.toText(wahana_id);
+               id = _name # "#" # Principal.toText(wahana_id); 
                banner = banner;
                description = description;
                price = price;
@@ -1777,138 +2245,138 @@ actor mahaka {
           };
      };
 
-     public shared ({caller = user}) func edit_wahana(
-          wahanaId: Text,
-          venueId: Text,
-          _name: Text,
-          _symbol: Text,
-          _decimals: Nat8,
-          _totalSupply: Nat,
-          description: Text,
-          banner: Types.LogoResult,
-          price: Nat
-     ) : async Result.Result<Text, Types.UpdateUserError> {
-          // if (Principal.isAnonymous(user)) {
-          //      return #err(#UserNotAuthenticated); 
-          // };
-          // let roleResult = await getRoleByPrincipal(user);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not (
-          //                (await Validation.check_for_sysAdmin(role)) or 
-          //                (await Validation.check_for_Admin(role)) or
-          //                (await Validation.check_for_SuperVisor(role))
-          //           )) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
-          let wahanas_object = _WahanaMap.get(venueId);
-          switch (wahanas_object) {
-               case null {
-                    throw (Error.reject("No Wahanas Found in the Venue"));
-               };
-               case (?w) {
-                    let wahanas_object_blob = await stable_get(w, Wahana_state);
-                    let wahanas_object: ?Types.Wahana_data = from_candid(wahanas_object_blob);
-                    switch (wahanas_object) {
-                         case null {
-                              throw (Error.reject("No object found in the memory"));
-                         };
-                         case (?val) {
-                              var wahanas_list = val.Wahanas;
-                              let wahana = List.find<Types.Wahana_details>(
-                                   wahanas_list,
-                                   func x { x.id == wahanaId }
-                              );
-                              var wahanaIds_list = val.WahanaIds;
-                              let exists_wahanaid = List.find<Text>(
-                                   wahanaIds_list,
-                                   func x { x == wahanaId }
-                              );
-                              switch (wahana) {
-                              case null {
-                                   throw (Error.reject("Wahana not found in the list"));
-                              };
-                              case (?wahana) {
+     // public shared ({caller = user}) func edit_wahana(
+     //      wahanaId: Text,
+     //      venueId: Text,
+     //      _name: Text,
+     //      _symbol: Text,
+     //      _decimals: Nat8,
+     //      _totalSupply: Nat,
+     //      description: Text,
+     //      banner: Types.LogoResult,
+     //      price: Nat
+     // ) : async Result.Result<Text, Types.UpdateUserError> {
+     //      // if (Principal.isAnonymous(user)) {
+     //      //      return #err(#UserNotAuthenticated); 
+     //      // };
+     //      // let roleResult = await getRoleByPrincipal(user);
+     //      // switch (roleResult) {
+     //      //      case (#err(error)) {
+     //      //           return #err(#RoleError);
+     //      //      };
+     //      //      case (#ok(role)) {
+     //      //           if (not (
+     //      //                (await Validation.check_for_sysAdmin(role)) or 
+     //      //                (await Validation.check_for_Admin(role)) or
+     //      //                (await Validation.check_for_SuperVisor(role))
+     //      //           )) {
+     //      //                return #err(#UserNotAuthorized);
+     //      //           };
+     //      //      };
+     //      // };
+     //      let wahanas_object = _WahanaMap.get(venueId);
+     //      switch (wahanas_object) {
+     //           case null {
+     //                throw (Error.reject("No Wahanas Found in the Venue"));
+     //           };
+     //           case (?w) {
+     //                let wahanas_object_blob = await stable_get(w, Wahana_state);
+     //                let wahanas_object: ?Types.Wahana_data = from_candid(wahanas_object_blob);
+     //                switch (wahanas_object) {
+     //                     case null {
+     //                          throw (Error.reject("No object found in the memory"));
+     //                     };
+     //                     case (?val) {
+     //                          var wahanas_list = val.Wahanas;
+     //                          let wahana = List.find<Types.Wahana_details>(
+     //                               wahanas_list,
+     //                               func x { x.id == wahanaId }
+     //                          );
+     //                          var wahanaIds_list = val.WahanaIds;
+     //                          let exists_wahanaid = List.find<Text>(
+     //                               wahanaIds_list,
+     //                               func x { x == wahanaId }
+     //                          );
+     //                          switch (wahana) {
+     //                          case null {
+     //                               throw (Error.reject("Wahana not found in the list"));
+     //                          };
+     //                          case (?wahana) {
 
-                                   Cycles.add<system>(500_000_000_000);
-                                   let initial_mints = [{
-                                        account = { owner = Principal.fromActor(mahaka); subaccount = null };
-                                        amount = _totalSupply;
-                                   }];
+     //                               Cycles.add<system>(500_000_000_000);
+     //                               let initial_mints = [{
+     //                                    account = { owner = Principal.fromActor(mahaka); subaccount = null };
+     //                                    amount = _totalSupply;
+     //                               }];
 
-                                   let init = {
-                                        decimals : Nat8 = _decimals;
-                                        initial_mints : [{
-                                        account : {
-                                             owner : Principal;
-                                             subaccount : ?Blob;
-                                        };
-                                        amount : Nat;
-                                        }] = initial_mints;
-                                        minting_account : {
-                                             owner : Principal;
-                                             subaccount : ?Blob;
-                                        } = { owner = user; subaccount = null };
-                                        token_name : Text = _name;
-                                        token_symbol : Text = _symbol;
-                                        transfer_fee : Nat = 0;
-                                   };
+     //                               let init = {
+     //                                    decimals : Nat8 = _decimals;
+     //                                    initial_mints : [{
+     //                                    account : {
+     //                                         owner : Principal;
+     //                                         subaccount : ?Blob;
+     //                                    };
+     //                                    amount : Nat;
+     //                                    }] = initial_mints;
+     //                                    minting_account : {
+     //                                         owner : Principal;
+     //                                         subaccount : ?Blob;
+     //                                    } = { owner = user; subaccount = null };
+     //                                    token_name : Text = _name;
+     //                                    token_symbol : Text = _symbol;
+     //                                    transfer_fee : Nat = 0;
+     //                               };
 
-                                   let Wahanatokens = await ICRCactor.Ledger(init);
-                                   let wahana_id = Principal.fromActor(Wahanatokens);
-                                   ignore await Wahanatokens.wallet_receive();
+     //                               let Wahanatokens = await ICRCactor.Ledger(init);
+     //                               let wahana_id = Principal.fromActor(Wahanatokens);
+     //                               ignore await Wahanatokens.wallet_receive();
 
-                                   let updated_wahana: Types.Wahana_details = {
-                                        id = _name # "#" # Principal.toText(wahana_id); 
-                                        banner = banner;
-                                        description = description;
-                                        price = price;
-                                        ride_title = _name;
-                                        creator = wahana.creator;
-                                        venueId = venueId
-                                   };
+     //                               let updated_wahana: Types.Wahana_details = {
+     //                                    id = _name # "#" # Principal.toText(wahana_id); 
+     //                                    banner = banner;
+     //                                    description = description;
+     //                                    price = price;
+     //                                    ride_title = _name;
+     //                                    creator = wahana.creator;
+     //                                    venueId = venueId
+     //                               };
 
-                                   let updated_wahanas_list = List.map<Types.Wahana_details, Types.Wahana_details>(
-                                        wahanas_list,
-                                        func(existing_wahana) {
-                                             if (existing_wahana.id == wahanaId) {
-                                                  updated_wahana
-                                             } else {
-                                                  existing_wahana
-                                             }
-                                        }
-                                   );
-                                   let updated_wahanaIds_list = List.map<Text, Text>(
-                                        wahanaIds_list,
-                                        func(existing_wahanaId) {
-                                             if (existing_wahanaId == wahanaId) {
-                                                  updated_wahana.id
-                                             } else {
-                                                  existing_wahanaId
-                                             }
-                                        }
-                                   );
-                                   let updated_wahana_data: Types.Wahana_data = {
-                                        Wahanas = updated_wahanas_list;
-                                        WahanaIds = updated_wahanaIds_list;
-                                   };
-                                   let updatedVenue = await updateVenuewithWahanas(venueId,List.toArray(updated_wahana_data.WahanaIds));
-                                   let wahana_blob = to_candid(updated_wahana_data);
-                                   let wahana_index = await update_stable(w,wahana_blob, Wahana_state);
-                                   _WahanaMap.put(venueId, wahana_index);
-                                   return #ok("Wahana updated successfully!");
-                              };
-                              };
-                         };
-                    };
-               };
-          };
-     };
+     //                               let updated_wahanas_list = List.map<Types.Wahana_details, Types.Wahana_details>(
+     //                                    wahanas_list,
+     //                                    func(existing_wahana) {
+     //                                         if (existing_wahana.id == wahanaId) {
+     //                                              updated_wahana
+     //                                         } else {
+     //                                              existing_wahana
+     //                                         }
+     //                                    }
+     //                               );
+     //                               let updated_wahanaIds_list = List.map<Text, Text>(
+     //                                    wahanaIds_list,
+     //                                    func(existing_wahanaId) {
+     //                                         if (existing_wahanaId == wahanaId) {
+     //                                              updated_wahana.id
+     //                                         } else {
+     //                                              existing_wahanaId
+     //                                         }
+     //                                    }
+     //                               );
+     //                               let updated_wahana_data: Types.Wahana_data = {
+     //                                    Wahanas = updated_wahanas_list;
+     //                                    WahanaIds = updated_wahanaIds_list;
+     //                               };
+     //                               let updatedVenue = await updateVenuewithWahanas(venueId,List.toArray(updated_wahana_data.WahanaIds));
+     //                               let wahana_blob = to_candid(updated_wahana_data);
+     //                               let wahana_index = await update_stable(w,wahana_blob, Wahana_state);
+     //                               _WahanaMap.put(venueId, wahana_index);
+     //                               return #ok("Wahana updated successfully!");
+     //                          };
+     //                          };
+     //                     };
+     //                };
+     //           };
+     //      };
+     // };
 
 
      public shared ({caller = user}) func deleteWahana (venue_id: Types.venueId, wahanaId: Text) : async Result.Result<(Bool, Types.Index), Types.UpdateUserError> {

@@ -156,6 +156,7 @@ module {
     public type PaymentType = {
         #Cash;
         #Card;
+        #ICP
     };
 
     public type TicketSaleInfo = {
@@ -187,4 +188,31 @@ module {
         elems : Region.Region;
         var elems_count : Nat64;
     };
+
+
+    // Ledger Types
+    public type BinaryAccountBalanceArgs = { account : Blob };
+    public type Tokens = { e8s : Nat64 };
+    public type Account = { owner : Principal; subaccount : ?Blob };
+    public type TransferFromArgs = {
+        to : Account;
+        fee : ?Nat;
+        spender_subaccount : ?Blob;
+        from : Account;
+        memo : ?Blob;
+        created_at_time : ?Nat64;
+        amount : Nat;
+    };
+    public type TransferFromError = {
+        #GenericError : { message : Text; error_code : Nat };
+        #TemporarilyUnavailable;
+        #InsufficientAllowance : { allowance : Nat };
+        #BadBurn : { min_burn_amount : Nat };
+        #Duplicate : { duplicate_of : Nat };
+        #BadFee : { expected_fee : Nat };
+        #CreatedInFuture : { ledger_time : Nat64 };
+        #TooOld;
+        #InsufficientFunds : { balance : Nat };
+    };
+    public type Result_3 = { #Ok : Nat; #Err : TransferFromError };
 };

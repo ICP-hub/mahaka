@@ -16,7 +16,7 @@ export default function MoreWahanaCard({ image, event, index }) {
   const color = colors[index % colors.length];
 
   return (
-    <Link to={`/${venueId}/events/${eventId}`} className="my-18">
+    <div className="my-18">
       <div className="shadow-lg h-64 rounded-2xl overflow-hidden flex my-18">
         <div
           className="pr-6 w-1/2 text-white"
@@ -41,6 +41,6 @@ export default function MoreWahanaCard({ image, event, index }) {
           />
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
