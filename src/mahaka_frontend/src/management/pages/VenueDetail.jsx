@@ -230,7 +230,7 @@ const EventTable = ({ eventArr }) => {
                 <div className="inventory-grid grid items-center gap-4 border-b px-6 py-3 md:px-8 border-b-border">
                   <div className="flex items-center">
                     <div className="relative mr-6 flex h-12 w-12 flex-0 items-center justify-center overflow-hidden rounded border border-border">
-                      <img  src={event.banner.data} alt="Event_img" />
+                      <img  src={event.logo.data} alt="Event_img" />
                     </div>
                   </div>
                   <div className="hidden truncate md:block">{event.title}</div>
