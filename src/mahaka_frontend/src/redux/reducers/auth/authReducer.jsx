@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
- import {createActor} from "../../../../../declarations/mahaka_backend"
+import { createActor } from "../../../../../declarations/mahaka_backend";
 import { Navigate, useNavigate } from "react-router-dom";
-
 
 import { DelegationIdentity } from "@dfinity/identity";
 
@@ -24,6 +23,7 @@ export const useAuthClient = () => {
     icpBalance,
   } = useIdentityKit();
   const authenticatedAgent = useAgent();
+
   console.log(icpBalance, "balance ");
 
   const disconnect = () => {

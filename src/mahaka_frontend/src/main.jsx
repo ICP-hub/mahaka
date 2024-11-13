@@ -33,12 +33,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       targets: [canisterID],
     }}
   >
-    <React.StrictMode>
-      <AuthProvider>
-        <Provider store={store}>
-          <App />
-        </Provider>
-      </AuthProvider>
-    </React.StrictMode>
+    <AuthProvider>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </AuthProvider>
   </IdentityKitProvider>
 );

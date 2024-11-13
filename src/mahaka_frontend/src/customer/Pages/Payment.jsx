@@ -1,35 +1,84 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import payimg from "../../assets/images/payment.png";
 import { useSelector } from "react-redux";
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { idlFactory } from "../../redux/reducers/auth/token-icp-ledger";
 import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
 import { Actor } from "@dfinity/agent";
 import { useAuth } from "../../redux/reducers/auth/authReducer";
 import { Principal } from "@dfinity/principal";
+
 const PaymentComponent = () => {
   const navigate = useNavigate();
-
-  // console.log("backend events are",events)
   const coffeeAmount = 0.0001;
   const [ticketType, setTicketType] = useState("SinglePass");
-  const [price, setPrice] = useState(1);
   const [processing, setProcessing] = useState(false);
   const [message, setMessage] = useState("Pay Now");
   const [loading, setLoading] = useState(false);
   const [insufficientFunds, setInsufficientFunds] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState("");
+
   const authenticatedAgent = useAgent();
   const { balance, wallet, backend } = useAuth();
-  console.log(authenticatedAgent);
-
-  const buyEventTicketHandler = async () => {
-    if (processing) {
-      return;
+  const [actor, setActor] = useState(null);
+  console.log("agent", authenticatedAgent);
+  // Initialize the actor when the component mounts
+  useEffect(() => {
+    if (balance < coffeeAmount / 100000000) {
+      setInsufficientFunds(true);
     }
+
+    if (authenticatedAgent) {
+      const newActor = Actor.createActor(idlFactory, {
+        agent: authenticatedAgent,
+        canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
+      });
+      setActor(newActor);
+    }
+  }, [balance, authenticatedAgent]);
+
+  const handlePayment = async (e) => {
+    console.log("acor", actor);
+
+    if (processing || !actor) return;
+    setLoading(true);
     setProcessing(true);
 
+    const transferArgs = {
+      from_subaccount: [],
+      spender: {
+        owner: Principal.fromText("bd3sg-teaaa-aaaaa-qaaba-cai"),
+        subaccount: [],
+      },
+      amount: BigInt(coffeeAmount * 10 ** 8 + 10000),
+      fee: [],
+      memo: [],
+      created_at_time: [],
+      expected_allowance: [],
+      expires_at: [],
+    };
+
+    try {
+      const response = await actor.icrc2_approve(transferArgs);
+      if (response.Ok) {
+        setMessage(`Transferred ${coffeeAmount} ICP`);
+        setPaymentStatus("Payment successful");
+        await buyEventTicketHandler();
+      } else {
+        throw new Error(response.Err || "Payment failed");
+      }
+    } catch (error) {
+      setMessage("Payment failed");
+      setPaymentStatus("Payment failed");
+      console.error("Payment error:", error);
+    } finally {
+      setLoading(false);
+      setProcessing(false);
+      setTimeout(() => setMessage("Make Payment"), 5000);
+    }
+  };
+
+  const buyEventTicketHandler = async () => {
     try {
       const ticketTypeVariant = { [ticketType]: null };
       const record = [
@@ -37,14 +86,8 @@ const PaymentComponent = () => {
           data: new Uint8Array([1, 2, 3]),
           description: "Ticket metadata",
           key_val_data: [
-            {
-              key: "eventName",
-              val: { TextContent: "Amazing Concert" },
-            },
-            {
-              key: "date",
-              val: { TextContent: "2024-12-31" },
-            },
+            { key: "eventName", val: { TextContent: "Amazing Concert" } },
+            { key: "date", val: { TextContent: "2024-12-31" } },
           ],
           purpose: { Rendered: null },
         },
@@ -64,66 +107,9 @@ const PaymentComponent = () => {
       );
 
       console.log("Event ticket purchased successfully:", response);
+      navigate("/ticket");
     } catch (err) {
       console.error("Error in buying event tickets:", err);
-    } finally {
-      setProcessing(false); // Allow new event creation after process is done
-    }
-    navigate("/ticket");
-  };
-
-  useEffect(() => {
-    if (balance < coffeeAmount / 100000000) {
-      setInsufficientFunds(true);
-    }
-  }, [balance]);
-
-  const handlePayment = async (e) => {
-    setLoading(true);
-    console.log(authenticatedAgent, "agent");
-
-    const actor = Actor.createActor(idlFactory, {
-      agent: authenticatedAgent,
-      canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
-    });
-    console.log("actor", actor);
-    const transferArgs = {
-      from_subaccount: [],
-      spender: {
-        owner: Principal.fromText("bd3sg-teaaa-aaaaa-qaaba-cai"),
-        subaccount: [],
-      },
-      amount: BigInt(coffeeAmount * 10 ** 8 + 10000),
-      fee: [],
-      memo: [],
-      created_at_time: [],
-      expected_allowance: [],
-      expires_at: [],
-    };
-
-    try {
-      const response = await actor.icrc2_approve(transferArgs);
-      if (response.Ok) {
-        console.log("res of paymnet", response);
-        setMessage(`Transferred ${coffeeAmount} ICP`);
-        setPaymentStatus("Payment successful");
-
-        buyEventTicketHandler();
-      } else {
-        throw new Error(response.Err || "Payment failed");
-      }
-    } catch (error) {
-      setMessage("Payment failed");
-      buyEventTicketHandler();
-
-      setPaymentStatus("Payment failed");
-      console.error("Payment error:", error);
-    } finally {
-      setLoading(false);
-      setTimeout(() => {
-        e.target.disabled = false;
-        setMessage("Make Payment");
-      }, 5000);
     }
   };
   return (
