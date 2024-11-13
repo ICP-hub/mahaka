@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import { ImSpinner9 } from "react-icons/im";
 import { getAllWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApiReducer";
-import { getAllWahanas } from "../../redux/reducers/apiReducers/wahanaApiReducer";
+import { getAllWahanas, setCurrentPage } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import { searchWahanas } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import { deleteWahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 // import { getWahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
@@ -63,7 +63,7 @@ import { IoCloseCircle } from "react-icons/io5";
 const AdminWahana = () => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
-  const { wahanas, loading } = useSelector((state) => state.wahana);
+  const { wahanas, loading, currentPage, totalPages} = useSelector((state) => state.wahana);
   console.log("logging the loadign for wahanas are", wahanas);
   const { venues } = useSelector((state) => state.venues);
 
@@ -86,6 +86,8 @@ const AdminWahana = () => {
   // const [editModalOpen, setEditModalOpen] = useState(false);
 
   // console.log("selected venue is",selectedVenue)
+
+
 
   useEffect(()=>{
     if(searchInput){
@@ -118,12 +120,12 @@ const AdminWahana = () => {
 
   useEffect(() => {
     if (selectedVenue) {
-      setSpinner(true);
+     
       fetchWahanas(selectedVenue);
     } else {
-      dispatch(getAllWahanas({ backend, chunkSize: 100, pageNo: 0 }));
+      dispatch(getAllWahanas({ backend, chunkSize: 3, pageNo: currentPage}));
     }
-  }, [selectedVenue]);
+  }, [selectedVenue ,dispatch, currentPage]);
 
   const fetchWahanas = (venueId) => {
     dispatch(
@@ -167,6 +169,29 @@ const AdminWahana = () => {
     dispatch(deleteWahana({ backend, deleteVenueId, deleteWahanaId }));
     setDeleteModalVisible(false); // Close the modal
   };
+
+
+
+  // const handleNextPage = () => {
+  //   dispatch(setPage(currentPage + 1));
+  // };
+
+  // const handlePreviousPage = () => {
+  //   if (currentPage > 1) {
+  //     dispatch(setPage(currentPage - 1));
+  //   }
+  // };
+
+  // const totalPages = Math.ceil(wahanas.length / 3);
+  // console.log("wahanas length are",wahanas.length)
+  //  console.log("total pages are", totalPages)
+
+  // const handlePageChange = (page) => {
+  //   console.log("handle page is",page)
+  //   dispatch(setCurrentPage(page));
+  //   dispatch(getAllWahanas({ backend, chunkSize: 3, pageNo: page }));
+  // };
+
 
   return (
     <div className="relative h-full">
@@ -289,6 +314,19 @@ const AdminWahana = () => {
             />
           </ModalOverlay>
         )}
+
+
+         {/* Pagination controls */}
+         {/* <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+        Previous
+      </button>
+      <span>Page {currentPage} of {totalPages}</span>
+      <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+        Next
+      </button> */}
+          
+
+
       </div>
     </div>
   );
@@ -367,40 +405,49 @@ const WahanaMain = ({
             </div>
           </button>
         </div>
-        {loading && initialLoad ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <SkeletonLoader />
-            <SkeletonLoader />
-            <SkeletonLoader />
-          </div>
-        ) :  wahanaData && wahanaData.length === 0?
-        <div className = "text-center text-gray-800 md:text-5xl text-3xl font-bold mt-10">
-        No wahanas found!
-        </div> : (
-          <div className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3">
-            {wahanaData?.map((wahana) => (
-              <WahanaCard
-                key={wahana.id}
-                wahana={{
-                  ...wahana,
-                  title: wahana.ride_title,
-                  price: wahana.price,
-                  image: wahana.banner?.data,
-                }}
-                onEditClick={onEditClick}
-                wahanaId={wahana.id}
-                venueId={wahana.venueId}
-                setSelectedWahana={setSelectedWahana}
-                setSelectedVenue={setSelectedVenue}
-                selectedVenue={selectedVenue}
-                selectedWahana={selectedWahana}
-                delete_Wahana={delete_Wahana}
-                loading={loading}
-                handleDescription={handleDescription}
-              />
-            ))}
-          </div>
-        )}
+       
+        {loading && initialLoad? (
+        <div className ="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <SkeletonLoader/>
+        <SkeletonLoader/>
+        <SkeletonLoader/>
+      </div>
+      
+      ):loading?
+      (
+        <div className="mt-8 text-center">
+
+    <div className="flex justify-center mt-30"><ImSpinner9 className = "animate-spin text-7xl opacity-80"/></div>
+        </div>
+      ) : wahanaData && wahanaData.length  === 0?
+      <div className = "text-center text-gray-800 md:text-5xl text-3xl font-bold mt-10">
+      No wahanas found!
+      </div>
+      :(
+        <div className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3">
+          {wahanaData?.map((wahana) => (
+            <WahanaCard
+              key={wahana.id}
+              wahana={{
+                ...wahana,
+                title: wahana.ride_title,
+                price: wahana.price,
+                image: wahana.banner?.data,
+              }}
+              onEditClick ={onEditClick}
+              wahanaId = {wahana.id}
+              venueId = {wahana.venueId}
+              setSelectedWahana = {setSelectedWahana}
+              setSelectedVenue = {setSelectedVenue}
+              selectedVenue = {selectedVenue}
+              selectedWahana = {selectedWahana}
+              delete_Wahana = {delete_Wahana}
+              loading = {loading}
+              handleDescription = {handleDescription}
+            />
+          ))}
+        </div>
+      )}
       </div>
     </div>
   );
