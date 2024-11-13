@@ -9,14 +9,14 @@ export default function MoreWahanaCard({ image, event, index }) {
 
   // Replace # with _ in venueId and eventId
   const venueId = decodeURIComponent(event.venueId).replace(/#/g, "_");
-  const eventId = decodeURIComponent(event.id).replace(/#/g, "_");
-  console.log(venueId, eventId);
+  const wahanaId = decodeURIComponent(event.id).replace(/#/g, "_");
+  console.log(venueId, wahanaId);
 
   // Choose color based on index (cycles through colors if there are more events than colors)
   const color = colors[index % colors.length];
 
   return (
-    <div className="my-18">
+    <Link to={`/${venueId}/wahanas/${wahanaId}`}  className="my-18">
       <div className="shadow-lg h-64 rounded-2xl overflow-hidden flex my-18">
         <div
           className="pr-6 w-1/2 text-white"
@@ -41,6 +41,6 @@ export default function MoreWahanaCard({ image, event, index }) {
           />
         </div>
       </div>
-    </div>
+      </Link>
   );
 }

@@ -105,12 +105,19 @@ export const getWahana = createAsyncThunk(
   "wahana/getWahana",
   async ({ backend, selectedWahana,  selectedVenue }) => {
     try {
+      console.log(selectedWahana);
+      console.log(selectedVenue);
+
       const response = await backend.getWahana(
         selectedWahana,
        selectedVenue
       );
+      console.log(response , "response");
       return response;
-    } catch (error) {
+    }
+    
+    catch (error) {
+
       console.error("Error getting wahanas:", error);
       throw error;
     }
@@ -275,12 +282,12 @@ const wahanaSlice = createSlice({
     .addCase(getWahana.fulfilled,(state, action)=>{
       state.loading = false;
       state.status = 'succeeded';
-      if (action.payload && action.payload.ok.data) {
+      if (action.payload && action.payload.ok) {
         if (action.meta.arg.pageNo > 1) {
           // Append new page of wahanas to the existing list
-          state.wahanas = [...state.wahanas, ...action.payload.data];
+          state.wahanas = [...state.wahanas, ...action.payload.ok];
         } else {
-          state.wahanas = action.payload.ok.data;
+          state.wahanas = action.payload.ok;
         }
         state.currentPage = action.payload.current_page || 1;
         state.totalPages = action.payload.Total_pages || 1;
