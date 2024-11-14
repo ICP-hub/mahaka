@@ -124,6 +124,7 @@ export const getAllWahanas = createAsyncThunk(
   async ({ backend, chunkSize, pageNo }) => {
     try {
       const response = await backend.getAllWahanas(chunkSize, pageNo);
+      console.log(response, "response");
       return response;
     } catch (error) {
       console.error("error fetching all wahanas", e);
@@ -227,15 +228,11 @@ const wahanaSlice = createSlice({
       })
       .addCase(getAllWahanas.fulfilled, (state, action) => {
         state.loading = false;
+
         if (action.payload && action.payload.ok.data) {
-          if (action.meta.arg.pageNo > 1) {
-            // Append new page of wahanas to the existing list
-            state.wahanas = [...state.wahanas, ...action.payload.data];
-          } else {
-            state.wahanas = action.payload.ok.data;
-          }
-          state.currentPage = action.payload.current_page || 1;
-          state.totalPages = action.payload.Total_pages || 1;
+          state.wahanas = action.payload.ok.data;
+          state.currentPage = action.payload.ok.current_page;
+          state.totalPages = action.payload.ok.Total_pages;
         } else {
           console.warn("Received empty or invalid response from API");
           state.wahanas = [];
@@ -247,6 +244,7 @@ const wahanaSlice = createSlice({
       })
       .addCase(getAllWahanas.rejected, (state, action) => {
         state.status = "failed";
+        state.wahanas = [];
         (state.loading = false), (state.error = action.error.message);
         notificationManager.error("Failed to fetch wahanas");
       })
