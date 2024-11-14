@@ -6,11 +6,18 @@ import { FcAlarmClock, FcCalendar } from "react-icons/fc";
 import TextHint from "../../customer/Components/TextHint";
 import { Principal } from "@dfinity/principal";
 
-const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, venueEndDate }) => {
+const CreateEventForm = ({
+  setIsModalOpen,
+  venueId,
+  venueTitle,
+  venueStartDate,
+  venueEndDate,
+}) => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
   const { loading, createEventLoader } = useSelector((state) => state.events);
   const { principal } = useSelector((state) => state.authentication);
+
   const [error, setError] = useState("");
   const [formErrors, setFormErrors] = useState({});
   useEffect(() => {
@@ -120,7 +127,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
       const day = String(date.getDate()).padStart(2, "0");
       return `${year}-${month}-${day}`;
     };
-    const minDate = venueStartDate ? new Date(venueStartDate) :"";
+    const minDate = venueStartDate ? new Date(venueStartDate) : "";
     const maxDate = venueEndDate ? new Date(venueEndDate) : "";
 
     if (minDate) {
@@ -147,7 +154,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
           setFormErrors((prev) => ({ ...prev, StartDate: "" }));
         }
         if (endDateRef.current._flatpickr) {
-          endDateRef.current._flatpickr.set('minDate', newStartDate);
+          endDateRef.current._flatpickr.set("minDate", newStartDate);
         }
       },
       required: true,
@@ -161,9 +168,11 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
 
           const normalizedMax = maxDate && new Date(maxDate);
           if (normalizedMax) normalizedMax.setHours(0, 0, 0, 0);
-          return (normalizedMin && normalizedDate < normalizedMin) ||
-            (normalizedMax && normalizedDate > normalizedMax);
-        }
+          return (
+            (normalizedMin && normalizedDate < normalizedMin) ||
+            (normalizedMax && normalizedDate > normalizedMax)
+          );
+        },
       ],
     });
     const endDatePicker = flatpickr(endDateRef.current, {
@@ -195,10 +204,12 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
           const normalizedStart = startDate ? new Date(startDate) : "";
           if (normalizedStart) normalizedStart.setHours(0, 0, 0, 0);
 
-          return (normalizedMin && normalizedDate < normalizedMin) ||
+          return (
+            (normalizedMin && normalizedDate < normalizedMin) ||
             (normalizedMax && normalizedDate > normalizedMax) ||
-            (normalizedStart && normalizedDate < normalizedStart);
-        }
+            (normalizedStart && normalizedDate < normalizedStart)
+          );
+        },
       ],
     });
 
@@ -256,7 +267,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     let updatedValue = value;
-  
+
     // Handle ticket limit fields specifically
     if (name.includes("Ticket_limit")) {
       updatedValue = parseInt(value) || 0;
@@ -264,10 +275,10 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
         ...prevState,
         collection_args: {
           ...prevState.collection_args,
-          [name]: updatedValue
-        }
+          [name]: updatedValue,
+        },
       }));
-  
+
       // Clear errors for ticket limit fields
       if (formErrors[name]) {
         setFormErrors((prevErrors) => ({
@@ -277,7 +288,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
       }
       return;
     }
-  
+
     // Handle nested collection_args fields
     if (
       name === "description" ||
@@ -290,20 +301,20 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
       if (name === "maxLimit") {
         updatedValue = parseInt(value) || 0;
       }
-      
+
       // Handle ticket prices as number
       if (name.includes("Ticket_price")) {
         updatedValue = parseFloat(value) || 0;
       }
-  
+
       setEventData((prevState) => ({
         ...prevState,
         collection_args: {
           ...prevState.collection_args,
-          [name]: updatedValue
-        }
+          [name]: updatedValue,
+        },
       }));
-  
+
       // Clear errors for nested fields
       if (formErrors[name]) {
         setFormErrors((prevErrors) => ({
@@ -318,8 +329,8 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
           ...prevState,
           eventDetails: {
             ...prevState.eventDetails,
-            Location: updatedValue
-          }
+            Location: updatedValue,
+          },
         }));
       } else {
         setEventData((prevState) => ({
@@ -327,7 +338,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
           [name]: updatedValue,
         }));
       }
-  
+
       // Clear errors for these fields
       if (formErrors[name]) {
         setFormErrors((prevErrors) => ({
@@ -489,7 +500,9 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
       return;
     }
     const fullVenueId = venueId;
-    const Id = Principal.fromText(principal);
+    const Id = Principal.fromText(
+      "h7yxq-n6yb2-6js2j-af5hk-h4inj-edrce-oevyj-kbs7a-76kft-vrqrw-nqe"
+    );
     console.log(fullVenueId, "venue id");
 
     try {
@@ -556,8 +569,9 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
   };
 
   const getInputClassName = (fieldName) => {
-    return `my-3 outline-none w-full bg-transparent ${formErrors[fieldName] ? "border-red-500" : ""
-      }`;
+    return `my-3 outline-none w-full bg-transparent ${
+      formErrors[fieldName] ? "border-red-500" : ""
+    }`;
   };
 
   return (
@@ -569,8 +583,9 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
           <TextHint text="Enter the title of the event." />
         </div>
         <div
-          className={`border ${formErrors.title ? "border-red-500" : "border-border"
-            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+          className={`border ${
+            formErrors.title ? "border-red-500" : "border-border"
+          } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
         >
           <input
             type="text"
@@ -594,8 +609,9 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
           <TextHint text="Enter the description of the event." />
         </div>
         <div
-          className={`border ${formErrors.description ? "border-red-500" : "border-border"
-            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+          className={`border ${
+            formErrors.description ? "border-red-500" : "border-border"
+          } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
         >
           <textarea
             name="description"
@@ -620,8 +636,9 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
             <TextHint text="Enter the start date of the event." />
           </div>
           <div
-            className={`flex items-center border ${formErrors.StartDate ? "border-red-500" : "border-border"
-              } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+            className={`flex items-center border ${
+              formErrors.StartDate ? "border-red-500" : "border-border"
+            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
           >
             <input
               ref={startDateRef}
@@ -641,8 +658,9 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
             <TextHint text="Enter the end date of the event." />
           </div>
           <div
-            className={`flex items-center border ${formErrors.EndDate ? "border-red-500" : "border-border"
-              } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+            className={`flex items-center border ${
+              formErrors.EndDate ? "border-red-500" : "border-border"
+            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
           >
             <input
               ref={endDateRef}
@@ -665,8 +683,9 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
             <TextHint text="Enter the start time of the event." />
           </div>
           <div
-            className={`flex items-center border ${formErrors.StartTime ? "border-red-500" : "border-border"
-              } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+            className={`flex items-center border ${
+              formErrors.StartTime ? "border-red-500" : "border-border"
+            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
           >
             <input
               ref={startTimeRef}
@@ -685,8 +704,9 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
             <TextHint text="Enter the end time of the event." />
           </div>
           <div
-            className={`flex items-center border ${formErrors.EndTime ? "border-red-500" : "border-border"
-              } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+            className={`flex items-center border ${
+              formErrors.EndTime ? "border-red-500" : "border-border"
+            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
           >
             <input
               ref={endTimeRef}
@@ -708,8 +728,9 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
           <TextHint text="Enter the location of the event." />
         </div>
         <div
-          className={`border ${formErrors.Location ? "border-red-500" : "border-border"
-            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+          className={`border ${
+            formErrors.Location ? "border-red-500" : "border-border"
+          } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
         >
           <input
             type="text"
@@ -738,7 +759,9 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
       <div className="flex space-x-4">
         <div className="w-1/3">
           <div className="flex items-center gap-2">
-            <label className="font-semibold text-sm">General Ticket Limit</label>
+            <label className="font-semibold text-sm">
+              General Ticket Limit
+            </label>
             <TextHint text="Enter the General Ticket Limit of the event." />
           </div>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
@@ -759,7 +782,9 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
         </div>
         <div className="w-1/3">
           <div className="flex items-center gap-2">
-            <label className="font-semibold text-sm">Student Ticket Limit</label>
+            <label className="font-semibold text-sm">
+              Student Ticket Limit
+            </label>
             <TextHint text="Enter the Student Ticket Limit of the event." />
           </div>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
@@ -893,8 +918,9 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle, venueStartDate, 
           Cancel
         </button> */}
         <button
-          className={`text-white py-2 px-4 rounded ${createEventLoader ? "bg-gray-600" : "bg-secondary"
-            }`}
+          className={`text-white py-2 px-4 rounded ${
+            createEventLoader ? "bg-gray-600" : "bg-secondary"
+          }`}
           disabled={createEventLoader}
           onClick={(e) => (createEventLoader ? null : handleSubmit(e))}
         >

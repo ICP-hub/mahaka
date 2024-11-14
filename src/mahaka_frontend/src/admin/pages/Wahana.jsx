@@ -105,7 +105,7 @@ const AdminWahana = () => {
   }, [loading]);
 
   useEffect(() => {
-    dispatch(getAllVenues({ backend, pageLimit: 100, currPage: 0 }));
+    dispatch(getAllVenues({ backend, pageLimit: 10, currPage: 0 }));
   }, [dispatch, backend]);
 
   // useEffect(()=>{

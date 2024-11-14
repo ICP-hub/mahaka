@@ -74,14 +74,15 @@ const WahanaPage = () => {
   const { ids, eventId } = useParams();
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
-  const { wahanas, loading } = useSelector((state) => state.wahana);
+  const { currentWahana:wahanas, loading } = useSelector(
+    (state) => state.wahana
+  );
   const [localError, setLocalError] = useState(null);
 
   useEffect(() => {
     console.log("Fetched Wahana Data:", wahanas);
   }, [wahanas]);
 
-  
   const eventIds = `${decodeURIComponent(eventId).replace(/_/g, "#")}${
     window.location.hash
   }`;
@@ -90,7 +91,6 @@ const WahanaPage = () => {
   }`;
   console.log("Decoded Venue ID:", venueId);
   console.log("Decoded Wahana ID:", eventIds);
-    
 
   useEffect(() => {
     if (!venueId || !eventIds) {
@@ -102,21 +102,21 @@ const WahanaPage = () => {
       return;
     }
 
-    dispatch(getWahana({ backend, selectedWahana: eventIds, selectedVenue: venueId }))
+    dispatch(
+      getWahana({ backend, selectedWahana: eventIds, selectedVenue: venueId })
+    )
       .unwrap()
       .catch((err) => {
         setLocalError(err.message || "Failed to fetch wahana details");
       });
   }, [dispatch, eventIds, venueId, backend]);
 
- 
-
   // Assuming the first event is the main event for this venue
 
-//   const duration =
-//     venue?.details.StartDate && venue?.details.EndDate
-//       ? calculateDuration(venue.details.StartDate, venue.details.EndDate)
-//       : "";
+  //   const duration =
+  //     venue?.details.StartDate && venue?.details.EndDate
+  //       ? calculateDuration(venue.details.StartDate, venue.details.EndDate)
+  //       : "";
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -166,7 +166,9 @@ const WahanaPage = () => {
           {loading ? (
             <h1 className=" animate-pulse bg-gray-300 rounded-2xl w-32 h-12 font-black mb-10"></h1>
           ) : (
-            <h1 className="text-4xl font-black pb-10">{wahanas?.ride_title || ""}</h1>
+            <h1 className="text-4xl font-black pb-10">
+              {wahanas?.ride_title || ""}
+            </h1>
           )}
           <div className="flex flex-col lg:flex-row gap-8">
             {/* left side section  */}
@@ -281,22 +283,18 @@ const WahanaPage = () => {
                     >
                       <div className="p-6 font-sans">
                         <ul className="list-disc list-inside mb-4">
-                        
                           <li>
                             <strong>Location:</strong>{" "}
                             {wahanas.ride_title || "Indonesia"}
                           </li>
                           <li>
-                            <strong>Price:</strong>{" "}
-                           IDR {parseInt(wahanas.price)}
+                            <strong>Price:</strong> IDR{" "}
+                            {parseInt(wahanas.price)}
                           </li>
                         </ul>
-                      
+
                         <div className="space-y-4">
-                          <div>
-                            {wahanas.description ||" "}
-                        
-                          </div>
+                          <div>{wahanas.description || " "}</div>
                         </div>
                       </div>
                     </motion.div>
@@ -328,11 +326,9 @@ const WahanaPage = () => {
                   <h1 className="text-2xl font-black">Wahana Details</h1>
                   <h3 className="text-lg font-normal">
                     {" "}
-                   IDR {parseInt(wahanas?.price)}
+                    IDR {parseInt(wahanas?.price)}
                   </h3>
-                 
                 </div>
-               
               </div>
             )}
           </div>

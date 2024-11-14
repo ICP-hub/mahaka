@@ -149,6 +149,7 @@ export default function SingleEvent() {
 
   console.log(eventLoading, "eventLoading");
   console.log(venueLoading, "venueLoading");
+  console.log(wahanaLoading, "wahanaLoading");
 
   // Assuming the first event is the main event for this venue
   const event = events && Array.isArray(events) ? events : null;
@@ -336,57 +337,8 @@ export default function SingleEvent() {
                               "4:00 PM"}
                           </li>
                         </ul>
-                        <p className="mb-4">
-                          This data is taken from the existing zoo website.
-                        </p>
-                        <div className="space-y-4">
-                          <div>
-                            <p>
-                              Come and visit New Zealand's first zoo to get up
-                              close and personal to native treasures and
-                              endangered animals from around the world.
-                            </p>
-                            <p>
-                              Child entry applies for 3-14 year olds, and under
-                              3s are free. All children under the age of 14 must
-                              be accompanied by an adult when visiting the Zoo.
-                            </p>
-                            <p>
-                              Zoo Entry Tickets purchased online are valid for
-                              12 months from purchase date. Tickets can also be
-                              bought in person at our front entrance.
-                            </p>
-                            <p>
-                              If you are looking for tickets to a special event
-                              or current discounted offer, these cannot be
-                              booked here. Please visit the relevant event or
-                              offer webpage for more information.
-                            </p>
-                          </div>
-                          <div>
-                            <p>
-                              Come and visit New Zealand's first zoo to get up
-                              close and personal to native treasures and
-                              endangered animals from around the world.
-                            </p>
-                            <p>
-                              Child entry applies for 3-14 year olds, and under
-                              3s are free. All children under the age of 14 must
-                              be accompanied by an adult when visiting the Zoo.
-                            </p>
-                            <p>
-                              Zoo Entry Tickets purchased online are valid for
-                              12 months from purchase date. Tickets can also be
-                              bought in person at our front entrance.
-                            </p>
-                            <p>
-                              If you are looking for tickets to a special event
-                              or current discounted offer, these cannot be
-                              booked here. Please visit the relevant event or
-                              offer webpage for more information.
-                            </p>
-                          </div>
-                        </div>
+
+                        <div className="space-y-4">{venue.Description}</div>
                       </div>
                     </motion.div>
                   )}
@@ -448,7 +400,7 @@ export default function SingleEvent() {
 
         {/* bottom crousel section  */}
         <div className="py-12 mx-auto px-4 sm:px-6 lg:px-8">
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h1 className="text-4xl font-black">Check Events</h1>
           </section>
 
@@ -463,57 +415,13 @@ export default function SingleEvent() {
                   ></div>
                 ))}
               </div>
-            ) : (
-              <Swiper
-                spaceBetween={40}
-                slidesPerView={1}
-                breakpoints={{
-                  640: {
-                    slidesPerView: 1,
-                  },
-                  768: {
-                    slidesPerView: 1,
-                  },
-                  1024: {
-                    slidesPerView: 2,
-                  },
-                }}
-                autoplay={{
-                  delay: 3000,
-                  disableOnInteraction: false,
-                }}
-                pagination={{
-                  clickable: true,
-                }}
-                modules={[Autoplay, Pagination]}
-                className="mySwiper px-4 sm:px-6 lg:px-8 mx-auto"
-              >
-                {event?.map((event, index) => (
-                  <SwiperSlide key={index}>
-                    <MoreEventCard
-                      event={event}
-                      index={index}
-                      image={event?.banner?.data}
-                    />
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-            )}
-          </div>
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
-            <h1 className="text-4xl font-black">Check wahana</h1>
-          </section>
-
-          <div className="max-w-7xl mx-auto">
-            {wahanaLoading ? (
-              <div className="flex my-18 space-x-4 px-4 sm:px-6 lg:px-8 mx-auto">
-                {/* Skeleton Loader for each card */}
-                {[...Array(2)].map((_, index) => (
-                  <div
-                    key={index}
-                    className="w-full lg:w-1/2 h-64 bg-gray-200 animate-pulse rounded-lg"
-                  ></div>
-                ))}
+            ) : event?.length === 0 ? (
+              <div className="p-6">
+                <div className="text-center p-8 bg-card rounded-lg border border-gray-200">
+                  <p className="text-lg ">
+                    No events available for this venue.
+                  </p>
+                </div>
               </div>
             ) : (
               <Swiper
@@ -540,7 +448,68 @@ export default function SingleEvent() {
                 modules={[Autoplay, Pagination]}
                 className="mySwiper px-4 sm:px-6 lg:px-8 mx-auto"
               >
-                {wahanas?.map((event, index) => (
+                {event.map((event, index) => (
+                  <SwiperSlide key={index}>
+                    <MoreEventCard
+                      event={event}
+                      index={index}
+                      image={event?.banner?.data}
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            )}
+          </div>
+
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 className="text-4xl font-black">Wahana</h1>
+          </section>
+
+          <div className="max-w-7xl mx-auto">
+            {wahanaLoading ? (
+              <div className="flex my-18 space-x-4 px-4 sm:px-6 lg:px-8 mx-auto">
+                {/* Skeleton Loader for each card */}
+                {[...Array(2)].map((_, index) => (
+                  <div
+                    key={index}
+                    className="w-full lg:w-1/2 h-64 bg-gray-200 animate-pulse rounded-lg"
+                  ></div>
+                ))}
+              </div>
+            ) : wahanas?.length === 0 ? (
+              <div className="p-6">
+                <div className="text-center p-8 bg-card rounded-lg border border-gray-200">
+                  <p className="text-lg ">
+                    No wahana available for this venue.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <Swiper
+                spaceBetween={40}
+                slidesPerView={1}
+                breakpoints={{
+                  640: {
+                    slidesPerView: 1,
+                  },
+                  768: {
+                    slidesPerView: 1,
+                  },
+                  1024: {
+                    slidesPerView: 2,
+                  },
+                }}
+                autoplay={{
+                  delay: 3000,
+                  disableOnInteraction: false,
+                }}
+                pagination={{
+                  clickable: true,
+                }}
+                modules={[Autoplay, Pagination]}
+                className="mySwiper px-4 sm:px-6 lg:px-8 mx-auto"
+              >
+                {wahanas.map((event, index) => (
                   <SwiperSlide key={index}>
                     <MoreWahanaCard
                       event={event}
