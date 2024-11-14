@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUserDetailsByCaller } from "../../redux/reducers/apiReducers/userApiReducer";
 import useLogin from "../../common/hooks/useLogin";
 import ProfileDemoImg from "../../assets/images/profile-demo.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../redux/reducers/auth/authReducer";
 import { ConnectWallet } from "@nfid/identitykit/react";
 import {
@@ -27,8 +27,14 @@ const NavLinks = [
 export default function Header() {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const toggleNavigation = () => setIsNavOpen((prev) => !prev);
+  const navigate = useNavigate();
   const { isConnected, login, logout } = useAuth();
 
+  useEffect(() => {
+    if (isConnected) {
+      navigate("/user-profile");
+    }
+  }, [isConnected, navigate]);
   // Effect if sidenav open overflow hidden
 
   return (
@@ -39,8 +45,10 @@ export default function Header() {
           <SearchBox />
           <div className="flex items-center gap-8">
             <NavHorizontal />
-
-            <ConnectWalletBtn onNavOpen={setIsNavOpen} />
+            <ConnectWallet
+              connectButtonComponent={ConnectBtn}
+              className="rounded-full bg-black"
+            />{" "}
           </div>
         </div>
         <button className="md:hidden" onClick={toggleNavigation}>
@@ -141,6 +149,7 @@ const NavVertical = ({ isNavOpen, onNavOpen }) => {
             // Replace to links
             <Link
               to={link.url}
+              onNavOpen
               key={index}
               onClick={() => onNavOpen(false)}
               className="flex px-2 py-4 font-medium rounded-md w-full"
@@ -151,7 +160,10 @@ const NavVertical = ({ isNavOpen, onNavOpen }) => {
           <TranslationForCustomer />
 
           <span className="flex w-full my-6">
-            <ConnectWalletBtn onNavOpen={onNavOpen} />
+            <ConnectWallet
+              connectButtonComponent={ConnectBtn}
+              className="rounded-full bg-black"
+            />{" "}
           </span>
         </motion.nav>
       )}
@@ -167,35 +179,35 @@ const ConnectBtn = ({ onClick }) => (
   </button>
 );
 
-const ConnectWalletBtn = ({ onNavOpen }) => {
-  const { isConnected, login, logout, principal } = useAuth();
-  const dispatch = useDispatch();
+// const ConnectWalletBtn = ({ onNavOpen }) => {
+//   const { isConnected, login, logout, principal } = useAuth();
+//   const dispatch = useDispatch();
 
-  // const { loginWithPlug } = useLogin();
+//   // const { loginWithPlug } = useLogin();
 
-  if (isConnected)
-    return (
-      <Link
-        to="/user-profile"
-        onClick={() => onNavOpen(false)}
-        className="p-2 rounded-full border-2 border-secondary"
-      >
-        {/* <img
-          src={ProfileDemoImg}
-          alt="Profile-pic"
-          className="h-12 w-12 md:h-8 md:w-8 rounded-full"
-        /> */}
-        <Avvvatars value={principal} shadow={true} />
-      </Link>
-    );
+//   if (isConnected)
+//     return (
+//       <Link
+//         to="/user-profile"
+//         onClick={() => onNavOpen(false)}
+//         className="p-2 rounded-full border-2 border-secondary"
+//       >
+//         {/* <img
+//           src={ProfileDemoImg}
+//           alt="Profile-pic"
+//           className="h-12 w-12 md:h-8 md:w-8 rounded-full"
+//         /> */}
+//         <Avvvatars value={principal} shadow={true} />
+//       </Link>
+//     );
 
-  return (
-    <ConnectWallet
-      connectButtonComponent={ConnectBtn}
-      className="rounded-full bg-black"
-    />
-  );
-};
+//   return (
+//     <ConnectWallet
+//       connectButtonComponent={ConnectBtn}
+//       className="rounded-full bg-black"
+//     />
+//   );
+// };
 
 // export default function Header() {
 //   const [isOpen, setIsOpen] = useState(false);

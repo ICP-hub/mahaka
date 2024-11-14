@@ -6,13 +6,20 @@ import { getUserDetailsByCaller } from "../../../redux/reducers/apiReducers/user
 import { useEffect } from "react";
 import Avvvatars from "avvvatars-react";
 import { useAuth } from "../../../redux/reducers/auth/authReducer";
+import { useNavigate } from "react-router-dom";
 
 const UserProfileData = () => {
   const dispatch = useDispatch();
   const logoutAndRedirect = useLogout();
   const { currentUser, userLoading } = useSelector((state) => state.users);
-  const { backend, principal, logout } = useAuth();
+  const navigate = useNavigate();
+  const { isConnected, login, logout, backend, principal } = useAuth();
 
+  useEffect(() => {
+    if (!isConnected) {
+      navigate("/");
+    }
+  }, [isConnected, navigate]);
   useEffect(() => {
     dispatch(getUserDetailsByCaller({ backend: backend }));
   }, [backend]);
