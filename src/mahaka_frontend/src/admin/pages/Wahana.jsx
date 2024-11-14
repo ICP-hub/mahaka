@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import { ImSpinner9 } from "react-icons/im";
 import { getAllWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApiReducer";
-import { getAllWahanas, setCurrentPage } from "../../redux/reducers/apiReducers/wahanaApiReducer";
+import { getAllWahanas, setPage} from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import { searchWahanas } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import { deleteWahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 // import { getWahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
@@ -63,7 +63,7 @@ import { IoCloseCircle } from "react-icons/io5";
 const AdminWahana = () => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
-  const { wahanas, loading, currentPage, totalPages} = useSelector((state) => state.wahana);
+  const { wahanas, loading, currentPage, wahanasPerPage} = useSelector((state) => state.wahana);
   console.log("logging the loadign for wahanas are", wahanas);
   const { venues } = useSelector((state) => state.venues);
 
@@ -89,13 +89,19 @@ const AdminWahana = () => {
 
 
 
+
+
+
+
+
+
   useEffect(()=>{
     if(searchInput){
       dispatch(searchWahanas({backend, searchText:searchInput, chunkSize:10, pageNo:0}))
     }else{
-      dispatch(getAllWahanas({backend, chunkSize:10, pageNo:0}))
+      dispatch(getAllWahanas({backend, chunkSize: 100, pageNo:0 }))
     }
-  },[searchInput,dispatch])
+  },[searchInput,dispatch, currentPage, wahanasPerPage])
 
 
   useEffect(() => {
@@ -123,9 +129,9 @@ const AdminWahana = () => {
      
       fetchWahanas(selectedVenue);
     } else {
-      dispatch(getAllWahanas({ backend, chunkSize: 3, pageNo: currentPage}));
+      dispatch(getAllWahanas({ backend,  chunkSize: 10, pageNo:0}));
     }
-  }, [selectedVenue ,dispatch, currentPage]);
+  }, [selectedVenue ,dispatch]);
 
   const fetchWahanas = (venueId) => {
     dispatch(
@@ -316,16 +322,7 @@ const AdminWahana = () => {
         )}
 
 
-         {/* Pagination controls */}
-         {/* <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
-        Previous
-      </button>
-      <span>Page {currentPage} of {totalPages}</span>
-      <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-        Next
-      </button> */}
-          
-
+       
 
       </div>
     </div>

@@ -111,7 +111,7 @@ const validateForm = () => {
 console.log("create wahana errors are", errors)
   // Validate title
   if (!formData.name.trim()) {
-    errors.title = "wahana title is required";
+    errors.name = "wahana title is required";
   }
 
   // Validate description
@@ -128,9 +128,9 @@ console.log("create wahana errors are", errors)
   if (!formData.banner.data) {
     errors.banner = "wahana banner is required";
   }
-  if (!formData.banner.logo_type) {
-    errors.logo = "Event logo is required";
-  }
+  // if (!formData.banner.logo_type) {
+  //   errors.logo = "Event logo is required";
+  // }
  
   setFormErrors(errors);
   return Object.keys(errors).length === 0;
@@ -141,6 +141,10 @@ console.log("create wahana errors are", errors)
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     setError("");
+    setFormErrors((prevErrors) => ({
+      ...prevErrors,
+      banner: undefined,
+    }));
     if (file) {
 
       try {
@@ -192,6 +196,27 @@ console.log("create wahana errors are", errors)
     }
   };
 
+
+  const handleInputChange = (e) => {
+    console.log("input change is",e.target.value)
+    const { name, value } = e.target;
+    console.log("input change is",value)
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+
+    if (formErrors[name]) {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: undefined,
+      }));
+    }
+  };
+
+
+  
+
   return (
     <div>
       <div className="space-y-4">
@@ -225,22 +250,21 @@ console.log("create wahana errors are", errors)
             <TextHint text="Enter the name of the wahana." />
             </div>
           <div 
-           className={`border ${formErrors.title ? "border-red-500" : "border-border"
+           className={`border ${formErrors.name ? "border-red-500" : "border-border"
            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
           >
             <input
               type="text"
               name="name"
               value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
+             
+              onChange = {handleInputChange }
               className="my-3 outline-none w-full bg-transparent"
               required
             />
           </div>
-          {formErrors.title && (
-          <p className="text-red-500 text-sm mt-1">{formErrors.title}</p>
+          {formErrors.name && (
+          <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>
         )}
         </div>
 
@@ -258,9 +282,7 @@ console.log("create wahana errors are", errors)
               name="description"
               rows={5}
               value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
+              onChange = {handleInputChange }
               className="mt-3 outline-none w-full bg-transparent"
               required
             />
@@ -282,9 +304,12 @@ console.log("create wahana errors are", errors)
           >
             <input
               value={formData.price}
-              onChange={(e) =>
-                setFormData({ ...formData, price: parseInt(e.target.value) })
-              }
+              name = "price"
+              type ="number"
+              // onChange={(e) =>
+              //   setFormData({ ...formData, price: parseInt(e.target.value) })
+              // }
+              onChange = {handleInputChange }
               className="my-3 outline-none w-full bg-transparent"
               required
             />

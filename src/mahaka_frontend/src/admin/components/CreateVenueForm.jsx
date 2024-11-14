@@ -295,6 +295,8 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
       }
     }
   };
+
+  
   const [logoPreview, setLogoPreview] = useState(null);
   const handleFileChange2 = async (e) => {
     const file = e.target.files[0];

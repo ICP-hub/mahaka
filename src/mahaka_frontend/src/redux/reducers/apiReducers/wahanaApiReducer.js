@@ -7,6 +7,7 @@ const initialState = {
   loading: false,
   error: null,
   currentPage: 1,
+  wahanasPerPage: 3,
   totalPages: 1,
   createWahanaLoader: false,
   
@@ -176,7 +177,12 @@ export const deleteWahana = createAsyncThunk(
 const wahanaSlice = createSlice({
   name: "wahana",
   initialState,
-  reducers: {},
+  reducers: {
+
+      setPage: (state, action) => {
+          state.currentPage = action.payload;
+      },
+  },
   extraReducers: (builder) => {
     builder
       // Handle createWahana
@@ -361,5 +367,7 @@ const wahanaSlice = createSlice({
    
   },
 });
+
+export const { setPage } = wahanaSlice.actions;
 
 export default wahanaSlice.reducer;
