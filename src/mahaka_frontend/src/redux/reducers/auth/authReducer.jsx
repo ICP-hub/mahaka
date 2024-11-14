@@ -24,7 +24,7 @@ export const useAuthClient = () => {
   } = useIdentityKit();
   const authenticatedAgent = useAgent();
 
-  console.log(icpBalance, "balance ");
+  console.log(authenticatedAgent, "agent ");
 
   const disconnect = () => {
     identityKitDisconnect();

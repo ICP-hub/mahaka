@@ -80,29 +80,28 @@ const AdminWahana = () => {
   const [deleteVenueId, setDeleteVenueId] = useState(null);
   const [wahanaDescription, setWahanaDescription] = useState("");
   const [descriptionModal, setDescriptionModal] = useState(false);
-  const [searchInput, setSearchInput] = useState("")
+  const [searchInput, setSearchInput] = useState("");
+  const [page, setPage] = useState(1);
 
-  console.log("search wahanas is", searchInput)
+  console.log("search wahanas is", searchInput);
   // const [editModalOpen, setEditModalOpen] = useState(false);
 
   // console.log("selected venue is",selectedVenue)
 
-
-
-
-
-
-
-
-
-  useEffect(()=>{
-    if(searchInput){
-      dispatch(searchWahanas({backend, searchText:searchInput, chunkSize:10, pageNo:0}))
-    }else{
-      dispatch(getAllWahanas({backend, chunkSize: 100, pageNo:0 }))
+  useEffect(() => {
+    if (searchInput) {
+      dispatch(
+        searchWahanas({
+          backend,
+          searchText: searchInput,
+          chunkSize: 10,
+          pageNo: 0,
+        })
+      );
+    } else {
+      dispatch(getAllWahanas({ backend, chunkSize: 3, pageNo: page - 1 }));
     }
-  },[searchInput,dispatch, currentPage, wahanasPerPage])
-
+  }, [searchInput, dispatch]);
 
   useEffect(() => {
     if (loading && initialLoad) {
@@ -113,7 +112,7 @@ const AdminWahana = () => {
   }, [loading]);
 
   useEffect(() => {
-    dispatch(getAllVenues({ backend, pageLimit: 100, currPage: 0 }));
+    dispatch(getAllVenues({ backend, pageLimit: 10, currPage: 0 }));
   }, [dispatch, backend]);
 
   // useEffect(()=>{
@@ -126,12 +125,11 @@ const AdminWahana = () => {
 
   useEffect(() => {
     if (selectedVenue) {
-     
       fetchWahanas(selectedVenue);
     } else {
-      dispatch(getAllWahanas({ backend,  chunkSize: 10, pageNo:0}));
+      dispatch(getAllWahanas({ backend, chunkSize: 3, pageNo: page - 1 }));
     }
-  }, [selectedVenue ,dispatch]);
+  }, [selectedVenue, page]);
 
   const fetchWahanas = (venueId) => {
     dispatch(
@@ -174,6 +172,9 @@ const AdminWahana = () => {
     console.log("handle delete ids are", deleteVenueId);
     dispatch(deleteWahana({ backend, deleteVenueId, deleteWahanaId }));
     setDeleteModalVisible(false); // Close the modal
+  };
+  const handlePageChange = (pageNumber) => {
+    setPage(pageNumber); // Update the page number when user clicks on a page button
   };
 
 
@@ -230,7 +231,7 @@ const AdminWahana = () => {
             <div className="flex justify-end">
               <button
                 className="bg-red-600 text-white px-4 py-2 mr-4 rounded-full"
-                onClick={()=>confirmDeleteWahana()}
+                onClick={() => confirmDeleteWahana()}
               >
                 Delete
               </button>
@@ -283,13 +284,48 @@ const AdminWahana = () => {
           onEditClick={() => setEditModalOpen(true)}
           setSelectedWahana={setSelectedWahana}
           initialLoad={initialLoad}
-          delete_Wahana = {delete_Wahana}
-          selectedWahana = {selectedWahana}
-          handleDescription = {handleDescription }
-          searchInput = {searchInput}
-          setSearchInput = {setSearchInput}
-         
+          delete_Wahana={delete_Wahana}
+          selectedWahana={selectedWahana}
+          handleDescription={handleDescription}
+          searchInput={searchInput}
+          setSearchInput={setSearchInput}
         />
+        <div className="flex justify-center m-6 items-center space-x-2">
+          {/* Prev button */}
+          <button
+            className={`px-3 py-1 rounded ${
+              page === 1
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-gray-200"
+            }`}
+            onClick={() => handlePageChange(page - 1)}
+            disabled={page === 1}
+          >
+            Prev
+          </button>
+
+          {/* Page number buttons */}
+          {Array.from({ length: 5 }, (_, i) => i + 1).map((pageNum) => (
+            <button
+              key={pageNum}
+              className={`mx-1 px-3 py-1 rounded ${
+                page === pageNum ? "bg-[#564BF1] text-white" : "bg-gray-200"
+              }`}
+              onClick={() => handlePageChange(pageNum)}
+            >
+              {pageNum}
+            </button>
+          ))}
+
+          {/* Next button */}
+          <button
+            className={`px-3 py-1 rounded bg-gray-200`}
+            onClick={() => handlePageChange(page + 1)}
+            // disabled={page === totalPages}
+          >
+            Next
+          </button>
+        </div>
 
         <ModalOverlay
           isOpen={isModalOpen}
@@ -343,7 +379,7 @@ const WahanaMain = ({
   initialLoad,
   handleDescription,
   searchInput,
-  setSearchInput
+  setSearchInput,
 }) => {
   const SkeletonLoader = () => {
     return (
@@ -388,11 +424,9 @@ const WahanaMain = ({
               type="text"
               placeholder="Search wahanas"
               className=" bg-transparent outline-none ml-4 lg:w-1000px"
-              search = {searchInput}
+              search={searchInput}
               // setSearchInput = {setSearchInput}
-              onChange = {(e)=>setSearchInput(e.target.value)}
-              
-
+              onChange={(e) => setSearchInput(e.target.value)}
             />
           </div>
 
@@ -402,49 +436,41 @@ const WahanaMain = ({
             </div>
           </button>
         </div>
-       
-        {loading && initialLoad? (
-        <div className ="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <SkeletonLoader/>
-        <SkeletonLoader/>
-        <SkeletonLoader/>
-      </div>
-      
-      ):loading?
-      (
-        <div className="mt-8 text-center">
-
-    <div className="flex justify-center mt-30"><ImSpinner9 className = "animate-spin text-7xl opacity-80"/></div>
-        </div>
-      ) : wahanaData && wahanaData.length  === 0?
-      <div className = "text-center text-gray-800 md:text-5xl text-3xl font-bold mt-10">
-      No wahanas found!
-      </div>
-      :(
-        <div className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3">
-          {wahanaData?.map((wahana) => (
-            <WahanaCard
-              key={wahana.id}
-              wahana={{
-                ...wahana,
-                title: wahana.ride_title,
-                price: wahana.price,
-                image: wahana.banner?.data,
-              }}
-              onEditClick ={onEditClick}
-              wahanaId = {wahana.id}
-              venueId = {wahana.venueId}
-              setSelectedWahana = {setSelectedWahana}
-              setSelectedVenue = {setSelectedVenue}
-              selectedVenue = {selectedVenue}
-              selectedWahana = {selectedWahana}
-              delete_Wahana = {delete_Wahana}
-              loading = {loading}
-              handleDescription = {handleDescription}
-            />
-          ))}
-        </div>
-      )}
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <SkeletonLoader />
+            <SkeletonLoader />
+            <SkeletonLoader />
+          </div>
+        ) : wahanaData && wahanaData.length === 0 ? (
+          <div className="text-center text-gray-800 md:text-5xl text-3xl font-bold mt-10">
+            No wahanas found!
+          </div>
+        ) : (
+          <div className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3">
+            {wahanaData?.map((wahana) => (
+              <WahanaCard
+                key={wahana.id}
+                wahana={{
+                  ...wahana,
+                  title: wahana.ride_title,
+                  price: wahana.price,
+                  image: wahana.banner?.data,
+                }}
+                onEditClick={onEditClick}
+                wahanaId={wahana.id}
+                venueId={wahana.venueId}
+                setSelectedWahana={setSelectedWahana}
+                setSelectedVenue={setSelectedVenue}
+                selectedVenue={selectedVenue}
+                selectedWahana={selectedWahana}
+                delete_Wahana={delete_Wahana}
+                loading={loading}
+                handleDescription={handleDescription}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

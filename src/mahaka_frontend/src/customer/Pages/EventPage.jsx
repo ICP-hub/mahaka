@@ -308,57 +308,8 @@ const EventPage = () => {
                               "4:00 PM"}
                           </li>
                         </ul>
-                        <p className="mb-4">
-                          This data is taken from the existing zoo website.
-                        </p>
-                        <div className="space-y-4">
-                          <div>
-                            <p>
-                              Come and visit New Zealand's first zoo to get up
-                              close and personal to native treasures and
-                              endangered animals from around the world.
-                            </p>
-                            <p>
-                              Child entry applies for 3-14 year olds, and under
-                              3s are free. All children under the age of 14 must
-                              be accompanied by an adult when visiting the Zoo.
-                            </p>
-                            <p>
-                              Zoo Entry Tickets purchased online are valid for
-                              12 months from purchase date. Tickets can also be
-                              bought in person at our front entrance.
-                            </p>
-                            <p>
-                              If you are looking for tickets to a special event
-                              or current discounted offer, these cannot be
-                              booked here. Please visit the relevant event or
-                              offer webpage for more information.
-                            </p>
-                          </div>
-                          <div>
-                            <p>
-                              Come and visit New Zealand's first zoo to get up
-                              close and personal to native treasures and
-                              endangered animals from around the world.
-                            </p>
-                            <p>
-                              Child entry applies for 3-14 year olds, and under
-                              3s are free. All children under the age of 14 must
-                              be accompanied by an adult when visiting the Zoo.
-                            </p>
-                            <p>
-                              Zoo Entry Tickets purchased online are valid for
-                              12 months from purchase date. Tickets can also be
-                              bought in person at our front entrance.
-                            </p>
-                            <p>
-                              If you are looking for tickets to a special event
-                              or current discounted offer, these cannot be
-                              booked here. Please visit the relevant event or
-                              offer webpage for more information.
-                            </p>
-                          </div>
-                        </div>
+
+                        <div className="space-y-4">{venue.description}</div>
                       </div>
                     </motion.div>
                   )}
