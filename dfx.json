@@ -2,6 +2,11 @@
 	"canisters": {
 		"mahaka_backend": {
 			"main": "src/mahaka_backend/main.mo",
+			"type": "motoko",
+			"dependencies": ["Fiatpayment"]
+		},
+		"Fiatpayment": {
+			"main": "src/FiatPayment/main.mo",
 			"type": "motoko"
 		},
 		"mahaka_frontend": {
