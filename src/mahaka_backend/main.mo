@@ -2543,6 +2543,24 @@ actor mahaka {
           return { data = pageData; current_page = pageNo + 1; total_pages = indexPages.size() };
      };
 
+     public type Icrc28TrustedOriginsResponse = {
+          trusted_origins : [Text];
+     };
 
+     // Equivalent to the Rust function that returns the record type
+     public func icrc28_trusted_origins() : async Icrc28TrustedOriginsResponse {
+          let trusted_origins = [   
+          "http://localhost:3000", 
+          "http://localhost:3000/login",
+          "http://bd3sg-teaaa-aaaaa-qaaba-cai.localhost:4943", 
+          "http://127.0.0.1:4943/?canisterId=bd3sg-teaaa-aaaaa-qaaba-cai", 
+          "http://127.0.0.1:4943/?canisterId=bkyz2-fmaaa-aaaaa-qaaaq-cai", 
+          "https://nfid.one",
+          "https://dev.nfid.one","https://3rwjt-vqaaa-aaaak-akusq-cai.icp0.io"];
+
+          return {
+               trusted_origins = trusted_origins;
+          };
+     };
 
 }
