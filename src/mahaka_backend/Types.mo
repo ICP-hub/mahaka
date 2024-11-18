@@ -52,6 +52,7 @@ module {
     public type ticket_info = {
         ticket_type : Types.ticket_type;
         price : Nat;
+        priceFiat : Float;
     };
 
     public type venueCollectionParams = {

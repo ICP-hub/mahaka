@@ -18,6 +18,7 @@ export const getUserDetailsByCaller = createAsyncThunk(
     if (backend) {
       try {
         const response = await backend.getUserdetailsbycaller();
+        // console.log("response userdata", response);
         return response;
       } catch (err) {
         console.error("Error fetching user data", err);

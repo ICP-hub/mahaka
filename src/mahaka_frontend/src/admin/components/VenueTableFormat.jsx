@@ -137,7 +137,6 @@ const VenueTableData = ({ venue, onDelete }) => {
             <img
               src={venue?.logo?.data ? venue?.logo?.data : VenueDemoImg}
               alt="Venue_img"
-              className="w-8"
             />
           </div>
         </div>

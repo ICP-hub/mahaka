@@ -11,6 +11,10 @@ import Ticket from "../customer/Pages/Ticket";
 import HeaderWahanas from "../customer/Pages/HeaderWahanas";
 import EventPage from "../customer/Pages/EventPage";
 import WahanaPage from "../customer/Pages/WahanaPage";
+import { element } from "prop-types";
+import UserProfileData from "../customer/Components/UserProfileComponents/UserProfileData";
+import UserBookingData from "../customer/Components/UserProfileComponents/UserBookingData";
+import { Navigate } from "react-router-dom";
 
 export const customerRoutes = [
   {
@@ -23,7 +27,15 @@ export const customerRoutes = [
       { path: ":ids/wahanas/:eventId", element: <WahanaPage /> },
       { path: "payment", element: <PaymentComponent /> },
       { path: "wahana-payment", element: <WahanaPayment /> },
-      { path: "user-profile", element: <UserProfile /> },
+      {
+        path: "user",
+        element: <UserProfile />,
+        children: [
+          { index: true, element: <Navigate to="/user/my-profile" /> },
+          { path: "my-profile", element: <UserProfileData /> },
+          { path: "my-booking", element: <UserBookingData /> },
+        ],
+      },
       { path: "about-us", element: <AboutMahaka /> },
       { path: "our-services", element: <ServicesMahaka /> },
       { path: "contact-us", element: <ContactMahaka /> },
