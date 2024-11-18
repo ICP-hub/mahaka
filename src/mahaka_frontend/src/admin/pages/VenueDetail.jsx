@@ -129,7 +129,7 @@ const VenueDetailPage = () => {
             <div className="mb-2 leading-relaxed">
               <p className="text-lg">
                 <strong>🕒 </strong>
-                {venue.Details.StartTime} - {venue.Details.EndTime}
+                {FormatTime(venue.Details.StartTime)} - {FormatTime(venue.Details.EndTime)}
               </p>
             </div>
             <div className="mb-2 leading-relaxed">
