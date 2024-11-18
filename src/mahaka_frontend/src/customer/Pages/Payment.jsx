@@ -5,46 +5,52 @@ import { useNavigate } from "react-router-dom";
 import { idlFactory } from "../../redux/reducers/auth/token-icp-ledger";
 import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
 import { Actor } from "@dfinity/agent";
-import { useAuth } from "../../redux/reducers/auth/authReducer";
+// import { useAuth } from "../../redux/reducers/auth/authReducer";
 import { Principal } from "@dfinity/principal";
 
 const PaymentComponent = () => {
-  const navigate = useNavigate();
-  const coffeeAmount = 0.0001;
-  const [ticketType, setTicketType] = useState("SinglePass");
-  const [processing, setProcessing] = useState(false);
-  const [message, setMessage] = useState("Pay Now");
-  const [loading, setLoading] = useState(false);
-  const [insufficientFunds, setInsufficientFunds] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState("");
+  // const navigate = useNavigate();
+  // const coffeeAmount = 0.0001;
+  // const [ticketType, setTicketType] = useState("SinglePass");
+  // const [processing, setProcessing] = useState(false);
+  // const [message, setMessage] = useState("Pay Now");
+  // const [loading, setLoading] = useState(false);
+  // const [insufficientFunds, setInsufficientFunds] = useState(false);
+  // const [paymentStatus, setPaymentStatus] = useState("");
 
-  const authenticatedAgent = useAgent();
-  const { balance, wallet, backend } = useAuth();
-  const [actor, setActor] = useState(null);
-  console.log("agent", authenticatedAgent);
-  // Initialize the actor when the component mounts
-  useEffect(() => {
-    if (balance < coffeeAmount / 100000000) {
-      setInsufficientFunds(true);
-    }
+  // const authenticatedAgent = useAgent();
+  // const { balance, wallet, backend } = useAuth();
+  // const [actor, setActor] = useState(null);
+  // console.log("agent", authenticatedAgent);
+  // // Initialize the actor when the component mounts
+  // useEffect(() => {
+  //   if (balance < coffeeAmount / 100000000) {
+  //     setInsufficientFunds(true);
+  //   }
 
-    if (authenticatedAgent) {
-      const newActor = Actor.createActor(idlFactory, {
-        agent: authenticatedAgent,
-        canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
-      });
-      setActor(newActor);
-    }
-  }, [balance, authenticatedAgent]);
+  //   if (authenticatedAgent) {
+  //     const newActor = Actor.createActor(idlFactory, {
+  //       agent: authenticatedAgent,
+  //       canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
+  //     });
+  //     setActor(newActor);
+  //   }
+  // }, [balance, authenticatedAgent]);
 
+<<<<<<< HEAD
   const handlePayment = async (e) => {
     console.log("Actor:", actor);
     console.log("Agent:", authenticatedAgent);
+=======
+  // const handlePayment = async (e) => {
+  //   console.log("acor", actor);
+>>>>>>> abe7f9a (update_login:dashboard)
 
-    if (processing || !actor) return;
-    setLoading(true);
-    setProcessing(true);
+  //   if (processing || !actor) return;
+  //   setLoading(true);
+  //   setProcessing(true);
 
+<<<<<<< HEAD
     const transferArgs = {
       from_subaccount: [],
       spender: {
@@ -82,41 +88,76 @@ const PaymentComponent = () => {
       setTimeout(() => setMessage("Make Payment"), 5000);
     }
   };
+=======
+  //   const transferArgs = {
+  //     from_subaccount: [],
+  //     spender: {
+  //       owner: Principal.fromText("bd3sg-teaaa-aaaaa-qaaba-cai"),
+  //       subaccount: [],
+  //     },
+  //     amount: BigInt(coffeeAmount * 10 ** 8 + 10000),
+  //     fee: [],
+  //     memo: [],
+  //     created_at_time: [],
+  //     expected_allowance: [],
+  //     expires_at: [],
+  //   };
 
-  const buyEventTicketHandler = async () => {
-    try {
-      const ticketTypeVariant = { [ticketType]: null };
-      const record = [
-        {
-          data: new Uint8Array([1, 2, 3]),
-          description: "Ticket metadata",
-          key_val_data: [
-            { key: "eventName", val: { TextContent: "Amazing Concert" } },
-            { key: "date", val: { TextContent: "2024-12-31" } },
-          ],
-          purpose: { Rendered: null },
-        },
-      ];
+  //   try {
+  //     const response = await actor.icrc2_approve(transferArgs);
+  //     if (response.Ok) {
+  //       setMessage(`Transferred ${coffeeAmount} ICP`);
+  //       setPaymentStatus("Payment successful");
+  //       await buyEventTicketHandler();
+  //     } else {
+  //       throw new Error(response.Err || "Payment failed");
+  //     }
+  //   } catch (error) {
+  //     setMessage("Payment failed");
+  //     setPaymentStatus("Payment failed");
+  //     console.error("Payment error:", error);
+  //   } finally {
+  //     setLoading(false);
+  //     setProcessing(false);
+  //     setTimeout(() => setMessage("Make Payment"), 5000);
+  //   }
+  // };
+>>>>>>> abe7f9a (update_login:dashboard)
 
-      const response = await backend.buyVenueTicket(
-        "current venue#br5f7-7uaaa-aaaaa-qaaca-cai",
-        { ticket_type: ticketTypeVariant, price: 1 },
-        record,
-        [
-          Principal.fromText(
-            "h7yxq-n6yb2-6js2j-af5hk-h4inj-edrce-oevyj-kbs7a-76kft-vrqrw-nqe"
-          ),
-        ],
-        { ICP: null },
-        1
-      );
+  // const buyEventTicketHandler = async () => {
+  //   try {
+  //     const ticketTypeVariant = { [ticketType]: null };
+  //     const record = [
+  //       {
+  //         data: new Uint8Array([1, 2, 3]),
+  //         description: "Ticket metadata",
+  //         key_val_data: [
+  //           { key: "eventName", val: { TextContent: "Amazing Concert" } },
+  //           { key: "date", val: { TextContent: "2024-12-31" } },
+  //         ],
+  //         purpose: { Rendered: null },
+  //       },
+  //     ];
 
-      console.log("Event ticket purchased successfully:", response);
-      navigate("/ticket");
-    } catch (err) {
-      console.error("Error in buying event tickets:", err);
-    }
-  };
+  //     const response = await backend.buyVenueTicket(
+  //       "current venue#br5f7-7uaaa-aaaaa-qaaca-cai",
+  //       { ticket_type: ticketTypeVariant, price: 1 },
+  //       record,
+  //       [
+  //         Principal.fromText(
+  //           "h7yxq-n6yb2-6js2j-af5hk-h4inj-edrce-oevyj-kbs7a-76kft-vrqrw-nqe"
+  //         ),
+  //       ],
+  //       { ICP: null },
+  //       1
+  //     );
+
+  //     console.log("Event ticket purchased successfully:", response);
+  //     navigate("/ticket");
+  //   } catch (err) {
+  //     console.error("Error in buying event tickets:", err);
+  //   }
+  // };
   return (
     <div className="w-full max-h-screen bg-white m-auto">
       <div className="max-w-7xl w-full  mx-auto   rounded-lg shadow-md grid grid-cols-1 md:grid-cols-2 md:gap-6">
