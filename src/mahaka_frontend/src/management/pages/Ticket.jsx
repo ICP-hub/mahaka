@@ -4,7 +4,7 @@ import { createActor } from "../../../../declarations/DIP721-NFT";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
-import { useAuth } from "../../redux/reducers/auth/authReducer";
+
 import { useIdentityKit } from "@nfid/identitykit/react";
 import { getAllEventsByVenue } from "../../redux/reducers/apiReducers/eventApiReducer";
 
@@ -17,7 +17,7 @@ const MgtTicket = () => {
   );
 
   const { events, eventLoading } = useSelector((state) => state.events);
-  const { backend } = useAuth();
+  const { backend } = useSelector((state) => state.authentication);
   const { identity } = useIdentityKit();
   const dispatch = useDispatch();
 
