@@ -1,32 +1,37 @@
 {
-	"canisters": {
-		"mahaka_backend": {
-			"main": "src/mahaka_backend/main.mo",
-			"type": "motoko"
-		},
-		"mahaka_frontend": {
-			"dependencies": ["mahaka_backend"],
-			"source": ["src/mahaka_frontend/dist"],
-			"type": "assets",
-			"workspace": "mahaka_frontend"
-		},
-		"icp_ledger_canister": {
-			"type": "custom",
-			"candid": "https://raw.githubusercontent.com/dfinity/ic/aba60ffbc46acfc8990bf4d5685c1360bd7026b9/rs/ledger_suite/icp/ledger.did",
-			"wasm": "https://download.dfinity.systems/ic/aba60ffbc46acfc8990bf4d5685c1360bd7026b9/canisters/ledger-canister.wasm.gz",
-			"remote": {
-				"id": {
-				"ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
-				}
-			}
-		}
-	},
-	"defaults": {
-		"build": {
-			"args": "",
-			"packtool": "mops sources"
-		}
-	},
-	"output_env_file": ".env",
-	"version": 1
+  "canisters": {
+    "mahaka_backend": {
+      "main": "src/mahaka_backend/main.mo",
+      "type": "motoko"
+    },
+
+    "mahaka_frontend": {
+      "dependencies": ["mahaka_backend"],
+      "source": ["src/mahaka_frontend/dist"],
+      "type": "assets",
+      "workspace": "mahaka_frontend"
+    },
+    "icp_ledger_canister": {
+      "type": "custom",
+      "candid": "https://raw.githubusercontent.com/dfinity/ic/aba60ffbc46acfc8990bf4d5685c1360bd7026b9/rs/ledger_suite/icp/ledger.did",
+      "wasm": "https://download.dfinity.systems/ic/aba60ffbc46acfc8990bf4d5685c1360bd7026b9/canisters/ledger-canister.wasm.gz",
+      "remote": {
+        "id": {
+          "ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+        }
+      }
+    },
+    "DIP721-NFT": {
+      "main": "src/DIP721-NFT/Nft.mo",
+      "type": "motoko"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": "mops sources"
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
 }
