@@ -38,7 +38,8 @@ const PaymentComponent = () => {
   }, [balance, authenticatedAgent]);
 
   const handlePayment = async (e) => {
-    console.log("acor", actor);
+    console.log("Actor:", actor);
+    console.log("Agent:", authenticatedAgent);
 
     if (processing || !actor) return;
     setLoading(true);
@@ -57,15 +58,19 @@ const PaymentComponent = () => {
       expected_allowance: [],
       expires_at: [],
     };
+    console.log("Transfer Args:", transferArgs);
 
     try {
       const response = await actor.icrc2_approve(transferArgs);
-      if (response.Ok) {
+      console.log("Response from icrc2_approve:", response);
+
+      if (response && response.Ok) {
         setMessage(`Transferred ${coffeeAmount} ICP`);
         setPaymentStatus("Payment successful");
         await buyEventTicketHandler();
       } else {
-        throw new Error(response.Err || "Payment failed");
+        console.error("Unexpected response format or error:", response);
+        throw new Error(response?.Err || "Payment failed");
       }
     } catch (error) {
       setMessage("Payment failed");
