@@ -5,7 +5,9 @@ import { updateUser } from "../../../redux/reducers/apiReducers/userApiReducer";
 function EditProfileForm({ setIsModalOpen }) {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
-  const { currentUser, userLoading } = useSelector((state) => state.users);
+  const { currentUserByCaller, userLoading } = useSelector(
+    (state) => state.users
+  );
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -13,12 +15,12 @@ function EditProfileForm({ setIsModalOpen }) {
   const [profileImage, setProfileImage] = useState(null);
 
   useEffect(() => {
-    if (currentUser) {
-      setFirstName(currentUser.firstName || "");
-      setLastName(currentUser.lastName || "");
-      setEmail(currentUser.email || "");
+    if (currentUserByCaller) {
+      setFirstName(currentUserByCaller.firstName || "");
+      setLastName(currentUserByCaller.lastName || "");
+      setEmail(currentUserByCaller.email || "");
     }
-  }, [currentUser]);
+  }, [currentUserByCaller]);
 
   const handleImageUpload = (e) => {
     setProfileImage(e.target.files[0]);

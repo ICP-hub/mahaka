@@ -34,9 +34,12 @@ function App() {
   useEffect(() => {
     if (user) {
       dispatch(updateAuthData({ user, identity }));
-      dispatch(getUserDetailsByCaller({ backend: backend }));
     }
   }, [user]);
+
+  useEffect(() => {
+    dispatch(getUserDetailsByCaller({ backend: backend }));
+  }, [backend]);
   /* ----------------------------------------------------------------------------------------------------- */
   /*  @ Effects : common dispatches.
   /* ----------------------------------------------------------------------------------------------------- */
