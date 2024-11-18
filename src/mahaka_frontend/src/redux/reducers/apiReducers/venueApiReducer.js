@@ -11,6 +11,8 @@ const initialState = {
   error: null,
   createVenueLoader: false,
   buyTicketLoading: false,
+  totalPages: 0,
+  currentPage: 0,
 };
 
 // async operations
@@ -18,10 +20,15 @@ export const getAllVenues = createAsyncThunk(
   "venues/getAllVenues",
   async ({ backend, pageLimit, currPage }) => {
     const response = await backend.getAllVenues(pageLimit, currPage);
-
-    return response.data;
+    console.log("response:", response);
+    return {
+      data: response.data,
+      totalPages: Number(response.Total_pages), 
+      currPage: Number(response.current_page)   
+    };
   }
 );
+
 
 // Get single venue
 export const getVenue = createAsyncThunk(
@@ -122,23 +129,14 @@ export const buyVenueTicket = createAsyncThunk(
     }
   }
 );
-
 export const searchVenues = createAsyncThunk(
   "venues/searchVenues",
   async ({ backend, searchText, pageLimit, currPage }) => {
-    try {
-      const response = await backend.searchVenues(
-        searchText,
-        pageLimit,
-        currPage
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error searching venues:", error);
-      throw error;
-    }
+    const response = await backend.searchVenues(searchText, pageLimit, currPage);
+    return { data: response.data, totalPages: response.totalPages, currPage };
   }
 );
+
 
 // Create slice
 const venueSlice = createSlice({
@@ -152,7 +150,9 @@ const venueSlice = createSlice({
       })
       .addCase(getAllVenues.fulfilled, (state, action) => {
         state.loading = false;
-        state.venues = action.payload;
+        state.venues = action.payload.data;
+        state.totalPages = action.payload.totalPages;
+        state.currentPage = action.payload.currPage;
         state.error = null;
       })
       .addCase(getAllVenues.rejected, (state, action) => {
@@ -171,7 +171,7 @@ const venueSlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
       })
-      
+
       .addCase(deleteVenue.pending, (state) => {
         state.loading = true;
       })
@@ -245,7 +245,9 @@ const venueSlice = createSlice({
       })
       .addCase(searchVenues.fulfilled, (state, action) => {
         state.loading = false;
-        state.venues = action.payload;
+        state.venues = action.payload.data;
+        state.totalPages = action.payload.totalPages;
+        state.currentPage = action.payload.currPage;
         state.error = null;
       })
       .addCase(searchVenues.rejected, (state, action) => {

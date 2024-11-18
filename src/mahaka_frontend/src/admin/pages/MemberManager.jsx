@@ -15,12 +15,16 @@ import { AnimatePresence, motion } from "framer-motion";
 import NavigationRight from "../../common/components/NavigationRight";
 import { useSelector, useDispatch } from "react-redux";
 import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
-import { updateUser } from "../../redux/reducers/apiReducers/userApiReducer";
+import {
+  getUserDetailsByCaller,
+  updateUser,
+} from "../../redux/reducers/apiReducers/userApiReducer";
 import { listUsers } from "../../redux/reducers/apiReducers/userApiReducer";
 import { useEffect } from "react";
 import { object } from "prop-types";
 import { getUserDetailsById } from "../../redux/reducers/apiReducers/userApiReducer";
 import { Principal } from "@dfinity/principal";
+import { useIdentityKit } from "@nfid/identitykit/react";
 const teamData = [
   {
     id: 3,
@@ -130,7 +134,7 @@ const MemberManager = () => {
   const [currentMember, setCurrentMember] = useState(null);
   const { users } = useSelector((state) => state.users);
   const { backend } = useSelector((state) => state.authentication);
-  const { currentUser, userLoading } = useSelector((state) => state.users);
+  const { currentUserById, userLoading } = useSelector((state) => state.users);
   const [isEditing, setIsEditing] = useState(false);
   console.log(users, "users");
 
@@ -141,7 +145,7 @@ const MemberManager = () => {
   const openDetailView = (member) => {
     console.log(member);
     dispatch(getUserDetailsById({ backend, userId: member }));
-    setCurrentMember(currentUser);
+    setCurrentMember(currentUserById);
     setIsEditing(false);
     toggleNav(true);
   };
@@ -269,18 +273,21 @@ const UpdateMember = ({
 }) => {
   const isNewMember = !member;
   const { backend } = useSelector((state) => state.authentication);
+  const { user } = useIdentityKit();
 
   const dispatch = useDispatch();
 
-  const { currentUser, userLoading } = useSelector((state) => state.users);
-  const [name, setName] = useState(!isNewMember ? currentUser.firstName : "");
-  const [email, setEmail] = useState(!isNewMember ? currentUser.email : "");
-  const [role, setRole] = useState(!isNewMember ? currentUser.role : "");
+  const { currentUserById, userLoading } = useSelector((state) => state.users);
+  const [name, setName] = useState(
+    !isNewMember ? currentUserById.firstName : ""
+  );
+  const [email, setEmail] = useState(!isNewMember ? currentUserById.email : "");
+  const [role, setRole] = useState(!isNewMember ? currentUserById.role : "");
   const [principalId, setPrincipalId] = useState(
-    !isNewMember ? currentUser.id : ""
+    !isNewMember ? currentUserById.id : ""
   );
   const [lastName, setLastName] = useState(
-    !isNewMember ? currentUser.lastName : ""
+    !isNewMember ? currentUserById.lastName : ""
   );
   const [venue, setVenue] = useState("");
 
@@ -288,7 +295,7 @@ const UpdateMember = ({
 
   const handleSubmit = () => {
     const Id = Principal.fromText(
-      "lkum4-lq5h6-xakur-f2d56-iuiz5-cmqv4-btmqz-y36ma-rhacf-ycxjr-wae"
+      "uktss-xp5gu-uwif5-hfpwu-rujms-foroa-4zdkd-ofspf-uqqre-wxqyj-cqe"
     );
     const roles = { role: null };
     // Create user object from form data
@@ -321,7 +328,7 @@ const UpdateMember = ({
           <div className="-mt-16 flex flex-auto items-end">
             <div className="ring-bg-card flex h-32 w-32 items-center justify-center overflow-hidden rounded-full ring-4">
               <div className="flex h-full w-full items-center justify-center overflow-hidden rounded bg-gray-200 text-8xl font-bold uppercase leading-none text-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                {isNewMember ? " " : currentUser?.firstName}
+                {isNewMember ? " " : currentUserById?.firstName}
               </div>
             </div>
             <div
@@ -359,7 +366,7 @@ const UpdateMember = ({
             ) : (
               !isNewMember && (
                 <ViewDetails
-                  member={userLoading ? "" : currentUser}
+                  member={userLoading ? "" : currentUserById}
                   venues={venues}
                 />
               )

@@ -8,7 +8,9 @@ import { CiEdit } from "react-icons/ci";
 import { motion } from "framer-motion";
 
 const UserProfileData = () => {
-  const { currentUser, userLoading } = useSelector((state) => state.users);
+  const { currentUserByCaller, userLoading } = useSelector(
+    (state) => state.users
+  );
   const { principal } = useSelector((state) => state.authentication);
   const [editModalOpen, setEditModalOpen] = useState(false);
 
@@ -41,10 +43,10 @@ const UserProfileData = () => {
           <div className="mt-2 space-y-2 flex flex-col items-center justify-center">
             <h1 className="text-base font-bold flex gap-1">
               <span className="text-gray-600">
-                {currentUser && currentUser.firstName}
+                {currentUserByCaller && currentUserByCaller.firstName}
               </span>
               <span className="text-gray-600">
-                {currentUser && currentUser.lastName}
+                {currentUserByCaller && currentUserByCaller.lastName}
               </span>
             </h1>
             <button className="text-blue-900 font-semibold text-sm flex gap-2 hover:underline">
@@ -59,7 +61,7 @@ const UserProfileData = () => {
               First Name
             </label>
             <p className="font-semibold">
-              {currentUser && currentUser.firstName}
+              {currentUserByCaller && currentUserByCaller.firstName}
             </p>
           </div>
           <div className="flex items-center p-4">
@@ -67,14 +69,16 @@ const UserProfileData = () => {
               Last Name
             </label>
             <p className="font-semibold">
-              {currentUser && currentUser.lastName}
+              {currentUserByCaller && currentUserByCaller.lastName}
             </p>
           </div>
           <div className="flex items-center p-4">
             <label className="block text-gray-700 font-semibold w-32">
               Email
             </label>
-            <p className="font-semibold">{currentUser && currentUser.email}</p>
+            <p className="font-semibold">
+              {currentUserByCaller && currentUserByCaller.email}
+            </p>
           </div>
           <div className="flex items-center p-4">
             <label className="block text-gray-700 font-semibold w-32">

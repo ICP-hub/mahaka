@@ -8,7 +8,7 @@ import {
   HiOutlineUser,
 } from "react-icons/hi2";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserDetailsByCaller } from "../../redux/reducers/apiReducers/userApiReducer";
+// import { getUserDetailsByCaller } from "../../redux/reducers/apiReducers/userApiReducer";
 import useLogin from "../../common/hooks/useLogin";
 import ProfileDemoImg from "../../assets/images/profile-demo.png";
 import { Link, useNavigate } from "react-router-dom";
@@ -229,6 +229,7 @@ const ConnectBtn = () => {
 // Profile menu : export if required
 const ProfileMenu = ({ onClose }) => {
   const { user, icpBalance, disconnect } = useIdentityKit();
+  const { currentUserByCaller } = useSelector((state) => state.users);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(user.principal.toText());
@@ -241,26 +242,33 @@ const ProfileMenu = ({ onClose }) => {
 
   return (
     <div className="flex flex-col p-2 rounded-xl overflow-hidden">
-      <Link
-        to="/admin"
-        className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto space-x-2"
-        onClick={onClose}
-      >
-        <div>
-          <GrUserAdmin size={20} />
-        </div>
-        <div>Admin Dashboard</div>
-      </Link>
-      <Link
-        to="/management"
-        className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto space-x-2"
-        onClick={onClose}
-      >
-        <div>
-          <GrUserManager size={20} />
-        </div>
-        <div>Management Dashboard</div>
-      </Link>
+      {currentUserByCaller &&
+        Object.keys(currentUserByCaller?.role)[0] === "admin" && (
+          <Link
+            to="/admin"
+            className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto space-x-2"
+            onClick={onClose}
+          >
+            <div>
+              <GrUserAdmin size={20} />
+            </div>
+            <div>Admin Dashboard</div>
+          </Link>
+        )}
+
+      {currentUserByCaller &&
+        Object.keys(currentUserByCaller?.role)[0] === "manager" && (
+          <Link
+            to="/management"
+            className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto space-x-2"
+            onClick={onClose}
+          >
+            <div>
+              <GrUserManager size={20} />
+            </div>
+            <div>Management Dashboard</div>
+          </Link>
+        )}
       <Link
         to="/user/my-profile"
         className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto space-x-2"
@@ -293,7 +301,7 @@ const ProfileMenu = ({ onClose }) => {
           >
             <GrCopy />
           </button>
-          <div className="bg-gray-500 px-2 min-w-36 max-w-36 overflow-hidden truncate">
+          <div className="bg-gray-500 rounded-md px-2 min-w-36 max-w-36 overflow-hidden truncate">
             {user.principal.toText()}
           </div>
         </div>
@@ -304,7 +312,7 @@ const ProfileMenu = ({ onClose }) => {
           <div>Balance</div>
         </div>
         <div className="ml-auto">
-          <div className="bg-gray-500 px-2 min-w-36 max-w-36 overflow-hidden truncate flex items-center justify-center">
+          <div className="bg-gray-500 rounded-md px-2 min-w-36 max-w-36 overflow-hidden truncate flex items-center justify-center">
             {icpBalance}
           </div>
         </div>
