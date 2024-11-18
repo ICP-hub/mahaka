@@ -42,28 +42,28 @@ const MgtTicket = () => {
     }
 
     setLoadingDetails(true);
-    try {
-      const actor = createActor(venue.Collection_id.toText(), {
-        agentOptions: { identity, verifyQuerySignatures: false },
-      });
-      dispatch(
-        getAllEventsByVenue({
-          backend,
-          chunkSize: 100,
-          pageNo: 0,
-          venueId: venue.id,
-        })
-      );
+    // try {
+    //   const actor = createActor(venue.Collection_id.toText(), {
+    //     agentOptions: { identity, verifyQuerySignatures: false },
+    //   });
+    //   dispatch(
+    //     getAllEventsByVenue({
+    //       backend,
+    //       chunkSize: 100,
+    //       pageNo: 0,
+    //       venueId: venue.id,
+    //     })
+    //   );
 
-      // Fetch ticket details from the actor
-      const details = await actor.getDIP721details();
-      setTicketDetails(details);
-    } catch (error) {
-      console.error("Error fetching ticket details:", error);
-      setTicketDetails(null);
-    } finally {
-      setLoadingDetails(false);
-    }
+    //   // Fetch ticket details from the actor
+    //   const details = await actor.getDIP721details();
+    //   setTicketDetails(details);
+    // } catch (error) {
+    //   console.error("Error fetching ticket details:", error);
+    //   setTicketDetails(null);
+    // } finally {
+    //   setLoadingDetails(false);
+    // }
   };
 
   const handleVenueChange = (event) => {

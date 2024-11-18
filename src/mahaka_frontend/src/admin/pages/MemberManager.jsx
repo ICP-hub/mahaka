@@ -141,7 +141,6 @@ const MemberManager = () => {
   const openDetailView = (member) => {
     console.log(member);
     dispatch(getUserDetailsById({ backend, userId: member }));
-
     setCurrentMember(currentUser);
     setIsEditing(false);
     toggleNav(true);
@@ -289,7 +288,7 @@ const UpdateMember = ({
 
   const handleSubmit = () => {
     const Id = Principal.fromText(
-      "zj52k-qpwud-qn5zv-4qkry-is7qv-f7vkd-eonxw-os33j-kwgfi-d67wf-2ae"
+      "lkum4-lq5h6-xakur-f2d56-iuiz5-cmqv4-btmqz-y36ma-rhacf-ycxjr-wae"
     );
     const roles = { role: null };
     // Create user object from form data

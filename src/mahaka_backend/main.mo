@@ -216,6 +216,13 @@ actor mahaka {
           index
      };
 
+     public func getDIPdetails(id : Principal) : async nftTypes.Dip721NonFungibleToken{
+          let collectionActor = actor (Principal.toText(id)) : actor {
+               getDIP721details : ()-> async nftTypes.Dip721NonFungibleToken;
+          };
+          let details = await collectionActor.getDIP721details();
+          return details;
+     };
 
      func handleTransferError(error : Types.TransferFromError) : Text {
         switch (error) {
@@ -2052,17 +2059,17 @@ actor mahaka {
           // if (Principal.isAnonymous(caller)) {
           //      return #err(#UserNotAuthenticated); 
           // }; 
-          // let roleResult = await getRoleByPrincipal(caller);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(roleRes)) {
-          //           if (not ((await Validation.check_for_sysAdmin(roleRes)) or (await Validation.check_for_Admin(roleRes)))) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
+          let roleResult = await getRoleByPrincipal(caller);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(roleRes)) {
+                    if (not ((await Validation.check_for_sysAdmin(roleRes)) or (await Validation.check_for_Admin(roleRes)))) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
           if (email == "") { return #err(#EmptyEmail) };
           if (firstName == "") { return #err(#EmptyFirstName) };
           if (lastName == "") { return #err(#EmptyLastName) };
@@ -2092,6 +2099,54 @@ actor mahaka {
                };
           };
      };
+
+    public shared ({ caller }) func updateUserUserDetails(
+          email: Text, 
+          firstName: Text, 
+          lastName: Text
+     ) : async Result.Result<(Types.User, Types.Index), Types.UpdateUserError> {
+          
+          if (email == "") { return #err(#EmptyEmail) };
+          if (firstName == "") { return #err(#EmptyFirstName) };
+          if (lastName == "") { return #err(#EmptyLastName) };
+
+          switch (Users.get(caller)) {
+               case null {
+                    return #err(#UserNotFound);
+               };
+               case (?existingIndex) {
+                    let user_blob = await stable_get(existingIndex, Users_state);
+                    let existingUserBlob : ?Types.User = from_candid(user_blob);
+                    switch (existingUserBlob) {
+                         case (?existingUser) {
+
+                              if (caller != existingUser.id) {
+                                   throw Error.reject("Caller is not authorized to update");
+                                   return #err(#UserNotAuthorized);
+                              };
+                              let updatedUser: Types.User = {
+                                   id = existingUser.id;
+                                   email = email;
+                                   firstName = firstName;
+                                   lastName = lastName;
+                                   role = existingUser.role;
+                                   assignedVenue = existingUser.assignedVenue;
+                              };
+
+                              let user_blob = to_candid(updatedUser);
+                              let updatedIndex = await update_stable(existingIndex, user_blob, Users_state);
+
+                              return #ok(updatedUser, updatedIndex);
+                         };
+                         case null {
+                              return #err(#UserNotFound);
+                         };
+                    };
+               };
+          };
+     };
+     
+
 
      public shared ({ caller }) func addAdmins(principalId : Principal, email : Text, firstName : Text, lastName : Text, role : Types.Roles, assignedVenue : Text) : async Result.Result<(Types.User, Types.Index), Types.UpdateUserError> {
           // if (Principal.isAnonymous(caller)) {

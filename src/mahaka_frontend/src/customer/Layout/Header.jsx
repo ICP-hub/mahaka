@@ -131,7 +131,7 @@ const NavHorizontal = () => {
     <nav className="flex items-center gap-12 font-medium over">
       {NavLinks.map((link, index) => (
         // Replace button with Link later
-        <Link to={link.url}>
+        <Link to={link.url} key={index}>
           <motion.div
             key={index}
             initial="initial"
@@ -168,7 +168,7 @@ const NavVertical = ({ isNavOpen, onNavOpen }) => {
       <div className="flex flex-col container mx-auto px-6 py-4">
         {NavLinks.map((link, index) => (
           // Replace button with Link later
-          <Link to={link.url}>
+          <Link to={link.url} key={index}>
             <div key={index} className="p-4">
               <h4>{link.title}</h4>
             </div>
@@ -231,10 +231,12 @@ const ProfileMenu = ({ onClose }) => {
   const { user, icpBalance, disconnect } = useIdentityKit();
 
   const handleCopy = () => {
-    navigator.clipboard
-      .writeText(user.principal.toText())
-      .then(() => notificationManager.success("Wallet address copied!"))
-      .catch((err) => console.error("Failed to copy text:", err));
+    navigator.clipboard.writeText(user.principal.toText());
+    notificationManager.success("Wallet address copied!");
+    // navigator.clipboard
+    //   .writeText(user.principal.toText())
+    //   .then(() => notificationManager.success("Wallet address copied!"))
+    //   .catch((err) => console.error("Failed to copy text:", err));
   };
 
   return (

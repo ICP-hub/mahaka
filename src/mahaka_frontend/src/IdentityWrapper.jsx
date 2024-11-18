@@ -4,6 +4,7 @@ import { IdentityKitAuthType, NFIDW, Plug } from "@nfid/identitykit";
 import { Provider } from "react-redux";
 import store from "./redux/store";
 import App from "./App";
+// import { HttpAgent } from "@dfinity/agent";
 
 export default function IdentityWrapper() {
   const [mount, setMount] = useState(false);
