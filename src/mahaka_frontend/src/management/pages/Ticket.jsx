@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Ticket from "../components/Ticket";
-import { createActor } from "../../../../declarations/DIP721-NFT";
+import { createActor } from "../../../../declarations/mahaka_backend";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
