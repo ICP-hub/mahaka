@@ -283,7 +283,7 @@ const MgtEvents = ()=>{
           ))}
         </select>
 
-        <div className="px-4 mt-4 sm:ml-4 sm:mt-0 sm:w-72 min-h-12 lg:min-w-[68%] md:min-w-[55%] rounded-full border border-border flex items-center bg-card text-icon">
+        <div className="px-4 mt-4 sm:ml-4 sm:mt-0 sm:w-72 min-h-12 lg:min-w-[68%] md:min-w-[55%] rounded-full border border-border flex items-start bg-card text-icon">
           <HiMagnifyingGlass size={20} />
           <input
             type="text"
