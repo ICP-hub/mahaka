@@ -5,120 +5,129 @@ import { useNavigate } from "react-router-dom";
 import { idlFactory } from "../../redux/reducers/auth/token-icp-ledger";
 import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
 import { Actor } from "@dfinity/agent";
-import { useAuth } from "../../redux/reducers/auth/authReducer";
+// import { useAuth } from "../../redux/reducers/auth/authReducer";
 import { Principal } from "@dfinity/principal";
 
 const PaymentComponent = () => {
-  const navigate = useNavigate();
-  const coffeeAmount = 0.0001;
-  const [ticketType, setTicketType] = useState("SinglePass");
-  const [processing, setProcessing] = useState(false);
-  const [message, setMessage] = useState("Pay Now");
-  const [loading, setLoading] = useState(false);
-  const [insufficientFunds, setInsufficientFunds] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState("");
-
   const authenticatedAgent = useAgent();
-  const { balance, wallet, backend } = useAuth();
-  const [actor, setActor] = useState(null);
-  console.log("agent", authenticatedAgent);
-  // Initialize the actor when the component mounts
-  useEffect(() => {
-    if (balance < coffeeAmount / 100000000) {
-      setInsufficientFunds(true);
+  const { user, icpBalance } = useIdentityKit();
+  const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
+
+  const handlePayment = async () => {
+    if (!user) {
+      alert("Please login first");
     }
 
-    if (authenticatedAgent) {
-      const newActor = Actor.createActor(idlFactory, {
-        agent: authenticatedAgent,
-        canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
-      });
-      setActor(newActor);
-    }
-  }, [balance, authenticatedAgent]);
+    // Create Actor for payment
+    const actor = Actor.createActor(idlFactory, {
+      agent: authenticatedAgent,
+      canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
+    });
 
-  const handlePayment = async (e) => {
-    console.log("Actor:", actor);
-    console.log("Agent:", authenticatedAgent);
+    const acc = {
+      owner: Principal.fromText(process.env.CANISTER_ID_MAHAKA_BACKEND),
+      subaccount: [],
+    };
 
-    if (processing || !actor) return;
-    setLoading(true);
-    setProcessing(true);
-
-    const transferArgs = {
+    const icrc2_approve_args = {
       from_subaccount: [],
-      spender: {
-        owner: Principal.fromText("bd3sg-teaaa-aaaaa-qaaba-cai"),
-        subaccount: [],
-      },
-      amount: BigInt(coffeeAmount * 10 ** 8 + 10000),
+      spender: acc,
       fee: [],
       memo: [],
+      amount: BigInt(10000),
       created_at_time: [],
       expected_allowance: [],
       expires_at: [],
     };
-    console.log("Transfer Args:", transferArgs);
 
     try {
-      const response = await actor.icrc2_approve(transferArgs);
-      console.log("Response from icrc2_approve:", response);
+      setIsPaymentProcessing(true);
+      const response = await actor.icrc2_approve(icrc2_approve_args);
+      console.log("Response from payment approve", response);
 
-      if (response && response.Ok) {
-        setMessage(`Transferred ${coffeeAmount} ICP`);
-        setPaymentStatus("Payment successful");
-        await buyEventTicketHandler();
+      if (response.Ok) {
+        console.log("Payment approved! run further steps");
       } else {
-        console.error("Unexpected response format or error:", response);
-        throw new Error(response?.Err || "Payment failed");
+        console.error("Payment failed");
       }
-    } catch (error) {
-      setMessage("Payment failed");
-      setPaymentStatus("Payment failed");
-      console.error("Payment error:", error);
-    } finally {
-      setLoading(false);
-      setProcessing(false);
-      setTimeout(() => setMessage("Make Payment"), 5000);
-    }
-  };
-
-  const buyEventTicketHandler = async () => {
-    try {
-      const ticketTypeVariant = { [ticketType]: null };
-      const record = [
-        {
-          data: new Uint8Array([1, 2, 3]),
-          description: "Ticket metadata",
-          key_val_data: [
-            { key: "eventName", val: { TextContent: "Amazing Concert" } },
-            { key: "date", val: { TextContent: "2024-12-31" } },
-          ],
-          purpose: { Rendered: null },
-        },
-      ];
-
-      const response = await backend.buyVenueTicket(
-        "current venue#br5f7-7uaaa-aaaaa-qaaca-cai",
-        { ticket_type: ticketTypeVariant, price: 1 },
-        record,
-        [
-          Principal.fromText(
-            "h7yxq-n6yb2-6js2j-af5hk-h4inj-edrce-oevyj-kbs7a-76kft-vrqrw-nqe"
-          ),
-        ],
-        { ICP: null },
-        1
-      );
-
-      console.log("Event ticket purchased successfully:", response);
-      navigate("/ticket");
     } catch (err) {
-      console.error("Error in buying event tickets:", err);
+      console.error("Error in payment approve", err);
+    } finally {
+      setIsPaymentProcessing(false);
     }
+
+    // const transferArgs = {
+    //   from_subaccount: [],
+    //   spender: {
+    //     owner: Principal.fromText("bd3sg-teaaa-aaaaa-qaaba-cai"),
+    //     subaccount: [],
+    //   },
+    //   amount: BigInt(coffeeAmount * 10 ** 8 + 10000),
+    //   fee: [],
+    //   memo: [],
+    //   created_at_time: [],
+    //   expected_allowance: [],
+    //   expires_at: [],
+    // };
+    // console.log("Transfer Args:", transferArgs);
+    // try {
+    //   const response = await actor.icrc2_approve(transferArgs);
+    //   console.log("Response from icrc2_approve:", response);
+    //   if (response && response.Ok) {
+    //     setMessage(`Transferred ${coffeeAmount} ICP`);
+    //     setPaymentStatus("Payment successful");
+    //     await buyEventTicketHandler();
+    //   } else {
+    //     console.error("Unexpected response format or error:", response);
+    //     throw new Error(response?.Err || "Payment failed");
+    //   }
+    // } catch (error) {
+    //   setMessage("Payment failed");
+    //   setPaymentStatus("Payment failed");
+    //   console.error("Payment error:", error);
+    // } finally {
+    //   setLoading(false);
+    //   setProcessing(false);
+    //   setTimeout(() => setMessage("Make Payment"), 5000);
+    // }
   };
+
+  // const buyEventTicketHandler = async () => {
+  //   try {
+  //     const ticketTypeVariant = { [ticketType]: null };
+  //     const record = [
+  //       {
+  //         data: new Uint8Array([1, 2, 3]),
+  //         description: "Ticket metadata",
+  //         key_val_data: [
+  //           { key: "eventName", val: { TextContent: "Amazing Concert" } },
+  //           { key: "date", val: { TextContent: "2024-12-31" } },
+  //         ],
+  //         purpose: { Rendered: null },
+  //       },
+  //     ];
+
+  //     const response = await backend.buyVenueTicket(
+  //       "current venue#br5f7-7uaaa-aaaaa-qaaca-cai",
+  //       { ticket_type: ticketTypeVariant, price: 1 },
+  //       record,
+  //       [
+  //         Principal.fromText(
+  //           "h7yxq-n6yb2-6js2j-af5hk-h4inj-edrce-oevyj-kbs7a-76kft-vrqrw-nqe"
+  //         ),
+  //       ],
+  //       { ICP: null },
+  //       1
+  //     );
+
+  //     console.log("Event ticket purchased successfully:", response);
+  //     navigate("/ticket");
+  //   } catch (err) {
+  //     console.error("Error in buying event tickets:", err);
+  //   }
+  // };
   return (
-    <div className="w-full max-h-screen bg-white m-auto">
+    <div className="w-full bg-white m-auto">
       <div className="max-w-7xl w-full  mx-auto   rounded-lg shadow-md grid grid-cols-1 md:grid-cols-2 md:gap-6">
         <div className="order-2 md:order-1 bg-white p-16 ">
           <h2 className="text-3xl font-black ">Payment</h2>
@@ -184,11 +193,10 @@ const PaymentComponent = () => {
           <button
             className="w-full bg-orange-500 text-white py-2 rounded-md"
             type="submit"
-            disabled={processing}
+            disabled={isPaymentProcessing}
             onClick={handlePayment}
           >
-            {" "}
-            {processing ? "Processing.." : "Process Payment"}
+            {isPaymentProcessing ? "Processing.." : "Process Payment"}
           </button>
 
           <p className="text-[#ACACAC] text-base font-normal mt-5">

@@ -1,20 +1,32 @@
 import React, { useEffect, useRef, useState } from "react";
 import "../style/index.css";
 import { AnimatePresence, motion } from "framer-motion";
-import { HiMagnifyingGlass, HiMiniBars3 } from "react-icons/hi2";
+import {
+  HiMagnifyingGlass,
+  HiMiniBars3,
+  HiOutlineTicket,
+  HiOutlineUser,
+} from "react-icons/hi2";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserDetailsByCaller } from "../../redux/reducers/apiReducers/userApiReducer";
 import useLogin from "../../common/hooks/useLogin";
 import ProfileDemoImg from "../../assets/images/profile-demo.png";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../redux/reducers/auth/authReducer";
-import { ConnectWallet } from "@nfid/identitykit/react";
-import {
-  NFIDLogin,
-  NFIDLogout,
-} from "../../redux/reducers/auth/authenticationReducer";
+import { ConnectWallet, useIdentityKit } from "@nfid/identitykit/react";
 import Avvvatars from "avvvatars-react";
 import TranslationForCustomer from "../../TranslationForCustomer";
+import {
+  GrAction,
+  GrCopy,
+  GrCurrency,
+  GrTicket,
+  GrUnlink,
+  GrUserAdmin,
+  GrUserManager,
+  GrUserSettings,
+} from "react-icons/gr";
+import { MdOutlineManageAccounts } from "react-icons/md";
+import notificationManager from "../../common/utils/notificationManager";
 
 const NavLinks = [
   { title: "HOME", url: "/" },
@@ -28,34 +40,45 @@ export default function Header() {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const toggleNavigation = () => setIsNavOpen((prev) => !prev);
   const navigate = useNavigate();
-  const { isConnected, login, logout } = useAuth();
+  const { user } = useIdentityKit();
 
-  useEffect(() => {
-    if (isConnected) {
-      navigate("/user-profile");
-    }
-  }, [isConnected, navigate]);
+  // useEffect(() => {
+  //   if (isConnected) {
+  //     navigate("/user-profile");
+  //   }
+  // }, [isConnected, navigate]);
   // Effect if sidenav open overflow hidden
 
   return (
     <div className="bg-[#124076]">
-      <div className="flex px-6 md:px-8 container mx-auto user_header justify-between items-center z-999">
+      <div className="flex px-6 md:px-8 container mx-auto user_header items-center z-999">
         <LogoSection />
-        <div className="hidden md:flex items-center gap-8 flex-1 justify-between">
-          <SearchBox />
-          <div className="flex items-center gap-8">
-            <NavHorizontal />
-            <ConnectWallet
-              connectButtonComponent={ConnectBtn}
-              className="rounded-full bg-black"
-            />{" "}
+        <div className="hidden md:flex items-center justify-center w-full">
+          <div className="flex items-center relative gap-8">
+            <SearchBox />
+            <div className="flex items-center">
+              <NavHorizontal />
+            </div>
           </div>
         </div>
-        <button className="md:hidden" onClick={toggleNavigation}>
-          <HiMiniBars3 size={24} />
-        </button>
+        <div className="flex items-center space-x-4 ml-auto">
+          <TranslationForCustomer />
+          <div className="md:hidden flex items-center space-x-2">
+            <div className="p-1 rounded-full relative h-10 w-10 flex items-center justify-center hover:bg-hover">
+              <button onClick={toggleNavigation}>
+                <HiMiniBars3 size={24} />
+              </button>
+            </div>
+            {user && <ConnectBtn />}
+          </div>
+          <div className="hidden md:flex">
+            <ConnectBtn />
+          </div>
+        </div>
       </div>
-      <NavVertical isNavOpen={isNavOpen} onNavOpen={setIsNavOpen} />
+      {isNavOpen && (
+        <NavVertical isNavOpen={isNavOpen} onNavOpen={setIsNavOpen} />
+      )}
     </div>
   );
 }
@@ -66,15 +89,15 @@ const LogoSection = () => {
 
 const SearchBox = () => {
   return (
-    <div className="flex items-center px-8 flex-1">
-      <span className="flex p-2 border rounded-md gap-2 w-[100%]">
+    <div className="flex items-center">
+      <div className="border border-white flex min-h-12 items-center px-2 rounded-lg">
         <input
           type="text"
           placeholder="Search for events, venues and more"
-          className="bg-transparent outline-none w-full placeholder:text-white"
+          className="bg-transparent outline-none w-full placeholder:text-white placeholder:truncate"
         />
         <HiMagnifyingGlass size={24} />
-      </span>
+      </div>
     </div>
   );
 };
@@ -119,65 +142,186 @@ const NavHorizontal = () => {
             <div className="flex">
               <motion.div
                 variants={swipeRight}
-                className="h-px w-full bg-white"
+                className="h-0.5 w-full bg-white"
               ></motion.div>
               <motion.div
                 variants={swipeLeft}
-                className="h-px w-full"
+                className="h-0.5 w-full"
               ></motion.div>
             </div>
           </motion.div>
         </Link>
       ))}
-      <TranslationForCustomer />
     </nav>
   );
 };
 
 const NavVertical = ({ isNavOpen, onNavOpen }) => {
+  const { user } = useIdentityKit();
   return (
-    <AnimatePresence>
-      {isNavOpen && (
-        <motion.nav
-          initial={{ marginTop: "-100%" }}
-          animate={{ marginTop: 0 }}
-          exit={{ marginTop: "-100%" }}
-          transition={{ duration: 0.3, stiffness: 300 }}
-          className="bg-primary user_nav_vertical md:hidden text-white flex flex-col gap-1 p-4 z-99"
-        >
-          {NavLinks.map((link, index) => (
-            // Replace to links
-            <Link
-              to={link.url}
-              onNavOpen
-              key={index}
-              onClick={() => onNavOpen(false)}
-              className="flex px-2 py-4 font-medium rounded-md w-full"
-            >
-              {link.title}
-            </Link>
-          ))}
-          <TranslationForCustomer />
-
-          <span className="flex w-full my-6">
-            <ConnectWallet
-              connectButtonComponent={ConnectBtn}
-              className="rounded-full bg-black"
-            />{" "}
-          </span>
-        </motion.nav>
-      )}
-    </AnimatePresence>
+    <motion.nav
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ stiffness: 300 }}
+      className="md:hidden absolute border-t border-gray-500 inset-x-0 bg-[#124076] text-white z-50"
+    >
+      <div className="flex flex-col container mx-auto px-6 py-4">
+        {NavLinks.map((link, index) => (
+          // Replace button with Link later
+          <Link to={link.url}>
+            <div key={index} className="p-4">
+              <h4>{link.title}</h4>
+            </div>
+          </Link>
+        ))}
+        {!user && (
+          <div className="p-4">
+            <ConnectBtn />
+          </div>
+        )}
+      </div>
+    </motion.nav>
   );
 };
-const ConnectBtn = ({ onClick }) => (
-  <button
-    onClick={onClick}
-    className="p-4 bg-secondary text-white font-medium rounded-lg hover:bg-orange-600 min-w-max"
-  >
-    Connect wallet
-  </button>
-);
+
+const ConnectBtn = () => {
+  const { user, connect } = useIdentityKit();
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleCloseMenu = () => {
+    setIsMenuOpen(false);
+  };
+
+  if (!user) {
+    return (
+      <button
+        onClick={() => connect()}
+        className="min-h-12 px-2 bg-[#F08E1E] text-white font-medium rounded-lg hover:bg-orange-600 max-w-max min-w-max"
+      >
+        Connect wallet
+      </button>
+    );
+  }
+
+  return (
+    <div className="relative h-20 flex items-center justify-center">
+      <div
+        className="h-12 w-12 p-0.5 border border-[#F08E1E] rounded-full flex items-center justify-center cursor-pointer"
+        onClick={() => setIsMenuOpen((pv) => !pv)}
+      >
+        <Avvvatars value={user.principal.toText()} size={40} shadow={true} />
+      </div>
+      {isMenuOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ stiffness: 300 }}
+          className="absolute top-20 bg-gray-900 min-w-80 right-0 rounded-xl"
+        >
+          <ProfileMenu onClose={handleCloseMenu} />
+        </motion.div>
+      )}
+    </div>
+  );
+};
+
+// Profile menu : export if required
+const ProfileMenu = ({ onClose }) => {
+  const { user, icpBalance, disconnect } = useIdentityKit();
+
+  const handleCopy = () => {
+    navigator.clipboard
+      .writeText(user.principal.toText())
+      .then(() => notificationManager.success("Wallet address copied!"))
+      .catch((err) => console.error("Failed to copy text:", err));
+  };
+
+  return (
+    <div className="flex flex-col p-2 rounded-xl overflow-hidden">
+      <Link
+        to="/admin"
+        className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto space-x-2"
+        onClick={onClose}
+      >
+        <div>
+          <GrUserAdmin size={20} />
+        </div>
+        <div>Admin Dashboard</div>
+      </Link>
+      <Link
+        to="/management"
+        className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto space-x-2"
+        onClick={onClose}
+      >
+        <div>
+          <GrUserManager size={20} />
+        </div>
+        <div>Management Dashboard</div>
+      </Link>
+      <Link
+        to="/user/my-profile"
+        className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto space-x-2"
+        onClick={onClose}
+      >
+        <div>
+          <GrUserSettings size={20} />
+        </div>
+        <div>My Profile</div>
+      </Link>
+      <Link
+        to="/user/my-booking"
+        className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto space-x-2"
+        onClick={onClose}
+      >
+        <div>
+          <GrTicket size={20} />
+        </div>
+        <div>My Bookings</div>
+      </Link>
+      <div className="px-4 py-2 rounded-md flex items-center flex-auto cursor-pointer">
+        <div className="flex items-center space-x-2">
+          <GrAction size={20} />
+          <div>Wallet</div>
+        </div>
+        <div className="ml-auto flex items-center space-x-2">
+          <button
+            className="p-2 hover:bg-indigo-600 rounded-full"
+            onClick={handleCopy}
+          >
+            <GrCopy />
+          </button>
+          <div className="bg-gray-500 px-2 min-w-36 max-w-36 overflow-hidden truncate">
+            {user.principal.toText()}
+          </div>
+        </div>
+      </div>
+      <div className="px-4 py-2 rounded-md flex items-center flex-auto cursor-pointer">
+        <div className="flex items-center space-x-2">
+          <GrCurrency size={20} />
+          <div>Balance</div>
+        </div>
+        <div className="ml-auto">
+          <div className="bg-gray-500 px-2 min-w-36 max-w-36 overflow-hidden truncate flex items-center justify-center">
+            {icpBalance}
+          </div>
+        </div>
+      </div>
+      <div
+        className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto cursor-pointer"
+        onClick={() => {
+          disconnect();
+          onClose();
+        }}
+      >
+        <div className="flex items-center space-x-2">
+          <GrUnlink size={20} />
+          <div>Disconnect</div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // const ConnectWalletBtn = ({ onNavOpen }) => {
 //   const { isConnected, login, logout, principal } = useAuth();
