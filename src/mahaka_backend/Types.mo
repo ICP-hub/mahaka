@@ -16,7 +16,7 @@ module {
         #manager;
         #bod;
         #user;
-        #vendor;
+        // #vendor;
         #staff;
         #supervisor;
     };
@@ -34,14 +34,24 @@ module {
         #Wahana;
     };
 
+    public type wahanaDetails = {
+        StartDate : Time.Time;
+        StartTime : Time.Time;
+        EndDate : Time.Time;
+        EndTime : Time.Time;
+        Location : Text;
+    };
+
     public type Wahana_details = {
         id : Text;
         ride_title : Text;
         description : Text;
+        details : wahanaDetails;
         banner : LogoResult;
         price : Nat;
         creator : Principal;
         venueId : Text;
+        featured : Bool;
     };
 
     public type Wahana_data = {
@@ -61,9 +71,9 @@ module {
     };
 
     public type eventDetails = {
-        StartDate : Text;
+        StartDate : Time.Time;
         StartTime : Time.Time;
-        EndDate : Text;
+        EndDate : Time.Time;
         EndTime : Time.Time;
         Location : Text;
     };
@@ -91,10 +101,10 @@ module {
     };
 
     public type venueDetails = {
-        StartDate : Text;
-        StartTime : Text;
-        EndDate : Text;
-        EndTime : Text;
+        StartDate : Time.Time;
+        StartTime : Time.Time;
+        EndDate : Time.Time;
+        EndTime : Time.Time;
         Location : Text;
     };
 
@@ -124,6 +134,27 @@ module {
         email : Text;
         role : Roles;
         assignedVenue : Text;
+    };
+
+    public type Testimonial = {
+        id : Principal;
+        description : Text;
+        title : Text;
+        location : Text
+    };
+
+    public type AttractionBanner = {
+        redirectUrl : Text;
+        image : Text;
+        title : Text;
+        description : Text;
+        category: BannerCategory; 
+
+    };
+
+    public type BannerCategory = {
+        #Attraction;
+        #ThirdParty;
     };
 
     public type UpdateUserError = {

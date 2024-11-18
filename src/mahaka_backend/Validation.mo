@@ -28,10 +28,10 @@ module {
         return true;
     };
 
-    public func check_for_vendor(role : Types.Roles) : async Bool {
-        assert (role == #vendor);
-        return true;
-    };
+    // public func check_for_vendor(role : Types.Roles) : async Bool {
+    //     assert (role == #vendor);
+    //     return true;
+    // };
 
     public func check_for_Staff(role : Types.Roles) : async Bool {
         assert (role == #staff);

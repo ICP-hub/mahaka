@@ -79,9 +79,23 @@ actor mahaka {
 
 
      private var Users = TrieMap.TrieMap<Principal, Types.Index>(Principal.equal, Principal.hash);
-     private var _stableusers : [(Principal, Types.Index)] = [];
+     private stable var _stableusers : [(Principal, Types.Index)] = [];
 
      stable var Users_state = {
+          bytes = Region.new();
+          var bytes_count : Nat64 = 0;
+          elems = Region.new ();
+          var elems_count : Nat64 = 0;
+     };
+
+     private var attractionBanner = TrieMap.TrieMap<Principal, Types.AttractionBanner>(Principal.equal, Principal.hash);
+     private stable var _AttractionBanner : [Types.AttractionBanner] = [];
+     private stable var _thirdPartyBanner : [Types.AttractionBanner] = [];
+
+     private var testimonial = TrieMap.TrieMap<Principal, Types.Index>(Principal.equal, Principal.hash);
+     private stable var _stableTestimonial : [(Principal, Types.Index)] = [];
+
+     stable var Testimonial_state = {
           bytes = Region.new();
           var bytes_count : Nat64 = 0;
           elems = Region.new ();
@@ -126,6 +140,8 @@ actor mahaka {
           _stableEventTicketsArray := Iter.toArray(_EventTicketsMap.entries());
           _stableWahanaTicketsArray := Iter.toArray(_WahanaTicketsMap.entries());
           _stableusers := Iter.toArray(Users.entries());
+          _stableTestimonial := Iter.toArray(testimonial.entries());
+          // _stableAttractionBanner := Iter.toArray(attractionBanner.entries());
      };
 
      system func postupgrade(){
@@ -136,6 +152,8 @@ actor mahaka {
           _EventTicketsMap := TrieMap.fromEntries(_stableEventTicketsArray.vals(), Text.equal, Text.hash);
           _WahanaTicketsMap := TrieMap.fromEntries(_stableWahanaTicketsArray.vals(), Text.equal, Text.hash);
           Users := TrieMap.fromEntries(_stableusers.vals(), Principal.equal, Principal.hash);
+          testimonial := TrieMap.fromEntries(_stableTestimonial.vals(), Principal.equal, Principal.hash);
+          // attractionBanner := TrieMap.fromEntries(_stableAttractionBanner.vals(), Principal.equal, Principal.hash);
 
      };
 
@@ -232,6 +250,114 @@ actor mahaka {
     };
 
 
+    public shared ({caller}) func addBanner(_details: [Types.AttractionBanner]): async Result.Result<Text, Text> {
+        try {
+            for (banner in _details.vals()) {
+                switch (banner.category) {
+                    case (#Attraction) {
+                        _AttractionBanner := Array.append(_AttractionBanner, [banner]);
+                    };
+                    case (#ThirdParty) {
+                        _thirdPartyBanner := Array.append(_thirdPartyBanner, [banner]);
+                    };
+                };
+            };
+            return #ok("Banners added successfully");
+        } catch (err) {
+            return #err("Failed to add banners");
+        };
+    };
+
+    public shared ({caller}) func getBannerByImageURL(imageUrl: Text): async Result.Result<Types.AttractionBanner, Text> {
+        let foundBanner = Array.find<Types.AttractionBanner>(
+          Array.append(_AttractionBanner, _thirdPartyBanner),
+            func (banner) { banner.redirectUrl == imageUrl }
+        );
+        switch foundBanner {
+            case (?banner) return #ok(banner);
+            case null return #err("Banner not found with the given image URL");
+        };
+    };
+
+    public shared ({caller}) func getAllBanners(category: Types.BannerCategory): async [Types.AttractionBanner] {
+        switch (category) {
+            case (#Attraction) return _AttractionBanner;
+            case (#ThirdParty) return _thirdPartyBanner;
+        };
+    };
+
+    public shared ({caller}) func updateBannerByImage(imageUrl: Text, updatedBanner: Types.AttractionBanner): async Result.Result<Types.AttractionBanner, Text> {
+        var updated = false;
+        switch (updatedBanner.category) {
+            case (#Attraction) {
+                _AttractionBanner := Array.map<Types.AttractionBanner, Types.AttractionBanner>(
+                    _AttractionBanner,
+                    func (banner) {
+                        if (banner.redirectUrl == imageUrl) {
+                            updated := true;
+                            return updatedBanner;
+                        } else {
+                            return banner;
+                        };
+                    }
+                );
+            };
+            case (#ThirdParty) {
+                _thirdPartyBanner := Array.map<Types.AttractionBanner, Types.AttractionBanner>(
+                    _thirdPartyBanner,
+                    func (banner) {
+                        if (banner.redirectUrl == imageUrl) {
+                            updated := true;
+                            return updatedBanner;
+                        } else {
+                            return banner;
+                        };
+                    }
+                );
+            };
+        };
+
+        if (updated) {
+            return #ok(updatedBanner);
+        } else {
+            return #err("Banner not found with the given image URL");
+        };
+    };
+
+    public shared ({caller}) func deleteBannerByImage(imageUrl: Text): async Result.Result<Text, Text> {
+        let initialAttractionSize = Array.size(_AttractionBanner);
+        let initialThirdPartySize = Array.size(_thirdPartyBanner);
+
+        _AttractionBanner := Array.filter<Types.AttractionBanner>(
+            _AttractionBanner,
+            func (banner) { banner.redirectUrl != imageUrl }
+        );
+
+        _thirdPartyBanner := Array.filter<Types.AttractionBanner>(
+            _thirdPartyBanner,
+            func (banner) { banner.redirectUrl != imageUrl }
+        );
+
+        if (Array.size(_AttractionBanner) < initialAttractionSize or Array.size(_thirdPartyBanner) < initialThirdPartySize) {
+            return #ok("Banner deleted successfully");
+        } else {
+            return #err("Banner not found with the given image URL");
+        };
+    };
+
+    public shared ({caller}) func clearAllBanners(category: Types.BannerCategory): async Result.Result<Text, Text> {
+          switch (category) {
+               case (#Attraction) {
+                    _AttractionBanner := [];
+                    return #ok("All attraction banners cleared");
+               };
+               case (#ThirdParty) {
+                    _thirdPartyBanner := [];
+                    return #ok("All third-party banners cleared");
+               };
+          };
+     };
+   
 //     --------------------------------------------------------------------------------------------------------------------
 
      
@@ -542,7 +668,11 @@ actor mahaka {
 
 
 
-     public shared ({caller = user}) func createEvent(venueId: Types.venueId, Event: Types.Events, eCollection: Types.eventCollectionParams): async Result.Result<Types.completeEvent, Types.UpdateUserError> {
+     public shared ({caller = user}) func createEvent(
+          venueId: Types.venueId, 
+          Event: Types.Events, 
+          eCollection: Types.eventCollectionParams
+     ): async Result.Result<Types.completeEvent, Types.UpdateUserError> {
           // if (Principal.isAnonymous(user)) {
           //      return #err(#UserNotAuthenticated); 
           // };
@@ -591,10 +721,10 @@ actor mahaka {
           let updatedEvents: Types.Events_data = switch (existingEvents) {
                case null {
                     let Events : Types.Events_data = {
-                         Events = List.push(newEvent, List.nil<Types.completeEvent>());
-                         EventIds = List.push(newEvent.id, List.nil<Text>());
-                    }
-                    
+                         Events = List.fromArray([newEvent]);
+                         EventIds = List.fromArray([newEvent.id]);
+                    };
+                    Events
                };
                case (?eventIndex) {
                     let eventsBlob = await stable_get(eventIndex, Events_state);
@@ -602,15 +732,18 @@ actor mahaka {
                     switch (existingData) {
                          case null {
                               let Events : Types.Events_data = {
-                                   Events = List.push(newEvent, List.nil<Types.completeEvent>());
-                                   EventIds = List.push(newEvent.id, List.nil<Text>());
-                              }
+                                   Events = List.fromArray([newEvent]);
+                                   EventIds = List.fromArray([newEvent.id]);
+                              };
+                              Events
+
                          };
                          case (?data) {
                               let Events : Types.Events_data = {
-                                   Events = List.push(newEvent, data.Events);
-                                   EventIds = List.push(newEvent.id, data.EventIds);
-                              }
+                                   Events = List.append(data.Events, List.fromArray([newEvent]));
+                                   EventIds = List.append(data.EventIds, List.fromArray([newEvent.id]));
+                              };
+                              Events
                          };
                     }
                };
@@ -675,7 +808,7 @@ actor mahaka {
           }; 
      };
 
-     public shared ({caller}) func getAllEvents(chunkSize : Nat, pageNo : Nat) : async Result.Result<{data : [Types.completeEvent]; current_page : Nat; Total_pages : Nat}, Types.CommonErrors> {
+     public shared ({caller}) func getAllEventsPaginated(chunkSize : Nat, pageNo : Nat) : async Result.Result<{data : [Types.completeEvent]; current_page : Nat; Total_pages : Nat}, Types.CommonErrors> {
           var allEvents : List.List<Types.completeEvent> = List.nil();
 
           for ((_, eventIndex) in _EventsMap.entries()) {
@@ -702,6 +835,63 @@ actor mahaka {
           let pages_data = index_pages[pageNo];
           return #ok{data = pages_data; current_page = pageNo + 1; Total_pages = index_pages.size()};
      };
+
+
+     public shared ({caller}) func getAllEvents() : async Result.Result<[Types.completeEvent], Types.CommonErrors> {
+          var allEvents : List.List<Types.completeEvent> = List.nil();
+
+          for ((_, eventIndex) in _EventsMap.entries()) {
+               let event_object_blob = await stable_get(eventIndex, Events_state);
+               let event_object : ?Types.Events_data = from_candid(event_object_blob);
+               
+               switch (event_object) {
+                    case (null) {
+                         return #err(#DataNotFound);
+                    };
+                    case (?eventData) {
+                         allEvents := List.append(allEvents, eventData.Events);
+                    };
+               };
+          };
+
+     
+          return #ok(List.toArray(allEvents));
+     };
+
+     public shared ({caller}) func getOngoingEvents(chunkSize : Nat, pageNo : Nat) : async Result.Result<{data : [Types.completeEvent]; current_page : Nat; Total_pages : Nat}, Types.CommonErrors> {
+          let allEventsResult = await getAllEvents();
+          switch (allEventsResult) {
+               case (#err(error)) {
+                    return #err(error);
+               };
+               case (#ok(allEventsData)) {
+                    let currentTime = Time.now();
+                    
+                    let ongoingEvents = Array.filter<Types.completeEvent>(
+                         allEventsData,
+                         func (event) {
+                              (event.details.StartDate <= currentTime) and (event.details.EndDate > currentTime)
+                         }
+                    );
+
+                    if (Array.size(ongoingEvents) == 0) {
+                         return #err(#DataNotFound);
+                    };
+
+                    let index_pages = Utils.paginate<Types.completeEvent>(ongoingEvents, chunkSize);
+                    if (index_pages.size() < pageNo) {
+                         throw Error.reject("Page not found");
+                    };
+                    if (index_pages.size() == 0) {
+                         throw Error.reject("No ongoing events found");
+                    };
+
+                    let pages_data = index_pages[pageNo];
+                    return #ok{data = pages_data; current_page = pageNo + 1; Total_pages = index_pages.size()};
+               };
+          };
+     };
+
 
      public shared ({caller}) func getEvent(eventId : Text, venueId : Text) : async Result.Result<Types.completeEvent, Types.CommonErrors> {
           let eventIndex = _EventsMap.get(venueId);
@@ -2088,7 +2278,9 @@ actor mahaka {
           _symbol : Text, 
           _decimals : Nat8 , 
           _totalSupply :Nat , 
-          description : Text , 
+          description : Text ,
+          _details : Types.wahanaDetails,
+          featured : Bool,
           banner : Types.LogoResult, 
           price : Nat
      ) : async Result.Result<Types.Wahana_details, Types.UpdateUserError> {
@@ -2141,10 +2333,12 @@ actor mahaka {
                id = _name # "#" # Principal.toText(wahana_id); 
                banner = banner;
                description = description;
+               details = _details;
                price = price;
                ride_title = _name;
                creator = user;
-               venueId = venueId
+               venueId = venueId;
+               featured = featured
           };
           
           let existingWahanas = _WahanaMap.get(venueId);
@@ -2176,8 +2370,8 @@ actor mahaka {
                          case (?data) {
                                    Debug.print("existing data");
                               let Wahanas : Types.Wahana_data = {
-                                   Wahanas = List.push<Types.Wahana_details>(new_wahana, data.Wahanas);
-                                   WahanaIds = List.push<Text>(new_wahana.id, data.WahanaIds);
+                                   Wahanas = List.append<Types.Wahana_details>(data.Wahanas, List.fromArray([new_wahana]));
+                                   WahanaIds = List.append<Text>(data.WahanaIds, List.fromArray([new_wahana.id]));
                               };
                               Wahanas
                          };
@@ -2254,7 +2448,7 @@ actor mahaka {
                          return #err(#DataNotFound);
                     };
                     case (?wahanaData) {
-                         allWahanas := List.append(allWahanas, wahanaData.Wahanas);
+                         allWahanas := List.append(wahanaData.Wahanas, allWahanas);
                     };
                };
           };
@@ -2307,6 +2501,60 @@ actor mahaka {
                };
           };
      };
+
+     public shared ({caller}) func getFirstFeaturedWahanaByVenue(chunkSize : Nat, pageNo : Nat) : async Result.Result<{data : [Types.Wahana_details]; current_page : Nat; Total_pages : Nat}, Types.CommonErrors> {
+          var featuredWahanas : List.List<Types.Wahana_details> = List.nil();
+
+          for ((venueId, wahanaIndex) in _WahanaMap.entries()) {
+               let wahana_object_blob = await stable_get(wahanaIndex, Wahana_state);
+               let wahana_object : ?Types.Wahana_data = from_candid(wahana_object_blob);
+
+               switch (wahana_object) {
+                    case (null) {
+                         // throw (Error.reject("No object found in the memory"));
+                         // return #err(#WahanaNotFound);
+                    };
+                    case (?wahanaData) {
+                         let featuredWahana = List.find<Types.Wahana_details>(
+                              wahanaData.Wahanas,
+                              func wahana { wahana.featured }
+                         );
+                         switch (featuredWahana) {
+                              case (null) {
+
+                              };
+                              case (?wahana) {
+                                   featuredWahanas := List.append(List.fromArray([wahana]), featuredWahanas);
+                              };
+                         };
+                    };
+               };
+          };
+
+          let featuredWahanasArray = List.toArray(featuredWahanas);
+
+          if (Array.size(featuredWahanasArray) == 0) {
+               return #err(#DataNotFound);
+          };
+
+          let index_pages = Utils.paginate<Types.Wahana_details>(featuredWahanasArray, chunkSize);
+          if (index_pages.size() < pageNo) {
+               throw Error.reject("Page not found");
+          };
+          if (index_pages.size() == 0) {
+               throw Error.reject("Page not found");
+          };
+
+          let pages_data = index_pages[pageNo];
+
+          return #ok{
+               data = pages_data;
+               current_page = pageNo + 1;
+               Total_pages = index_pages.size();
+          };
+     };
+
+
 
      // public shared ({caller = user}) func edit_wahana(
      //      wahanaId: Text,
@@ -2560,6 +2808,127 @@ actor mahaka {
 
           return {
                trusted_origins = trusted_origins;
+          };
+     };
+
+      /*********************************************************/
+     /*                   Testimonials                    */
+     /*********************************************************/
+
+     public shared ({caller = user}) func createTestimonial(description: Text, title: Text, location: Text): async Result.Result<Types.Testimonial, Text> {
+          switch (testimonial.get(user)) {
+               case (null) {
+
+                    let newTestimonial: Types.Testimonial = {
+                         id = user;
+                         description = description;
+                         title = title;
+                         location = location;
+                    };
+
+                    let testimonialBlob = to_candid(newTestimonial);
+                    let testimonialIndex = await stable_add(testimonialBlob, Testimonial_state);
+                    testimonial.put(user, testimonialIndex);
+
+                    return #ok(newTestimonial);
+               };
+               case (?_) {
+                    return #err("You have already submitted a testimonial.");
+               };
+          };
+     };
+
+     public shared ({caller = user}) func deleteTestimonial(): async Result.Result<Text, Text> {
+          let testimonialIndex = testimonial.get(user);
+
+          switch (testimonialIndex) {
+               case (null) {
+                    return #err("Testimonial not found.");
+               };
+               case (?index) {
+                    testimonial.delete(user);
+                    return #ok("Testimonial deleted successfully.");
+               };
+          };
+     };
+
+     public shared ({caller = user}) func updateTestimonial(description: Text, title: Text, location: Text): async Result.Result<Types.Testimonial, Text> {
+          let testimonialIndex = testimonial.get(user);
+
+          switch (testimonialIndex) {
+               case (null) {
+                    return #err("Testimonial not found. Please create one first.");
+               };
+               case (?index) {
+                    let testimonialBlob = await stable_get(index, Testimonial_state);
+                    let foundTestimonial: ?Types.Testimonial = from_candid(testimonialBlob);
+
+                    switch (foundTestimonial) {
+                         case null {
+                              return #err("Unable to retrieve testimonial data.");
+                         };
+                         case (?existingTestimonial) {
+                              let updatedTestimonial: Types.Testimonial = {
+                                   id = existingTestimonial.id;
+                                   description = description;
+                                   title = title;
+                                   location = location;
+                              };
+
+                              let updatedBlob = to_candid(updatedTestimonial);
+                              let updated = await update_stable(index, updatedBlob, Testimonial_state);
+
+                              return #ok(updatedTestimonial);
+                         };
+                    };
+               };
+          };
+     };
+
+     public shared ({caller}) func getAllTestimonials(): async Result.Result<[Types.Testimonial], Text> {
+          var allTestimonials: [Types.Testimonial] = [];
+
+          for ((_, index) in testimonial.entries()) {
+               let testimonialBlob = await stable_get(index, Testimonial_state);
+               let testimonial: ?Types.Testimonial = from_candid(testimonialBlob);
+
+               switch (testimonial) {
+                    case null {
+                         // Skip invalid entries.
+                    };
+                    case (?t) {
+                         allTestimonials := Array.append(allTestimonials, [t]);
+                    };
+               };
+          };
+
+          if (allTestimonials.size() == 0) {
+               return #err("No testimonials available.");
+          };
+
+          return #ok(allTestimonials);
+     };
+
+     public shared ({caller}) func getTestimonial(userId: Principal): async Result.Result<Types.Testimonial, Text> {
+          let testimonialIndex = testimonial.get(userId);
+
+          switch (testimonialIndex) {
+               case (null) {
+                    return #err("Testimonial not found.");
+               };
+               case (?index) {
+                    let testimonialBlob = await stable_get(index, Testimonial_state);
+                    let foundTestimonial: ?Types.Testimonial = from_candid(testimonialBlob);
+
+                    switch (foundTestimonial) {
+                         case (null) {
+                              return #err("Unable to retrieve testimonial data.");
+                         };
+                         case (?testimonial) {
+                              return #ok(testimonial);
+                         };
+                    };
+               };
           };
      };
 
