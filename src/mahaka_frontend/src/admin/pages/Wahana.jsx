@@ -63,7 +63,7 @@ import { IoCloseCircle } from "react-icons/io5";
 const AdminWahana = () => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
-  const { wahanas, loading, currentPage, wahanasPerPage} = useSelector((state) => state.wahana);
+  const { wahanas, loading, currentPage, wahanasPerPage, totalPages} = useSelector((state) => state.wahana);
   console.log("logging the loadign for wahanas are", wahanas);
   const { venues } = useSelector((state) => state.venues);
 
@@ -103,13 +103,13 @@ const AdminWahana = () => {
     }
   }, [searchInput, dispatch]);
 
-  useEffect(() => {
-    if (loading && initialLoad) {
-      setInitialLoad(true);
-    } else if (!loading && initialLoad) {
-      setInitialLoad(false);
-    }
-  }, [loading]);
+  // useEffect(() => {
+  //   if (loading && initialLoad) {
+  //     setInitialLoad(true);
+  //   } else if (!loading && initialLoad) {
+  //     setInitialLoad(false);
+  //   }
+  // }, [loading]);
 
   useEffect(() => {
     dispatch(getAllVenues({ backend, pageLimit: 10, currPage: 0 }));
@@ -125,21 +125,33 @@ const AdminWahana = () => {
 
   useEffect(() => {
     if (selectedVenue) {
+      
       fetchWahanas(selectedVenue);
+      // setPage(page-1)
+      
     } else {
-      dispatch(getAllWahanas({ backend, chunkSize: 3, pageNo: page - 1 }));
+      dispatch(getAllWahanas({ backend, chunkSize: 1, pageNo: page - 1 }));
     }
   }, [selectedVenue, page]);
+
+
+  // page sets to 1 when venue is selected
+  useEffect(()=>{
+    if(selectedVenue){
+      setPage(1)
+    }
+  },[selectedVenue])
 
   const fetchWahanas = (venueId) => {
     dispatch(
       getAllWahanasbyVenue({
         backend,
-        chunkSize: 100,
-        pageNo: 0,
+        chunkSize: 1,
+        pageNo: page-1,
         venueId: venueId,
       })
     );
+     
   };
 
   const handleDescription = (description) => {
@@ -174,7 +186,9 @@ const AdminWahana = () => {
     setDeleteModalVisible(false); // Close the modal
   };
   const handlePageChange = (pageNumber) => {
-    setPage(pageNumber); // Update the page number when user clicks on a page button
+  
+    setPage(pageNumber);
+ 
   };
 
 
@@ -290,7 +304,7 @@ const AdminWahana = () => {
           searchInput={searchInput}
           setSearchInput={setSearchInput}
         />
-        <div className="flex justify-center m-6 items-center space-x-2">
+        <div className="flex justify-end m-6 items-center space-x-2">
           {/* Prev button */}
           <button
             className={`px-3 py-1 rounded ${
@@ -305,7 +319,7 @@ const AdminWahana = () => {
           </button>
 
           {/* Page number buttons */}
-          {Array.from({ length: 5 }, (_, i) => i + 1).map((pageNum) => (
+          {Array.from({ length:Number(totalPages) }, (_, i) => i + 1).map((pageNum) => (
             <button
               key={pageNum}
               className={`mx-1 px-3 py-1 rounded ${
@@ -321,7 +335,7 @@ const AdminWahana = () => {
           <button
             className={`px-3 py-1 rounded bg-gray-200`}
             onClick={() => handlePageChange(page + 1)}
-            // disabled={page === totalPages}
+             disabled={page === Number(totalPages)}
           >
             Next
           </button>
@@ -470,6 +484,8 @@ const WahanaMain = ({
               />
             ))}
           </div>
+
+
         )}
       </div>
     </div>

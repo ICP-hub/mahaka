@@ -51,6 +51,26 @@ export const getAllEventsByVenue = createAsyncThunk(
   }
 );
 
+// getallevents
+
+export const getAllEvents = createAsyncThunk(
+  "events/getAllEvents",
+  async ({ backend, chunkSize, pageNo, venueId }) => {
+    try {
+      const response = await backend.getAllEvents(
+        chunkSize,
+        pageNo,
+      
+      );
+      console.log("Events fetched:", response);
+      return response;
+    } catch (error) {
+      console.error("Error fetching events:", error);
+      throw error;
+    }
+  }
+);
+
 //buy Event Ticket
 export const buyEventTicket = createAsyncThunk(
   "events/buyEventTicket",
@@ -85,11 +105,36 @@ export const getEvent = createAsyncThunk(
   }
 );
 
+// search events 
+
+export const searchEvents= createAsyncThunk(
+  "events/searchEvents",
+  async ({ backend, searchText, chunkSize, pageNo }) => {
+    try {
+      const response = await backend.searchEvents(
+        searchText,
+        chunkSize,
+        pageNo
+      );
+       return response.data;
+      // console.log("search response is ",response.data)
+    } catch (error) {
+      console.error("error searching the events", error);
+      throw error;
+    }
+  }
+);
+
 // Create slice
 const eventSlice = createSlice({
   name: "events",
   initialState,
-  reducers: {},
+  reducers: {
+
+    setPage: (state, action) => {
+      state.currentPage = action.payload;
+  },
+  },
   extraReducers: (builder) => {
     builder
       // Handle createEvent
@@ -105,6 +150,22 @@ const eventSlice = createSlice({
       .addCase(createEvent.rejected, (state, action) => {
         state.createEventLoader = false;
         state.error = action.error.message;
+      })
+
+      // search events 
+
+      .addCase(searchEvents.pending, (state) => {
+        state.eventsLoading = true;
+      })
+      .addCase(searchEvents.fulfilled, (state, action) => {
+        state.eventsLoading = false;
+        state.events = action.payload;
+        state.error = null;
+      })
+      .addCase(searchEvents.rejected, (state, action) => {
+        state.eventsLoading = false;
+        // state.error = action.error.message;
+        state.error = action.error.message || "An error occurred";
       })
 
       // Handle deleteEvent
@@ -137,8 +198,8 @@ const eventSlice = createSlice({
         } else {
           state.events = action.payload.ok.data;
         }
-        state.currentPage = action.payload.current_page;
-        state.totalPages = action.payload.Total_pages;
+        state.currentPage = action.payload.ok.current_page;
+        state.totalPages = action.payload.ok.Total_pages;
         state.error = null;
       })
       .addCase(getAllEventsByVenue.rejected, (state, action) => {
@@ -146,6 +207,43 @@ const eventSlice = createSlice({
         state.events = [];
         state.error = action.error.message;
       })
+
+      // getallevents
+      .addCase(getAllEvents.pending, (state) => {
+        state.status = "loading";
+        state. eventsLoading = true;
+        state.error = null;
+      })
+      .addCase(getAllEvents.fulfilled, (state, action) => {
+        state. eventsLoading = false;
+
+        if (action.payload && action.payload.ok.data) {
+          state.events = action.payload.ok.data;
+          state.currentPage = action.payload.ok.current_page;
+          state.totalPages = action.payload.ok.Total_pages;
+           console.log("the events are  page is", state.events)
+        } else {
+          console.warn("Received empty or invalid response from API");
+          state.events = [];
+          state.currentPage = 1;
+          state.totalPages = 1;
+        }
+        state.error = null;
+        state.status = "succeeded";
+      })
+      .addCase(getAllEvents.rejected, (state, action) => {
+        state.status = "failed";
+        state.events = [];
+        (state. eventsLoading = false), (state.error = action.error.message);
+        notificationManager.error("Failed to fetch events");
+      })
+
+
+
+
+
+
+
       .addCase(buyEventTicket.pending, (state) => {
         state.buyTicketLoading = true;
       })

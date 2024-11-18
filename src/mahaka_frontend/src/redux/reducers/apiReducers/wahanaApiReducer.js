@@ -91,7 +91,9 @@ export const getAllWahanasbyVenue = createAsyncThunk(
         chunkSize,
         pageNo,
         venueId
+        
       );
+      console.log(response, "response of wahanas by venue");
       return response;
     } catch (error) {
       console.error("Error fetching wahanas:", error);
@@ -239,6 +241,7 @@ const wahanaSlice = createSlice({
           state.wahanas = action.payload.ok.data;
           state.currentPage = action.payload.ok.current_page;
           state.totalPages = action.payload.ok.Total_pages;
+          // console.log("current wahana page is", state.currentPage)
         } else {
           console.warn("Received empty or invalid response from API");
           state.wahanas = [];
@@ -296,26 +299,23 @@ const wahanaSlice = createSlice({
       })
       .addCase(getAllWahanasbyVenue.fulfilled, (state, action) => {
         state.loading = false;
-        if (action.payload && action.payload.ok.data) {
-          if (action.meta.arg.pageNo > 1) {
-            // Append new page of wahanas to the existing list
-            state.wahanas = [...state.wahanas, ...action.payload.data];
-          } else {
-            state.wahanas = action.payload.ok.data;
-          }
-          state.currentPage = action.payload.current_page || 1;
-          state.totalPages = action.payload.Total_pages || 1;
-        } else {
-          console.warn("Received empty or invalid response from API");
-          state.wahanas = [];
-          state.currentPage = 1;
-          state.totalPages = 1;
-        }
-        state.error = null;
+       if (action.payload && action.payload.ok.data){
+        state.wahanas = action.payload.ok.data;
+        state.currentPage = action.payload.ok.current_Page;
+        state.totalPages = action.payload.ok.Total_pages;
+        console.log("current wahana page is", state.currentPage)
+
+       }else{
+        console.warn("Received empty or invalid response from API")
+        state.wahanas = [];
+        state.currentPage = 1;
+        state.totalPages = 1;
+
+       }
       })
       .addCase(getAllWahanasbyVenue.rejected, (state, action) => {
         state.loading = false;
-        state.wahanas = [];
+        state.currentWahana = [];
         state.error = action.error.message;
         notificationManager.error("Failed to fetch wahanas");
       });

@@ -200,10 +200,11 @@ console.log("create wahana errors are", errors)
   const handleInputChange = (e) => {
     console.log("input change is",e.target.value)
     const { name, value } = e.target;
+    const updatedValue = name === "price" ? Number(value) : value;
     console.log("input change is",value)
     setFormData((prevState) => ({
       ...prevState,
-      [name]: value,
+      [name]:  updatedValue,
     }));
 
     if (formErrors[name]) {

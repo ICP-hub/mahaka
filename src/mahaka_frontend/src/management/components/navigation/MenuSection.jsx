@@ -13,14 +13,17 @@ const MenuSection = () => {
   const location = useLocation();
 
   const menuItems = [
+    { path: "/management/venues", label: "Venues", icon: <MdMap size={24} /> },
     {
       path: "/management/wahana",
       label: "Wahana",
       icon: <HiOutlineStar size={24} />,
     },
     // { path: "/admin/events", label: "Events", icon: <MdEventNote size={24} /> },
-    { path: "/management/venues", label: "Venues", icon: <MdMap size={24} /> },
-    { path: "/management/voucher", label: "Voucher", icon: <MdMap size={24} /> },
+    // { path: "/management/venues", label: "Venues", icon: <MdMap size={24} /> },
+    // { path: "/management/voucher", label: "Voucher", icon: <MdMap size={24} /> }, 
+    { path: "/management/events", label: "Events", icon: <MdMap size={24} /> },
+
 
     // {
     //   path: "/management/users",

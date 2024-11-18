@@ -64,7 +64,7 @@ import { IoCloseCircle } from "react-icons/io5";
 const MgtWahana = () => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
-  const { wahanas, loading } = useSelector((state) => state.wahana);
+  const { wahanas, loading, totalPages } = useSelector((state) => state.wahana);
   console.log("logging the loadign for wahanas are", wahanas)
   const { venues } = useSelector((state) => state.venues);
 
@@ -82,16 +82,26 @@ const MgtWahana = () => {
   const [wahanaDescription, setWahanaDescription] = useState("")
   const [descriptionModal, setDescriptionModal] = useState(false);
   const [searchInput, setSearchInput] = useState("")
+  const [page, setPage] = useState(1);
 
 
 
+  const handlePageChange = (pageNumber) => {
+    // console.log("total pages", Number(totalPages))
+    // console.log("page number is ", pageNumber)
+    // if (pageNumber >  Number(totalPages)){
+    //   setPage(pageNumber=1)
+    // }else{
+    setPage(pageNumber);
+  // } // Update the page number when user clicks on a page button
+  };
 
 // searching for wahanas
   useEffect(()=>{
     if(searchInput){
-      dispatch(searchWahanas({backend, searchText:searchInput, chunkSize:10, pageNo:0}))
+      dispatch(searchWahanas({backend, searchText:searchInput, chunkSize:1, pageNo:page-1}))
     }else{
-      dispatch(getAllWahanas({backend, chunkSize:10, pageNo:0}))
+      dispatch(getAllWahanas({backend, chunkSize:1, pageNo:page-1}))
     }
   },[searchInput,dispatch])
 
@@ -113,28 +123,34 @@ const MgtWahana = () => {
   }, [dispatch, backend]);
 
   useEffect(() => {
-   
     if (selectedVenue) {
       // setSpinner(true)
       fetchWahanas(selectedVenue);
     }else{
       
-      dispatch(getAllWahanas({backend, chunkSize:100, pageNo:0}))
+      dispatch(getAllWahanas({backend, chunkSize:1, pageNo:page-1}))
       setInitialLoad(false)
-
     }
   
-  }, [selectedVenue]);
+  }, [selectedVenue,page]);
 
 
   const fetchWahanas = (venueId) => {
     dispatch(getAllWahanasbyVenue({
       backend,
-      chunkSize: 100,
-      pageNo: 0,
+      chunkSize: 10,
+      pageNo: page-1,
       venueId: venueId
     }));
   };
+
+
+    // page sets to 1 when venue is selected
+    useEffect(()=>{
+      if(selectedVenue){
+        setPage(1)
+      }
+    },[selectedVenue])
 
   const handleDescription = (description)=>{
     console.log("wahana description is ", description)
@@ -257,6 +273,44 @@ const MgtWahana = () => {
          
         />
 
+        {/* pagination control */}
+        <div className="flex justify-end m-6 items-center space-x-2">
+          {/* Prev button */}
+          <button
+            className={`px-3 py-1 rounded ${
+              page === 1
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-gray-200"
+            }`}
+            onClick={() => handlePageChange(page - 1)}
+            disabled={page === 1}
+          >
+            Prev
+          </button>
+
+          {/* Page number buttons */}
+          {Array.from({ length:Number(totalPages) }, (_, i) => i + 1).map((pageNum) => (
+            <button
+              key={pageNum}
+              className={`mx-1 px-3 py-1 rounded ${
+                page === pageNum ? "bg-[#564BF1] text-white" : "bg-gray-200"
+              }`}
+              onClick={() => handlePageChange(pageNum)}
+            >
+              {pageNum}
+            </button>
+          ))}
+
+          {/* Next button */}
+          <button
+            className={`px-3 py-1 rounded bg-gray-200`}
+            onClick={() => handlePageChange(page + 1)}
+             disabled={page === Number(totalPages)}
+          >
+            Next
+          </button>
+        </div>
+
         <ModalOverlay
           isOpen={isModalOpen}
           setIsOpen={setIsModalOpen}
@@ -342,15 +396,14 @@ const WahanaMain = ({   wahanaData,
           />
         </div>
 
-        <button className="mt-8 sm:ml-auto sm:mt-0" onClick={onCreateClick}>
+        {/* <button className="mt-8 sm:ml-auto sm:mt-0" onClick={onCreateClick}>
           <div className="inline-flex items-center align-middle bg-secondary px-3 py-2 rounded-full text-white">
             + Add Wahana
-          </div>
-         
-        </button>
-
-       
+          </div>  
+        </button> */}
+        
       </div>
+      
       {loading && initialLoad? (
         <div className ="grid grid-cols-1 md:grid-cols-3 gap-6">
         <SkeletonLoader/>
@@ -360,10 +413,12 @@ const WahanaMain = ({   wahanaData,
       
       ):loading?
       (
-        <div className="mt-8 text-center">
-
-    <div className="flex justify-center mt-30"><ImSpinner9 className = "animate-spin text-7xl opacity-80"/></div>
-        </div>
+        <div className ="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <SkeletonLoader/>
+        <SkeletonLoader/>
+        <SkeletonLoader/>
+      </div>
+       
       ) : wahanaData && wahanaData.length  === 0?
       <div className = "text-center text-gray-800 md:text-5xl text-3xl font-bold mt-10">
       No wahanas found!

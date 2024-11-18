@@ -11,6 +11,7 @@ import CreateEventForm from "../components/CreateEventForm";
 import { HiArrowLongLeft, HiChevronDown } from "react-icons/hi2";
 import EventDummyImg from "../../assets/images/fram1.png";
 import { motion, AnimatePresence } from "framer-motion";
+import { FaArrowRight } from "react-icons/fa";
 
 const FormatTime = (timeString) => {
   const time = parseInt(timeString, 10);
@@ -95,6 +96,7 @@ const MgtVenueDetailPage = () => {
 
   const venue =
     currentVenue && Array.isArray(currentVenue) ? currentVenue[1] : null;
+    
 
   if (!venue) {
     return <div className="p-4 md:p-6">No venue data available.</div>;
@@ -167,7 +169,14 @@ const MgtVenueDetailPage = () => {
           <h2 className="text-xl font-semibold mb-2">Venue ID</h2>
           <p>{venue.id}</p>
         </div>
-        <EventTable eventArr={events} />
+        {/* <EventTable eventArr={events} /> */}
+
+        <div className ="flex">
+          <button className = "bg-orange-400 text-white p-2 rounded-full mr-3 px-2 flex my-2"   onClick={() => navigate('/management/wahana')}>View Wahanas  <FaArrowRight className ="ml-2 mt-1"/></button>
+         
+          
+          <button className = "bg-orange-400 text-white p-2 rounded-full mr-3 px-2 flex my-2"   onClick={() => navigate('/management/events')}>View Events  <FaArrowRight className ="ml-2 mt-1"/></button>
+        </div>
       </div>
 
       {/* Modal for updating the venue */}
