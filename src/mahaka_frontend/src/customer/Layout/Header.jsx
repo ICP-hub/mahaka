@@ -27,6 +27,7 @@ import {
 } from "react-icons/gr";
 import { MdOutlineManageAccounts } from "react-icons/md";
 import notificationManager from "../../common/utils/notificationManager";
+import { useAuth } from "../../connect/useClient";
 
 const NavLinks = [
   { title: "HOME", url: "/" },
@@ -41,7 +42,7 @@ export default function Header() {
   const toggleNavigation = () => setIsNavOpen((prev) => !prev);
   const navigate = useNavigate();
   const { user } = useIdentityKit();
-
+  const { isConnected, login, logout } = useAuth();
   // useEffect(() => {
   //   if (isConnected) {
   //     navigate("/user-profile");
@@ -69,7 +70,7 @@ export default function Header() {
                 <HiMiniBars3 size={24} />
               </button>
             </div>
-            {user && <ConnectBtn />}
+            {isConnected && <ConnectBtn />}
           </div>
           <div className="hidden md:flex">
             <ConnectBtn />
@@ -186,21 +187,27 @@ const NavVertical = ({ isNavOpen, onNavOpen }) => {
 
 const ConnectBtn = () => {
   const { user, connect } = useIdentityKit();
+  const { isConnected, login, logout, balance } = useAuth();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleCloseMenu = () => {
     setIsMenuOpen(false);
   };
-
-  if (!user) {
+  const ConnectBtn1 = ({ onClick }) => (
+    <button
+      onClick={onClick}
+      className="min-h-12 px-2 bg-[#F08E1E] text-white font-medium rounded-lg hover:bg-orange-600 max-w-max min-w-max"
+    >
+      Connect wallet
+    </button>
+  );
+  if (!isConnected) {
     return (
-      <button
-        onClick={() => connect()}
-        className="min-h-12 px-2 bg-[#F08E1E] text-white font-medium rounded-lg hover:bg-orange-600 max-w-max min-w-max"
-      >
-        Connect wallet
-      </button>
+      <ConnectWallet
+        connectButtonComponent={ConnectBtn1}
+        className="rounded-full bg-black"
+      />
     );
   }
 
@@ -210,7 +217,7 @@ const ConnectBtn = () => {
         className="h-12 w-12 p-0.5 border border-[#F08E1E] rounded-full flex items-center justify-center cursor-pointer"
         onClick={() => setIsMenuOpen((pv) => !pv)}
       >
-        <Avvvatars value={user.principal.toText()} size={40} shadow={true} />
+        <Avvvatars value={user?.principal?.toText()} size={40} shadow={true} />
       </div>
       {isMenuOpen && (
         <motion.div
@@ -230,9 +237,10 @@ const ConnectBtn = () => {
 const ProfileMenu = ({ onClose }) => {
   const { user, icpBalance, disconnect } = useIdentityKit();
   const { currentUserByCaller } = useSelector((state) => state.users);
+  const { isConnected, login, logout, balance, principal } = useAuth();
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(user.principal.toText());
+    navigator.clipboard.writeText(user?.principal?.toText());
     notificationManager.success("Wallet address copied!");
     // navigator.clipboard
     //   .writeText(user.principal.toText())
@@ -302,7 +310,7 @@ const ProfileMenu = ({ onClose }) => {
             <GrCopy />
           </button>
           <div className="bg-gray-500 rounded-md px-2 min-w-36 max-w-36 overflow-hidden truncate">
-            {user.principal.toText()}
+            {principal?.toText()}
           </div>
         </div>
       </div>
@@ -313,14 +321,14 @@ const ProfileMenu = ({ onClose }) => {
         </div>
         <div className="ml-auto">
           <div className="bg-gray-500 rounded-md px-2 min-w-36 max-w-36 overflow-hidden truncate flex items-center justify-center">
-            {icpBalance}
+            {balance}
           </div>
         </div>
       </div>
       <div
         className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto cursor-pointer"
         onClick={() => {
-          disconnect();
+          logout();
           onClose();
         }}
       >

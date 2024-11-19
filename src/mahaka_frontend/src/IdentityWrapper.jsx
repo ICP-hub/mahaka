@@ -1,33 +1,37 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IdentityKitProvider, IdentityKitTheme } from "@nfid/identitykit/react";
 import { IdentityKitAuthType, NFIDW, Plug } from "@nfid/identitykit";
 import { Provider } from "react-redux";
 import store from "./redux/store";
 import App from "./App";
-// import { HttpAgent } from "@dfinity/agent";
+import { AuthProvider } from "./connect/useClient";
 
 export default function IdentityWrapper() {
-  const [mount, setMount] = useState(false);
-  //https://dev.nfid.one/rpc
+  const [isMounted, setIsMounted] = useState(false);
+
+  const canisterID = process.env.CANISTER_ID_MAHAKA_BACKEND;
   const signers = [NFIDW, Plug];
-  useState(() => {
-    setMount(true);
+
+  useEffect(() => {
+    setIsMounted(true);
   }, []);
 
-  const targetCanister = process.env.CANISTER_ID_MAHAKA_BACKEND;
-  if (mount)
-    return (
-      <IdentityKitProvider
-        signers={signers}
-        theme={IdentityKitTheme.SYSTEM}
-        authType={IdentityKitAuthType.DELEGATION}
-        signerClientOptions={{
-          targets: [targetCanister],
-        }}
-      >
-        <Provider store={store}>
+  if (!isMounted) return null;
+
+  return (
+    <IdentityKitProvider
+      signers={signers}
+      theme={IdentityKitTheme.SYSTEM}
+      authType={IdentityKitAuthType.DELEGATION}
+      signerClientOptions={{
+        targets: [canisterID],
+      }}
+    >
+      <Provider store={store}>
+        <AuthProvider>
           <App />
-        </Provider>
-      </IdentityKitProvider>
-    );
+        </AuthProvider>
+      </Provider>
+    </IdentityKitProvider>
+  );
 }

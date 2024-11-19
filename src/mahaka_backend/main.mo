@@ -128,7 +128,7 @@ actor mahaka {
         icrc2_transfer_from : shared Types.TransferFromArgs -> async Types.Result_3;
     };
 
-     let FiatPayCanister = actor "bd3sg-teaaa-aaaaa-qaaba-cai" : actor {
+     let FiatPayCanister = actor "be2us-64aaa-aaaaa-qaabq-cai" : actor {
         create_invoice : shared (Principal,FiatTypes.Request.CreateInvoiceBody) -> async Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>>;
     };
 
