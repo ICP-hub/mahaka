@@ -495,24 +495,19 @@ const CreateEventForm = ({
     if (!validateForm()) {
       return;
     }
-    if (!venueId) {
-      console.error("Venue ID is missing");
-      return;
-    }
-    const fullVenueId = venueId;
+
     const Id = Principal.fromText(
       "h7yxq-n6yb2-6js2j-af5hk-h4inj-edrce-oevyj-kbs7a-76kft-vrqrw-nqe"
     );
-    console.log(fullVenueId, "venue id");
 
     try {
       await dispatch(
         createEvent({
           backend,
-          id: fullVenueId,
+          id: "venue #b77ix-eeaaa-aaaaa-qaada-cai",
           record: {
             id: "",
-            venueId: fullVenueId,
+            venueId: "venue #b77ix-eeaaa-aaaaa-qaada-cai",
             title: eventData.title,
             creator: Id,
             sTicket_limit: eventData.collection_args.sTicket_limit,
@@ -526,11 +521,11 @@ const CreateEventForm = ({
               logo_type: eventData.collection_args.banner.logo_type,
             },
             details: {
-              StartDate: eventData.eventDetails.StartDate,
-              StartTime: parseInt(eventData.eventDetails.StartTime, 10),
+              StartDate: 1234,
+              StartTime: 2345,
               Location: eventData.eventDetails.Location,
-              EndDate: eventData.eventDetails.EndDate,
-              EndTime: parseInt(eventData.eventDetails.EndTime, 10),
+              EndDate: 434,
+              EndTime: 5643,
             },
             gTicket_limit: eventData.collection_args.gTicket_limit,
             vTicket_limit: eventData.collection_args.vTicket_limit,

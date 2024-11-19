@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { Principal } from "@dfinity/principal";
 import notificationManager from "../../common/utils/notificationManager";
 
-export default function Ticket({
+export default function EventTickets({
   type,
   gradientClass,
   name,
@@ -39,7 +39,7 @@ export default function Ticket({
       console.log(record);
       console.log(selectedVenue);
 
-      const response = await backend.buyOfflineVenueTicket(
+      const response = await backend.buyOfflineEventTicket(
         selectedVenue.id,
         { ticket_type: ticketTypeVariant, price: 1, priceFiat: 1 },
         record,

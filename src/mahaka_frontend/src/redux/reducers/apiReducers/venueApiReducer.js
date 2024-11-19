@@ -23,12 +23,11 @@ export const getAllVenues = createAsyncThunk(
     console.log("response:", response);
     return {
       data: response.data,
-      totalPages: Number(response.Total_pages), 
-      currPage: Number(response.current_page)   
+      totalPages: Number(response.Total_pages),
+      currPage: Number(response.current_page),
     };
   }
 );
-
 
 // Get single venue
 export const getVenue = createAsyncThunk(
@@ -132,11 +131,14 @@ export const buyVenueTicket = createAsyncThunk(
 export const searchVenues = createAsyncThunk(
   "venues/searchVenues",
   async ({ backend, searchText, pageLimit, currPage }) => {
-    const response = await backend.searchVenues(searchText, pageLimit, currPage);
+    const response = await backend.searchVenues(
+      searchText,
+      pageLimit,
+      currPage
+    );
     return { data: response.data, totalPages: response.totalPages, currPage };
   }
 );
-
 
 // Create slice
 const venueSlice = createSlice({
