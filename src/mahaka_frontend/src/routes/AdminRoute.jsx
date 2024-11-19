@@ -18,7 +18,7 @@ export const adminRoutes = [
       // Redirect to dashboard component
       { index: true, element: <Navigate to="/admin/dashboard" /> },
       { path: "dashboard", element: <AdminDashboard /> },
-      // { path: "events", element: <EventManager /> },
+      { path: "events", element: <EventManager /> },
       { path: "venues", element: <VenueManger /> },
       {
         path: "venues/venue/:title/:id",

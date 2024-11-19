@@ -1,5 +1,12 @@
 export function formatDate(dateString) {
-  const date = new Date(dateString);
+  let date;
+
+  if (typeof dateString === "bigint") {
+    date = new Date(Number(dateString));
+  } else {
+    date = new Date(dateString);
+  }
+
   const months = [
     "Jan",
     "Feb",

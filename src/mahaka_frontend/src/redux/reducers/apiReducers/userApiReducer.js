@@ -4,7 +4,8 @@ import { Principal } from "@dfinity/principal";
 // Initial state
 const initialState = {
   users: [],
-  currentUser: null,
+  currentUserById: null,
+  currentUserByCaller: null,
   userLoading: true,
   error: null,
   currentPage: 1,
@@ -32,7 +33,7 @@ export const getUserDetailsById = createAsyncThunk(
   "users/getUserDetailsById",
   async ({ backend, userId }) => {
     const response = await backend.getUserdetailsbyid(userId);
-    console.log(response);
+    // console.log(response);
     return response;
   }
 );
@@ -65,18 +66,18 @@ export const updateUser = createAsyncThunk(
   }
 );
 
-export const createUser = createAsyncThunk(
-  "users/createUser",
-  async ({ backend, user }) => {
-    const response = await backend.createUser(
-      user.email,
-      user.firstName,
-      user.lastName,
-      user.role
-    );
-    return response;
-  }
-);
+// export const createUser = createAsyncThunk(
+//   "users/createUser",
+//   async ({ backend, user }) => {
+//     const response = await backend.createUser(
+//       user.email,
+//       user.firstName,
+//       user.lastName,
+//       user.role
+//     );
+//     return response;
+//   }
+// );
 
 // Create slice
 const userSlice = createSlice({
@@ -90,7 +91,7 @@ const userSlice = createSlice({
       })
       .addCase(getUserDetailsByCaller.fulfilled, (state, action) => {
         state.userLoading = false;
-        state.currentUser = action.payload.ok;
+        state.currentUserByCaller = action.payload.ok;
         state.error = null;
       })
       .addCase(getUserDetailsByCaller.rejected, (state, action) => {
@@ -102,7 +103,7 @@ const userSlice = createSlice({
       })
       .addCase(getUserDetailsById.fulfilled, (state, action) => {
         state.userLoading = false;
-        state.currentUser = action.payload.ok;
+        state.currentUserById = action.payload.ok;
         state.error = null;
       })
       .addCase(getUserDetailsById.rejected, (state, action) => {
@@ -142,27 +143,27 @@ const userSlice = createSlice({
           state.users.push(updatedUser); // If it's a new user, add them
         }
 
-        state.currentUser = updatedUser;
+        state.currentUserById = updatedUser;
         state.error = null;
       })
       .addCase(updateUser.rejected, (state, action) => {
         state.userLoading = false;
         state.error = action.error.message;
-      })
-      .addCase(createUser.pending, (state) => {
-        state.userLoading = true;
-      })
-      .addCase(createUser.fulfilled, (state, action) => {
-        state.userLoading = false;
-        const newUser = action.payload.ok;
-        console.log(newUser, "new user");
-        state.users.push(newUser); // Directly add new user to the list
-        state.error = null;
-      })
-      .addCase(createUser.rejected, (state, action) => {
-        state.userLoading = false;
-        state.error = action.error.message;
       });
+    // .addCase(createUser.pending, (state) => {
+    //   state.userLoading = true;
+    // })
+    // .addCase(createUser.fulfilled, (state, action) => {
+    //   state.userLoading = false;
+    //   const newUser = action.payload.ok;
+    //   console.log(newUser, "new user");
+    //   state.users.push(newUser); // Directly add new user to the list
+    //   state.error = null;
+    // })
+    // .addCase(createUser.rejected, (state, action) => {
+    //   state.userLoading = false;
+    //   state.error = action.error.message;
+    // });
   },
 });
 
