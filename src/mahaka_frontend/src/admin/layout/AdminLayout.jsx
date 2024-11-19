@@ -37,7 +37,7 @@ const AdminLayout = () => {
       {state.isOpen && (
         <ScreenOverlayBlur onOverlayClicked={handleNavigationOnSmallScreen} />
       )}
-      <div className={`layout ${selected}`}>
+      <div className={`layout ${selected} max-h-screen overflow-hidden`}>
         <div className="text-text">
           <NavigationVertical navigationState={state} />
           <div className="flex w-full min-w-0 flex-auto flex-col overflow-y-auto custom-scroll bg-background">
