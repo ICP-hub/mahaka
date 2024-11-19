@@ -266,7 +266,7 @@ const MgtEvents = ()=>{
       
 
 
-      <div className="flex w-full max-w-xs flex-col justify-center sm:max-w-none sm:flex-row mt-5">
+      <div className="flex w-full max-w-xs flex-col justify-center gap-2 sm:max-w-none sm:flex-row mt-10">
         <select
           value={selectedVenue || ""}
           onChange={(e) => setSelectedVenue(e.target.value)}
@@ -283,7 +283,7 @@ const MgtEvents = ()=>{
           ))}
         </select>
 
-        <div className="px-4 mt-4 sm:ml-4 sm:mt-0 sm:w-72 min-h-12 lg:min-w-[68%] md:min-w-[55%] rounded-full border border-border flex items-start bg-card text-icon">
+        <div className="px-4 mt-4 sm:ml-4 sm:mt-0 sm:w-72 min-h-12 min-w-[75%] rounded-full border border-border flex items-center bg-card text-icon">
           <HiMagnifyingGlass size={20} />
           <input
             type="text"
@@ -299,7 +299,7 @@ const MgtEvents = ()=>{
       {/* displaying the events  */}
       { eventsLoading?
       (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mx-7">
       <SkeletonLoader />
       <SkeletonLoader />
       <SkeletonLoader />

@@ -367,7 +367,7 @@ const WahanaMain = ({   wahanaData,
   return (
     <div className="flex flex-auto p-6 sm:p-10">
     <div className="mx-auto flex w-full max-w-xs flex-auto flex-col sm:max-w-5xl">
-      <div className="flex w-full max-w-xs flex-col justify-center sm:max-w-none sm:flex-row ">
+      <div className="flex w-full max-w-xs flex-col justify-center mx-3 sm:max-w-none sm:flex-row ">
         <select
           value={selectedVenue || ""}
           onChange={(e) => setSelectedVenue(e.target.value)}
@@ -384,7 +384,7 @@ const WahanaMain = ({   wahanaData,
           ))}
         </select>
 
-        <div className="px-4 mt-4 sm:ml-4 sm:mt-0 sm:w-72 min-h-12 lg:min-w-[68%] md:min-w-[55%] rounded-full border border-border flex items-start
+        <div className="px-4 mt-4 sm:ml-4 sm:mt-0 sm:w-72 min-h-12 mx-5 lg:min-w-[83%] md:min-w-[79%] rounded-full border border-border flex items-center
          bg-card text-icon">
           <HiMagnifyingGlass size={20} />
           <input
