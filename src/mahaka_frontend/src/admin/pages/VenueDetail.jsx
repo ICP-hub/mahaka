@@ -10,13 +10,28 @@ import UpdateVenueForm from "../components/UpdateVenueForm";
 import CreateEventForm from "../components/CreateEventForm";
 import { HiArrowLongLeft, HiChevronDown } from "react-icons/hi2";
 
-const FormatTime = (timeString) => {
-  const time = parseInt(timeString, 10);
-  const hours = Math.floor(time / 100);
-  const minutes = time % 100;
-  const period = hours >= 12 ? "PM" : "AM";
-  const formattedHours = hours % 12 || 12;
-  return `${formattedHours}:${minutes.toString().padStart(2, "0")} ${period}`;
+const FormatTime = (nanoseconds) => {
+  // Input validation
+  if (!nanoseconds && nanoseconds !== 0) {
+    return "Invalid input";
+  }
+  try {
+    const totalMinutes = Math.floor(Number(nanoseconds) / (60 * 1000000000));
+    // Validate range (24 hours in minutes = 1440)
+    if (totalMinutes < 0 || totalMinutes >= 1440) {
+      return "Time out of range";
+    }
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    const period = hours >= 12 ? "PM" : "AM";
+    let formattedHours = hours % 12;
+    formattedHours = formattedHours === 0 ? 12 : formattedHours;
+    const displayHours = formattedHours.toString().padStart(2, "0");
+    const displayMinutes = minutes.toString().padStart(2, "0");
+    return `${displayHours}:${displayMinutes} ${period}`;
+  } catch (error) {
+    return "Invalid time format";
+  }
 };
 
 const VenueDetailPage = () => {
@@ -351,6 +366,19 @@ const EventCard = ({ event }) => {
                 <p className="text-sm font-medium ">End Date</p>
                 <p className="text-sm ">
                   {formatDate(event.details.EndDate)}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-sm font-medium ">Start Time</p>
+                <p className="text-sm ">
+                  {FormatTime(event.details.StartTime)}
+                </p>
+              </div>
+              <div>
+              <p className="text-sm font-medium ">End Time</p>
+                <p className="text-sm ">
+                  {FormatTime(event.details.EndTime)}
                 </p>
               </div>
               <div>

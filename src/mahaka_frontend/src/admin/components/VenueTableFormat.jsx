@@ -11,13 +11,28 @@ import {
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import { deleteVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
-const FormatTime = (timeString) => {
-  const time = parseInt(timeString, 10);
-  const hours = Math.floor(time / 100);
-  const minutes = time % 100;
-  const period = hours >= 12 ? "PM" : "AM";
-  const formattedHours = hours % 12 || 12;
-  return `${formattedHours}:${minutes.toString().padStart(2, "0")} ${period}`;
+const FormatTime = (nanoseconds) => {
+  // Input validation
+  if (!nanoseconds && nanoseconds !== 0) {
+    return "Invalid input";
+  }
+  try {
+    const totalMinutes = Math.floor(Number(nanoseconds) / (60 * 1000000000));
+    // Validate range (24 hours in minutes = 1440)
+    if (totalMinutes < 0 || totalMinutes >= 1440) {
+      return "Time out of range";
+    }
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    const period = hours >= 12 ? "PM" : "AM";
+    let formattedHours = hours % 12;
+    formattedHours = formattedHours === 0 ? 12 : formattedHours;
+    const displayHours = formattedHours.toString().padStart(2, "0");
+    const displayMinutes = minutes.toString().padStart(2, "0");
+    return `${displayHours}:${displayMinutes} ${period}`;
+  } catch (error) {
+    return "Invalid time format";
+  }
 };
 const VenueTableFormat = ({ filteredVenues }) => {
   console.log(filteredVenues);
@@ -111,8 +126,8 @@ const VenueTableFormat = ({ filteredVenues }) => {
                       key={index}
                       venue={venue}
                       onDelete={() => handleDeleteClick(venue.id)}
-                      // isExpanded={expandedVenue === index}
-                      // onToggleDetail={() => handleToggleDetail(index)}
+                    // isExpanded={expandedVenue === index}
+                    // onToggleDetail={() => handleToggleDetail(index)}
                     />
                   </motion.div>
                 ))}
@@ -172,7 +187,7 @@ const VenueTableData = ({ venue, onDelete }) => {
           >
             <HiOutlineDotsHorizontal
               size={24}
-              // className={`${isExpanded ? "text-secondary" : "text-icon"}`}
+            // className={`${isExpanded ? "text-secondary" : "text-icon"}`}
             />
           </Link>
 

@@ -110,7 +110,6 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
     });
 
     // Initialize Flatpickr for times
-    // Initialize Flatpickr for times
     flatpickr(startTimeRef.current, {
       enableTime: true,
       noCalendar: true,
@@ -400,16 +399,18 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
       return;
     }
 
-    // Convert StartDate and EndDate to timestamps (int)
     const startDateTimestamp = new Date(venueData.eventDetails.StartDate).getTime();
     const endDateTimestamp = new Date(venueData.eventDetails.EndDate).getTime();
 
-    // Convert StartTime and EndTime to total minutes as int
     const [startHours, startMinutes] = venueData.eventDetails.StartTime.split(":").map(Number);
     const [endHours, endMinutes] = venueData.eventDetails.EndTime.split(":").map(Number);
 
     const startTimeInMinutes = startHours * 60 + startMinutes;
     const endTimeInMinutes = endHours * 60 + endMinutes;
+
+    const startTimeInNanoseconds = startTimeInMinutes * 60 * 1000000000;
+    const endTimeInNanoseconds = endTimeInMinutes * 60 * 1000000000;
+
     dispatch(
       createVenue({
         backend,
@@ -421,10 +422,10 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         capacity: parseInt(venueData.capacity),
         details: {
           StartDate: startDateTimestamp,
-          StartTime: startTimeInMinutes,
+          StartTime: startTimeInNanoseconds, 
           Location: venueData.eventDetails.Location,
           EndDate: endDateTimestamp,
-          EndTime: endTimeInMinutes,
+          EndTime: endTimeInNanoseconds,      
         },
         description: venueData.collection_args.description,
         action: setIsModalOpen,
