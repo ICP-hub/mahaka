@@ -12,6 +12,15 @@ import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import { deleteVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
 
+const FormatTime = (timeString) => {
+  const time = parseInt(timeString, 10);
+  const hours = Math.floor(time / 100);
+  const minutes = time % 100;
+  const period = hours >= 12 ? "PM" : "AM";
+  const formattedHours = hours % 12 || 12;
+  return `${formattedHours}:${minutes.toString().padStart(2, "0")} ${period}`;
+};
+
 const VenueTableFormat = ({ filteredVenues }) => {
   console.log(filteredVenues);
   const { venues, loading } = useSelector((state) => state.venues);
@@ -149,7 +158,9 @@ const VenueTableData = ({ venue, onDelete }) => {
         <div className="hidden lg:block">
           {formatDate(venue.Details.EndDate)}
         </div>
-        <div className="hidden lg:block">Time</div>
+        <div className="hidden lg:block">
+        {FormatTime(venue?.Details?.StartTime)}-{FormatTime(venue?.Details?.EndTime)}
+        </div>
         <div className="truncate">{venue.Details.Location}</div>
 
         {/* Wrap both icons inside a flex container */}

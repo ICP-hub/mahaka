@@ -127,8 +127,8 @@ const CreateEventForm = ({
       const day = String(date.getDate()).padStart(2, "0");
       return `${year}-${month}-${day}`;
     };
-    const minDate = venueStartDate ? new Date(venueStartDate) : "";
-    const maxDate = venueEndDate ? new Date(venueEndDate) : "";
+    const minDate = venueStartDate ? new Date(Number(venueStartDate)) : "";
+    const maxDate = venueEndDate ? new Date(Number(venueEndDate)) : "";
 
     if (minDate) {
       minDate.setHours(0, 0, 0, 0);
