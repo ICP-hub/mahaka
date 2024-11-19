@@ -4,119 +4,20 @@ import { FaArrowRight } from "react-icons/fa";
 import {
   HiMagnifyingGlass,
   HiMiniShieldCheck,
-  HiMiniSignal,
   HiOutlineEnvelope,
   HiOutlineFlag,
   HiOutlinePencilSquare,
   HiOutlinePlusSmall,
   HiXMark,
 } from "react-icons/hi2";
-import { AnimatePresence, motion } from "framer-motion";
 import NavigationRight from "../../common/components/NavigationRight";
 import { useSelector, useDispatch } from "react-redux";
-import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
 import {
-  getUserDetailsByCaller,
+  deleteUserByPrincipal,
   updateUser,
 } from "../../redux/reducers/apiReducers/userApiReducer";
-import { listUsers } from "../../redux/reducers/apiReducers/userApiReducer";
-import { useEffect } from "react";
-import { object } from "prop-types";
-import { getUserDetailsById } from "../../redux/reducers/apiReducers/userApiReducer";
 import { Principal } from "@dfinity/principal";
-import { useIdentityKit } from "@nfid/identitykit/react";
-const teamData = [
-  {
-    id: 3,
-    name: "Meera Iyer",
-    email: "meera.iyer@gmail.com",
-    role: "Supervisor",
-    principalId:
-      "zabc1-ef2h6-mzaw-k4j78-lotq3-wieq5-puqas-v36bc-hyruq-jklmn-vzxtr",
-    assignedVenues: ["Assigned venue one", "Assigned venue two"],
-  },
-  {
-    id: 4,
-    name: "Ravi Singh",
-    email: "ravi.singh@gmail.com",
-    role: "Manager",
-    principalId:
-      "zabc1-ef2h6-mzaw-k4j78-lotq3-wieq5-puqas-v36bc-hyruq-jklmn-vzxtr",
-    assignedVenues: ["Assigned venue one", "Assigned venue two"],
-  },
-  {
-    id: 5,
-    name: "Neha Gupta",
-    email: "neha.gupta@gmail.com",
-    role: "Staff",
-    principalId:
-      "zabc1-ef2h6-mzaw-k4j78-lotq3-wieq5-puqas-v36bc-hyruq-jklmn-vzxtr",
-    assignedVenues: ["Assigned venue one", "Assigned venue two"],
-  },
-  {
-    id: 6,
-    name: "Karan Verma",
-    email: "karan.verma@gmail.com",
-    role: "BOD",
-    principalId:
-      "zabc1-ef2h6-mzaw-k4j78-lotq3-wieq5-puqas-v36bc-hyruq-jklmn-vzxtr",
-    assignedVenues: ["Assigned venue one", "Assigned venue two"],
-  },
-  {
-    id: 7,
-    name: "Pooja Mehta",
-    email: "pooja.mehta@gmail.com",
-    role: "Supervisor",
-    principalId:
-      "zabc1-ef2h6-mzaw-k4j78-lotq3-wieq5-puqas-v36bc-hyruq-jklmn-vzxtr",
-    assignedVenues: ["Assgned venue one", "Assgned venue two"],
-  },
-  {
-    id: 8,
-    name: "Siddharth Jain",
-    email: "siddharth.jain@gmail.com",
-    role: "Manager",
-    principalId:
-      "zabc1-ef2h6-mzaw-k4j78-lotq3-wieq5-puqas-v36bc-hyruq-jklmn-vzxtr",
-    assignedVenues: ["Assgned venue one", "Assgned venue two"],
-  },
-  {
-    id: 9,
-    name: "Tanvi Bansal",
-    email: "tanvi.bansal@gmail.com",
-    role: "Staff",
-    principalId:
-      "zabc1-ef2h6-mzaw-k4j78-lotq3-wieq5-puqas-v36bc-hyruq-jklmn-vzxtr",
-    assignedVenues: ["Assgned venue one", "Assgned venue two"],
-  },
-  {
-    id: 10,
-    name: "Vikram Rao",
-    email: "vikram.rao@gmail.com",
-    role: "Admin",
-    principalId:
-      "zabc1-ef2h6-mzaw-k4j78-lotq3-wieq5-puqas-v36bc-hyruq-jklmn-vzxtr",
-    assignedVenues: ["Assgned venue one", "Assgned venue two"],
-  },
-  {
-    id: 11,
-    name: "Shreya Nair",
-    email: "shreya.nair@gmail.com",
-    role: "BOD",
-    principalId:
-      "zabc1-ef2h6-mzaw-k4j78-lotq3-wieq5-puqas-v36bc-hyruq-jklmn-vzxtr",
-    assignedVenues: ["Assgned venue one", "Assgned venue two"],
-  },
-  {
-    id: 12,
-    name: "Ankit Sethi",
-    email: "ankit.sethi@gmail.com",
-    role: "Staff",
-    principalId:
-      "zabc1-ef2h6-mzaw-k4j78-lotq3-wieq5-puqas-v36bc-hyruq-jklmn-vzxtr",
-    assignedVenues: ["Assgned venue one", "Assgned venue two"],
-  },
-];
+import notificationManager from "../../common/utils/notificationManager";
 
 // Permissions
 const rolePermissions = {
@@ -128,37 +29,20 @@ const rolePermissions = {
 };
 
 const MemberManager = () => {
-  const { venues } = useSelector((state) => state.venues);
+  const { users, userLoading } = useSelector((state) => state.users);
   const [isRtNavOpen, setIsRtNavOpen] = useState(false);
-  const [members, setMembers] = useState(teamData);
   const [currentMember, setCurrentMember] = useState(null);
-  const { users } = useSelector((state) => state.users);
-  const { backend } = useSelector((state) => state.authentication);
-  const { currentUserById, userLoading } = useSelector((state) => state.users);
   const [isEditing, setIsEditing] = useState(false);
-  console.log(users, "users");
 
   const toggleNav = (isOpen) => {
     setIsRtNavOpen(isOpen);
   };
 
   const openDetailView = (member) => {
-    console.log(member);
-    dispatch(getUserDetailsById({ backend, userId: member }));
-    setCurrentMember(currentUserById);
+    setCurrentMember(member);
     setIsEditing(false);
     toggleNav(true);
   };
-
-  const deleteMember = (id) => {
-    setMembers(members.filter((member) => member.id !== id));
-    setCurrentMember(null);
-    toggleNav(false);
-  };
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(listUsers({ backend, pageLimit: 10, currPage: 0 }));
-  }, [backend]);
 
   return (
     <div className="flex flex-auto flex-col">
@@ -171,7 +55,13 @@ const MemberManager = () => {
                   Members
                 </div>
                 <div className="text-secondary ml-0.5 font-medium">
-                  {members.length} members
+                  {userLoading ? (
+                    <div className="animate-pulse bg-gray-500 rounded-md text-gray-500 max-w-fit">
+                      0 members
+                    </div>
+                  ) : (
+                    <div>{users.length} members</div>
+                  )}
                 </div>
               </div>
               <div className="mt-4 flex items-center sm:mt-0 md:mt-4">
@@ -201,22 +91,25 @@ const MemberManager = () => {
                 </div>
               </div>
             </div>
-            <MemberList
-              members={users}
-              onMemberClick={openDetailView}
-              isRtNavOpen={isRtNavOpen}
-              userLoading={userLoading}
-            />
+            {userLoading ? (
+              <div>Loading...</div>
+            ) : users.length > 0 ? (
+              <MemberList
+                members={users}
+                onMemberClick={openDetailView}
+                isRtNavOpen={isRtNavOpen}
+              />
+            ) : (
+              <div>No users found</div>
+            )}
           </div>
           <NavigationRight isOpen={isRtNavOpen}>
             <UpdateMember
               member={currentMember}
               onToggle={toggleNav}
-              onDelete={deleteMember}
               isEditing={isEditing}
               setIsEditing={setIsEditing}
-              members={members}
-              setMembers={setMembers}
+              members={users}
             />
           </NavigationRight>
         </div>
@@ -225,90 +118,93 @@ const MemberManager = () => {
   );
 };
 
-const MemberList = ({ members, onMemberClick, isRtNavOpen, userLoading }) => {
+const MemberList = ({ members, onMemberClick, isRtNavOpen }) => {
   return (
-    <>
-      {userLoading ? (
-        <div>loading....</div>
-      ) : (
-        <div>
-          {members.map((member) => (
-            <div
-              key={member?.id.toText()}
-              className="z-20 flex cursor-pointer items-center border-b px-6 py-4 md:px-8 dark:hover:bg-hover hover:bg-gray-100 border-b-border bg-card justify-start"
-              onClick={() => {
-                if (!isRtNavOpen) onMemberClick(member?.id);
-              }}
-            >
-              <div className="flex h-10 w-10 flex-0 items-center justify-center overflow-hidden rounded-full">
-                <Avvvatars value={member.firstName} size={48} shadow={true} />
-              </div>
-              <div className="ml-4 min-w-0">
-                <div className="truncate font-medium leading-5">
-                  {`${member.firstName} ${member.lastName}`}
-                </div>
-                <div className="flex items-center justify-center rounded-full bg-gray-100 px-2 py-0.5 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300 max-w-fit">
-                  <span className="whitespace-nowrap text-sm font-medium">
-                    {/* {Object.keys(member.role)} role */}
-                  </span>
-                </div>
-              </div>
-              <FaArrowRight className="flex items-end ml-auto opacity-90" />
+    <div>
+      {members.map((member) => (
+        <div
+          key={member.id.toText()}
+          className="z-20 flex cursor-pointer items-center border-b px-6 py-4 md:px-8 dark:hover:bg-hover hover:bg-gray-100 border-b-border bg-card justify-start"
+          onClick={() => {
+            if (!isRtNavOpen) onMemberClick(member);
+          }}
+        >
+          <div className="flex h-10 w-10 flex-0 items-center justify-center overflow-hidden rounded-full">
+            <Avvvatars value={member.firstName} size={48} shadow={true} />
+          </div>
+          <div className="ml-4 min-w-0">
+            <div className="truncate font-medium leading-5">
+              {member.firstName} {member.lastName}
             </div>
-          ))}
+            <div className="flex items-center justify-center rounded-full bg-gray-100 px-2 py-0.5 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300 max-w-fit">
+              <span className="whitespace-nowrap text-sm font-medium">
+                {Object.keys(member.role)[0]}
+              </span>
+            </div>
+          </div>
+          <FaArrowRight className="flex items-end ml-auto opacity-90" />
         </div>
-      )}
-    </>
+      ))}
+    </div>
   );
 };
 
-const UpdateMember = ({
-  member,
-  onToggle,
-  onDelete,
-  isEditing,
-  setIsEditing,
-  members,
-  setMembers,
-}) => {
-  const isNewMember = !member;
+const UpdateMember = ({ member, onToggle, isEditing, setIsEditing }) => {
+  const [firstName, setFirstName] = useState(member ? member.firstName : "");
+  const [lastName, setLastName] = useState(member ? member.lastName : "");
+  const [email, setEmail] = useState(member ? member.email : "");
+  const [role, setRole] = useState(member ? Object.keys(member.role)[0] : "");
+  const [principalId, setPrincipalId] = useState(
+    member ? member.id.toText() : ""
+  );
+  const [selectedVenue, setSelectedVenue] = useState(
+    member ? member.assignedVenue : ""
+  );
   const { backend } = useSelector((state) => state.authentication);
-  const { user } = useIdentityKit();
-
+  const { venues } = useSelector((state) => state.venues);
+  const isNewMember = !member;
   const dispatch = useDispatch();
 
-  const { currentUserById, userLoading } = useSelector((state) => state.users);
-  const [name, setName] = useState(
-    !isNewMember ? currentUserById.firstName : ""
-  );
-  const [email, setEmail] = useState(!isNewMember ? currentUserById.email : "");
-  const [role, setRole] = useState(!isNewMember ? currentUserById.role : "");
-  const [principalId, setPrincipalId] = useState(
-    !isNewMember ? currentUserById.id : ""
-  );
-  const [lastName, setLastName] = useState(
-    !isNewMember ? currentUserById.lastName : ""
-  );
-  const [venue, setVenue] = useState("");
-
-  const { venues } = useSelector((state) => state.venues);
-
   const handleSubmit = () => {
-    const Id = Principal.fromText(
-      "uktss-xp5gu-uwif5-hfpwu-rujms-foroa-4zdkd-ofspf-uqqre-wxqyj-cqe"
-    );
-    const roles = { role: null };
-    // Create user object from form data
-    const user = {
-      firstName: name,
+    // Validation
+    const validateField = (value, message, pattern) => {
+      if (!value || (pattern && !pattern.test(value))) {
+        notificationManager.error(message);
+        return false;
+      }
+      return true;
+    };
+    if (
+      !validateField(firstName.trim(), "First name is required.") ||
+      !validateField(lastName.trim(), "Last name is required.") ||
+      !validateField(
+        email,
+        "Invalid email format.",
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      ) ||
+      !validateField(role, "Role is required.") ||
+      !validateField(selectedVenue, "Assigned venue is required.")
+    ) {
+      return;
+    }
+
+    // pass validation
+    const userDataForUpdate = {
+      firstName: firstName,
       lastName: lastName,
+      role: { [role]: null },
       email: email,
-      role: { [`${role}`]: null },
-      principal: Id,
+      principal: principalId,
+      venue: selectedVenue,
     };
 
-    // Dispatch the updateUser action with necessary arguments
-    dispatch(updateUser({ backend, user, onToggle }));
+    dispatch(
+      updateUser({
+        backend: backend,
+        user: userDataForUpdate,
+        onToggle: onToggle,
+      })
+    );
   };
 
   return (
@@ -328,7 +224,7 @@ const UpdateMember = ({
           <div className="-mt-16 flex flex-auto items-end">
             <div className="ring-bg-card flex h-32 w-32 items-center justify-center overflow-hidden rounded-full ring-4">
               <div className="flex h-full w-full items-center justify-center overflow-hidden rounded bg-gray-200 text-8xl font-bold uppercase leading-none text-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                {isNewMember ? " " : currentUserById?.firstName}
+                {firstName.charAt(0)}
               </div>
             </div>
             <div
@@ -342,34 +238,34 @@ const UpdateMember = ({
             </div>
           </div>
           <div className="mt-3 truncate text-4xl font-bold">
-            {!isNewMember ? member.name : "New Member"}
+            {member ? (
+              <div>
+                {member.firstName} {member.lastName}
+              </div>
+            ) : (
+              "New Member"
+            )}
           </div>
           <div className="mt-2">
             {isEditing ? (
               <EditDetails
-                name={name}
-                setName={setName}
+                firstName={firstName}
                 lastName={lastName}
+                setFirstName={setFirstName}
                 setLastName={setLastName}
                 email={email}
                 setEmail={setEmail}
                 role={role}
                 setRole={setRole}
+                selectedVenue={selectedVenue}
+                setSelectedVenue={setSelectedVenue}
                 principalId={principalId}
                 setPrincipalId={setPrincipalId}
                 onSubmit={handleSubmit}
-                onDelete={() => onDelete(member.id)}
-                venues={venues}
-                venue={venue}
-                setVenue={setVenue}
+                onToggle={onToggle}
               />
             ) : (
-              !isNewMember && (
-                <ViewDetails
-                  member={userLoading ? "" : currentUserById}
-                  venues={venues}
-                />
-              )
+              <ViewDetails member={member} venues={venues} />
             )}
           </div>
         </div>
@@ -379,35 +275,41 @@ const UpdateMember = ({
 };
 
 const EditDetails = ({
-  name,
-  setName,
+  firstName,
+  setFirstName,
   lastName,
   setLastName,
   email,
   setEmail,
   role,
   setRole,
+  selectedVenue,
+  setSelectedVenue,
   principalId,
   setPrincipalId,
   onSubmit,
-  onDelete,
-  venues,
-  venue,
-  setVenue,
+  onToggle,
 }) => {
-  const availableRoles = [
-    "staff",
-    "manager",
-    "supervisor",
-    "bod",
-    "admin",
-    "user",
-    "vendor",
-  ];
-
-  const availableVenues = venues.map((venue) => venue.Title);
-
+  const availableRoles = ["staff", "manager", "supervisor", "bod", "admin"];
+  const dispatch = useDispatch();
+  const { venues } = useSelector((state) => state.venues);
+  const { newLoading, deleteLoading } = useSelector((state) => state.users);
+  const { backend } = useSelector((state) => state.authentication);
   const permissions = rolePermissions[role] || [];
+
+  const handleSelectedVenue = (event) => {
+    setSelectedVenue(event.target.value);
+  };
+
+  const handleDeleteMember = () => {
+    dispatch(
+      deleteUserByPrincipal({
+        backend: backend,
+        principal: Principal.fromText(principalId),
+        onToggle: onToggle,
+      })
+    );
+  };
 
   return (
     <div>
@@ -424,19 +326,19 @@ const EditDetails = ({
         </div>
       </div>
       <div className="mt-4">
-        <div className="font-medium"> First Name</div>
+        <div className="font-medium">First name</div>
         <div className="w-full border border-border flex items-center px-2 sm:px-4 min-h-12 rounded-md focus-within:border-secondary">
           <input
             type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
             placeholder="Enter Name"
             className="min-h-12 w-full border-0 bg-transparent px-0 py-2 text-text focus:outline-none focus:ring-0"
           />
         </div>
       </div>
       <div className="mt-4">
-        <div className="font-medium"> Last Name</div>
+        <div className="font-medium">Last name</div>
         <div className="w-full border border-border flex items-center px-2 sm:px-4 min-h-12 rounded-md focus-within:border-secondary">
           <input
             type="text"
@@ -484,11 +386,14 @@ const EditDetails = ({
           onChange={(e) => setRole(e.target.value)}
           className="w-full border border-border rounded-md px-2 min-h-12 bg-card focus-within:border-secondary"
         >
+          <option value="" disabled>
+            Select a role
+          </option>{" "}
           {availableRoles.map((availableRole) => (
             <option
               key={availableRole}
               value={availableRole}
-              className="bg-card text-text"
+              className="bg-card text-text capitalize"
             >
               {availableRole}
             </option>
@@ -499,34 +404,39 @@ const EditDetails = ({
         <div className="font-medium">Assigned Venue*</div>
         <select
           className="w-full border border-border rounded-md px-2 min-h-12 bg-card focus-within:border-secondary"
-          value={venue}
-          onChange={(e) => setVenue(e.target.value)}
+          value={selectedVenue}
+          onChange={handleSelectedVenue}
         >
-          {availableVenues.map((venue) => (
-            <option key={venue} value={venue} className="bg-card">
-              {venue}
+          <option value="" disabled>
+            Select a venue
+          </option>
+          {venues.map(({ Title, id }) => (
+            <option key={Title} value={id} className="bg-card">
+              {Title}
             </option>
           ))}
         </select>
       </div>
       <div className="-mx-6 mt-10 flex items-center border-t bg-gray-50 py-4 pl-1 pr-4 dark:bg-transparent sm:-mx-12 sm:pl-7 sm:pr-12 border-t-border font-medium">
         <button
-          onClick={onDelete}
+          onClick={handleDeleteMember}
+          disabled={deleteLoading}
           className="text-error px-5 min-w-16 relative inline-flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full min-h-10"
         >
-          Delete
+          {deleteLoading ? "Deleting..." : "Delete"}
         </button>
         <button
-          onClick={onDelete}
           className="ml-auto px-5 min-w-16 relative inline-flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full min-h-10"
+          onClick={() => onToggle(false)}
         >
           Cancel
         </button>
         <button
           onClick={onSubmit}
+          disabled={newLoading}
           className="px-5 min-w-16 relative inline-flex items-center justify-center bg-indigo-600 rounded-full min-h-10 text-white ml-2"
         >
-          Save
+          {newLoading ? "Saving..." : "save"}
         </button>
       </div>
     </div>
@@ -535,16 +445,20 @@ const EditDetails = ({
 
 const ViewDetails = ({ member, venues }) => {
   if (!member) return null;
+  const permissions = rolePermissions[Object.keys(member.role)[0]] || [];
 
-  const permissions = rolePermissions[member.role] || [];
-  console.log(member);
+  const venueTitle = venues.map(({ id, Title }) => {
+    if (id === member.assignedVenue) {
+      return Title;
+    }
+  });
 
   return (
     <div>
       <div className="mt-2 flex flex-wrap items-center">
         <div className="mb-3 mr-3 flex items-center justify-center rounded-full bg-gray-100 px-3 py-1 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300">
           <span className="whitespace-nowrap text-sm font-medium">
-            {Object.keys(member.role)}
+            {Object.keys(member.role)[0]}
           </span>
         </div>
       </div>
@@ -575,178 +489,14 @@ const ViewDetails = ({ member, venues }) => {
         <div className="flex">
           <HiOutlineFlag size={24} />
           <div className="ml-6 min-w-0 space-y-1">
-            {member.assignedVenue}
-            {/* {member?.assignedVenues?.map((v, index) => (
-              <div
-                key={index}
-                className="flex items-center leading-6 cursor-pointer"
-              >
-                <div>{v}</div>
-              </div>
-            ))} */}
+            <div className="flex items-center leading-6 cursor-pointer">
+              <div>{venueTitle}</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 };
-
-// const [isModalOpen, setIsModalOpen] = useState(false);
-// const [newMember, setNewMember] = useState({
-//   name: "",
-//   email: "",
-//   principalId: "",
-//   role: "Admin",
-// });
-
-// const [isEditMode, setIsEditMode] = useState(false);
-// const [editingMember, setEditingMember] = useState(null);
-
-// const handleAddOrEditMember = () => {
-//   if (newMember.email && newMember.name && newMember.principalId) {
-//     if (isEditMode && editingMember) {
-//       // Edit mode: update member
-//       setMembers(
-//         members.map((member) =>
-//           member.id === editingMember.id
-//             ? { ...editingMember, ...newMember }
-//             : member
-//         )
-//       );
-//     } else {
-//       // Add mode: add new member
-//       setMembers([
-//         ...members,
-//         {
-//           id: members.length + 1,
-//           name: newMember.name,
-//           email: newMember.email,
-//           role: newMember.role,
-//         },
-//       ]);
-//     }
-
-//     // Close modal and reset state
-//     setIsModalOpen(false);
-//     setIsEditMode(false);
-//     setEditingMember(null);
-//     setNewMember({ name: "", email: "", principalId: "", role: "Read" });
-//   }
-// };
-
-// const handleDeleteMember = (id) => {
-//   setMembers(members.filter((member) => member.id !== id));
-// };
-
-// const getRoleColor = (role) => {
-//   switch (role) {
-//     case "Admin":
-//       return "bg-orange-500";
-//     case "Write":
-//       return "bg-green-500";
-//     case "Read":
-//       return "bg-blue-600";
-//     default:
-//       return "bg-gray-500";
-//   }
-// };
-
-// return (
-//   <div className="p-6">
-//     <h2 className="text-2xl font-bold mb-4">Teams</h2>
-//     <div className="mb-4">
-//       {/* <h3 className="text-lg font-semibold mb-2">Add team members</h3> */}
-//       <div className="flex items-center">
-//         <button
-//           onClick={() => {
-//             setIsModalOpen(true);
-//             setIsEditMode(false);
-//             setNewMember({
-//               name: "",
-//               email: "",
-//               principalId: "",
-//               role: "Admin",
-//             });
-//           }}
-//           className="bg-orange-500 text-white p-3 rounded-md hover:bg-orange-600 focus:outline-none flex items-center"
-//         >
-//           <MdAddCircleOutline size={24} className="mr-2" />
-//           Add Member
-//         </button>
-//       </div>
-//     </div>
-//     <div className="flex flex-col space-y-2">
-//       {members.map((member, index) => (
-//         <div
-//           className="flex flex-col py-6 sm:flex-row sm:items-center bg-card px-4 md:px-6 rounded"
-//           key={index}
-//         >
-//           <div className="flex items-center">
-//             <div className="flex h-10 w-10 flex-0 items-center justify-center overflow-hidden rounded-full">
-//               <img
-//                 src={ProfileDummy}
-//                 alt="user_avatar"
-//                 className="h-full w-full object-cover"
-//               />
-//             </div>
-//             <div className="ml-4">
-//               <div className="font-medium">{member.name}</div>
-//               <div>{member.email}</div>
-//             </div>
-//           </div>
-//           <div className="mt-4 flex items-center sm:ml-auto sm:mt-0">
-//             <div className="order-2 ml-4 sm:order-1 sm:ml-0 flex space-x-1 px-4 py-2 bg-secondary rounded text-white">
-//               <span>Role :</span>
-//               <p>{member.role}</p>
-//             </div>
-//             <div className="order-1 sm:order-2 sm:ml-3">
-//               <CiEdit size={24} />
-//             </div>
-//           </div>
-//           <button
-//             onClick={() => handleDeleteMember(member.id)}
-//             className="text-red-500 ml-4"
-//           >
-//             <ButtonWrapper color=" hover:text-red-400">
-//               <MdDelete size={24} />
-//             </ButtonWrapper>
-//           </button>
-//         </div>
-//       ))}
-//     </div>
-//     {/* <ul>
-//       {members.map((member) => (
-//         <li key={member.id} className="flex bg-card text-text items-center justify-between py-2 m-3 border-b border-gray-300">
-//           <div className="flex items-center">
-//             <MdPerson
-//               className="w-10 h-10 rounded-full mr-3"
-//             />
-//             <div>
-//               <p className="font-semibold">{member.name}</p>
-//               <p className="text-sm text-gray-500">{member.email}</p>
-//             </div>
-//           </div>
-//           <div className="flex items-center">
-
-//             <select
-//               defaultValue={member.role}
-//               className="mr-2 p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-//             >
-//               <option>Role: Admin</option>
-//               <option>Role: Write</option>
-//               <option>Role: Read</option>
-//             </select>
-//             <button
-//               onClick={() => handleDeleteMember(member.id)}
-//               className="text-red-500"
-//             >
-//               <MdDelete size={20} />
-//             </button>
-//           </div>
-//         </li>
-//       ))}
-//     </ul> */}
-//   </div>
-// };
 
 export default MemberManager;

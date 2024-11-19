@@ -50,10 +50,10 @@ const CreateEventForm = ({
       vTicket_limit: 150,
     },
     eventDetails: {
-      StartDate: "",
+      StartDate: 65,
       StartTime: 0,
       Location: "",
-      EndDate: "",
+      EndDate: 55,
       EndTime: 0,
     },
   });
