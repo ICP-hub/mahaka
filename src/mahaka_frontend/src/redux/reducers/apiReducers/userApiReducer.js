@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
+import notificationManager from "../../../common/utils/notificationManager";
 
 // Initial state
 const initialState = {
@@ -10,6 +11,8 @@ const initialState = {
   error: null,
   currentPage: 1,
   totalPages: 1,
+  newLoading: false,
+  deleteLoading: false,
 };
 
 // Async operations
@@ -46,38 +49,55 @@ export const listUsers = createAsyncThunk(
   }
 );
 
+// Update user
 export const updateUser = createAsyncThunk(
   "users/updateUser",
-  async ({ backend, user, onToggle }) => {
-    console.log(user.role);
-    const response = await backend.updateUser(
-      user.principal,
-      user.email,
-      user.firstName,
-      user.lastName,
-      user.role,
-      "one"
-    );
-    if (response.ok) {
-      onToggle(false); // Close the modal after successful update if required
-      return response;
+  async ({ backend, user, onToggle }, { rejectWithValue }) => {
+    try {
+      const response = await backend.updateUser(
+        Principal.fromText(user.principal),
+        user.email,
+        user.firstName,
+        user.lastName,
+        user.role,
+        user.venue
+      );
+      console.log("response adding member", response);
+      if (response.ok) {
+        notificationManager.success("User updated!");
+        onToggle(false);
+        return response;
+      }
+      throw new Error("Failed to update user");
+    } catch (error) {
+      notificationManager.error(
+        "Failed to update member details! Please check the principal ID"
+      );
+      console.error("Error creating member", error);
+      return rejectWithValue(error || "An unexpected error occurred");
     }
-    throw new Error("Failed to update user");
   }
 );
 
-// export const createUser = createAsyncThunk(
-//   "users/createUser",
-//   async ({ backend, user }) => {
-//     const response = await backend.createUser(
-//       user.email,
-//       user.firstName,
-//       user.lastName,
-//       user.role
-//     );
-//     return response;
-//   }
-// );
+// Remove user
+export const deleteUserByPrincipal = createAsyncThunk(
+  "users/deleteUserByPrincipal",
+  async ({ backend, principal, onToggle }, { rejectWithValue }) => {
+    try {
+      const response = await backend.deleteUserByPrincipal(principal);
+      if (response.ok) {
+        onToggle(false);
+        notificationManager.error("User deleted!");
+        return response.ok;
+      }
+      throw new Error("Failed to delete user");
+    } catch (error) {
+      notificationManager.error("Failed to remove member details!");
+      console.error("Error deleting member", error);
+      return rejectWithValue(error || "An unexpected error occurred");
+    }
+  }
+);
 
 // Create slice
 const userSlice = createSlice({
@@ -86,6 +106,7 @@ const userSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // Case user details by caller
       .addCase(getUserDetailsByCaller.pending, (state) => {
         state.userLoading = true;
       })
@@ -98,6 +119,8 @@ const userSlice = createSlice({
         state.userLoading = false;
         state.error = action.error.message;
       })
+
+      // Case user details by id
       .addCase(getUserDetailsById.pending, (state) => {
         state.userLoading = true;
       })
@@ -110,6 +133,8 @@ const userSlice = createSlice({
         state.userLoading = false;
         state.error = action.error.message;
       })
+
+      // Case list users
       .addCase(listUsers.pending, (state) => {
         state.userLoading = true;
       })
@@ -124,46 +149,48 @@ const userSlice = createSlice({
         state.userLoading = false;
         state.error = action.error.message;
       })
+
+      // Case update user
       .addCase(updateUser.pending, (state) => {
-        state.userLoading = true;
+        state.newLoading = true;
       })
       .addCase(updateUser.fulfilled, (state, action) => {
-        state.userLoading = false;
+        state.newLoading = false;
         const updatedUser = action.payload.ok;
         const userIndex = state.users.findIndex(
-          (user) => user.principal === updatedUser.principal
+          (user) => user.id.toText() === updatedUser[0].id.toText()
         );
 
         if (userIndex !== -1) {
           state.users[userIndex] = {
             ...state.users[userIndex],
-            ...updatedUser,
+            ...updatedUser[0],
           };
         } else {
-          state.users.push(updatedUser); // If it's a new user, add them
+          state.users.push(updatedUser[0]);
         }
-
-        state.currentUserById = updatedUser;
         state.error = null;
       })
       .addCase(updateUser.rejected, (state, action) => {
-        state.userLoading = false;
+        state.newLoading = false;
+        state.error = action.error.message;
+      })
+
+      // Delete user update
+      .addCase(deleteUserByPrincipal.pending, (state) => {
+        state.deleteLoading = true;
+      })
+      .addCase(deleteUserByPrincipal.fulfilled, (state, action) => {
+        state.deleteLoading = false;
+        state.users = state.users.filter(
+          (user) => user.id.toText() !== action.payload[0].id.toText()
+        );
+        state.error = null;
+      })
+      .addCase(deleteUserByPrincipal.rejected, (state, action) => {
+        state.deleteLoading = false;
         state.error = action.error.message;
       });
-    // .addCase(createUser.pending, (state) => {
-    //   state.userLoading = true;
-    // })
-    // .addCase(createUser.fulfilled, (state, action) => {
-    //   state.userLoading = false;
-    //   const newUser = action.payload.ok;
-    //   console.log(newUser, "new user");
-    //   state.users.push(newUser); // Directly add new user to the list
-    //   state.error = null;
-    // })
-    // .addCase(createUser.rejected, (state, action) => {
-    //   state.userLoading = false;
-    //   state.error = action.error.message;
-    // });
   },
 });
 
