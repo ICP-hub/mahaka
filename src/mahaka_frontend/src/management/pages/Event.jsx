@@ -307,7 +307,7 @@ const MgtEvents = ()=>{
       ):
       
        events && events.length === 0 ? 
-        <div className="text-center text-gray-800 md:text-5xl text-3xl font-bold mt-10">
+        <div className="text-center text-gray-500 md:text-5xl text-3xl font-bold mt-10">
           No events found!
         </div>:
       
@@ -329,15 +329,14 @@ const MgtEvents = ()=>{
 }
 
 
-{/* pagination */} 
+{/* pagination */}
 <div className="flex justify-end m-6 items-center space-x-2">
           {/* Prev button */}
           <button
-            className={`px-3 py-1 rounded ${
-              page === 1
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-gray-200"
-            }`}
+            className={`px-3 py-1 rounded ${page === 1
+              ? "bg-card text-gray-500 cursor-not-allowed"
+              : "bg-gray-200"
+              }`}
             onClick={() => handlePageChange(page - 1)}
             disabled={page === 1}
           >
@@ -345,12 +344,11 @@ const MgtEvents = ()=>{
           </button>
 
           {/* Page number buttons */}
-          {Array.from({ length:Number(totalPages) }, (_, i) => i + 1).map((pageNum) => (
+          {Array.from({ length: Number(totalPages) }, (_, i) => i + 1).map((pageNum) => (
             <button
               key={pageNum}
-              className={`mx-1 px-3 py-1 rounded ${
-                page === pageNum ? "bg-[#564BF1] text-white" : "bg-gray-200"
-              }`}
+              className={`mx-1 px-3 py-1 rounded ${page === pageNum ? "bg-[#564BF1] text-white" : "bg-gray-200"
+                }`}
               onClick={() => handlePageChange(pageNum)}
             >
               {pageNum}
@@ -359,27 +357,16 @@ const MgtEvents = ()=>{
 
           {/* Next button */}
           <button
-            className={`px-3 py-1 rounded bg-gray-200`}
+            className={`px-3 py-1 rounded bg-card`}
             onClick={() => handlePageChange(page + 1)}
-             disabled={page === Number(totalPages)}
+            disabled={page === Number(totalPages)}
           >
             Next
           </button>
         </div>
-
-
-
-
-
-
-
       </div>
-
-
-
-           
-        </div>
-    )
-}
+    </div>
+  )
+};
 
 export default MgtEvents;
