@@ -191,6 +191,11 @@ module {
         #ICP
     };
 
+    public type TicketType = {
+        #Offline;
+        #Online
+    };
+
     public type TicketSaleInfo = {
         ticketId : Nat;
         category : Text;
@@ -198,6 +203,8 @@ module {
         numOfVisitors : Nat;
         saleDate : Time.Time;
         ticketIssuer : Principal;
+        recepient : Principal;
+        ticketType : TicketType;
         price : Nat;
     };
 
