@@ -194,7 +194,7 @@ const ConnectBtn = () => {
   const handleCloseMenu = () => {
     setIsMenuOpen(false);
   };
-  const ConnectBtn1 = ({ onClick }) => (
+  const ConnectBtn1 = ({ onClick, ...props }) => (
     <button
       onClick={onClick}
       className="min-h-12 px-2 bg-[#F08E1E] text-white font-medium rounded-lg hover:bg-orange-600 max-w-max min-w-max"

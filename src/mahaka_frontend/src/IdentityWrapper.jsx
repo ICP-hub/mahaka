@@ -24,7 +24,7 @@ export default function IdentityWrapper() {
       theme={IdentityKitTheme.SYSTEM}
       authType={IdentityKitAuthType.DELEGATION}
       signerClientOptions={{
-        targets: [canisterID],
+        targets: [canisterID], // Ensure the correct canister ID is used
       }}
     >
       <Provider store={store}>
