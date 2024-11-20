@@ -249,6 +249,7 @@ import { Principal } from "@dfinity/principal";
 import { useAuth } from "../../connect/useClient";
 import { Actor } from "@dfinity/agent";
 import { idlFactory } from "../../connect/token-cicp-ladger";
+import { useDispatch, useSelector } from "react-redux";
 
 const coffeeAmount = 0.0001;
 const PaymentComponent = ({}) => {
@@ -257,7 +258,9 @@ const PaymentComponent = ({}) => {
   const [insufficientFunds, setInsufficientFunds] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState("");
   const authenticatedAgent = useAgent();
-  const { balance, wallet, backend } = useAuth();
+  const { balance, wallet } = useAuth();
+  const { backend } = useSelector((state) => state.authentication);
+
 
   useEffect(() => {
     if (balance < coffeeAmount / 100000000) {
@@ -321,7 +324,7 @@ const PaymentComponent = ({}) => {
   const handlePayment2 = async (e) => {
     setLoading(true);
 
-    const _venueId = "test#b77ix-eeaaa-aaaaa-qaada-cai";
+    const _venueId = "Venue1#bw4dl-smaaa-aaaaa-qaacq-cai";
     const _ticket_type = { GroupPass: null }; // Replace with the selected ticket type
     const _metadata = [
       {
@@ -338,13 +341,13 @@ const PaymentComponent = ({}) => {
     ); // Replace with actual receiver
     const numOfVisitors = BigInt(2); // Number of tickets to purchase
 
-    const paymentType = { variant: "Card" };
+    const paymentType = { Card : null };
 
     console.log("backend", backend);
     try {
       const response = await backend.buyVenueTicket(
         _venueId,
-        { ticket_type: _ticket_type, priceFiat: 0.0, price: BigInt(100_000) },
+        { ticket_type: _ticket_type, priceFiat: 1, price: BigInt(100_000) },
         _metadata,
         receiver,
         paymentType,
@@ -383,7 +386,7 @@ const PaymentComponent = ({}) => {
 
           <button
             className="border border-[#5442f6e7] text-black items-center flex font-semibold gap-1 px-2 py-2 rounded-md mt-4"
-            onClick={handlePayment}
+            onClick={handlePayment2}
             disabled={loading}
           >
             card
