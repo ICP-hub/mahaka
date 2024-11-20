@@ -41,10 +41,10 @@ const MgtEvents = ()=>{
 
     useEffect(()=>{
       if(searchInput){
-        dispatch(searchEvents({backend, searchText: searchInput, chunkSize:1, pageNo:page-1}))
+        dispatch(searchEvents({backend, searchText: searchInput, chunkSize:3, pageNo:page-1}))
 
       }else{
-        dispatch(getAllEvents({backend, chunkSize:1, pageNo:page-1}))
+        dispatch(getAllEvents({backend, chunkSize:3, pageNo:page-1}))
 
       }
     },[searchInput,dispatch,page])
@@ -66,7 +66,7 @@ const MgtEvents = ()=>{
           fetchEvents(selectedVenue);
         }else{
           
-          dispatch(getAllEvents({backend, chunkSize:1, pageNo:page-1}))
+          dispatch(getAllEvents({backend, chunkSize:3, pageNo:page-1}))
           console.log("logging the loadign for events are", events)
 
         //   setInitialLoad(false)
@@ -78,7 +78,7 @@ const MgtEvents = ()=>{
         dispatch(
             getAllEventsByVenue({
             backend,
-            chunkSize: 1,
+            chunkSize: 3,
             pageNo: page-1,
             venueId: venueId,
           })
@@ -95,7 +95,7 @@ const MgtEvents = ()=>{
       const [isExpanded, setIsExpanded] = useState(false);
     
       return (
-        <div className=" rounded-lg shadow-md overflow-hidden border border-gray-300">
+        <div className=" rounded-lg shadow-md overflow-hidden border border-gray-300 mx-4">
           <div className="relative h-48 w-full">
             <img
               src={event.banner.data}
@@ -307,7 +307,7 @@ const MgtEvents = ()=>{
       ):
       
        events && events.length === 0 ? 
-        <div className="text-center text-gray-800 md:text-5xl text-3xl font-bold mt-10">
+        <div className="text-center text-gray-800 md:text-5xl text-3xl font-bold mt-10 dark:text-white">
           No events found!
         </div>:
       

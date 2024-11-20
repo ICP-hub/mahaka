@@ -509,10 +509,10 @@ const CreateEventForm = ({
       await dispatch(
         createEvent({
           backend,
-          id: fullVenueId,
+          id: venueId,
           record: {
             id: "",
-            venueId: fullVenueId,
+            venueId: venueId,
             title: eventData.title,
             creator: Id,
             sTicket_limit: eventData.collection_args.sTicket_limit,
@@ -526,10 +526,10 @@ const CreateEventForm = ({
               logo_type: eventData.collection_args.banner.logo_type,
             },
             details: {
-              StartDate: eventData.eventDetails.StartDate,
+              StartDate: new Date(eventData.eventDetails.StartDate).getTime(),
               StartTime: parseInt(eventData.eventDetails.StartTime, 10),
               Location: eventData.eventDetails.Location,
-              EndDate: eventData.eventDetails.EndDate,
+              EndDate: new Date(eventData.eventDetails.EndDate).getTime(),
               EndTime: parseInt(eventData.eventDetails.EndTime, 10),
             },
             gTicket_limit: eventData.collection_args.gTicket_limit,

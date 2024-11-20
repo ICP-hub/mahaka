@@ -421,7 +421,7 @@ const WahanaMain = ({   wahanaData,
       </div>
        
       ) : wahanaData && wahanaData.length  === 0?
-      <div className = "text-center text-gray-800 md:text-5xl text-3xl font-bold mt-10">
+      <div className = "text-center text-gray-800 md:text-5xl text-3xl font-bold mt-10 dark:text-white">
       No wahanas found!
       </div>
       :(
