@@ -785,7 +785,7 @@ const CreateEventForm = ({
             <label className="font-semibold text-sm">
               General Ticket Price
             </label>
-            <TextHint text="Enter the General Ticket Limit of the event." />
+            <TextHint text="Enter the General Ticket Price of the event." />
           </div>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
@@ -797,9 +797,9 @@ const CreateEventForm = ({
               required
             />
           </div>
-          {formErrors.gTicket_limit && (
+          {formErrors.gTicket_price && (
             <p className="text-red-500 text-sm mt-1">
-              {formErrors.gTicket_limit}
+              {formErrors.gTicket_price}
             </p>
           )}
         </div>
@@ -821,9 +821,9 @@ const CreateEventForm = ({
               required
             />
           </div>
-          {formErrors.sTicket_limit && (
+          {formErrors.gTicket_limit && (
             <p className="text-red-500 text-sm mt-1">
-              {formErrors.sTicket_limit}
+              {formErrors.gTicket_limit}
             </p>
           )}
         </div>
