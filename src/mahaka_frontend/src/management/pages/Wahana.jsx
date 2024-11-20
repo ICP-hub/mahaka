@@ -279,7 +279,7 @@ const MgtWahana = () => {
           <button
             className={`px-3 py-1 rounded ${
               page === 1
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                ? "bg-card text-gray-500 cursor-not-allowed"
                 : "bg-gray-200"
             }`}
             onClick={() => handlePageChange(page - 1)}
@@ -303,7 +303,7 @@ const MgtWahana = () => {
 
           {/* Next button */}
           <button
-            className={`px-3 py-1 rounded bg-gray-200`}
+            className={`px-3 py-1 rounded bg-card`}
             onClick={() => handlePageChange(page + 1)}
              disabled={page === Number(totalPages)}
           >

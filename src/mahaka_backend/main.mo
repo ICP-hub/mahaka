@@ -258,6 +258,20 @@ actor mahaka {
 
 
     public shared ({caller}) func addBanner(_details: [Types.AttractionBanner]): async Result.Result<Text, Text> {
+         // if (Principal.isAnonymous(user)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
         try {
             for (banner in _details.vals()) {
                 switch (banner.category) {
@@ -294,6 +308,20 @@ actor mahaka {
     };
 
     public shared ({caller}) func updateBannerByImage(imageUrl: Text, updatedBanner: Types.AttractionBanner): async Result.Result<Types.AttractionBanner, Text> {
+         // if (Principal.isAnonymous(user)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
         var updated = false;
         switch (updatedBanner.category) {
             case (#Attraction) {
@@ -332,6 +360,20 @@ actor mahaka {
     };
 
     public shared ({caller}) func deleteBannerByImage(imageUrl: Text): async Result.Result<Text, Text> {
+      // if (Principal.isAnonymous(user)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
         let initialAttractionSize = Array.size(_AttractionBanner);
         let initialThirdPartySize = Array.size(_thirdPartyBanner);
 
@@ -353,6 +395,20 @@ actor mahaka {
     };
 
     public shared ({caller}) func clearAllBanners(category: Types.BannerCategory): async Result.Result<Text, Text> {
+      // if (Principal.isAnonymous(user)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           switch (category) {
                case (#Attraction) {
                     _AttractionBanner := [];
@@ -613,6 +669,20 @@ actor mahaka {
      };
 
      public shared func getAllVenues(chunkSize : Nat , pageNo : Nat) : async {data : [Types.Venue] ; current_page : Nat ; Total_pages : Nat} {
+           // if (Principal.isAnonymous(user)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           var venues = List.nil<Types.Venue>();
           for ((venue_id, venue_index) in _venueMap.entries()) {
                let venue_blob = await stable_get(venue_index, Venue_state);
@@ -640,6 +710,7 @@ actor mahaka {
 
      // Search venues 
      public shared func searchVenues(searchTerm: Text, chunkSize: Nat, pageNo: Nat) : async {data: [Types.Venue]; current_page: Nat; total_pages: Nat} {
+          
           var matchingVenues = List.nil<Types.Venue>();
           let loweredSearchTerm = Text.toLowercase(searchTerm);
 
@@ -816,6 +887,24 @@ actor mahaka {
      };
 
      public shared ({caller}) func getAllEventsPaginated(chunkSize : Nat, pageNo : Nat) : async Result.Result<{data : [Types.completeEvent]; current_page : Nat; Total_pages : Nat}, Types.CommonErrors> {
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or 
+          //                (await Validation.check_for_Staff(role)) or 
+          //                (await Validation.check_for_Manager(role)) or 
+          //                (await Validation.check_for_Bod(role)))
+          //           ) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
+          
           var allEvents : List.List<Types.completeEvent> = List.nil();
 
           for ((_, eventIndex) in _EventsMap.entries()) {
@@ -845,6 +934,23 @@ actor mahaka {
 
 
      public shared ({caller}) func getAllEvents() : async Result.Result<[Types.completeEvent], Types.CommonErrors> {
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or 
+          //                (await Validation.check_for_Staff(role)) or 
+          //                (await Validation.check_for_Manager(role)) or 
+          //                (await Validation.check_for_Bod(role)))
+          //           ) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           var allEvents : List.List<Types.completeEvent> = List.nil();
 
           for ((_, eventIndex) in _EventsMap.entries()) {
@@ -901,6 +1007,24 @@ actor mahaka {
 
 
      public shared ({caller}) func getEvent(eventId : Text, venueId : Text) : async Result.Result<Types.completeEvent, Types.CommonErrors> {
+          
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or 
+          //                (await Validation.check_for_Staff(role)) or 
+          //                (await Validation.check_for_Manager(role)) or 
+          //                (await Validation.check_for_Bod(role)))
+          //           ) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           let eventIndex = _EventsMap.get(venueId);
           switch(eventIndex){
                case null {
@@ -1281,7 +1405,9 @@ actor mahaka {
           categoryId: Text,
           paymentType: Types.PaymentType,
           ticketPrice: Nat,
+          offlineOrOnline : Types.TicketType,
           saleType: Text,
+          recepient : Principal,
           caller : Principal
      ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError> {
           let _logo = await collectionActor.logoDip721();
@@ -1305,6 +1431,8 @@ actor mahaka {
                               numOfVisitors = 1;
                               saleDate = Time.now();
                               ticketIssuer = caller;
+                              ticketType = offlineOrOnline; 
+                              recepient = recepient;
                               price = ticketPrice;
                          };
                          let res = await recordTicketSale(categoryId, ticketSaleInfo, saleType);
@@ -1335,7 +1463,9 @@ actor mahaka {
           numOfVisitors: Nat,
           wahanaId: Text,
           paymentType: Types.PaymentType,
+          offlineOrOnline : Types.TicketType,
           price: Nat,
+          recepient : Principal,
           caller : Principal
      ) : async Result.Result<[icrcTypes.TxIndex], icrcTypes.TransferError or Types.MintError> {
           var transferReceipts: List.List<icrcTypes.TxIndex> = List.nil();
@@ -1366,6 +1496,8 @@ actor mahaka {
                               numOfVisitors = 1;
                               saleDate = Time.now();
                               ticketIssuer = caller;
+                              ticketType = offlineOrOnline; 
+                              recepient = recepient;
                               price = price;
                          };
                          let res = await recordTicketSale(wahanaId, ticketSaleInfo, "wahana");
@@ -1427,21 +1559,23 @@ actor mahaka {
           paymentType: Types.PaymentType,
           numOfVisitors: Nat
      ) : async Result.Result<[nftTypes.MintReceiptPart] or Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>>, Types.MintError or Text> {
-          let collectionId = await Utils.extractCanisterId(venueId);
-          let collectionActor = actor (collectionId) : actor {
-               logoDip721: () -> async Types.LogoResult;
-               mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
-          };
+          
+          
           switch (paymentType) {
                case (#Cash) {
                     throw Error.reject("Cash option is not available");
                     // await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receivers, numOfVisitors, venueId, paymentType, _ticket_type.price, "venue", caller);
                };
                case (#ICP) {
+                    let collectionId = await Utils.extractCanisterId(venueId);
+                    let collectionActor = actor (collectionId) : actor {
+                         logoDip721: () -> async Types.LogoResult;
+                         mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
+                    };
                     let transferResult = await performICPTransfer(caller, (_ticket_type.price * 10**8) * numOfVisitors );
                     switch (transferResult) {
                          case (#Ok(_)) {
-                              await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receiver, numOfVisitors, venueId, paymentType, _ticket_type.price, "venue", caller);
+                              await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receiver, numOfVisitors, venueId, paymentType, _ticket_type.price, #Online, "venue", receiver, caller);
                          };
                          case (#Err(error)) {
                               throw Error.reject(debug_show ("Transfer Error", error));
@@ -1500,7 +1634,7 @@ actor mahaka {
                               let transferResult = await performICPTransfer(caller, _ticket_type.price * numOfVisitors);
                               switch (transferResult) {
                                    case (#Ok(_)) {
-                                        await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receiver, numOfVisitors, _eventId, paymentType, _ticket_type.price, "venue", caller);
+                                        await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receiver, numOfVisitors, _eventId, paymentType, _ticket_type.price, #Online, "venue", receiver, caller);
                                    };
                                    case (#Err(error)) {
                                         throw Error.reject(debug_show ("Transfer Error", error));
@@ -1565,7 +1699,7 @@ actor mahaka {
                               let transferResult = await performICPTransfer(caller, wahana.price * numOfVisitors);
                               switch (transferResult) {
                                    case (#Ok(_)) {
-                                        await processTransfer(collectionActor, receiver, numOfVisitors, wahanaId, paymentType, wahana.price,caller);
+                                        await processTransfer(collectionActor, receiver, numOfVisitors, wahanaId, paymentType, #Online, wahana.price, receiver, caller);
                                    };
                                    case (#Err(error)) {
                                         throw Error.reject(debug_show ("Transfer Error", error));
@@ -1612,6 +1746,21 @@ actor mahaka {
           paymentType: Types.PaymentType,
           numOfVisitors: Nat
      ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError or Text> {
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or 
+          //                (await Validation.check_for_Staff(role)) or 
+          //           ) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           let collectionId = await Utils.extractCanisterId(venueId);
           let collectionActor = actor (collectionId) : actor {
                logoDip721: () -> async Types.LogoResult;
@@ -1619,13 +1768,13 @@ actor mahaka {
           };
           switch (paymentType) {
                case (#Cash) {
-                    await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receiver, numOfVisitors, venueId, paymentType, _ticket_type.price, "venue", caller);
+                    await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receiver, numOfVisitors, venueId, paymentType, _ticket_type.price, #Offline, "venue", receiver, caller);
                };
                case (#ICP) {
                     let transferResult = await performICPTransfer(caller, _ticket_type.price * numOfVisitors);
                     switch (transferResult) {
                          case (#Ok(_)) {
-                              await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receiver, numOfVisitors, venueId, paymentType, _ticket_type.price, "venue", caller);
+                              await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receiver, numOfVisitors, venueId, paymentType, _ticket_type.price, #Offline, "venue", receiver, caller);
                          };
                          case (#Err(error)) {
                               throw Error.reject(debug_show ("Transfer Error", error));
@@ -1634,8 +1783,8 @@ actor mahaka {
                     };
                };
                case (#Card) {
-                    // No operation for card payment at this time
-                    return #ok([]);
+                    throw Error.reject("Card option is not available");
+                    return #err("Card not Available");
                };
           };
      };
@@ -1650,6 +1799,21 @@ actor mahaka {
           numOfVisitors: Nat,
           paymentType: Types.PaymentType
      ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError or Text> {
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or 
+          //                (await Validation.check_for_Staff(role)) or 
+          //           ) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           let eventResult = await getEvent(_eventId, _venueId);
           switch (eventResult) {
                case (#ok(event)) {
@@ -1659,13 +1823,13 @@ actor mahaka {
                     };
                     switch (paymentType) {
                          case (#Cash) {
-                              await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receiver, numOfVisitors, _eventId, paymentType, _ticket_type.price, "event", caller);
+                              await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receiver, numOfVisitors, _eventId, paymentType, _ticket_type.price, #Offline, "event", receiver, caller);
                          };
                          case (#ICP) {
                               let transferResult = await performICPTransfer(caller, _ticket_type.price * numOfVisitors);
                               switch (transferResult) {
                                    case (#Ok(_)) {
-                                        await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receiver, numOfVisitors, _eventId, paymentType, _ticket_type.price, "venue", caller);
+                                        await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receiver, numOfVisitors, _eventId, paymentType, _ticket_type.price, #Offline, "venue", receiver, caller);
                                    };
                                    case (#Err(error)) {
                                         throw Error.reject(debug_show ("Transfer Error", error));
@@ -1674,8 +1838,8 @@ actor mahaka {
                               };
                          };
                          case (#Card) {
-                              // No operation for card payment at this time
-                              return #ok([]);
+                              throw Error.reject("Card option is not available");
+                              return #err("Card not Available");
                          };
                     };
                };
@@ -1690,6 +1854,21 @@ actor mahaka {
           numOfVisitors: Nat,
           paymentType: Types.PaymentType
      ) : async Result.Result<[icrcTypes.TxIndex], icrcTypes.TransferError or Types.MintError or Text> {
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or 
+          //                (await Validation.check_for_Staff(role)) or 
+          //           ) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           let wahanaResult = await getWahana(wahanaId, venueId);
           switch (wahanaResult) {
                case (#ok(wahana)) {
@@ -1705,13 +1884,13 @@ actor mahaka {
                     };
                     switch (paymentType) {
                          case (#Cash) {
-                              await processTransfer(collectionActor, receiver, numOfVisitors, wahanaId, paymentType, wahana.price,caller);
+                              await processTransfer(collectionActor, receiver, numOfVisitors, wahanaId, paymentType, #Offline, wahana.price, receiver, caller);
                          };
                          case (#ICP) {
                               let transferResult = await performICPTransfer(caller, wahana.price * numOfVisitors);
                               switch (transferResult) {
                                    case (#Ok(_)) {
-                                        await processTransfer(collectionActor, receiver, numOfVisitors, wahanaId, paymentType, wahana.price,caller);
+                                        await processTransfer(collectionActor, receiver, numOfVisitors, wahanaId, paymentType, #Offline, wahana.price, receiver, caller);
                                    };
                                    case (#Err(error)) {
                                         throw Error.reject(debug_show ("Transfer Error", error));
@@ -1720,8 +1899,8 @@ actor mahaka {
                               };
                          };
                          case (#Card) {
-                              // No operation for card payment at this time
-                              return #ok([]);
+                              throw Error.reject("Card option is not available");
+                              return #err("Card not Available");
                          };
                     };
                     // await processTransfer(collectionActor, receivers, numOfVisitors, wahanaId, paymentType, wahana.price,caller);
@@ -1927,7 +2106,24 @@ actor mahaka {
      //      };
      // };
 
-     public shared ({caller}) func getVenueTickets(venueId : Text) : async Result.Result<List.List<Types.TicketSaleInfo>, Text> {
+     public shared ({caller}) func getVenueTickets(venueId : Text) : async Result.Result<[Types.TicketSaleInfo], Text> {
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or 
+          //                (await Validation.check_for_Staff(role)) or 
+          //                (await Validation.check_for_Manager(role)) or 
+          //                (await Validation.check_for_Bod(role)))
+          //           ) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           switch (_VenueTicketsMap.get(venueId)) {
                case null {
                     return #err("Venue Ticets not found");
@@ -1940,7 +2136,7 @@ actor mahaka {
                               return #err("Failed to deserialize ticket data");
                          };
                          case (?deserializedTickets) {
-                              return #ok(deserializedTickets);
+                              return #ok(List.toArray(deserializedTickets));
                          };
                     };
                };
@@ -1948,7 +2144,24 @@ actor mahaka {
      };
 
 
-     public shared ({caller}) func getEventTickets(eventId : Text) : async Result.Result<List.List<Types.TicketSaleInfo>, Text> {
+     public shared ({caller}) func getEventTickets(eventId : Text) : async Result.Result<[Types.TicketSaleInfo], Text> {
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or 
+          //                (await Validation.check_for_Staff(role)) or 
+          //                (await Validation.check_for_Manager(role)) or 
+          //                (await Validation.check_for_Bod(role)))
+          //           ) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           switch (_EventTicketsMap.get(eventId)) {
                case null {
                     return #err("Event Tickets not found");
@@ -1961,7 +2174,7 @@ actor mahaka {
                               return #err("Failed to deserialize ticket data");
                          };
                          case (?deserializedTickets) {
-                              return #ok(deserializedTickets);
+                              return #ok(List.toArray(deserializedTickets));
                          };
                     };
                };
@@ -1970,7 +2183,24 @@ actor mahaka {
 
 
 
-     public shared ({caller}) func getWahanaTickets(wahanaId : Text) : async Result.Result<List.List<Types.TicketSaleInfo>, Text> {
+     public shared ({caller}) func getWahanaTickets(wahanaId : Text) : async Result.Result<[Types.TicketSaleInfo], Text> {
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or 
+          //                (await Validation.check_for_Staff(role)) or 
+          //                (await Validation.check_for_Manager(role)) or 
+          //                (await Validation.check_for_Bod(role)))
+          //           ) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           switch (_WahanaTicketsMap.get(wahanaId)) {
                case null {
                     return #err("Wahana Tickets not found");
@@ -1983,12 +2213,270 @@ actor mahaka {
                               return #err("Failed to deserialize ticket data");
                          };
                          case (?deserializedTickets) {
-                              return #ok(deserializedTickets);
+                              return #ok(List.toArray(deserializedTickets));
                          };
                     };
                };
           }
      };
+
+     public shared ({caller}) func getAllCallerVenueTickets(
+          chunkSize: Nat,
+          pageNo: Nat
+     ): async Result.Result<{ data: [Types.TicketSaleInfo]; current_page: Nat; total_pages: Nat }, Text> {
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or 
+          //                (await Validation.check_for_Staff(role)) or 
+          //                (await Validation.check_for_Manager(role)) or 
+          //                (await Validation.check_for_Bod(role)))
+          //           ) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
+          var allTickets = List.nil<Types.TicketSaleInfo>();
+
+          for ((_, ticketsIndex) in _VenueTicketsMap.entries()) {
+               let ticketBlob = await stable_get(ticketsIndex, Ticket_state);
+               let obj: ?List.List<Types.TicketSaleInfo> = from_candid(ticketBlob);
+               switch obj {
+                    case null {
+                         return #err("Failed to deserialize ticket data");
+                    };
+                    case (?deserializedTickets) {
+                         for (ticket in List.toArray(deserializedTickets).vals()) {
+                              if (ticket.recepient == caller or ticket.ticketIssuer == caller) {
+                                   allTickets := List.push<Types.TicketSaleInfo>(ticket, allTickets);
+                              };
+                         };
+                    };
+               };
+          };
+
+          let ticketsArray = List.toArray(allTickets);
+          let indexPages = Utils.paginate<Types.TicketSaleInfo>(ticketsArray, chunkSize);
+
+          if (pageNo >= indexPages.size() or indexPages.size() == 0) {
+               return #err("Page not found");
+          };
+
+          let pageData = indexPages[pageNo];
+          return #ok({
+               data = pageData;
+               current_page = pageNo + 1;
+               total_pages = indexPages.size();
+          });
+     };
+
+
+     public shared ({caller}) func getAllCallerEventTickets(
+          chunkSize: Nat,
+          pageNo: Nat
+     ): async Result.Result<{ data: [Types.TicketSaleInfo]; current_page: Nat; total_pages: Nat }, Text> {
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or 
+          //                (await Validation.check_for_Staff(role)) or 
+          //                (await Validation.check_for_Manager(role)) or 
+          //                (await Validation.check_for_Bod(role)))
+          //           ) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
+          var allTickets = List.nil<Types.TicketSaleInfo>();
+
+          for ((_, ticketsIndex) in _EventTicketsMap.entries()) {
+               let ticketBlob = await stable_get(ticketsIndex, Ticket_state);
+               let obj: ?List.List<Types.TicketSaleInfo> = from_candid(ticketBlob);
+               switch obj {
+                    case null {
+                         return #err("Failed to deserialize ticket data");
+                    };
+                    case (?deserializedTickets) {
+                         for (ticket in List.toArray(deserializedTickets).vals()) {
+                              if (ticket.recepient == caller or ticket.ticketIssuer == caller) {
+                              allTickets := List.push(ticket, allTickets);
+                              };
+                         };
+                    };
+               };
+          };
+
+          let ticketsArray = List.toArray(allTickets);
+          let indexPages = Utils.paginate<Types.TicketSaleInfo>(ticketsArray, chunkSize);
+
+          if (pageNo >= indexPages.size() or indexPages.size() == 0) {
+               return #err("Page not found");
+          };
+
+          let pageData = indexPages[pageNo];
+          return #ok({
+               data = pageData;
+               current_page = pageNo + 1;
+               total_pages = indexPages.size();
+          });
+     };
+
+
+     public shared ({caller}) func getAllCallerWahanaTickets(
+          chunkSize: Nat,
+          pageNo: Nat
+     ): async Result.Result<{ data: [Types.TicketSaleInfo]; current_page: Nat; total_pages: Nat }, Text> {
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or 
+          //                (await Validation.check_for_Staff(role)) or 
+          //                (await Validation.check_for_Manager(role)) or 
+          //                (await Validation.check_for_Bod(role)))
+          //           ) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
+          var allTickets = List.nil<Types.TicketSaleInfo>();
+
+          for ((_, ticketsIndex) in _WahanaTicketsMap.entries()) {
+               let ticketBlob = await stable_get(ticketsIndex, Ticket_state);
+               let obj: ?List.List<Types.TicketSaleInfo> = from_candid(ticketBlob);
+               switch obj {
+                    case null {
+                         return #err("Failed to deserialize ticket data");
+                    };
+                    case (?deserializedTickets) {
+                         for (ticket in List.toArray(deserializedTickets).vals()) {
+                              if (ticket.recepient == caller or ticket.ticketIssuer == caller) {
+                              allTickets := List.push(ticket, allTickets);
+                              };
+                         };
+                    };
+               };
+          };
+
+          let ticketsArray = List.toArray(allTickets);
+          let indexPages = Utils.paginate<Types.TicketSaleInfo>(ticketsArray, chunkSize);
+
+          if (pageNo >= indexPages.size() or indexPages.size() == 0) {
+               return #err("Page not found");
+          };
+
+          let pageData = indexPages[pageNo];
+          return #ok({
+               data = pageData;
+               current_page = pageNo + 1;
+               total_pages = indexPages.size();
+          });
+     };
+
+
+     public shared ({caller}) func getAllCallerTickets(
+          chunkSize: Nat,
+          pageNo: Nat
+     ): async Result.Result<{ data: [Types.TicketSaleInfo]; current_page: Nat; total_pages: Nat }, Text> {
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or 
+          //                (await Validation.check_for_Staff(role)) or 
+          //                (await Validation.check_for_Manager(role)) or 
+          //                (await Validation.check_for_Bod(role)))
+          //           ) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
+          let venueTickets = async {
+               await fetchCategoryTickets(_VenueTicketsMap, caller);
+          };
+          let eventTickets = async {
+               await fetchCategoryTickets(_EventTicketsMap, caller);
+          };
+          let wahanaTickets = async {
+               await fetchCategoryTickets(_WahanaTicketsMap, caller);
+          };
+
+          let allTickets = List.append(
+               await venueTickets,
+               List.append(await eventTickets, await wahanaTickets)
+          );
+
+          return paginateTickets(allTickets, chunkSize, pageNo);
+     };
+
+     private func fetchCategoryTickets(
+          categoryMap: TrieMap.TrieMap<Text, Types.Index>,
+          caller : Principal
+     ): async List.List<Types.TicketSaleInfo> {
+          var tickets = List.nil<Types.TicketSaleInfo>();
+
+          for ((_, ticketsIndex) in categoryMap.entries()) {
+               let ticketBlob = await stable_get(ticketsIndex, Ticket_state);
+               let obj: ?List.List<Types.TicketSaleInfo> = from_candid(ticketBlob);
+               switch obj {
+                    case null {
+                         
+                    };
+                    case (?deserializedTickets) {
+                         tickets := List.append(
+                              tickets,
+                              List.filter<Types.TicketSaleInfo>(deserializedTickets, func (ticket) {
+                              ticket.recepient == caller or ticket.ticketIssuer == caller
+                              })
+                         );
+                    };
+               };
+          };
+
+          return tickets;
+     };
+
+     private func paginateTickets(
+          allTickets: List.List<Types.TicketSaleInfo>,
+          chunkSize: Nat,
+          pageNo: Nat
+     ): Result.Result<{ data: [Types.TicketSaleInfo]; current_page: Nat; total_pages: Nat }, Text> {
+
+          let ticketsArray = List.toArray(allTickets);
+          let indexPages = Utils.paginate<Types.TicketSaleInfo>(ticketsArray, chunkSize);
+
+          if (pageNo >= indexPages.size() or indexPages.size() == 0) {
+               return #err("Page not found");
+          };
+
+          let pageData = indexPages[pageNo];
+          return #ok({
+               data = pageData;
+               current_page = pageNo + 1;
+               total_pages = indexPages.size();
+          });
+     };
+
+
+
 
 
      // Helper function to handle stable memory updates
@@ -2001,14 +2489,14 @@ actor mahaka {
           let currentSalesIndex = map.get(categoryId);
           let updatedSales: List.List<Types.TicketSaleInfo> = switch (currentSalesIndex) {
                case null {
-                    List.push(saleInfo, List.nil<Types.TicketSaleInfo>())
+                    List.fromArray([saleInfo])
                };
                case (?index) {
                     let ticketBlob = await stable_get(index, state);
                     let existingData: ?List.List<Types.TicketSaleInfo> = from_candid(ticketBlob);
                     switch (existingData) {
-                         case null { List.push(saleInfo, List.nil<Types.TicketSaleInfo>()) };
-                         case (?data) { List.push(saleInfo, data) };
+                         case null { List.fromArray([saleInfo]) };
+                         case (?data) { List.push<Types.TicketSaleInfo>(saleInfo, data) };
                     }
                };
           };
@@ -2492,6 +2980,23 @@ actor mahaka {
      };
 
      public shared ({caller}) func getAllWahanas(chunkSize : Nat, pageNo : Nat) : async Result.Result<{data : [Types.Wahana_details]; current_page : Nat; Total_pages : Nat}, Types.CommonErrors> {
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or 
+          //                (await Validation.check_for_Staff(role)) or 
+          //                (await Validation.check_for_Manager(role)) or 
+          //                (await Validation.check_for_Bod(role)))
+          //           ) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           var allWahanas : List.List<Types.Wahana_details> = List.nil();
 
           for ((_, wahanaIndex) in _WahanaMap.entries()) {
@@ -2522,6 +3027,23 @@ actor mahaka {
 
 
      public shared ({caller}) func getWahana(wahanaId : Text, venueId : Text) : async Result.Result<Types.Wahana_details,Types.CommonErrors> {
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or 
+          //                (await Validation.check_for_Staff(role)) or 
+          //                (await Validation.check_for_Manager(role)) or 
+          //                (await Validation.check_for_Bod(role)))
+          //           ) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           let wahanaIndex = _WahanaMap.get(venueId);
           switch(wahanaIndex){
                case null {

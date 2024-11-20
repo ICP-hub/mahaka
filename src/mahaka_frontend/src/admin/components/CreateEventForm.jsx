@@ -45,9 +45,9 @@ const CreateEventForm = ({
       sTicket_price: 25,
       gTicket_price: 50,
       vTicket_price: 30,
-      sTicket_limit: 100,
-      gTicket_limit: 200,
-      vTicket_limit: 150,
+      sTicket_limit: "",
+      gTicket_limit: "",
+      vTicket_limit: "",
     },
     eventDetails: {
       StartDate: "",
@@ -127,8 +127,17 @@ const CreateEventForm = ({
       const day = String(date.getDate()).padStart(2, "0");
       return `${year}-${month}-${day}`;
     };
-    const minDate = venueStartDate ? new Date(Number(venueStartDate)) : "";
-    const maxDate = venueEndDate ? new Date(Number(venueEndDate)) : "";
+    const convertBigIntToDate = (dateValue) => {
+      if (typeof dateValue === 'bigint') {
+        return new Date(Number(dateValue));
+      } else if (dateValue) {
+        return new Date(dateValue);
+      }
+      return "";
+    };
+
+    const minDate = convertBigIntToDate(venueStartDate);
+    const maxDate = convertBigIntToDate(venueEndDate);
 
     if (minDate) {
       minDate.setHours(0, 0, 0, 0);
@@ -266,11 +275,20 @@ const CreateEventForm = ({
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    let updatedValue = value;
-
-    // Handle ticket limit fields specifically
+    
+    // Handle ticket limit fields
     if (name.includes("Ticket_limit")) {
-      updatedValue = parseInt(value) || 0;
+      const updatedValue = parseInt(value) ;
+      
+      // Validate input (optional but recommended)
+      if (updatedValue < 0) {
+        setFormErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: "Ticket limit cannot be negative",
+        }));
+        return;
+      }
+      
       setEventData((prevState) => ({
         ...prevState,
         collection_args: {
@@ -278,8 +296,8 @@ const CreateEventForm = ({
           [name]: updatedValue,
         },
       }));
-
-      // Clear errors for ticket limit fields
+  
+      // Clear errors for ticket limit fields if value is valid
       if (formErrors[name]) {
         setFormErrors((prevErrors) => ({
           ...prevErrors,
@@ -288,7 +306,8 @@ const CreateEventForm = ({
       }
       return;
     }
-
+  
+    // Rest of the handleInputChange function remains the same...
     // Handle nested collection_args fields
     if (
       name === "description" ||
@@ -297,16 +316,18 @@ const CreateEventForm = ({
       name === "name" ||
       name.includes("Ticket_price")
     ) {
+      let updatedValue = value;
+      
       // Handle maxLimit as number
       if (name === "maxLimit") {
         updatedValue = parseInt(value) || 0;
       }
-
+  
       // Handle ticket prices as number
       if (name.includes("Ticket_price")) {
         updatedValue = parseFloat(value) || 0;
       }
-
+  
       setEventData((prevState) => ({
         ...prevState,
         collection_args: {
@@ -314,7 +335,7 @@ const CreateEventForm = ({
           [name]: updatedValue,
         },
       }));
-
+  
       // Clear errors for nested fields
       if (formErrors[name]) {
         setFormErrors((prevErrors) => ({
@@ -329,16 +350,16 @@ const CreateEventForm = ({
           ...prevState,
           eventDetails: {
             ...prevState.eventDetails,
-            Location: updatedValue,
+            Location: value,
           },
         }));
       } else {
         setEventData((prevState) => ({
           ...prevState,
-          [name]: updatedValue,
+          [name]: value,
         }));
       }
-
+  
       // Clear errors for these fields
       if (formErrors[name]) {
         setFormErrors((prevErrors) => ({
@@ -504,7 +525,14 @@ const CreateEventForm = ({
       "h7yxq-n6yb2-6js2j-af5hk-h4inj-edrce-oevyj-kbs7a-76kft-vrqrw-nqe"
     );
     console.log(fullVenueId, "venue id");
+    const startDateTimestamp = new Date(eventData.eventDetails.StartDate).getTime();
+    const endDateTimestamp = new Date(eventData.eventDetails.EndDate).getTime();
 
+    const startTimeInMinutes = parseInt(eventData.eventDetails.StartTime, 10);
+    const endTimeInMinutes = parseInt(eventData.eventDetails.EndTime, 10);
+
+    const startTimeInNanoseconds = startTimeInMinutes * 60 * 1000000000;
+    const endTimeInNanoseconds = endTimeInMinutes * 60 * 1000000000;
     try {
       await dispatch(
         createEvent({
@@ -526,11 +554,11 @@ const CreateEventForm = ({
               logo_type: eventData.collection_args.banner.logo_type,
             },
             details: {
-              StartDate: new Date(eventData.eventDetails.StartDate).getTime(),
-              StartTime: parseInt(eventData.eventDetails.StartTime, 10),
+              StartDate: startDateTimestamp,
+              StartTime: startTimeInNanoseconds,
               Location: eventData.eventDetails.Location,
-              EndDate: new Date(eventData.eventDetails.EndDate).getTime(),
-              EndTime: parseInt(eventData.eventDetails.EndTime, 10),
+              EndDate: endDateTimestamp,
+              EndTime: endTimeInNanoseconds,
             },
             gTicket_limit: eventData.collection_args.gTicket_limit,
             vTicket_limit: eventData.collection_args.vTicket_limit,
@@ -569,9 +597,8 @@ const CreateEventForm = ({
   };
 
   const getInputClassName = (fieldName) => {
-    return `my-3 outline-none w-full bg-transparent ${
-      formErrors[fieldName] ? "border-red-500" : ""
-    }`;
+    return `my-3 outline-none w-full bg-transparent ${formErrors[fieldName] ? "border-red-500" : ""
+      }`;
   };
 
   return (
@@ -583,9 +610,8 @@ const CreateEventForm = ({
           <TextHint text="Enter the title of the event." />
         </div>
         <div
-          className={`border ${
-            formErrors.title ? "border-red-500" : "border-border"
-          } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+          className={`border ${formErrors.title ? "border-red-500" : "border-border"
+            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
         >
           <input
             type="text"
@@ -609,9 +635,8 @@ const CreateEventForm = ({
           <TextHint text="Enter the description of the event." />
         </div>
         <div
-          className={`border ${
-            formErrors.description ? "border-red-500" : "border-border"
-          } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+          className={`border ${formErrors.description ? "border-red-500" : "border-border"
+            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
         >
           <textarea
             name="description"
@@ -636,9 +661,8 @@ const CreateEventForm = ({
             <TextHint text="Enter the start date of the event." />
           </div>
           <div
-            className={`flex items-center border ${
-              formErrors.StartDate ? "border-red-500" : "border-border"
-            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+            className={`flex items-center border ${formErrors.StartDate ? "border-red-500" : "border-border"
+              } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
           >
             <input
               ref={startDateRef}
@@ -658,9 +682,8 @@ const CreateEventForm = ({
             <TextHint text="Enter the end date of the event." />
           </div>
           <div
-            className={`flex items-center border ${
-              formErrors.EndDate ? "border-red-500" : "border-border"
-            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+            className={`flex items-center border ${formErrors.EndDate ? "border-red-500" : "border-border"
+              } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
           >
             <input
               ref={endDateRef}
@@ -683,9 +706,8 @@ const CreateEventForm = ({
             <TextHint text="Enter the start time of the event." />
           </div>
           <div
-            className={`flex items-center border ${
-              formErrors.StartTime ? "border-red-500" : "border-border"
-            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+            className={`flex items-center border ${formErrors.StartTime ? "border-red-500" : "border-border"
+              } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
           >
             <input
               ref={startTimeRef}
@@ -704,9 +726,8 @@ const CreateEventForm = ({
             <TextHint text="Enter the end time of the event." />
           </div>
           <div
-            className={`flex items-center border ${
-              formErrors.EndTime ? "border-red-500" : "border-border"
-            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+            className={`flex items-center border ${formErrors.EndTime ? "border-red-500" : "border-border"
+              } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
           >
             <input
               ref={endTimeRef}
@@ -728,9 +749,8 @@ const CreateEventForm = ({
           <TextHint text="Enter the location of the event." />
         </div>
         <div
-          className={`border ${
-            formErrors.Location ? "border-red-500" : "border-border"
-          } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+          className={`border ${formErrors.Location ? "border-red-500" : "border-border"
+            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
         >
           <input
             type="text"
@@ -918,9 +938,8 @@ const CreateEventForm = ({
           Cancel
         </button> */}
         <button
-          className={`text-white py-2 px-4 rounded ${
-            createEventLoader ? "bg-gray-600" : "bg-secondary"
-          }`}
+          className={`text-white py-2 px-4 rounded ${createEventLoader ? "bg-gray-600" : "bg-secondary"
+            }`}
           disabled={createEventLoader}
           onClick={(e) => (createEventLoader ? null : handleSubmit(e))}
         >
