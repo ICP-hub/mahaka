@@ -13,6 +13,7 @@ export default function EventTickets({
   highlightClass,
   tickets,
   selectedVenue,
+  id,
 }) {
   const { backend } = useSelector((state) => state.authentication);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,6 +41,7 @@ export default function EventTickets({
       console.log(selectedVenue);
 
       const response = await backend.buyOfflineEventTicket(
+        id,
         selectedVenue.id,
         { ticket_type: ticketTypeVariant, price: 1, priceFiat: 1 },
         record,
@@ -48,11 +50,11 @@ export default function EventTickets({
           "h7yxq-n6yb2-6js2j-af5hk-h4inj-edrce-oevyj-kbs7a-76kft-vrqrw-nqe"
         ),
 
-        { Cash: null },
-        1
+        1,
+        { Cash: null }
       );
 
-      console.log("venue ticket purchased successfully:", response);
+      console.log("event ticket purchased successfully:", response);
       notificationManager.success("Ticket purchase successfully");
       const ticket = await backend.getVenueTickets(
         "h7yxq-n6yb2-6js2j-af5hk-h4inj-edrce-oevyj-kbs7a-76kft-vrqrw-nqe"
@@ -60,7 +62,7 @@ export default function EventTickets({
       console.log(ticket);
       toggleModal();
     } catch (err) {
-      console.error("Error in buying venue tickets:", err);
+      console.error("Error in buying event tickets:", err);
       toggleModal();
     }
   };

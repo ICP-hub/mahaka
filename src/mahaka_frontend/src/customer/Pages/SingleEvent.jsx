@@ -154,19 +154,19 @@ export default function SingleEvent() {
   // Assuming the first event is the main event for this venue
   const event = events && Array.isArray(events) ? events : null;
 
-  const duration =
-    venue?.Details.StartDate && venue?.Details.EndDate
-      ? calculateDuration(venue.Details.StartDate, venue.Details.EndDate)
-      : "";
+  // const duration =
+  //   venue?.Details.StartDate && venue?.Details.EndDate
+  //     ? calculateDuration(venue.Details.StartDate, venue.Details.EndDate)
+  //     : "";
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  };
+  // const formatDate = (dateString) => {
+  //   const date = new Date(dateString);
+  //   return date.toLocaleDateString("en-US", {
+  //     day: "numeric",
+  //     month: "long",
+  //     year: "numeric",
+  //   });
+  // };
 
   const formatTime = (timeString) => {
     const time = parseInt(timeString, 10);
@@ -332,9 +332,9 @@ export default function SingleEvent() {
                           </li>
                           <li>
                             <strong>Last Entry:</strong>{" "}
-                            {(venue?.Details.EndTime &&
+                            {/* {(venue?.Details.EndTime &&
                               venue.Details.EndTime) ||
-                              "4:00 PM"}
+                              "4:00 PM"} */}
                           </li>
                         </ul>
 
@@ -367,19 +367,11 @@ export default function SingleEvent() {
               <div className="lg:w-1/3 h-[340px] w-full shadow-lg rounded-lg sticky top-0">
                 <div className="p-8">
                   <h1 className="text-2xl font-black">Venue Details</h1>
+                  <h3 className="text-lg font-normal"> </h3>
                   <h3 className="text-lg font-normal">
-                    {" "}
-                    {venue?.Details.StartDate &&
-                      formatDate(venue.Details.StartDate)}{" "}
-                    -
-                    {(venue?.Details.EndDate &&
-                      formatDate(venue.Details.EndDate)) ||
-                      "13 Jul- 17 Jul 2024"}
-                  </h3>
-                  <h3 className="text-lg font-normal">
-                    {venue?.Details.StartTime && venue.Details.StartTime} -
+                    {/* {venue?.Details.StartTime && venue.Details.StartTime} -
                     {(venue?.Details.EndTime && venue.Details.EndTime) ||
-                      "12:00AM - 3:00PM"}
+                      "12:00AM - 3:00PM"} */}
                   </h3>
                   <h3 className="text-lg font-normal">
                     Location of the Venue - {venue?.Details.Location}
@@ -387,11 +379,11 @@ export default function SingleEvent() {
                 </div>
                 <h2 className="text-2xl font-normal pl-8">
                   Venue ends on :{" "}
-                  <span className="text-red-600">
+                  {/* <span className="text-red-600">
                     {(venue?.Details.EndDate &&
                       formatDate(venue.Details.EndDate)) ||
                       "17 July, 2024"}
-                  </span>
+                  </span> */}
                 </h2>
               </div>
             )}

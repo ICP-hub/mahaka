@@ -128,7 +128,7 @@ actor mahaka {
         icrc2_transfer_from : shared Types.TransferFromArgs -> async Types.Result_3;
     };
 
-     let FiatPayCanister = actor "be2us-64aaa-aaaaa-qaabq-cai" : actor {
+     let FiatPayCanister = actor "bd3sg-teaaa-aaaaa-qaaba-cai" : actor {
         create_invoice : shared (Principal,FiatTypes.Request.CreateInvoiceBody) -> async Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>>;
     };
 
@@ -258,6 +258,20 @@ actor mahaka {
 
 
     public shared ({caller}) func addBanner(_details: [Types.AttractionBanner]): async Result.Result<Text, Text> {
+         // if (Principal.isAnonymous(user)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
         try {
             for (banner in _details.vals()) {
                 switch (banner.category) {
@@ -294,6 +308,20 @@ actor mahaka {
     };
 
     public shared ({caller}) func updateBannerByImage(imageUrl: Text, updatedBanner: Types.AttractionBanner): async Result.Result<Types.AttractionBanner, Text> {
+         // if (Principal.isAnonymous(user)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
         var updated = false;
         switch (updatedBanner.category) {
             case (#Attraction) {
@@ -332,6 +360,20 @@ actor mahaka {
     };
 
     public shared ({caller}) func deleteBannerByImage(imageUrl: Text): async Result.Result<Text, Text> {
+      // if (Principal.isAnonymous(user)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
         let initialAttractionSize = Array.size(_AttractionBanner);
         let initialThirdPartySize = Array.size(_thirdPartyBanner);
 
@@ -353,6 +395,20 @@ actor mahaka {
     };
 
     public shared ({caller}) func clearAllBanners(category: Types.BannerCategory): async Result.Result<Text, Text> {
+      // if (Principal.isAnonymous(user)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           switch (category) {
                case (#Attraction) {
                     _AttractionBanner := [];
@@ -2049,7 +2105,7 @@ actor mahaka {
      //      };
      // };
 
-     public shared ({caller}) func getVenueTickets(venueId : Text) : async Result.Result<List.List<Types.TicketSaleInfo>, Text> {
+     public shared ({caller}) func getVenueTickets(venueId : Text) : async Result.Result<[Types.TicketSaleInfo], Text> {
           // let roleResult = await getRoleByPrincipal(user);
           // switch (roleResult) {
           //      case (#err(error)) {
@@ -2079,7 +2135,7 @@ actor mahaka {
                               return #err("Failed to deserialize ticket data");
                          };
                          case (?deserializedTickets) {
-                              return #ok(deserializedTickets);
+                              return #ok(List.toArray(deserializedTickets));
                          };
                     };
                };
@@ -2087,7 +2143,7 @@ actor mahaka {
      };
 
 
-     public shared ({caller}) func getEventTickets(eventId : Text) : async Result.Result<List.List<Types.TicketSaleInfo>, Text> {
+     public shared ({caller}) func getEventTickets(eventId : Text) : async Result.Result<[Types.TicketSaleInfo], Text> {
           // let roleResult = await getRoleByPrincipal(user);
           // switch (roleResult) {
           //      case (#err(error)) {
@@ -2117,7 +2173,7 @@ actor mahaka {
                               return #err("Failed to deserialize ticket data");
                          };
                          case (?deserializedTickets) {
-                              return #ok(deserializedTickets);
+                              return #ok(List.toArray(deserializedTickets));
                          };
                     };
                };
@@ -2126,7 +2182,7 @@ actor mahaka {
 
 
 
-     public shared ({caller}) func getWahanaTickets(wahanaId : Text) : async Result.Result<List.List<Types.TicketSaleInfo>, Text> {
+     public shared ({caller}) func getWahanaTickets(wahanaId : Text) : async Result.Result<[Types.TicketSaleInfo], Text> {
           // let roleResult = await getRoleByPrincipal(user);
           // switch (roleResult) {
           //      case (#err(error)) {
@@ -2156,7 +2212,7 @@ actor mahaka {
                               return #err("Failed to deserialize ticket data");
                          };
                          case (?deserializedTickets) {
-                              return #ok(deserializedTickets);
+                              return #ok(List.toArray(deserializedTickets));
                          };
                     };
                };
@@ -2195,7 +2251,7 @@ actor mahaka {
                     };
                     case (?deserializedTickets) {
                          for (ticket in List.toArray(deserializedTickets).vals()) {
-                              if (ticket.recepient == caller) {
+                              if (ticket.recepient == caller or ticket.ticketIssuer == caller) {
                                    allTickets := List.push<Types.TicketSaleInfo>(ticket, allTickets);
                               };
                          };
@@ -2251,7 +2307,7 @@ actor mahaka {
                     };
                     case (?deserializedTickets) {
                          for (ticket in List.toArray(deserializedTickets).vals()) {
-                              if (ticket.recepient == caller) {
+                              if (ticket.recepient == caller or ticket.ticketIssuer == caller) {
                               allTickets := List.push(ticket, allTickets);
                               };
                          };
@@ -2307,7 +2363,7 @@ actor mahaka {
                     };
                     case (?deserializedTickets) {
                          for (ticket in List.toArray(deserializedTickets).vals()) {
-                              if (ticket.recepient == caller) {
+                              if (ticket.recepient == caller or ticket.ticketIssuer == caller) {
                               allTickets := List.push(ticket, allTickets);
                               };
                          };
@@ -2387,7 +2443,7 @@ actor mahaka {
                          tickets := List.append(
                               tickets,
                               List.filter<Types.TicketSaleInfo>(deserializedTickets, func (ticket) {
-                              ticket.recepient == caller
+                              ticket.recepient == caller or ticket.ticketIssuer == caller
                               })
                          );
                     };

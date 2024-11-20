@@ -44,9 +44,7 @@ export default function Ticket({
         { ticket_type: ticketTypeVariant, price: 1, priceFiat: 1 },
         record,
 
-        Principal.fromText(
-          "h7yxq-n6yb2-6js2j-af5hk-h4inj-edrce-oevyj-kbs7a-76kft-vrqrw-nqe"
-        ),
+        Principal.fromText("2vxsx-fae"),
 
         { Cash: null },
         1
@@ -54,10 +52,7 @@ export default function Ticket({
 
       console.log("venue ticket purchased successfully:", response);
       notificationManager.success("Ticket purchase successfully");
-      const ticket = await backend.getVenueTickets(
-        "h7yxq-n6yb2-6js2j-af5hk-h4inj-edrce-oevyj-kbs7a-76kft-vrqrw-nqe"
-      );
-      console.log(ticket);
+
       toggleModal();
     } catch (err) {
       console.error("Error in buying venue tickets:", err);

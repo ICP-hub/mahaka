@@ -21,6 +21,7 @@ const MgtTicket = () => {
   const { events, eventLoading } = useSelector((state) => state.events);
   const { backend } = useSelector((state) => state.authentication);
   const [eventDetails, setEventDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
   const { identity } = useIdentityKit();
   const dispatch = useDispatch();
 
@@ -53,6 +54,7 @@ const MgtTicket = () => {
           );
           console.log(details);
           setEventDetails(details);
+          setLoading(false);
         } catch (error) {
           console.log(error);
         }
@@ -60,7 +62,7 @@ const MgtTicket = () => {
 
       eventData();
     }
-  }, [eventLoading, events]);
+  }, [eventLoading, events, venues]);
 
   const fetchTicketDetails = async (venue) => {
     if (!venue?.Collection_id) {
@@ -99,14 +101,28 @@ const MgtTicket = () => {
     }
   };
   const handleEventChange = async (event) => {
-    const venue = events.find((v) => v.id === event.target.value);
+    setLoading(true);
+    const selectedEventId = event.target.value;
 
-    console.log(venue, "events");
-    if (venue) {
-      setSelectedEvent(venue);
+    console.log(selectedEventId);
+    const selectedEvent = events.find((v) => v.id === selectedEventId);
 
-      const details = await backend.getDIPdetails(venue?.Collection_id);
-      setEventDetails(details);
+    if (selectedEvent) {
+      setSelectedEvent(selectedEvent); // Update selected event immediately
+      setEventDetails(null); // Clear previous details while loading
+
+      try {
+        const details = await backend.getDIPdetails(
+          selectedEvent?.event_collectionid
+        );
+        console.log(details);
+
+        setEventDetails(details);
+        setLoading(false); // Update state with new event details
+      } catch (error) {
+        console.error("Error fetching event details:", error);
+        setEventDetails(null); // Handle errors gracefully
+      }
     }
   };
 
@@ -174,7 +190,7 @@ const MgtTicket = () => {
           </option>
         ))}
       </select>
-      {eventLoading ? (
+      {loadingDetails ? (
         <p>Loading ticket details...</p>
       ) : eventDetails ? (
         <div>
@@ -182,6 +198,7 @@ const MgtTicket = () => {
             {...ticketData}
             tickets={eventDetails}
             selectedVenue={selectedEvent}
+            id={selectedVenue?.id}
           />
         </div>
       ) : (

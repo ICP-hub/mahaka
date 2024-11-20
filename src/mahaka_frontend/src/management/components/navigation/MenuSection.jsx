@@ -21,9 +21,8 @@ const MenuSection = () => {
     },
     // { path: "/admin/events", label: "Events", icon: <MdEventNote size={24} /> },
     // { path: "/management/venues", label: "Venues", icon: <MdMap size={24} /> },
-    // { path: "/management/voucher", label: "Voucher", icon: <MdMap size={24} /> }, 
+    // { path: "/management/voucher", label: "Voucher", icon: <MdMap size={24} /> },
     { path: "/management/events", label: "Events", icon: <MdMap size={24} /> },
-
 
     // {
     //   path: "/management/users",
@@ -33,10 +32,14 @@ const MenuSection = () => {
     // { path: "/management/sales", label: "Sales", icon: <MdEqualizer size={24} /> },
     {
       path: "/management/useractivity",
-      label: "User Activity",
+      label: "Ticket History",
       icon: <MdEvent size={24} />,
     },
-    { path: "/management/ticket", label: "Ticket", icon: <MdMap size={24} /> }
+    {
+      path: "/management/ticket",
+      label: " Offline Ticket",
+      icon: <MdMap size={24} />,
+    },
   ];
 
   // Check active path
@@ -48,7 +51,6 @@ const MenuSection = () => {
         <div className="relative flex items-center justify-start p-2.5 font-medium leading-5 no-underline rounded-md text-secondaryText">
           <div className="text-secondaryText">
             <div className="text-white text-md">DASHBOARD</div>
-            <div className="text-sm">Manager</div>
           </div>
         </div>
       </div>
