@@ -277,7 +277,7 @@ const PaymentComponent = ({}) => {
     const transferArgs = {
       from_subaccount: [],
       spender: {
-        owner: Principal.fromText(process.env.CANISTER_ID_MAHAKA_BACKEND),
+        owner: Principal.fromText("be2us-64aaa-aaaaa-qaabq-cai"),
         subaccount: [],
       },
       amount: BigInt(coffeeAmount * 10 ** 8 + 10000),
@@ -321,8 +321,7 @@ const PaymentComponent = ({}) => {
   const handlePayment2 = async (e) => {
     setLoading(true);
 
-    const _venueId = "test#b77ix-eeaaa-aaaaa-qaada-cai"; // Replace with actual venue ID
-    const _eventId = "bcvbv#by6od-j4aaa-aaaaa-qaadq-cai"; // Replace with actual event ID
+    const _venueId = "test#b77ix-eeaaa-aaaaa-qaada-cai";
     const _ticket_type = { GroupPass: null }; // Replace with the selected ticket type
     const _metadata = [
       {
@@ -338,19 +337,20 @@ const PaymentComponent = ({}) => {
       "5gojq-7zyol-kqpfn-vett2-e6at4-2wmg5-wyshc-ptyz3-t7pos-okakd-7qe"
     ); // Replace with actual receiver
     const numOfVisitors = BigInt(2); // Number of tickets to purchase
-    const paymentType = { Card: null }; // Replace with the selected payment type
 
+    const paymentType = { variant: "Card" };
+
+    console.log("backend", backend);
     try {
-      const response = await backend.buyEventTicket(
+      const response = await backend.buyVenueTicket(
         _venueId,
-        _eventId,
         { ticket_type: _ticket_type, priceFiat: 0.0, price: BigInt(100_000) },
         _metadata,
         receiver,
-        numOfVisitors,
-        paymentType
+        paymentType,
+        numOfVisitors
       );
-
+      console.log("res", response);
       if ("ok" in response) {
         setMessage("Ticket purchased successfully");
         setPaymentStatus("Purchase successful");
@@ -380,16 +380,10 @@ const PaymentComponent = ({}) => {
         <div className="mb-6 flex flex-col justify-center items-center"></div>
         <div className="flex justify-between items-center">
           <p className="font-bold">Price: {coffeeAmount} ICP</p>
+
           <button
             className="border border-[#5442f6e7] text-black items-center flex font-semibold gap-1 px-2 py-2 rounded-md mt-4"
             onClick={handlePayment}
-            disabled={loading}
-          >
-            {loading ? "Processing..." : message}
-          </button>
-          <button
-            className="border border-[#5442f6e7] text-black items-center flex font-semibold gap-1 px-2 py-2 rounded-md mt-4"
-            onClick={handlePayment2}
             disabled={loading}
           >
             card

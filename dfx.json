@@ -24,11 +24,8 @@
           "ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
         }
       }
-    },
-    "DIP721-NFT": {
-      "main": "src/DIP721-NFT/Nft.mo",
-      "type": "motoko"
     }
+   
 	},
 	"defaults": {
 		"build": {
