@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
 import { createWahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
 import TextHint from "../../customer/Components/TextHint";
@@ -356,6 +357,7 @@ console.log("create wahana errors are", errors)
          {formErrors.banner && (
           <p className="text-red-500 text-sm mt-1">{formErrors.banner}</p>)} 
         </div>
+        
       </div>
 
       <div className="flex justify-end mt-6 space-x-4">

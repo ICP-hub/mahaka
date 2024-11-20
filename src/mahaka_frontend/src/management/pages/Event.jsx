@@ -41,10 +41,10 @@ const MgtEvents = ()=>{
 
     useEffect(()=>{
       if(searchInput){
-        dispatch(searchEvents({backend, searchText: searchInput, chunkSize:1, pageNo:page-1}))
+        dispatch(searchEvents({backend, searchText: searchInput, chunkSize:3, pageNo:page-1}))
 
       }else{
-        dispatch(getAllEvents({backend, chunkSize:1, pageNo:page-1}))
+        dispatch(getAllEvents({backend, chunkSize:3, pageNo:page-1}))
 
       }
     },[searchInput,dispatch,page])
@@ -66,7 +66,7 @@ const MgtEvents = ()=>{
           fetchEvents(selectedVenue);
         }else{
           
-          dispatch(getAllEvents({backend, chunkSize:1, pageNo:page-1}))
+          dispatch(getAllEvents({backend, chunkSize:3, pageNo:page-1}))
           console.log("logging the loadign for events are", events)
 
         //   setInitialLoad(false)
@@ -78,7 +78,7 @@ const MgtEvents = ()=>{
         dispatch(
             getAllEventsByVenue({
             backend,
-            chunkSize: 1,
+            chunkSize: 3,
             pageNo: page-1,
             venueId: venueId,
           })
@@ -95,7 +95,7 @@ const MgtEvents = ()=>{
       const [isExpanded, setIsExpanded] = useState(false);
     
       return (
-        <div className=" rounded-lg shadow-md overflow-hidden border border-gray-300">
+        <div className=" rounded-lg shadow-md overflow-hidden border border-gray-300 mx-4">
           <div className="relative h-48 w-full">
             <img
               src={event.banner.data}
@@ -266,7 +266,7 @@ const MgtEvents = ()=>{
       
 
 
-      <div className="flex w-full max-w-xs flex-col justify-center sm:max-w-none sm:flex-row mt-5">
+      <div className="flex w-full max-w-xs flex-col justify-center gap-2 sm:max-w-none sm:flex-row mt-10">
         <select
           value={selectedVenue || ""}
           onChange={(e) => setSelectedVenue(e.target.value)}
@@ -283,7 +283,7 @@ const MgtEvents = ()=>{
           ))}
         </select>
 
-        <div className="px-4 mt-4 sm:ml-4 sm:mt-0 sm:w-72 min-h-12 lg:min-w-[68%] md:min-w-[55%] rounded-full border border-border flex items-center bg-card text-icon">
+        <div className="px-4 mt-4 sm:ml-4 sm:mt-0 sm:w-72 min-h-12 min-w-[75%] rounded-full border border-border flex items-center bg-card text-icon">
           <HiMagnifyingGlass size={20} />
           <input
             type="text"
@@ -299,7 +299,7 @@ const MgtEvents = ()=>{
       {/* displaying the events  */}
       { eventsLoading?
       (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mx-7">
       <SkeletonLoader />
       <SkeletonLoader />
       <SkeletonLoader />

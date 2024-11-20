@@ -1560,17 +1560,18 @@ actor mahaka {
           numOfVisitors: Nat
      ) : async Result.Result<[nftTypes.MintReceiptPart] or Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>>, Types.MintError or Text> {
           
-          let collectionId = await Utils.extractCanisterId(venueId);
-          let collectionActor = actor (collectionId) : actor {
-               logoDip721: () -> async Types.LogoResult;
-               mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
-          };
+          
           switch (paymentType) {
                case (#Cash) {
                     throw Error.reject("Cash option is not available");
                     // await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receivers, numOfVisitors, venueId, paymentType, _ticket_type.price, "venue", caller);
                };
                case (#ICP) {
+                    let collectionId = await Utils.extractCanisterId(venueId);
+                    let collectionActor = actor (collectionId) : actor {
+                         logoDip721: () -> async Types.LogoResult;
+                         mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
+                    };
                     let transferResult = await performICPTransfer(caller, (_ticket_type.price * 10**8) * numOfVisitors );
                     switch (transferResult) {
                          case (#Ok(_)) {

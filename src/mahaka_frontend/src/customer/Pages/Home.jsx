@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback  } from "react";
 import HeroSider from "../Components/LandingPageComponents/HeroSider";
 import venueImage from "../../assets/images/venue2.png";
 import venueImage1 from "../../assets/images/venue1.png";
@@ -20,9 +20,11 @@ import { GoArrowUpRight } from "react-icons/go";
 import OngoingSlider from "../../customer/Components/LandingPageComponents/OngoingSlider";
 import TestimonialCarousel from "../../customer/Components/LandingPageComponents/Testimonial";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector,useDispatch } from "react-redux";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import { getAllBanners } from "../../redux/reducers/apiReducers/bannerApiReducer";
+
 
 const VenueCard = ({ venue, layout }) => (
   <Link
@@ -52,10 +54,43 @@ const VenueCard = ({ venue, layout }) => (
   </Link>
 );
 
+
+
 export default function Home() {
   const { venues, loading } = useSelector((state) => state.venues);
+  console.log("venues in home",venues)
+  const { backend } = useSelector((state) => state.authentication);
+   const {banners} = useSelector((state)=>state.banner)
+   console.log("banners in home", banners?.title)
+  const dispatch = useDispatch();
 
-  // console.log("Venues home are",venues)
+ //console.log("banners is home", banners)
+
+
+
+//  third party banners
+  useEffect(() => {
+
+    const fetchBanners = async (category)=>{
+      try{
+        await dispatch(getAllBanners({backend, category}))
+      }catch(e){
+        console.log("error in fetching banners",e)
+      }
+  
+    }
+      console.log("logging in home")
+     // dispatch(getAllBanners ({backend, category}))
+     fetchBanners({ ThirdParty: null }) 
+    
+  }, [backend, dispatch]);
+
+
+
+
+  console.log("Venues in Home:", venues);
+  console.log("Banners in Home:", banners);
+
 
   const layoutConfigs = [
     {
@@ -329,31 +364,46 @@ export default function Home() {
         {/* 3 Grid card  start*/}
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-3 md:grid-cols-2  gap-[33px]">
+
+            {banners.map((banner)=>(
+               <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden">
+                <h1 className = "text-gray-600 mx-2 my-2 text-xl font-bold">{banner.title}</h1>
+                {/* <p className ="text-slate-700 mx-2 my-2">{banner?.description}</p> */}
+               <img
+                 src={banner?.image}
+                 alt="image"
+                 className="w-full  h-[100%] object-cover object-center"
+               />
+             </div>
+
+            ))}
+
+              </div>
             {/* card 1 */}
-            <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden">
-              <img
+            {/* <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden"> */}
+              {/* <img
                 src={SocialMedia}
                 alt="image"
                 className="w-full  h-[204px] object-cover object-center"
-              />
-            </div>
+              /> */}
+            {/* </div> */}
             {/* card 2 */}
-            <div className="w-full  h-[204px] shadow-lg rounded-2xl overflow-hidden bg-gradient-to-r from-blue-900 to-gray-900 ">
+            {/* <div className="w-full  h-[204px] shadow-lg rounded-2xl overflow-hidden bg-gradient-to-r from-blue-900 to-gray-900 ">
               <img
                 src={fram6}
                 alt="image"
                 className="object-contain object-center h-[100%]"
               />
-            </div>
+            </div> */}
             {/* card 3 */}
-            <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden  bg-gray-950">
+            {/* <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden  bg-gray-950">
               <img
                 src={Group16}
                 alt="image"
                 className="object-contain object-center h-[100%] w-full"
               />
-            </div>
-          </div>
+            </div> */}
+         
         </div>
         {/* 3 Grid card  end*/}
         {/* 2 Grid card  start*/}

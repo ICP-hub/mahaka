@@ -45,9 +45,9 @@ const CreateEventForm = ({
       sTicket_price: 25,
       gTicket_price: 50,
       vTicket_price: 30,
-      sTicket_limit: 100,
-      gTicket_limit: 200,
-      vTicket_limit: 150,
+      sTicket_limit: "",
+      gTicket_limit: "",
+      vTicket_limit: "",
     },
     eventDetails: {
       StartDate: "",
@@ -275,11 +275,20 @@ const CreateEventForm = ({
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    let updatedValue = value;
-
-    // Handle ticket limit fields specifically
+    
+    // Handle ticket limit fields
     if (name.includes("Ticket_limit")) {
-      updatedValue = parseInt(value) || 0;
+      const updatedValue = parseInt(value) ;
+      
+      // Validate input (optional but recommended)
+      if (updatedValue < 0) {
+        setFormErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: "Ticket limit cannot be negative",
+        }));
+        return;
+      }
+      
       setEventData((prevState) => ({
         ...prevState,
         collection_args: {
@@ -287,8 +296,8 @@ const CreateEventForm = ({
           [name]: updatedValue,
         },
       }));
-
-      // Clear errors for ticket limit fields
+  
+      // Clear errors for ticket limit fields if value is valid
       if (formErrors[name]) {
         setFormErrors((prevErrors) => ({
           ...prevErrors,
@@ -297,7 +306,8 @@ const CreateEventForm = ({
       }
       return;
     }
-
+  
+    // Rest of the handleInputChange function remains the same...
     // Handle nested collection_args fields
     if (
       name === "description" ||
@@ -306,16 +316,18 @@ const CreateEventForm = ({
       name === "name" ||
       name.includes("Ticket_price")
     ) {
+      let updatedValue = value;
+      
       // Handle maxLimit as number
       if (name === "maxLimit") {
         updatedValue = parseInt(value) || 0;
       }
-
+  
       // Handle ticket prices as number
       if (name.includes("Ticket_price")) {
         updatedValue = parseFloat(value) || 0;
       }
-
+  
       setEventData((prevState) => ({
         ...prevState,
         collection_args: {
@@ -323,7 +335,7 @@ const CreateEventForm = ({
           [name]: updatedValue,
         },
       }));
-
+  
       // Clear errors for nested fields
       if (formErrors[name]) {
         setFormErrors((prevErrors) => ({
@@ -338,16 +350,16 @@ const CreateEventForm = ({
           ...prevState,
           eventDetails: {
             ...prevState.eventDetails,
-            Location: updatedValue,
+            Location: value,
           },
         }));
       } else {
         setEventData((prevState) => ({
           ...prevState,
-          [name]: updatedValue,
+          [name]: value,
         }));
       }
-
+  
       // Clear errors for these fields
       if (formErrors[name]) {
         setFormErrors((prevErrors) => ({
@@ -527,10 +539,10 @@ const CreateEventForm = ({
       await dispatch(
         createEvent({
           backend,
-          id: fullVenueId,
+          id: venueId,
           record: {
             id: "",
-            venueId: fullVenueId,
+            venueId: venueId,
             title: eventData.title,
             creator: Id,
             sTicket_limit: eventData.collection_args.sTicket_limit,
