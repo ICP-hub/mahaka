@@ -11,6 +11,12 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
   const { venues } = useSelector((state) => state.venues);
   const [formErrors, setFormErrors] = useState({});
   console.log("create wahana errors are", formErrors)
+  const [isToggled, setIsToggled] = useState(false);
+  console.log("logging wahana toggle",isToggled)
+
+  const handleToggle = () => {
+    setIsToggled((prevState) => !prevState);
+  };
   const [formData, setFormData] = useState({
     name: "",
     symbol: "",
@@ -18,11 +24,20 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
     totalSupply: 1000000,
     description: "",
     price: "",
+    featured:isToggled,
     banner: {
       data: "",
       logo_type: "image",
     },
     venueId: "",
+    
+    details: {
+      StartDate: 44,
+      StartTime: 44,
+      Location: "hyd",
+      EndDate: 44,
+      EndTime: 44,
+    },
   });
   const [error, setError] = useState("");
   const [bannerPreview, setBannerPreview] = useState("");
@@ -186,6 +201,7 @@ console.log("create wahana errors are", errors)
           backend,
           venueId: formData.venueId,
           ...formData,
+          featured:isToggled
         })
       );
       onSuccess();
@@ -221,6 +237,24 @@ console.log("create wahana errors are", errors)
 
   return (
     <div>
+      {/* toggle the wahana */}
+      <div className = "flex justify-end">
+      <div 
+  onClick={handleToggle} 
+  className={`relative w-12 h-6 flex items-center rounded-full cursor-pointer transition-colors duration-300 ${
+    isToggled ? 'bg-orange-500' : 'bg-gray-500'
+  }`}
+>
+  <div
+    className={`absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+      isToggled ? 'translate-x-6' : 'translate-x-0'
+    }`}
+  ></div>
+</div>
+
+    </div>
+
+
       <div className="space-y-4">
         {/* Select Venue */}
         <div className="flex flex-col gap-1">
