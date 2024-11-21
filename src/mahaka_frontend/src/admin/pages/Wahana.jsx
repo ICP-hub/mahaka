@@ -130,7 +130,7 @@ const AdminWahana = () => {
       // setPage(page-1)
       
     } else {
-      dispatch(getAllWahanas({ backend, chunkSize: 1, pageNo: page - 1 }));
+      dispatch(getAllWahanas({ backend, chunkSize: 10, pageNo: 0 }));
     }
   }, [selectedVenue, page]);
 
@@ -146,8 +146,8 @@ const AdminWahana = () => {
     dispatch(
       getAllWahanasbyVenue({
         backend,
-        chunkSize: 1,
-        pageNo: page-1,
+        chunkSize: 10,
+        pageNo: 0,
         venueId: venueId,
       })
     );

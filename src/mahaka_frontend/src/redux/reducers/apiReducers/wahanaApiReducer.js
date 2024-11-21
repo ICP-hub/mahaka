@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import notificationManager from "../../../common/utils/notificationManager";
+import { MdDetails } from "react-icons/md";
 
 // Initial state for Wahana
 const initialState = {
@@ -24,10 +25,14 @@ export const createWahana = createAsyncThunk(
     decimal,
     totalSupply,
     description,
+    featured,
     banner,
+    details,
+    
     price,
   }) => {
     try {
+      console.log("wahana reducer featured",featured)
       const response = await backend.createWahana(
         venueId,
         name,
@@ -35,10 +40,14 @@ export const createWahana = createAsyncThunk(
         decimal,
         totalSupply,
         description,
+        details ,
+        featured,
         banner,
         price
       );
+      console.log("wahana created successfully")
       return response;
+      
     } catch (error) {
       console.error("Error creating wahana:", error);
       throw error;
@@ -190,7 +199,7 @@ const wahanaSlice = createSlice({
       .addCase(createWahana.rejected, (state, action) => {
         state.createWahanaLoader = false;
         state.error = action.error.message;
-        notificationManager.error("Failed to create wahana");
+       // notificationManager.error("Failed to create wahana");
       })
 
       // search wahana
@@ -225,7 +234,7 @@ const wahanaSlice = createSlice({
       .addCase(edit_wahana.rejected, (state, action) => {
         state.createWahanaLoader = false;
         state.error = action.error.message;
-        notificationManager.error("Failed to Edit wahana");
+       //notificationManager.error("Failed to Edit wahana");
       })
 
       //Getting all wahanas
@@ -255,7 +264,7 @@ const wahanaSlice = createSlice({
         state.status = "failed";
         state.wahanas = [];
         (state.loading = false), (state.error = action.error.message);
-        notificationManager.error("Failed to fetch wahanas");
+       // notificationManager.error("Failed to fetch wahanas");
       })
 
       // handle getting single wahana
@@ -271,7 +280,7 @@ const wahanaSlice = createSlice({
       .addCase(getWahana.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
-        notificationManager.error("Failed to fetch wahana");
+      //  notificationManager.error("Failed to fetch wahana");
       })
       // delete wahana
 

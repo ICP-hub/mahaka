@@ -387,23 +387,23 @@ const EventCard = ({ event }) => {
               </div>
             </div>
 
-            <div>
-              <p className="text-sm font-medium mb-2">Ticket Limits</p>
-              <div className="grid grid-cols-3 gap-2">
+            {/* <div>
+              <p className="text-sm font-medium mb-2">General Ticket</p>
+              <div className="grid grid-cols-2 gap-2">
                 <div className="p-2 bg-card rounded">
-                  <p className="text-sm font-medium">General</p>
+                  <p className="text-sm font-medium">Limit</p>
                   <p className="text-sm">{parseInt(event.gTicket_limit)}</p>
                 </div>
                 <div className="p-2 bg-card rounded">
-                  <p className="text-sm font-medium">Student</p>
-                  <p className="text-sm">{parseInt(event.sTicket_limit)}</p>
+                  <p className="text-sm font-medium">Price</p>
+                  <p className="text-sm">{parseInt(event.gTicket_price)}</p>
                 </div>
                 <div className="p-2 bg-card rounded">
                   <p className="text-sm font-medium">VIP</p>
                   <p className="text-sm">{parseInt(event.vTicket_limit)}</p>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         )}
       </div>

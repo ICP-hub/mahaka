@@ -9,15 +9,15 @@ import TextHint from "../../customer/Components/TextHint";
 
 
 
-const CreateBannerForm = ({onClose})=>{
+const CreateBannerForm = ({onClose, onSuccess})=>{
 
  
     const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
   
-  const { venues } = useSelector((state) => state.venues);
+ // const { venues } = useSelector((state) => state.venues);
   const [formErrors, setFormErrors] = useState({});
-  //console.log("create wahana errors are", formErrors)
+  //console.log("create banner errors are", formErrors)
 
   const [error, setError] = useState("");
   const [bannerPreview, setBannerPreview] = useState("");
@@ -34,6 +34,66 @@ const CreateBannerForm = ({onClose})=>{
         reject(error);
       };
       reader.readAsDataURL(imageFile);
+    });
+  };
+
+  const resizeImage = (file) => {
+    return new Promise((resolve) => {
+      const maxSize = 200 * 1024; // 200KB
+
+      // Create image element to load the file
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+
+      img.onload = () => {
+        // Create canvas
+        const canvas = document.createElement("canvas");
+        let width = img.width;
+        let height = img.height;
+
+        // Calculate new dimensions while maintaining aspect ratio
+        const aspectRatio = width / height;
+
+        // Start with original dimensions
+        let quality = 0.7;
+        canvas.width = width;
+        canvas.height = height;
+
+        // Draw image on canvas
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Function to convert canvas to file
+        const getCanvasBlob = (quality) => {
+          return new Promise((resolve) => {
+            canvas.toBlob(
+              (blob) => {
+                resolve(blob);
+              },
+              file.type,
+              quality
+            );
+          });
+        };
+
+        // Recursively reduce quality until file size is under maxSize
+        const reduceSize = async (currentQuality) => {
+          const blob = await getCanvasBlob(currentQuality);
+
+          if (blob.size <= maxSize || currentQuality <= 0.1) {
+            // Convert blob to file
+            const resizedFile = new File([blob], file.name, {
+              type: file.type,
+            });
+            resolve(resizedFile);
+          } else {
+            // Reduce quality and try again
+            await reduceSize(currentQuality - 0.1);
+          }
+        };
+
+        reduceSize(quality);
+      };
     });
   };
 
@@ -71,39 +131,40 @@ const CreateBannerForm = ({onClose})=>{
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
-    setError("");
-    setFormErrors((prevErrors) => ({
-      ...prevErrors,
-      image: undefined,
-    }));
     if (file) {
-
       try {
+        setError("");
+        setFormErrors((prevErrors) => ({
+          ...prevErrors,
+          image: undefined,
+        }));
+  
         let processedFile = file;
         const maxSize = 200 * 1024; // 200KB
-
-        // Check if file needs resizing
+  
+        // Resize the file if needed
         if (file.size > maxSize) {
           processedFile = await resizeImage(file);
         }
-
-        // Convert the processed file to blob
+  
+        // Convert the file to Base64 for backend
         const blob = await imageToFileBlob(processedFile);
-        
-      setBannerData({
-        ...bannerData,
-        image:blob,
-      });// Set the banner preview
-      setBannerPreview(URL.createObjectURL(processedFile));
-
-      // Reading the image as an ArrayBuffer for backend submission
-    } catch (error) {
-      setError("Error processing image. Please try again.");
-      console.error("Error processing image:", error);
+  
+        // Update form state
+        setBannerData({
+          ...bannerData,
+          image: blob, // Base64 image for backend
+        });
+  
+        // Update the preview
+        setBannerPreview(URL.createObjectURL(processedFile));
+      } catch (error) {
+        setError("Error processing image. Please try again.");
+        console.error("Error processing image:", error);
+      }
     }
-  }
-};
-
+  };
+  
 
 // 
 
@@ -114,7 +175,7 @@ const CreateBannerForm = ({onClose})=>{
    const handleCreateBanner = async (e) => {
     console.log("submit is triggered", bannerData)
     e.preventDefault();
-    // setIsSubmitting(true);
+     setIsSubmitting(true);
     if (!validateForm()) {
       return;
     }
@@ -123,9 +184,16 @@ const CreateBannerForm = ({onClose})=>{
       await dispatch(
         addBanner({
           backend,
-        ...bannerData
+          title: bannerData.title,
+          redirectUrl: bannerData.redirectUrl,
+          description: bannerData.description,
+          category: bannerData.category,
+          image: bannerData.image,
         })
-      );
+      ).unwrap();
+      
+      onClose();
+      console.log("Banner created successfully:", result);
       
       
     } catch (error) {
@@ -168,7 +236,7 @@ const CreateBannerForm = ({onClose})=>{
             </div>
           <div 
            className={`border 
-            rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+            rounded-lg px-4 ${formErrors.title ? "border-red-500" : "border-border"} focus-within:border-indigo-600 dark:focus-within:border-border`}
           >
             <input
               type="text"
@@ -193,7 +261,7 @@ const CreateBannerForm = ({onClose})=>{
             </div>
           <div 
            className={`border 
-            rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+            rounded-lg px-4 ${formErrors.redirectUrl ? "border-red-500" : "border-border"} focus-within:border-indigo-600 dark:focus-within:border-border`}
           >
             <input
               type="text"
@@ -225,6 +293,7 @@ const CreateBannerForm = ({onClose})=>{
           >
          
             <textarea
+            type="text"
               name="description"
               rows={5}
               value={bannerData.description}
@@ -273,7 +342,7 @@ const CreateBannerForm = ({onClose})=>{
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <label className="font-semibold">Banner </label>
-            <TextHint text="Upload the image of the wahana." />
+            <TextHint text="Upload the image for the banner." />
             </div>
           <div className={`flex flex-col items-center justify-center border border-gray-300 p-4 rounded ${formErrors.image?"border-red-500":"border-border"}`}>
             <input

@@ -58,7 +58,7 @@ function App() {
   //         redirectUrl: "anil",
   //         description: "anil",
   //         category: { ThirdParty:null }, 
-  //         image: "https://img.freepik.com/free-vector/modern-event-banner-template-with-degrade-background_1361-2219.jpg",
+  //         image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wAAAgEBAY2BGQAAAABJRU5ErkJggg==",
   //       },
   //     ];
 
@@ -70,8 +70,10 @@ function App() {
   //     console.log("Error in creating banner",e)
 
   //   }
+  //  }
 
-  // }
+
+
 
   // const fetchBanners = async (category) => {
   //   console.log("category is", category)
@@ -91,8 +93,8 @@ function App() {
   
   return (
     <div className="light bg-background no-scrollbar">
-      {/* <button onClick = {handleBanner}>create banner</button>
-      <button
+      {/* <button onClick = {handleBanner}>create banner</button> */}
+      {/* <button
   onClick={() => fetchBanners({ ThirdParty: null })} // Pass '#Attraction' as the category
   className="border p-3 mx-5"
 >

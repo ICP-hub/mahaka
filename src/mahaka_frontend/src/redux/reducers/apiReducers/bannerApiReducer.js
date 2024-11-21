@@ -17,25 +17,29 @@ export const addBanner = createAsyncThunk(
     "banner/addBanner",
     async ({
       backend,
-     title,
-     redirectUrl,
-     description,
-     category,
-     image,
+      title,
+      redirectUrl,
+      description,
+      category,
+      image
+    
      
     }) => {
       
-      //console.log("title in reducer is",title,category,image)
+     
       try {
-        const response = await backend.addBanner(
-           title,
-           redirectUrl,
-           description,
-           category,
-           image   
-        );
+        console.log("title in reducer is",title,category)
+        const response = await backend.addBanner([
+          {
+          title,
+          redirectUrl,
+          description,
+          category,
+          image
+          }
+        ]);
         // action(false);
-        console.log("banner response in reducer", response)
+       // console.log("banner response in reducer", category)
         return response;
       } catch (error) {
         throw error;
@@ -116,7 +120,7 @@ const bannerSlice = createSlice({
               // state.totalPages = action.payload.ok.Total_pages;
               state.error = null;
           
-            notificationManager.success("banners fetched successfully");
+           // notificationManager.success("banners fetched successfully");
             // console.log("banners fetched successfully",state.banners)
           })
           .addCase(getAllBanners.rejected, (state, action) => {
