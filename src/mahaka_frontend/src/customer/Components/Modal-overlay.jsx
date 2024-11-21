@@ -17,7 +17,7 @@ const ModalOverlay = ({ isOpen, setIsOpen, title, children }) => {
             exit={{ scale: 0.9 }}
             transition={{ ease: "easeInOut", duration: 0.15 }}
             onClick={(e) => e.stopPropagation()}
-            className="md:rounded-2xl w-full max-w-xl cursor-default relative overflow-hidden bg-card shadow-lg text-text"
+            className="md:rounded-2xl min-h-screen md:min-h-full w-screen md:max-w-xl cursor-default relative overflow-hidden bg-card shadow-lg text-text"
           >
             <div className="flex justify-between px-6 py-4 items-center text-secondary border-b border-border">
               <h3 className="text-xl font-semibold">{title}</h3>

@@ -46,73 +46,71 @@ const MemberManager = () => {
 
   return (
     <div className="flex flex-auto flex-col">
-      <div className="relative flex flex-auto">
-        <div className="absolute inset-0 flex min-w-0 overflow-hidden">
-          <div className="relative overflow-y-auto overflow-x-hidden flex-auto custom-scroll">
-            <div className="flex flex-auto flex-col justify-between border-b px-6 py-8 sm:flex-row md:flex-col md:px-8 bg-card border-b-border">
-              <div>
-                <div className="text-4xl font-extrabold leading-none tracking-tight">
-                  Members
-                </div>
-                <div className="text-secondary ml-0.5 font-medium">
-                  {userLoading ? (
-                    <div className="animate-pulse bg-gray-500 rounded-md text-gray-500 max-w-fit">
-                      0 members
-                    </div>
-                  ) : (
-                    <div>{users.length} members</div>
-                  )}
-                </div>
+      <div className="flex min-w-0 overflow-hidden">
+        <div className="relative overflow-y-auto overflow-x-hidden flex-auto custom-scroll">
+          <div className="flex flex-auto flex-col justify-between border-b px-6 py-8 sm:flex-row md:flex-col md:px-8 bg-card border-b-border">
+            <div>
+              <div className="text-4xl font-extrabold leading-none tracking-tight">
+                Members
               </div>
-              <div className="mt-4 flex items-center sm:mt-0 md:mt-4">
-                <div className="flex-auto flex items-center">
-                  <div className="flex flex-auto">
-                    <div className="relative px-4 rounded-full border border-border min-h-10 flex items-center w-full">
-                      <HiMagnifyingGlass size={20} className="mr-1" />
-                      <input
-                        type="text"
-                        className="outline-none bg-transparent w-full"
-                        placeholder="Search members"
-                      />
-                    </div>
+              <div className="text-secondary ml-0.5 font-medium">
+                {userLoading ? (
+                  <div className="animate-pulse bg-gray-500 rounded-md text-gray-500 max-w-fit">
+                    0 members
                   </div>
-                  <button
-                    className="ml-4 px-4 items-center flex bg-secondary text-white min-h-10 rounded-full"
-                    onClick={() => {
-                      if (!isRtNavOpen) {
-                        setCurrentMember(null);
-                        setIsEditing(false);
-                        toggleNav(true);
-                      }
-                    }}
-                  >
-                    <HiOutlinePlusSmall size={20} /> Add
-                  </button>
-                </div>
+                ) : (
+                  <div>{users.length} members</div>
+                )}
               </div>
             </div>
-            {userLoading ? (
-              <div>Loading...</div>
-            ) : users.length > 0 ? (
-              <MemberList
-                members={users}
-                onMemberClick={openDetailView}
-                isRtNavOpen={isRtNavOpen}
-              />
-            ) : (
-              <div>No users found</div>
-            )}
+            <div className="mt-4 flex items-center sm:mt-0 md:mt-4">
+              <div className="flex-auto flex items-center">
+                <div className="flex flex-auto">
+                  <div className="relative px-4 rounded-full border border-border min-h-10 flex items-center w-full">
+                    <HiMagnifyingGlass size={20} className="mr-1" />
+                    <input
+                      type="text"
+                      className="outline-none bg-transparent w-full"
+                      placeholder="Search members"
+                    />
+                  </div>
+                </div>
+                <button
+                  className="ml-4 px-4 items-center flex bg-secondary text-white min-h-10 rounded-full"
+                  onClick={() => {
+                    if (!isRtNavOpen) {
+                      setCurrentMember(null);
+                      setIsEditing(false);
+                      toggleNav(true);
+                    }
+                  }}
+                >
+                  <HiOutlinePlusSmall size={20} /> Add
+                </button>
+              </div>
+            </div>
           </div>
-          <NavigationRight isOpen={isRtNavOpen}>
-            <UpdateMember
-              member={currentMember}
-              onToggle={toggleNav}
-              isEditing={isEditing}
-              setIsEditing={setIsEditing}
+          {userLoading ? (
+            <div>Loading...</div>
+          ) : users.length > 0 ? (
+            <MemberList
               members={users}
+              onMemberClick={openDetailView}
+              isRtNavOpen={isRtNavOpen}
             />
-          </NavigationRight>
+          ) : (
+            <div>No users found</div>
+          )}
         </div>
+        <NavigationRight isOpen={isRtNavOpen}>
+          <UpdateMember
+            member={currentMember}
+            onToggle={toggleNav}
+            isEditing={isEditing}
+            setIsEditing={setIsEditing}
+            members={users}
+          />
+        </NavigationRight>
       </div>
     </div>
   );

@@ -11,6 +11,7 @@ import {
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import { deleteVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
+import notificationManager from "../../common/utils/notificationManager";
 const FormatTime = (nanoseconds) => {
   // Input validation
   if (!nanoseconds && nanoseconds !== 0) {
@@ -35,8 +36,10 @@ const FormatTime = (nanoseconds) => {
   }
 };
 const VenueTableFormat = ({ filteredVenues }) => {
-  console.log(filteredVenues);
-  const { venues, loading } = useSelector((state) => state.venues);
+  // console.log(filteredVenues);
+  const { venues, loading, deleteLoading } = useSelector(
+    (state) => state.venues
+  );
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [selectedVenueId, setSelectedVenueId] = useState(null);
   const dispatch = useDispatch();
@@ -49,11 +52,13 @@ const VenueTableFormat = ({ filteredVenues }) => {
 
   // Confirm deletion and dispatch deleteVenue action
   const confirmDeleteVenue = () => {
-    dispatch(deleteVenue({ backend: backend, venueId: selectedVenueId }));
-    setDeleteModalVisible(false); // Close the modal
+    dispatch(deleteVenue({ backend: backend, venueId: selectedVenueId })).then(
+      () => {
+        notificationManager.error("Venue deleted successfully");
+        setDeleteModalVisible(false);
+      }
+    );
   };
-
-
 
   // const [expandedVenue, setExpandedVenue] = useState(null);
 
@@ -70,19 +75,20 @@ const VenueTableFormat = ({ filteredVenues }) => {
       {/* Delete Confirmation Modal */}
       {deleteModalVisible && (
         <div className="fixed inset-0 z-50 flex items-center rounded justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded shadow-lg">
+          <div className="bg-card p-6 rounded shadow-lg">
             <h2 className="text-xl mb-4">
               Are you sure you want to delete this venue?
             </h2>
             <div className="flex justify-end">
               <button
                 className="bg-red-600 text-white px-4 py-2 rounded mr-4"
+                disabled={deleteLoading}
                 onClick={confirmDeleteVenue}
               >
-                Delete
+                {deleteLoading ? "Deleting..." : "Delete"}
               </button>
               <button
-                className="bg-gray-300 px-4 py-2 rounded"
+                className="px-4 py-2 rounded"
                 onClick={() => setDeleteModalVisible(false)}
               >
                 Cancel
@@ -93,7 +99,7 @@ const VenueTableFormat = ({ filteredVenues }) => {
       )}
 
       <div className="flex flex-auto overflow-hidden font-medium">
-        <div className="flex flex-auto flex-col overflow-hidden sm:overflow-y-scroll custom-scroll">
+        <div className="flex flex-auto flex-col overflow-hidden">
           <div className="grid">
             <div className="custom-grid text-secondary sticky top-0 z-10 gap-4 bg-gray-50 px-6 py-4 text-md font-semibold shadow dark:bg-gray-900 md:px-8">
               <div></div>
@@ -126,8 +132,8 @@ const VenueTableFormat = ({ filteredVenues }) => {
                       key={index}
                       venue={venue}
                       onDelete={() => handleDeleteClick(venue.id)}
-                    // isExpanded={expandedVenue === index}
-                    // onToggleDetail={() => handleToggleDetail(index)}
+                      // isExpanded={expandedVenue === index}
+                      // onToggleDetail={() => handleToggleDetail(index)}
                     />
                   </motion.div>
                 ))}
@@ -173,7 +179,8 @@ const VenueTableData = ({ venue, onDelete }) => {
           {formatDate(venue?.Details?.EndDate)}
         </div>
         <div className="hidden lg:block">
-          {FormatTime(venue?.Details?.StartTime)}-{FormatTime(venue?.Details?.EndTime)}
+          {FormatTime(venue?.Details?.StartTime)}-
+          {FormatTime(venue?.Details?.EndTime)}
         </div>
         <div className="truncate">{venue?.Details?.Location}</div>
 
@@ -187,7 +194,7 @@ const VenueTableData = ({ venue, onDelete }) => {
           >
             <HiOutlineDotsHorizontal
               size={24}
-            // className={`${isExpanded ? "text-secondary" : "text-icon"}`}
+              // className={`${isExpanded ? "text-secondary" : "text-icon"}`}
             />
           </Link>
 

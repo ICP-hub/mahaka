@@ -144,7 +144,8 @@ const VenueDetailPage = () => {
             <div className="mb-2 leading-relaxed">
               <p className="text-lg">
                 <strong>🕒 </strong>
-                {FormatTime(venue.Details.StartTime)} - {FormatTime(venue.Details.EndTime)}
+                {FormatTime(venue.Details.StartTime)} -{" "}
+                {FormatTime(venue.Details.EndTime)}
               </p>
             </div>
             <div className="mb-2 leading-relaxed">
@@ -179,13 +180,13 @@ const VenueDetailPage = () => {
           <h2 className="text-xl font-semibold mb-2">Venue ID</h2>
           <p>{venue.id}</p>
         </div>
-        <button
+        {/* <button
           className="px-4 py-2 mb-3 bg-indigo-500 text-white rounded hover:bg-indigo-600"
           onClick={() => setIsEventModalOpen(true)}
         >
           Create Event
-        </button>
-        <EventCardGrid eventArr={events} />
+        </button> */}
+        {/* <EventCardGrid eventArr={events} /> */}
         {/* <div className="mb-6">
           <h2 className="text-xl font-semibold mb-2">Events</h2>
           {events.length > 0 ? (
@@ -251,7 +252,7 @@ const VenueDetailPage = () => {
 
       {/* Modal for creating an event */}
 
-      {isEventModalOpen && (
+      {/* {isEventModalOpen && (
         <ModalOverlay
           isOpen={isEventModalOpen}
           setIsOpen={setIsEventModalOpen}
@@ -265,7 +266,7 @@ const VenueDetailPage = () => {
             venueEndDate={venue.Details.EndDate}
           />
         </ModalOverlay>
-      )}
+      )} */}
     </>
   );
 };
@@ -319,19 +320,19 @@ const EventCard = ({ event }) => {
             <h3 className="text-lg font-semibold ">{event.title}</h3>
             <p className="text-sm ">{event.details.Location}</p>
           </div>
-          <span className={`px-2 py-1 text-sm rounded-full ${
-            event.active 
-              ? 'bg-green-100 text-green-800' 
-              : 'bg-gray-100 text-green-800'
-          }`}>
+          <span
+            className={`px-2 py-1 text-sm rounded-full ${
+              event.active
+                ? "bg-green-100 text-green-800"
+                : "bg-gray-100 text-green-800"
+            }`}
+          >
             {event.active ? "Active" : "Active"}
           </span>
         </div>
 
-        <p className="text-sm  line-clamp-2 mb-4">
-          {event.description}
-        </p>
-        
+        <p className="text-sm  line-clamp-2 mb-4">{event.description}</p>
+
         <div className="flex justify-between items-center mb-2">
           <div>
             <p className="text-sm font-medium ">Start Date</p>
@@ -364,9 +365,7 @@ const EventCard = ({ event }) => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm font-medium ">End Date</p>
-                <p className="text-sm ">
-                  {formatDate(event.details.EndDate)}
-                </p>
+                <p className="text-sm ">{formatDate(event.details.EndDate)}</p>
               </div>
 
               <div>
@@ -376,10 +375,8 @@ const EventCard = ({ event }) => {
                 </p>
               </div>
               <div>
-              <p className="text-sm font-medium ">End Time</p>
-                <p className="text-sm ">
-                  {FormatTime(event.details.EndTime)}
-                </p>
+                <p className="text-sm font-medium ">End Time</p>
+                <p className="text-sm ">{FormatTime(event.details.EndTime)}</p>
               </div>
               <div>
                 <p className="text-sm font-medium ">Event ID</p>
@@ -410,6 +407,5 @@ const EventCard = ({ event }) => {
     </div>
   );
 };
-
 
 export default VenueDetailPage;

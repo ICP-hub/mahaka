@@ -4,22 +4,31 @@ import notificationManager from "../../../common/utils/notificationManager";
 // Initial state
 const initialState = {
   events: [],
+  eventByVenue: [],
   currentEvent: null,
-  eventsLoading: false,
   error: null,
   currentPage: 1,
   totalPages: 1,
+  eventsLoading: true,
   createEventLoader: false,
   buyTicketLoading: false,
+  singleEventLoading: false,
   deleteEventLoader: false,
 };
 
 // creating an event
 export const createEvent = createAsyncThunk(
   "events/createEvent",
-  async ({ backend, id, record, collection_args }) => {
-    const response = await backend.createEvent(id, record, collection_args);
-    return response;
+  async ({ closeModal, backend, id, record, collection_args }) => {
+    try {
+      const response = await backend.createEvent(id, record, collection_args);
+      console.log("respones creating event", response);
+      closeModal();
+      return response;
+    } catch (err) {
+      console.error("Error creating event ", err);
+      notificationManager.error("Error creating event!");
+    }
   }
 );
 
@@ -52,17 +61,12 @@ export const getAllEventsByVenue = createAsyncThunk(
 );
 
 // getallevents
-
-export const getAllEvents = createAsyncThunk(
-  "events/getAllEvents",
-  async ({ backend, chunkSize, pageNo, venueId }) => {
+export const getAllEventsPaginated = createAsyncThunk(
+  "events/getAllEventsPaginated",
+  async ({ backend }) => {
     try {
-      const response = await backend.getAllEvents(
-        chunkSize,
-        pageNo,
-      
-      );
-      console.log("Events fetched:", response);
+      const response = await backend.getAllEventsPaginated(10, 0);
+      // console.log("Events fetched:", response);
       return response;
     } catch (error) {
       console.error("Error fetching events:", error);
@@ -96,7 +100,7 @@ export const getEvent = createAsyncThunk(
   async ({ backend, eventIds, venueId }) => {
     try {
       const response = await backend.getEvent(eventIds, venueId);
-      console.log("Event fetched:", response);
+      // console.log("Event fetched:", response);
       return response;
     } catch (error) {
       console.error("Error fetching event:", error);
@@ -105,9 +109,9 @@ export const getEvent = createAsyncThunk(
   }
 );
 
-// search events 
+// search events
 
-export const searchEvents= createAsyncThunk(
+export const searchEvents = createAsyncThunk(
   "events/searchEvents",
   async ({ backend, searchText, chunkSize, pageNo }) => {
     try {
@@ -116,7 +120,7 @@ export const searchEvents= createAsyncThunk(
         chunkSize,
         pageNo
       );
-       return response.data;
+      return response.data;
       // console.log("search response is ",response.data)
     } catch (error) {
       console.error("error searching the events", error);
@@ -130,10 +134,9 @@ const eventSlice = createSlice({
   name: "events",
   initialState,
   reducers: {
-
     setPage: (state, action) => {
       state.currentPage = action.payload;
-  },
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -152,18 +155,18 @@ const eventSlice = createSlice({
         state.error = action.error.message;
       })
 
-      // search events 
+      // search events
 
       .addCase(searchEvents.pending, (state) => {
-        state.eventsLoading = true;
+        state.singleEventLoading = true;
       })
       .addCase(searchEvents.fulfilled, (state, action) => {
-        state.eventsLoading = false;
+        state.singleEventLoading = false;
         state.events = action.payload;
         state.error = null;
       })
       .addCase(searchEvents.rejected, (state, action) => {
-        state.eventsLoading = false;
+        state.singleEventLoading = false;
         // state.error = action.error.message;
         state.error = action.error.message || "An error occurred";
       })
@@ -188,61 +191,36 @@ const eventSlice = createSlice({
 
       // Handle getAllEventsByVenue
       .addCase(getAllEventsByVenue.pending, (state) => {
-        state.eventsLoading = true;
+        state.singleEventLoading = true;
       })
       .addCase(getAllEventsByVenue.fulfilled, (state, action) => {
-        state.eventsLoading = false;
-        if (action.meta.arg.pageNo > 1) {
-          // Append new page of events to the existing list
-          state.events = [...state.events, ...action.payload.ok];
-        } else {
-          state.events = action.payload.ok.data;
-        }
-        state.currentPage = action.payload.ok.current_page;
-        state.totalPages = action.payload.ok.Total_pages;
-        state.error = null;
+        state.singleEventLoading = false;
+        state.eventByVenue = action.payload.ok.data;
       })
       .addCase(getAllEventsByVenue.rejected, (state, action) => {
-        state.eventsLoading = false;
-        state.events = [];
+        state.singleEventLoading = false;
+        state.eventByVenue = [];
         state.error = action.error.message;
       })
 
       // getallevents
-      .addCase(getAllEvents.pending, (state) => {
+      .addCase(getAllEventsPaginated.pending, (state) => {
         state.status = "loading";
-        state. eventsLoading = true;
+        state.eventsLoading = true;
         state.error = null;
       })
-      .addCase(getAllEvents.fulfilled, (state, action) => {
-        state. eventsLoading = false;
-
-        if (action.payload && action.payload.ok.data) {
-          state.events = action.payload.ok.data;
-          state.currentPage = action.payload.ok.current_page;
-          state.totalPages = action.payload.ok.Total_pages;
-           console.log("the events are  page is", state.events)
-        } else {
-          console.warn("Received empty or invalid response from API");
-          state.events = [];
-          state.currentPage = 1;
-          state.totalPages = 1;
-        }
+      .addCase(getAllEventsPaginated.fulfilled, (state, action) => {
+        state.eventsLoading = false;
+        state.events = [...action.payload.ok.data];
         state.error = null;
         state.status = "succeeded";
       })
-      .addCase(getAllEvents.rejected, (state, action) => {
+      .addCase(getAllEventsPaginated.rejected, (state, action) => {
         state.status = "failed";
-        state.events = [];
-        (state. eventsLoading = false), (state.error = action.error.message);
-        notificationManager.error("Failed to fetch events");
+        // state.events = [];
+        (state.eventsLoading = false), (state.error = action.error.message);
+        // notificationManager.error("Failed to fetch events");
       })
-
-
-
-
-
-
 
       .addCase(buyEventTicket.pending, (state) => {
         state.buyTicketLoading = true;
@@ -259,18 +237,18 @@ const eventSlice = createSlice({
         notificationManager.error("Failed to purchase event ticket");
       })
       .addCase(getEvent.pending, (state) => {
-        state.eventsLoading = true;
+        state.singleEventLoading = true;
       })
       .addCase(getEvent.fulfilled, (state, action) => {
-        state.eventsLoading = false;
+        state.singleEventLoading = false;
         state.currentEvent = action.payload.ok;
         state.error = null;
         notificationManager.success("Event fetched successfully");
       })
       .addCase(getEvent.rejected, (state, action) => {
-        state.eventsLoading = false;
+        state.singleEventLoading = false;
         state.error = action.error.message;
-        notificationManager.error("Failed to fetch event");
+        // notificationManager.error("Failed to fetch event");
       });
   },
 });

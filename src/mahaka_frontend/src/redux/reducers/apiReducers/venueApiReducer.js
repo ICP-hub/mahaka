@@ -13,6 +13,7 @@ const initialState = {
   buyTicketLoading: false,
   totalPages: 0,
   currentPage: 0,
+  deleteLoading: false,
 };
 
 // async operations
@@ -151,6 +152,7 @@ const venueSlice = createSlice({
         state.loading = true;
       })
       .addCase(getAllVenues.fulfilled, (state, action) => {
+        console.log("add case for get all venues", action);
         state.loading = false;
         state.venues = action.payload.data;
         state.totalPages = action.payload.totalPages;
@@ -175,7 +177,7 @@ const venueSlice = createSlice({
       })
 
       .addCase(deleteVenue.pending, (state) => {
-        state.loading = true;
+        state.deleteLoading = true;
       })
       .addCase(deleteVenue.fulfilled, (state, action) => {
         state.loading = false;
@@ -185,7 +187,7 @@ const venueSlice = createSlice({
         state.error = null;
       })
       .addCase(deleteVenue.rejected, (state, action) => {
-        state.loading = false;
+        state.deleteLoading = false;
         state.error = action.error.message;
       })
 

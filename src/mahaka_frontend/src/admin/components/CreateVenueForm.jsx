@@ -148,7 +148,6 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
       required: true,
     });
 
-
     return () => {
       startDatePicker.destroy();
       endDatePicker.destroy();
@@ -187,7 +186,6 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
       }));
     }
   };
-
 
   const imageToFileBlob = (imageFile) => {
     return new Promise((resolve, reject) => {
@@ -299,7 +297,6 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
     }
   };
 
-
   const [logoPreview, setLogoPreview] = useState(null);
   const handleFileChange2 = async (e) => {
     const file = e.target.files[0];
@@ -339,12 +336,10 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
     }
   };
 
-
   const validateForm = () => {
     // Check if all required fields are filled
     const errors = {};
-    if (
-      !venueData.collection_args.description) {
+    if (!venueData.collection_args.description) {
       errors.description = "Venue description is required";
     }
     if (!venueData.eventDetails.Location) {
@@ -399,11 +394,15 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
       return;
     }
 
-    const startDateTimestamp = new Date(venueData.eventDetails.StartDate).getTime();
+    const startDateTimestamp = new Date(
+      venueData.eventDetails.StartDate
+    ).getTime();
     const endDateTimestamp = new Date(venueData.eventDetails.EndDate).getTime();
 
-    const [startHours, startMinutes] = venueData.eventDetails.StartTime.split(":").map(Number);
-    const [endHours, endMinutes] = venueData.eventDetails.EndTime.split(":").map(Number);
+    const [startHours, startMinutes] =
+      venueData.eventDetails.StartTime.split(":").map(Number);
+    const [endHours, endMinutes] =
+      venueData.eventDetails.EndTime.split(":").map(Number);
 
     const startTimeInMinutes = startHours * 60 + startMinutes;
     const endTimeInMinutes = endHours * 60 + endMinutes;
@@ -422,10 +421,10 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         capacity: parseInt(venueData.capacity),
         details: {
           StartDate: startDateTimestamp,
-          StartTime: startTimeInNanoseconds, 
+          StartTime: startTimeInNanoseconds,
           Location: venueData.eventDetails.Location,
           EndDate: endDateTimestamp,
-          EndTime: endTimeInNanoseconds,      
+          EndTime: endTimeInNanoseconds,
         },
         description: venueData.collection_args.description,
         action: setIsModalOpen,
@@ -434,8 +433,9 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
   };
 
   const getInputClassName = (fieldName) => {
-    return `my-3 outline-none w-full bg-transparent ${formErrors[fieldName] ? "border-red-500" : ""
-      }`;
+    return `my-3 outline-none w-full bg-transparent ${
+      formErrors[fieldName] ? "border-red-500" : ""
+    }`;
   };
 
   return (
@@ -456,7 +456,6 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
               value={venueData.title}
               onChange={handleInputChange}
               className="my-3 outline-none w-full bg-transparent"
-
             />
           </div>
         </div>
@@ -477,7 +476,6 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
                 handleNestedInputChange(e, "collection_args", "description")
               }
               className="mt-3 outline-none w-full bg-transparent"
-
             />
           </div>
         </div>
@@ -491,13 +489,13 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
               <TextHint text="Enter the start date of the venue." />
             </div>
             <div
-              className={`flex items-center border ${formErrors.StartDate ? "border-red-500" : "border-border"
-                } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+              className={`flex items-center border ${
+                formErrors.StartDate ? "border-red-500" : "border-border"
+              } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
             >
               <input
                 ref={startDateRef}
                 className={getInputClassName("StartDate")}
-
               />
               <FcCalendar size={24} />
             </div>
@@ -513,13 +511,13 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
               <TextHint text="Enter the end date of the venue." />
             </div>
             <div
-              className={`flex items-center border ${formErrors.EndDate ? "border-red-500" : "border-border"
-                } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+              className={`flex items-center border ${
+                formErrors.EndDate ? "border-red-500" : "border-border"
+              } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
             >
               <input
                 ref={endDateRef}
                 className={getInputClassName("EndDate")}
-
               />
               <FcCalendar size={24} />
             </div>
@@ -535,13 +533,13 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
               <TextHint text="Enter the starting time of the venue." />
             </div>
             <div
-              className={`flex items-center border ${formErrors.StartTime ? "border-red-500" : "border-border"
-                } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+              className={`flex items-center border ${
+                formErrors.StartTime ? "border-red-500" : "border-border"
+              } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
             >
               <input
                 ref={startTimeRef}
                 className={getInputClassName("StartTime")}
-
               />
               <FcAlarmClock size={24} />
             </div>
@@ -557,13 +555,13 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
               <TextHint text="Enter the ending time of the venue." />
             </div>
             <div
-              className={`flex items-center border ${formErrors.EndTime ? "border-red-500" : "border-border"
-                } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+              className={`flex items-center border ${
+                formErrors.EndTime ? "border-red-500" : "border-border"
+              } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
             >
               <input
                 ref={endTimeRef}
                 className={getInputClassName("EndTime")}
-
               />
               <FcAlarmClock size={24} />
             </div>
@@ -586,7 +584,6 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
                 handleNestedInputChange(e, "eventDetails", "Location")
               }
               className="my-3 outline-none w-full bg-transparent"
-
             />
           </div>
         </div>
@@ -605,7 +602,6 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
               value={venueData.capacity}
               onChange={handleInputChange}
               className="my-3 outline-none w-full bg-transparent"
-
             />
           </div>
         </div>
@@ -626,7 +622,6 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
                 value={venueData.gTicket_limit}
                 onChange={handleInputChange}
                 className="my-3 outline-none w-full bg-transparent"
-
               />
             </div>
             {formErrors.gTicket_limit && (
@@ -647,7 +642,6 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
                 value={venueData.sTicket_limit}
                 onChange={handleInputChange}
                 className="my-3 outline-none w-full bg-transparent"
-
               />
             </div>
             {formErrors.sTicket_limit && (
@@ -668,7 +662,6 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
                 value={venueData.vTicket_limit}
                 onChange={handleInputChange}
                 className="my-3 outline-none w-full bg-transparent"
-
               />
             </div>
             {formErrors.vTicket_limit && (
@@ -755,13 +748,13 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
               <p className="text-red-500 text-sm mt-1">{formErrors.logo}</p>
             )}
           </div>
-
         </div>
-        <div className="flex justify-center">
+        <div className="flex justify-end">
           <button
             type="submit"
-            className={`text-white py-2 px-4 rounded ${createVenueLoader ? "bg-gray-400" : "bg-secondary"
-              }`}
+            className={`text-white py-2 px-4 rounded mt-4 ${
+              createVenueLoader ? "bg-gray-400" : "bg-secondary"
+            }`}
             disabled={createVenueLoader}
           >
             {createVenueLoader ? "Creating..." : "Create Venue"}

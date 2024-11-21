@@ -37,17 +37,19 @@ const AdminLayout = () => {
       {state.isOpen && (
         <ScreenOverlayBlur onOverlayClicked={handleNavigationOnSmallScreen} />
       )}
-      <div className={`layout ${selected} max-h-screen overflow-hidden`}>
+      <div className={`layout ${selected} h-full`}>
         <div className="text-text">
           <NavigationVertical navigationState={state} />
-          <div className="flex w-full min-w-0 flex-auto flex-col overflow-y-auto custom-scroll bg-background">
+          <div className="flex w-full min-w-0 flex-auto flex-col bg-background h-screen overflow-y-auto sm:overflow-hidden">
             <AppBar
               toggleNavigation={toggleNavigation}
               selected={selected}
               setSelected={setSelected}
             />
 
-            <Outlet />
+            <div className="sm:overflow-y-auto custom-scroll">
+              <Outlet />
+            </div>
           </div>
         </div>
       </div>
