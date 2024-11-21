@@ -5,13 +5,14 @@ const MgtUserActivity = () => {
   const { backend } = useSelector((state) => state.authentication);
   const [tickets, setTickets] = useState([]);
   const [error, setError] = useState(null);
-  const [loading,setLoading]=useState(true)
+  const [loading, setLoading] = useState(true);
 
   const getTickets = async () => {
     try {
       const res = await backend.getAllCallerTickets(10, 0);
+      console.log(res);
       setTickets(res.ok.data || []);
-      setLoading(false)
+      setLoading(false);
     } catch (err) {
       console.error(err);
       setError("Failed to fetch tickets.");
@@ -32,7 +33,7 @@ const MgtUserActivity = () => {
       {error && (
         <div className="text-red-600 bg-red-100 p-4 rounded mb-6">{error}</div>
       )}
-      {loading? (
+      {loading ? (
         <div className="text-gray-500 text-center py-12">loading...</div>
       ) : (
         <div className="overflow-x-auto">
