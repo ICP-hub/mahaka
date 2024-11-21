@@ -13,6 +13,7 @@ const initialState = {
   buyTicketLoading: false,
   totalPages: 0,
   currentPage: 0,
+  deleteLoading: false,
 };
 
 // async operations
@@ -23,12 +24,11 @@ export const getAllVenues = createAsyncThunk(
     console.log("response:", response);
     return {
       data: response.data,
-      totalPages: Number(response.Total_pages), 
-      currPage: Number(response.current_page)   
+      totalPages: Number(response.Total_pages),
+      currPage: Number(response.current_page),
     };
   }
 );
-
 
 // Get single venue
 export const getVenue = createAsyncThunk(
@@ -132,11 +132,14 @@ export const buyVenueTicket = createAsyncThunk(
 export const searchVenues = createAsyncThunk(
   "venues/searchVenues",
   async ({ backend, searchText, pageLimit, currPage }) => {
-    const response = await backend.searchVenues(searchText, pageLimit, currPage);
+    const response = await backend.searchVenues(
+      searchText,
+      pageLimit,
+      currPage
+    );
     return { data: response.data, totalPages: response.totalPages, currPage };
   }
 );
-
 
 // Create slice
 const venueSlice = createSlice({
@@ -149,6 +152,7 @@ const venueSlice = createSlice({
         state.loading = true;
       })
       .addCase(getAllVenues.fulfilled, (state, action) => {
+        console.log("add case for get all venues", action);
         state.loading = false;
         state.venues = action.payload.data;
         state.totalPages = action.payload.totalPages;
@@ -173,7 +177,7 @@ const venueSlice = createSlice({
       })
 
       .addCase(deleteVenue.pending, (state) => {
-        state.loading = true;
+        state.deleteLoading = true;
       })
       .addCase(deleteVenue.fulfilled, (state, action) => {
         state.loading = false;
@@ -183,7 +187,7 @@ const venueSlice = createSlice({
         state.error = null;
       })
       .addCase(deleteVenue.rejected, (state, action) => {
-        state.loading = false;
+        state.deleteLoading = false;
         state.error = action.error.message;
       })
 

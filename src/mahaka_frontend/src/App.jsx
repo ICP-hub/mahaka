@@ -10,6 +10,7 @@ import "flatpickr/dist/flatpickr.min.css";
 import { ConnectWallet, useIdentityKit } from "@nfid/identitykit/react";
 import { updateAuthData } from "./redux/reducers/auth/authenticationReducer";
 import { getUserDetailsByCaller } from "./redux/reducers/apiReducers/userApiReducer";
+import { getAllEventsPaginated } from "./redux/reducers/apiReducers/eventApiReducer";
 // import { createVenue , updateVenue } from "./redux/reducers/apiReducers/venueApiReducer";
 
 function App() {
@@ -49,59 +50,12 @@ function App() {
     dispatch(getAllVenues({ backend: backend, pageLimit: 100, currPage: 0 }));
   }, []);
 
-  
+  useEffect(() => {
+    dispatch(getAllEventsPaginated({ backend: backend }));
+  }, []);
 
-
-  // const handleBanner = async ()=>{
-  //   try{
-  //     const bannerData = [
-  //       {
-  //         title: "anil",
-  //         redirectUrl: "anil",
-  //         description: "anil",
-  //         category: { ThirdParty:null }, 
-  //         image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wAAAgEBAY2BGQAAAABJRU5ErkJggg==",
-  //       },
-  //     ];
-
-  //     // const response = await backend.addBanner(bannerData);
-  // dispatch(addBanner({backend, bannerData:bannerData}))
-     
-  //     // console.log("banner response is",response)
-  //   }catch(e){
-  //     console.log("Error in creating banner",e)
-
-  //   }
-  //  }
-
-
-
-
-  // const fetchBanners = async (category) => {
-  //   console.log("category is", category)
-  //   try {
-  //     // Call the backend's getAllBanners function (without passing any arguments)
-  //     //const response = await backend.getAllBanners(category);
-  
-  //     // Now you can handle the response, which should be an array of banners
-  //    // console.log("Banner fetched response:", response);
-  //     dispatch(getAllBanners ({backend, category}))
-  
-      
-  //   } catch (e) {
-  //     console.error("Error in fetching banners", e);
-  //   }
-  // };
-  
   return (
-    <div className="light bg-background no-scrollbar">
-      {/* <button onClick = {handleBanner}>create banner</button> */}
-      {/* <button
-  onClick={() => fetchBanners({ ThirdParty: null })} // Pass '#Attraction' as the category
-  className="border p-3 mx-5"
->
-  Fetch Banners
-</button> */}
+    <div>
       <RouterProvider router={appRoutes} />
       <NotificationToast />
     </div>

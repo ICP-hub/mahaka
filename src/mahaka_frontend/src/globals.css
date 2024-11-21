@@ -11,6 +11,10 @@
   margin: 0px;
 }
 
+body {
+  overflow: hidden;
+}
+
 /*  all images are responsive */
 img {
   max-width: 100%;

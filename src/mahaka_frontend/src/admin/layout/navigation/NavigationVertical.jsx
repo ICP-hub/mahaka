@@ -21,7 +21,7 @@ const NavigationVertical = ({ navigationState }) => {
       variants={animationVariants}
       initial={navigationState.isOpen ? "open" : "closed"}
       animate={navigationState.isOpen ? "open" : "closed"}
-      className="min-w-64 max-w-64 bg-primary border-r-border border-r z-[200] fixed md:sticky h-full no-scrollbar overflow-y-auto"
+      className="min-w-64 max-w-64 bg-primary border-r-border border-r z-[200] fixed md:sticky h-screen no-scrollbar overflow-y-auto pb-8"
     >
       <LogoSection />
       <ProfileSection />

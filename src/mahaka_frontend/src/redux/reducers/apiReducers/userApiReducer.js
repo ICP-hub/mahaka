@@ -70,9 +70,7 @@ export const updateUser = createAsyncThunk(
       }
       throw new Error("Failed to update user");
     } catch (error) {
-      notificationManager.error(
-        "Failed to update member details! Please check the principal ID"
-      );
+      notificationManager.error("Failed to update member details!");
       console.error("Error creating member", error);
       return rejectWithValue(error || "An unexpected error occurred");
     }
