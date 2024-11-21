@@ -412,6 +412,25 @@ actor Fiat {
             Http.Status.OK);
     };
 
+    public query func get_invoice(invoiceId : Nat) : async Http.Response<Http.ResponseStatus<Invoice, {}>> {
+
+        var invoiceRes : Invoice = switch (Trie.get(invoicesTrie, Utils.keyNat(invoiceId), Nat.equal)) {
+            case null {
+                return Utils.generalResponse(false, 
+                    "Invoice not found.", 
+                    #err({}), 
+                    Http.Status.NotFound
+                );
+            };
+            case (?result) result;
+        };
+
+        return Utils.generalResponse(true, 
+            Messages.success_operation,
+            #success(invoiceRes), 
+            Http.Status.OK);
+    };
+
     // public func _change_invoice_status (invoiceReq: Types.Request.ConfirmInvoiceBody) : async Http.Response<Http.ResponseStatus<Types.Response.ConfirmInvoiceBody, {}>> {
 
     // };
@@ -419,7 +438,7 @@ actor Fiat {
     public shared({caller}) func change_invoice_status (invoiceReq: Types.Request.ConfirmInvoiceBody) : async Http.Response<Http.ResponseStatus<Types.Response.ConfirmInvoiceBody, {}>> {
         // Check if the caller is anonymous
         if (Validation.isAnonymous(caller)) {
-            return Utils.generalResponse(false, Messages.not_authorized, #err({}), Http.Status.UnprocessableEntity);
+            // return Utils.generalResponse(false, Messages.not_authorized, #err({}), Http.Status.UnprocessableEntity);
         }
         // Check if the payment method is empty
         else if (Validation.isEmpty(invoiceReq.paymentMethod)) {

@@ -7,6 +7,7 @@ import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
 
 import { useIdentityKit } from "@nfid/identitykit/react";
 import { getAllEventsByVenue } from "../../redux/reducers/apiReducers/eventApiReducer";
+import { fetchTicketDetails } from "../../redux/reducers/apiReducers/ticketApiReducer";
 import EventTickets from "../components/EventTickets";
 
 const MgtTicket = () => {
@@ -24,11 +25,6 @@ const MgtTicket = () => {
   const [loading, setLoading] = useState(true);
   const { identity } = useIdentityKit();
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    // Fetch venues when the component mounts
-    dispatch(getAllVenues({ backend, chunkSize: 100, pageNo: 0 }));
-  }, [dispatch, backend]);
 
   useEffect(() => {
     // Automatically select the first venue and fetch its ticket details
@@ -174,35 +170,39 @@ const MgtTicket = () => {
         <p>No ticket details available for the selected venue.</p>
       )}
 
-      <label className="block mb-2 text-lg font-medium">Select event</label>
-      <select
-        id="event"
-        className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-6"
-        value={selectedEvent?.id || ""}
-        onChange={handleEventChange}
-      >
-        <option value="" disabled>
-          Choose a event
-        </option>
-        {events.map((venue) => (
-          <option key={venue.id} value={venue.id}>
-            {venue.title}
-          </option>
-        ))}
-      </select>
-      {loadingDetails ? (
-        <p>Loading ticket details...</p>
-      ) : eventDetails ? (
-        <div>
-          <EventTickets
-            {...ticketData}
-            tickets={eventDetails}
-            selectedVenue={selectedEvent}
-            id={selectedVenue?.id}
-          />
-        </div>
-      ) : (
-        <p>No ticket details available for the selected venue.</p>
+      {events.length > 0 && (
+        <>
+          <label className="block mb-2 text-lg font-medium">Select event</label>
+          <select
+            id="event"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-6"
+            value={selectedEvent?.id || ""}
+            onChange={handleEventChange}
+          >
+            <option value="" disabled>
+              Choose a event
+            </option>
+            {events.map((venue) => (
+              <option key={venue.id} value={venue.id}>
+                {venue.title}
+              </option>
+            ))}
+          </select>
+          {loadingDetails ? (
+            <p>Loading ticket details...</p>
+          ) : eventDetails ? (
+            <div>
+              <EventTickets
+                {...ticketData}
+                tickets={eventDetails}
+                selectedVenue={selectedEvent}
+                id={selectedVenue?.id}
+              />
+            </div>
+          ) : (
+            <p>No ticket details available for the selected venue.</p>
+          )}
+        </>
       )}
     </div>
   );

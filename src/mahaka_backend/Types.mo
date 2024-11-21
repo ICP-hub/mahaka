@@ -5,6 +5,7 @@ import Region "mo:base/Region";
 import Time "mo:base/Time";
 import Principal "mo:base/Principal";
 import Types "../DIP721-NFT/Types";
+import TypesICRC "../ICRC/Types";
 
 module {
 
@@ -48,7 +49,8 @@ module {
         description : Text;
         details : wahanaDetails;
         banner : LogoResult;
-        price : Nat;
+        priceFiat : Float;
+        priceICP : Nat;
         creator : Principal;
         venueId : Text;
         featured : Bool;
@@ -196,17 +198,63 @@ module {
         #Online
     };
 
+    public type category = {
+        #Venue;
+        #Event;
+        #Wahana;
+    };
+
     public type TicketSaleInfo = {
         ticketId : Nat;
-        category : Text;
+        categoryId : Text;
         paymentType : PaymentType;
         numOfVisitors : Nat;
         saleDate : Time.Time;
         ticketIssuer : Principal;
         recepient : Principal;
         ticketType : TicketType;
-        price : Nat;
+        price : Nat or Float;
     };
+
+    public type ArgsStore = {
+        collectionActor: actor {
+               logoDip721: () -> async Types.LogoResult;
+               mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: Types.ticket_type, logo: Types.LogoResult) -> async Types.MintReceipt;
+        };
+        metadata : Types.MetadataDesc; 
+        ticketType : ticket_info;
+        receiver : Principal; 
+        numOfVisitors : Nat;
+        categoryId : venueId; 
+        paymentType : PaymentType;
+        ticketPrice: Float or Nat;
+        offlineOrOnline : TicketType;
+        saleType : Text;
+        recepient : Principal; 
+        caller : Principal
+    };
+
+    public type ArgsStoreWahana ={
+        collectionActor: actor {
+               icrc1_transfer: ({
+                    from_subaccount: ?TypesICRC.Subaccount;
+                    to: TypesICRC.Account;
+                    amount: TypesICRC.Tokens;
+                    fee: ?TypesICRC.Tokens;
+                    memo: ?TypesICRC.Memo;
+                    created_at_time: ?TypesICRC.Timestamp;
+               }) -> async TypesICRC.Result<TypesICRC.TxIndex, TypesICRC.TransferError>
+          };
+        receiver : Principal; 
+        numOfVisitors : Nat;
+        wahanaId : Text; 
+        paymentType : PaymentType;
+        offlineOrOnline : TicketType;
+        price: Float;
+        recepient : Principal; 
+        caller : Principal
+    };
+
 
     public type MintError = {
         #MintErr;

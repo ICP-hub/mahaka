@@ -28,6 +28,7 @@ export const createWahana = createAsyncThunk(
     featured,
     banner,
     details,
+    priceFiat,
     
     price,
   }) => {
@@ -43,6 +44,7 @@ export const createWahana = createAsyncThunk(
         details ,
         featured,
         banner,
+        priceFiat,
         price
       );
       console.log("wahana created successfully")
@@ -326,7 +328,7 @@ const wahanaSlice = createSlice({
         state.loading = false;
         state.currentWahana = [];
         state.error = action.error.message;
-        notificationManager.error("Failed to fetch wahanas");
+        //notificationManager.error("Failed to fetch wahanas");
       });
   },
 });

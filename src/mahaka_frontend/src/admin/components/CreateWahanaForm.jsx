@@ -24,6 +24,7 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
     totalSupply: 1000000,
     description: "",
     price: "",
+    priceFiat:"",
     featured:isToggled,
     banner: {
       data: "",
@@ -139,6 +140,10 @@ console.log("create wahana errors are", errors)
   if (!formData.price) {
     errors.price = "price is required";
   }
+// price in Fiat currency
+  if (!formData.priceFiat) {
+    errors.priceFiat = "price is required";
+  }
 
   // Validate banner image
   if (!formData.banner.data) {
@@ -215,46 +220,39 @@ console.log("create wahana errors are", errors)
 
 
   const handleInputChange = (e) => {
-    console.log("input change is",e.target.value)
     const { name, value } = e.target;
-    const updatedValue = name === "price" ? Number(value) : value;
-    console.log("input change is",value)
+  
+    console.log("input change is", value);
+  
+    // Ensure that priceFiat is a valid number, or fallback to 0
+    const updatedValue = name === "priceFiat"
+      ? (value === "" ? 0 : parseFloat(value))  // If empty, set as 0
+      : name === "price"
+        ? (value === "" ? 0 : Number(value))   // If empty, set as 0 for price
+        : value;  // For other fields, just keep the value as is
+  
+    console.log("Updated value is", updatedValue);
+  
     setFormData((prevState) => ({
       ...prevState,
-      [name]:  updatedValue,
+      [name]: updatedValue,
     }));
-
+  
     if (formErrors[name]) {
       setFormErrors((prevErrors) => ({
         ...prevErrors,
-        [name]: undefined,
+        [name]: undefined,  // Clear any existing error for this field
       }));
     }
   };
+  
 
 
   
 
   return (
     <div>
-      {/* toggle the wahana */}
-      <div className = "flex justify-end">
-      <div 
-  onClick={handleToggle} 
-  className={`relative w-12 h-6 flex items-center rounded-full cursor-pointer transition-colors duration-300 ${
-    isToggled ? 'bg-orange-500' : 'bg-gray-500'
-  }`}
->
-  <div
-    className={`absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-      isToggled ? 'translate-x-6' : 'translate-x-0'
-    }`}
-  ></div>
-</div>
-
-    </div>
-
-
+     
       <div className="space-y-4">
         {/* Select Venue */}
         <div className="flex flex-col gap-1">
@@ -353,6 +351,37 @@ console.log("create wahana errors are", errors)
           {formErrors.price && (
           <p className="text-red-500 text-sm mt-1">{formErrors.price}</p>)}
         </div>
+     
+     {/* price in Fiat currency */}
+
+     <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">Price (FIAT)</label>
+            <TextHint text="Enter the price of the wahana." />
+            </div>
+          <div
+           className={`border ${formErrors.priceFiat ? "border-red-500" : "border-border"
+           } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+          >
+            <input
+              value={ formData.priceFiat || ""}
+              
+              type ="number"
+              name="priceFiat" 
+              step="0.01" 
+              // onChange={(e) =>
+              //   setFormData({ ...formData, price: parseInt(e.target.value) })
+              // }
+              onChange = {handleInputChange }
+              className="my-3 outline-none w-full bg-transparent"
+              required
+            />
+          </div>
+          {formErrors.priceFiat && (
+          <p className="text-red-500 text-sm mt-1">{formErrors.priceFiat}</p>)}
+        </div>
+
+
 
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
@@ -394,7 +423,36 @@ console.log("create wahana errors are", errors)
         
       </div>
 
-      <div className="flex justify-end mt-6 space-x-4">
+     
+
+
+      <div className = "mt-5">
+        <div className = "flex">
+        <label className="font-semibold mr-2">Featured </label>
+        <TextHint text="Upload the image of the wahana." />
+        </div>
+      <div 
+  onClick={handleToggle} 
+  className={`relative w-12 h-6 flex items-center rounded-full cursor-pointer transition-colors my-2 duration-300 ${
+    isToggled ? 'bg-orange-500' : 'bg-gray-500'
+  }`}
+>
+  <div
+    className={`absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+      isToggled ? 'translate-x-6' : 'translate-x-0'
+    }`}
+  ></div>
+</div>
+    </div>
+
+
+
+
+
+
+
+
+    <div className="flex justify-end mt-6 space-x-4">
         <button
           className="px-4 py-2 bg-gray-100 text-gray-800 rounded-full"
           onClick={onClose}
