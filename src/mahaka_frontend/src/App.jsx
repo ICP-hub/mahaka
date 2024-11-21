@@ -49,6 +49,8 @@ function App() {
     dispatch(getAllVenues({ backend: backend, pageLimit: 100, currPage: 0 }));
   }, []);
 
+  
+
 
   // const handleBanner = async ()=>{
   //   try{

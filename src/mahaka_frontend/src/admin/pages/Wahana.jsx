@@ -553,7 +553,7 @@ const WahanaCard = ({ wahana, delete_Wahana, loading, handleDescription }) => {
         <div className="flex items-baseline whitespace-nowrap">
           <div className="mr-2 text-2xl">IDR</div>
           <div className="text-6xl font-semibold leading-tight tracking-tight">
-            {parseInt(wahana?.price)}
+            {parseInt(wahana?.priceICP)}
           </div>
           <div className="text-secondary text-2xl">/person</div>
           {/* <button className="mt-8 sm:ml-auto sm:mt-0" onClick={onEditClick}>

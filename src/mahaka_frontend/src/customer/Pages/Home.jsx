@@ -343,29 +343,10 @@ export default function Home() {
         {/* --------------------------------venues section end-------------------------------- */}
 
         {/* third party BANNER section start*/}
-        <div className="my-12">
-          <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-            <div className="h-[259px] bg-gradient-to-r from-blue-900 to-gray-900 rounded-2xl shadow-md py-8  overflow-hidden flex flex-col justify-center items-center">
-              <h2 className="relative top-32 text-[76.77px] font-extrabold gradienttext">
-                THIRD PARTY BANNER
-              </h2>
-
-              <div className="w-[305.37px] h-[330.38px] relative -top-[2.75rem]">
-                <img
-                  src={maskgroup}
-                  alt="Profile"
-                  className="w-full h-full object-contain object-center "
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        {/* third party BANNER section end*/}
-        {/* 3 Grid card  start*/}
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-3 md:grid-cols-2  gap-[33px]">
+          <div className="grid lg:grid-cols-1 md:grid-cols-1  gap-[33px]">
 
-            {banners.map((banner)=>(
+          {banners.slice(0, 1).map((banner) => (
                <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden">
                 <h1 className = "text-gray-600 mx-2 my-2 text-xl font-bold">{banner.title}</h1>
                 {/* <p className ="text-slate-700 mx-2 my-2">{banner?.description}</p> */}
@@ -379,53 +360,46 @@ export default function Home() {
             ))}
 
               </div>
-            {/* card 1 */}
-            {/* <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden"> */}
-              {/* <img
-                src={SocialMedia}
-                alt="image"
-                className="w-full  h-[204px] object-cover object-center"
-              /> */}
-            {/* </div> */}
-            {/* card 2 */}
-            {/* <div className="w-full  h-[204px] shadow-lg rounded-2xl overflow-hidden bg-gradient-to-r from-blue-900 to-gray-900 ">
-              <img
-                src={fram6}
-                alt="image"
-                className="object-contain object-center h-[100%]"
-              />
-            </div> */}
-            {/* card 3 */}
-            {/* <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden  bg-gray-950">
-              <img
-                src={Group16}
-                alt="image"
-                className="object-contain object-center h-[100%] w-full"
-              />
-            </div> */}
-         
         </div>
-        {/* 3 Grid card  end*/}
+        {/* third party BANNER section end*/}
         {/* 2 Grid card  start*/}
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2   gap-[33px]">
-            {/* card 1 */}
-            <div className="w-full max-h-[175px]  shadow-lg rounded-2xl overflow-hidden  ">
-              <img
-                src={SocialMedia2}
-                alt="image"
-                className="object-cover object-center h-[100%]"
-              />
-            </div>
-            {/* card 2 */}
-            <div className="w-full max-h-[175px]  shadow-lg rounded-2xl overflow-hidden  bg-gradient-to-r from-blue-900 to-gray-900">
-              <img
-                src={fram4}
-                alt="image"
-                className="object-cover object-center h-[100%]"
-              />
-            </div>
-          </div>
+          <div className="grid lg:grid-cols-2 md:grid-cols-2  gap-[33px]">
+
+          {banners.slice(2, 4).map((banner) => (
+               <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden">
+                <h1 className = "text-gray-600 mx-2 my-2 text-xl font-bold">{banner.title}</h1>
+                {/* <p className ="text-slate-700 mx-2 my-2">{banner?.description}</p> */}
+               <img
+                 src={banner?.image}
+                 alt="image"
+                 className="w-full  h-[100%] object-cover object-center"
+               />
+             </div>
+
+            ))}
+
+              </div>
+        </div>
+        {/* 2 Grid card  end*/}
+        {/* 3 Grid card  start*/}
+        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-3 md:grid-cols-3  gap-[33px]">
+
+          {banners.slice(2).map((banner) => (
+               <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden">
+                <h1 className = "text-gray-600 mx-2 my-2 text-xl font-bold">{banner.title}</h1>
+                {/* <p className ="text-slate-700 mx-2 my-2">{banner?.description}</p> */}
+               <img
+                 src={banner?.image}
+                 alt="image"
+                 className="w-full  h-[100%] object-cover object-center"
+               />
+             </div>
+
+            ))}
+
+              </div>
         </div>
         {/* 2 Grid card  end*/}
         {/* OnGoing Event slider Start  */}
