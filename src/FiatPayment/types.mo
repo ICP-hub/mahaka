@@ -1,6 +1,9 @@
 import Principal "mo:base/Principal";
 import Float "mo:base/Float";
 import Http "http";
+import nftTypes "../DIP721-NFT/Types";
+import Types "../mahaka_backend/Types";
+
 
 module {
 
@@ -17,11 +20,26 @@ module {
         createdAt: Int;
     };
 
+    public type MintArgs = {
+          metadata: nftTypes.MetadataDesc;
+          ticketType: nftTypes.ticket_type;
+          receiver: Principal;
+          numOfVisitors: Nat;
+          categoryId: Text;
+          paymentType: Types.PaymentType;
+          ticketPrice: Nat;
+          offlineOrOnline : Types.TicketType;
+          saleType: Text;
+          recepient : Principal;
+          caller : Principal
+    };
+
     public type Item = {
         id: Nat;
         name: Text;
         quantity: Int;
         price: Float;
+        categoryId : Text;
     };
     
     public module InvoiceStatus = {
