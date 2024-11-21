@@ -208,19 +208,21 @@ const EventCard = ({ event }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const toggleExpand = () => setIsExpanded((pv) => !pv);
 
-  // Format date
-  function formatDate(timestamp) {
-    return new Date(timestamp).toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+  function formatDateAndTime(timestamp) {
+    const dateObject = new Date(timestamp * 1000);
+    const date = dateObject.toDateString();
+    const time = dateObject.toLocaleTimeString("en-GB", { hour12: false });
+    return {
+      date: date,
+      time: time,
+    };
   }
 
-  // Format time
-  function formatTime(timestamp) {
-    return new Date(timestamp).toUTCString().slice(-9, -4);
-  }
+  const startInterVal = formatDateAndTime(parseInt(event.details.StartDate));
+  const endInterVal = formatDateAndTime(parseInt(event.details.EndDate));
+
+  console.log("start", startInterVal);
+  console.log("end", endInterVal);
 
   return (
     <div className="bg-card flex min-h-96 max-h-fit flex-col rounded-2xl overflow-hidden">
@@ -260,8 +262,8 @@ const EventCard = ({ event }) => {
         <div className="flex items-center justify-between mt-2">
           <div className="flex flex-col font-medium">
             <div>Start Date</div>
-            <div>{formatDate(parseInt(event.details.StartDate))} </div>
-            <div>{formatTime(parseInt(event.details.StartTime))}</div>
+            <div>{startInterVal.date}</div>
+            <div>{startInterVal.time}</div>
           </div>
           <button
             onClick={toggleExpand}
@@ -291,8 +293,8 @@ const EventCard = ({ event }) => {
               <div className="flex justify-between">
                 <div className="flex flex-col font-medium w-1/2">
                   <div>End Date</div>
-                  <div>{formatDate(parseInt(event.details.EndDate))}</div>
-                  <div>{formatTime(parseInt(event.details.EndTime))}</div>
+                  <div>{endInterVal.date}</div>
+                  <div>{endInterVal.time}</div>
                 </div>
                 <div className="flex flex-col font-medium w-1/2">
                   <div>Event ID</div>
