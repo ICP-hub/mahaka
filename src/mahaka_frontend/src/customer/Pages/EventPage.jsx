@@ -5,6 +5,7 @@ import Ticket from "../../customer/Components/Ticket";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import {getDIPdetails} from "../../redux/reducers/apiReducers/dipapireducer"
 import { Swiper, SwiperSlide } from "swiper/react";
 import { getVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
 import { getEvent } from "../../redux/reducers/apiReducers/eventApiReducer";
@@ -54,8 +55,8 @@ const ticketData = [
   },
 ];
 const calculateDuration = (StartDate, EndDate) => {
-  const start = new Date(StartDate);
-  const end = new Date(EndDate);
+  const start = new Date(typeof StartDate === 'bigint' ? Number(StartDate) : StartDate);
+  const end = new Date(typeof EndDate === 'bigint' ? Number(EndDate) : EndDate);
   const durationMs = end - start;
   const days = Math.floor(durationMs / (1000 * 60 * 60 * 24));
 
@@ -121,6 +122,17 @@ const EventPage = () => {
       .catch((err) => {
         setLocalError(err.message || "Failed to fetch events for the venue");
       });
+
+      try {
+        const venuePrincipal = currentEvent.event_collectionid;
+        dispatch(getDIPdetails({ backend, principal: venuePrincipal }))
+          .unwrap()
+          .catch((err) => {
+            console.error("Failed to fetch DIP details:", err);
+          });
+      } catch (error) {
+        console.error("Invalid venue Principal:", error);
+      }
   }, [dispatch, venueId, backend]);
 
   // Assuming the first event is the main event for this venue
@@ -130,23 +142,38 @@ const EventPage = () => {
       ? calculateDuration(venue.details.StartDate, venue.details.EndDate)
       : "";
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  };
+      const formatDate = (dateString) => {
+        const date = new Date(typeof dateString === 'bigint' ? Number(dateString) : dateString);
+        return date.toLocaleDateString("en-US", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        });
+      };
 
-  const formatTime = (timeString) => {
-    const time = parseInt(timeString, 10);
-    const hours = Math.floor(time / 100);
-    const minutes = time % 100;
-    const period = hours >= 12 ? "PM" : "AM";
-    const formattedHours = hours % 12 || 12;
-    return `${formattedHours}:${minutes.toString().padStart(2, "0")} ${period}`;
-  };
+      const FormatTime = (nanoseconds) => {
+        // Input validation
+        if (!nanoseconds && nanoseconds !== 0) {
+          return "Invalid input";
+        }
+        try {
+          const totalMinutes = Math.floor(Number(nanoseconds) / (60 * 1000000000));
+          // Validate range (24 hours in minutes = 1440)
+          if (totalMinutes < 0 || totalMinutes >= 1440) {
+            return "Time out of range";
+          }
+          const hours = Math.floor(totalMinutes / 60);
+          const minutes = totalMinutes % 60;
+          const period = hours >= 12 ? "PM" : "AM";
+          let formattedHours = hours % 12;
+          formattedHours = formattedHours === 0 ? 12 : formattedHours;
+          const displayHours = formattedHours.toString().padStart(2, "0");
+          const displayMinutes = minutes.toString().padStart(2, "0");
+          return `${displayHours}:${displayMinutes} ${period}`;
+        } catch (error) {
+          return "Invalid time format";
+        }
+      };
 
   return (
     <>
@@ -304,7 +331,7 @@ const EventPage = () => {
                           <li>
                             <strong>Last Entry:</strong>{" "}
                             {(venue?.details.EndTime &&
-                              venue.details.EndTime) ||
+                             FormatTime( venue.details.EndTime)) ||
                               "4:00 PM"}
                           </li>
                         </ul>
@@ -348,8 +375,8 @@ const EventPage = () => {
                       "13 Jul- 17 Jul 2024"}
                   </h3>
                   <h3 className="text-lg font-normal">
-                    {venue?.details.StartTime && venue.details.StartTime} -
-                    {(venue?.details.EndTime && venue.details.EndTime) ||
+                    {venue?.details.StartTime && FormatTime(venue.details.StartTime)} -
+                    {(venue?.details.EndTime && FormatTime(venue.details.EndTime)) ||
                       "12:00AM - 3:00PM"}
                   </h3>
                   <h3 className="text-lg font-normal">
