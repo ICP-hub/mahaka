@@ -42,12 +42,12 @@ const CreateEventForm = ({
       created_at: Date.now(),
       collection_type: "Event",
       symbol: "",
-      sTicket_price: 25,
-      gTicket_price: 50,
-      vTicket_price: 30,
-      sTicket_limit: "",
+      sTicket_price: 10,
+      gTicket_price: "",
+      vTicket_price: 20,
+      sTicket_limit: 50,
       gTicket_limit: "",
-      vTicket_limit: "",
+      vTicket_limit: 60,
     },
     eventDetails: {
       StartDate: "",
@@ -94,12 +94,15 @@ const CreateEventForm = ({
     if (!eventData.collection_args.gTicket_limit) {
       errors.gTicket_limit = "General ticket limit is required";
     }
-    if (!eventData.collection_args.sTicket_limit) {
-      errors.sTicket_limit = "Student ticket limit is required";
+    if (!eventData.collection_args.gTicket_price) {
+      errors.gTicket_limit = "General ticket price is required";
     }
-    if (!eventData.collection_args.vTicket_limit) {
-      errors.vTicket_limit = "VIP ticket limit is required";
-    }
+    // if (!eventData.collection_args.sTicket_limit) {
+    //   errors.sTicket_limit = "Student ticket limit is required";
+    // }
+    // if (!eventData.collection_args.vTicket_limit) {
+    //   errors.vTicket_limit = "VIP ticket limit is required";
+    // }
 
     // Validate banner image
     if (!eventData.collection_args.banner.data) {
@@ -777,12 +780,36 @@ const CreateEventForm = ({
 
       {/* Ticket Limits */}
       <div className="flex space-x-4">
-        <div className="w-1/3">
+        <div className="w-1/2">
+          <div className="flex items-center gap-2">
+            <label className="font-semibold text-sm">
+              General Ticket Price
+            </label>
+            <TextHint text="Enter the General Ticket Price of the event." />
+          </div>
+          <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
+            <input
+              type="number"
+              name="gTicket_price"
+              value={eventData.collection_args.gTicket_price}
+              onChange={handleInputChange}
+              className="my-3 outline-none w-full bg-transparent"
+              required
+            />
+          </div>
+          {formErrors.gTicket_price && (
+            <p className="text-red-500 text-sm mt-1">
+              {formErrors.gTicket_price}
+            </p>
+          )}
+        </div>
+
+        <div className="w-1/2">
           <div className="flex items-center gap-2">
             <label className="font-semibold text-sm">
               General Ticket Limit
             </label>
-            <TextHint text="Enter the General Ticket Limit of the event." />
+            <TextHint text="Enter the Student Ticket Limit of the event." />
           </div>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
@@ -800,7 +827,8 @@ const CreateEventForm = ({
             </p>
           )}
         </div>
-        <div className="w-1/3">
+
+        {/* <div className="w-1/3">
           <div className="flex items-center gap-2">
             <label className="font-semibold text-sm">
               Student Ticket Limit
@@ -843,7 +871,7 @@ const CreateEventForm = ({
               {formErrors.vTicket_limit}
             </p>
           )}
-        </div>
+        </div> */}
       </div>
 
       {/* Event Image */}
