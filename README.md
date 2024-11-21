@@ -109,3 +109,8 @@ token_name = opt \"Local ICP\";
 }
 })
 "
+
+"DIP721-NFT": {
+"main": "src/DIP721-NFT/Nft.mo",
+"type": "motoko"
+}
