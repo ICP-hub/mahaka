@@ -5,6 +5,7 @@ import flatpickr from "flatpickr";
 import { FcAlarmClock, FcCalendar } from "react-icons/fc";
 import { Principal } from "@dfinity/principal";
 import TextHint from "../../customer/Components/TextHint";
+import notificationManager from "../../common/utils/notificationManager";
 import {
   FormFieldDate,
   FormFieldImageUpload,
