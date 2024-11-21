@@ -104,9 +104,10 @@ export const createVenue = createAsyncThunk(
         description
       );
       action(false);
+      console.log("response creating venue", response);
       return response;
     } catch (error) {
-      throw error;
+      console.log("Error creating venue", error);
     }
   }
 );
