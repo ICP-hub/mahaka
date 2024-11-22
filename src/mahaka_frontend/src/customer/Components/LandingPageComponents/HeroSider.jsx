@@ -14,33 +14,14 @@ import { getAllBanners } from "../../../redux/reducers/apiReducers/bannerApiRedu
 export default function HeroSide() {
   const { backend } = useSelector((state) => state.authentication);
   const {banners} = useSelector((state) => state.banner);
+  const {  attractionBanners } = useSelector((state) => state.banner);
   console.log("banners in herosider is", banners)
+  console.log("only attraction  banners in hero sider",  attractionBanners);
   const dispatch = useDispatch();
 
+ 
 
-
-
-  useEffect(() => {
-
-    const fetchBanners = async (category)=>{
-      try{
-        await dispatch(getAllBanners({backend, category}))
-      }catch(e){
-        console.log("error in fetching banners",e)
-      }
   
-    }
-      console.log("logging in hEROSIDER")
-     // dispatch(getAllBanners ({backend, category}))
-     fetchBanners({ Attraction: null }) 
-    
-  }, [backend, dispatch]);
-
-  console.log("logging in hEROSIDER BANNERS",banners)
-
-
-
-  // Fetch banners from Redux store
  
 
   return (
@@ -57,7 +38,7 @@ export default function HeroSide() {
       className="mySwiper"
     >
       {/* Dynamically generate slides */}
-      {banners?.map((banner, index) => (
+      {attractionBanners?.map((banner, index) => (
         <SwiperSlide key={index}>
           <HeroCard
             title={banner.title}

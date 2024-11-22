@@ -2,7 +2,10 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import notificationManager from "../../../common/utils/notificationManager";
 
 const initialState = {
-    banners: [],
+  attractionBanners: [],
+  thirdPartyBanners:[],
+  banners:[],
+
     currentBanner: null,
     bannerLoading: false,
     error: null,
@@ -61,7 +64,7 @@ export const addBanner = createAsyncThunk(
             category
          
         );
-        console.log("banners fetched response is", response)
+       // console.log("banners fetched response is", response)
         return response;
       } catch (error) {
         throw error;
@@ -86,6 +89,7 @@ const bannerSlice = createSlice({
         })
         .addCase(addBanner.fulfilled, (state, action) => {
           state. bannerLoading = false;
+          
           state.banners.push(action.payload); 
           // state.banners = [...state.banners, action.payload];
           state.error = null;
@@ -106,20 +110,23 @@ const bannerSlice = createSlice({
           })
           .addCase(getAllBanners.fulfilled, (state, action) => {
             state. bannerLoading = false;
+
+            if (action.meta.arg.category.Attraction !== undefined) {
+              // Update only attractionBanners
+              state.attractionBanners = action.payload;
+            } else if (action.meta.arg.category.ThirdParty !== undefined) {
+              // Update only thirdPartyBanners
+              state.thirdPartyBanners = action.payload;
+            }
            
-            if (action.payload) {
-            
-                // Append new page of events to the existing list
-               // state.banners = [...state.banners, ...action.payload];
-               state.banners = action.payload || []
-                console.log("banners fetched successfully",state.banners)
-              } else {
-                state.banners = []
-              }
-              // state.currentPage = action.payload.ok.current_page;
-              // state.totalPages = action.payload.ok.Total_pages;
-              state.error = null;
           
+              // Log the separated banners
+              console.log("Attraction Banners:", state.attractionBanners);
+              console.log("Third Party Banners:", state.thirdPartyBanners);
+          
+              // Update state
+             
+         
            // notificationManager.success("banners fetched successfully");
             // console.log("banners fetched successfully",state.banners)
           })

@@ -57,30 +57,58 @@ export default function Home() {
   const { venues, loading } = useSelector((state) => state.venues);
   console.log("venues in home", venues);
   const { backend } = useSelector((state) => state.authentication);
-  const { banners } = useSelector((state) => state.banner);
-  console.log("banners in home", banners?.title);
+  const {  attractionBanners, thirdPartyBanners } = useSelector((state) => state.banner);
+ //const {  thirdPartyBanners } = useSelector((state) => state.banner);
+//  const { banners } = useSelector((state) => state.banner);
+ // console.log("only third party  banners in home",  thirdPartyBanners);
+
+ console.log("Attraction Banners home:", attractionBanners);
+ console.log("Third Party Banners home:", thirdPartyBanners);
   const dispatch = useDispatch();
-  const [attractionBanners, setAttractionBanners] = useState([]);
-  const [thirdPartyBanners, setThirdPartyBanners] = useState([]);
 
-  //console.log("banners is home", banners)
 
-  //  third party banners
   useEffect(() => {
     const fetchBanners = async (category) => {
+      console.log("useeffect category", category);
       try {
         await dispatch(getAllBanners({ backend, category }));
       } catch (e) {
-        console.log("error in fetching banners", e);
+        console.log("Error in fetching banners:", e);
       }
     };
-    console.log("logging in home");
-    // dispatch(getAllBanners ({backend, category}))
-    fetchBanners({ ThirdParty: null });
-  }, [backend, dispatch]);
+  
+    // Fetch both categories concurrently
+  
+    // Wait for both fetches to complete
+    const fetchBannersSequentially = async () => {
 
-  console.log("Venues in Home:", venues);
-  console.log("Banners in Home:", banners);
+
+     await fetchBanners({ Attraction: null });
+      await fetchBanners({ ThirdParty: null });
+     
+    };
+  
+    fetchBannersSequentially();
+  }, []);
+  
+
+// // attraction banners
+// useEffect(() => {
+//   const fetchBanners = async (category) => {
+//     try {
+//       await dispatch(getAllBanners({ backend, category }));
+//     } catch (e) {
+//       console.log("error in fetching banners", e);
+//     }
+//   };
+//   console.log("logging in home");
+//   // dispatch(getAllBanners ({backend, category}))
+//   fetchBanners({ ThirdParty: null });
+// }, [backend, dispatch]);
+
+  
+  //console.log("Venues in Home:", venues);
+  //console.log("Banners in Home:", banners);
 
   const layoutConfigs = [
     {
@@ -150,7 +178,7 @@ export default function Home() {
 
   return (
     <>
-      <HeroSider />
+      <HeroSider attractionBanners = {attractionBanners}/>
       <section className="py-12">
         {/* -------------------------------------venues section start------------------------------ */}
 
@@ -335,9 +363,9 @@ export default function Home() {
         {/* third party BANNER section start*/}
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-1 md:grid-cols-1  gap-[33px]">
-            {banners.slice(0, 1).map((banner) => (
+            {thirdPartyBanners.slice(0, 1).map((banner) => (
               <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden">
-                {/* <p className ="text-slate-700 mx-2 my-2">{banner?.description}</p> */}
+               <p className ="text-slate-700 mx-2 my-2">{banner?.title}</p> 
                 <img
                   src={banner?.image}
                   alt="image"
@@ -351,9 +379,9 @@ export default function Home() {
         {/* 2 Grid card  start*/}
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 md:grid-cols-2  gap-[33px]">
-            {banners.slice(2, 4).map((banner) => (
+            {thirdPartyBanners.slice(1, 3).map((banner) => (
               <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden">
-                {/* <p className ="text-slate-700 mx-2 my-2">{banner?.description}</p> */}
+                 <p className ="text-slate-700 mx-2 my-2">{banner?.title}</p> 
                 <img
                   src={banner?.image}
                   alt="image"
@@ -367,9 +395,9 @@ export default function Home() {
         {/* 3 Grid card  start*/}
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-3 md:grid-cols-3  gap-[33px]">
-            {banners.slice(2).map((banner) => (
+            {thirdPartyBanners.slice(3).map((banner) => (
               <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden">
-                {/* <p className ="text-slate-700 mx-2 my-2">{banner?.description}</p> */}
+                <p className ="text-slate-700 mx-2 my-2">{banner?.title}</p> 
                 <img
                   src={banner?.image}
                   alt="image"
