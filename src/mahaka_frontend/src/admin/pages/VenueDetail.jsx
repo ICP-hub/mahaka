@@ -52,11 +52,11 @@ const VenueDetailPage = () => {
                 className="h-full w-full object-cover"
               ></img>
             </div>
-            <div className="mb-1 ml-auto flex items-center">
+            {/* <div className="mb-1 ml-auto flex items-center">
               <button className="bg-indigo-600 flex items-center justify-center min-h-10 px-4 rounded-full text-white">
                 Edit Venue
               </button>
-            </div>
+            </div> */}
           </div>
           <div className="mt-3 truncate text-4xl font-bold">
             {currentVenue[1].Title}
@@ -68,34 +68,34 @@ const VenueDetailPage = () => {
               </span>
             </div>
           </div>
-          <div class="mt-4 flex flex-col space-y-8 border-t pt-6">
-            <div class="flex sm:items-center">
+          <div className="mt-4 flex flex-col space-y-8 border-t pt-6">
+            <div className="flex sm:items-center">
               <HiOutlineMapPin size={24} />
-              <div class="ml-6 leading-6">
+              <div className="ml-6 leading-6">
                 {currentVenue[1].Details.Location}
               </div>
             </div>
-            <div class="flex sm:items-center">
+            <div className="flex sm:items-center">
               <p>Maximum Capacity</p>
-              <div class="ml-6 leading-6">
+              <div className="ml-6 leading-6">
                 {parseInt(currentVenue[1].capacity)}
               </div>
             </div>
-            <div class="flex sm:items-center">
+            <div className="flex sm:items-center">
               <p>Start Date</p>
-              <div class="ml-6 leading-6">Nov 25, 2024</div>
+              <div className="ml-6 leading-6">Nov 25, 2024</div>
             </div>
-            <div class="flex sm:items-center">
+            <div className="flex sm:items-center">
               <p>End Date</p>
-              <div class="ml-6 leading-6">Nov 28, 2024</div>
+              <div className="ml-6 leading-6">Nov 28, 2024</div>
             </div>
-            <div class="flex sm:items-center">
+            <div className="flex sm:items-center">
               <p>Venue id</p>
-              <div class="ml-6 leading-6">{currentVenue[1].id}</div>
+              <div className="ml-6 leading-6">{currentVenue[1].id}</div>
             </div>
-            <div class="flex">
+            <div className="flex">
               <p>Venue Description</p>
-              <div class="prose prose-sm ml-6 max-w-none">
+              <div className="prose prose-sm ml-6 max-w-none">
                 <p>{currentVenue[1].Description}</p>
               </div>
             </div>
@@ -141,42 +141,42 @@ const LoadingScreen = () => {
               </span>
             </div>
           </div>
-          <div class="mt-4 flex flex-col space-y-8 border-t pt-6">
-            <div class="flex sm:items-center">
+          <div className="mt-4 flex flex-col space-y-8 border-t pt-6">
+            <div className="flex sm:items-center">
               <div className="h-8 w-8 rounded-full bg-gray-400 animate-pulse"></div>
-              <div class="ml-6 leading-6">
+              <div className="ml-6 leading-6">
                 <span className="bg-gray-400 animate-pulse text-gray-400 rounded-md">
                   Lorem ipsum dolor sit amet
                 </span>
               </div>
             </div>
-            <div class="flex sm:items-center">
+            <div className="flex sm:items-center">
               <div className="h-8 w-8 rounded-full bg-gray-400 animate-pulse"></div>
-              <div class="ml-6 leading-6">
+              <div className="ml-6 leading-6">
                 <span className="bg-gray-400 animate-pulse text-gray-400 rounded-md">
                   Lorem ipsum
                 </span>
               </div>
             </div>
-            <div class="flex sm:items-center">
+            <div className="flex sm:items-center">
               <div className="h-8 w-8 rounded-full bg-gray-400 animate-pulse"></div>
-              <div class="ml-6 leading-6">
+              <div className="ml-6 leading-6">
                 <span className="bg-gray-400 animate-pulse text-gray-400 rounded-md">
                   Lorem ipsum
                 </span>
               </div>
             </div>
-            <div class="flex sm:items-center">
+            <div className="flex sm:items-center">
               <div className="h-8 w-8 rounded-full bg-gray-400 animate-pulse"></div>
-              <div class="ml-6 leading-6">
+              <div className="ml-6 leading-6">
                 <span className="bg-gray-400 animate-pulse text-gray-400 rounded-md">
                   Lorem ipsum dolor sit amet
                 </span>
               </div>
             </div>
-            <div class="flex">
+            <div className="flex">
               <div className="h-8 w-8 rounded-full bg-gray-400 animate-pulse"></div>
-              <div class="prose prose-sm ml-6 max-w-none">
+              <div className="prose prose-sm ml-6 max-w-none">
                 <p className="bg-gray-400 animate-pulse text-gray-400 rounded-md">
                   In amet voluptate ad eiusmod cupidatat nulla sunt eu amet
                   occaecat qui cillum occaecat tempor minim nostrud ullamco amet

@@ -50,6 +50,8 @@ const VenueTableFormat = ({ filteredVenues }) => {
     setDeleteModalVisible(true);
   };
 
+  console.log(deleteLoading);
+
   // Confirm deletion and dispatch deleteVenue action
   const confirmDeleteVenue = () => {
     dispatch(deleteVenue({ backend: backend, venueId: selectedVenueId })).then(

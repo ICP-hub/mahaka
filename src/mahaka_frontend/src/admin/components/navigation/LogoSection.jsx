@@ -1,9 +1,19 @@
 import { RiLogoutCircleRLine } from "react-icons/ri";
 import ButtonWrapper from "../../../common/ButtonWrapper";
-import { useLogout } from "../../../common/hooks/useLogout";
+import { useNavigate } from "react-router-dom";
+import { useIdentityKit } from "@nfid/identitykit/react";
+import notificationManager from "../../../common/utils/notificationManager";
 
 const LogoSection = () => {
-  const logoutAndRedirect = useLogout();
+  const navigate = useNavigate();
+  const { disconnect } = useIdentityKit();
+
+  const logoutAndRedirect = () => {
+    disconnect();
+    navigate("/");
+    notificationManager.success("Logout Successfully");
+  };
+
   return (
     <div className="flex w-full items-center p-4 pl-6">
       <div className="font-black text-secondaryText">MAHAKA</div>
