@@ -5,33 +5,33 @@ import { createWahana } from "../../redux/reducers/apiReducers/wahanaApiReducer"
 import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
 import TextHint from "../../customer/Components/TextHint";
 
-const CreateWahanaForm = ({ onClose, onSuccess }) => {
+const CreateWahanaForm = ({ onClose }) => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
   const { venues } = useSelector((state) => state.venues);
   const [formErrors, setFormErrors] = useState({});
-  console.log("create wahana errors are", formErrors)
+  console.log("create wahana errors are", formErrors);
   const [isToggled, setIsToggled] = useState(false);
-  console.log("logging wahana toggle",isToggled)
+  console.log("logging wahana toggle", isToggled);
 
   const handleToggle = () => {
     setIsToggled((prevState) => !prevState);
   };
   const [formData, setFormData] = useState({
     name: "",
-    symbol: "",
+    symbol: "waha",
     decimal: 8,
     totalSupply: 1000000,
     description: "",
     price: "",
-    priceFiat:"",
-    featured:isToggled,
+    priceFiat: "",
+    featured: isToggled,
     banner: {
       data: "",
       logo_type: "image",
     },
     venueId: "",
-    
+
     details: {
       StartDate: 44,
       StartTime: 44,
@@ -70,7 +70,7 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
 
       img.onload = () => {
         // Create canvas
-        const canvas = document.createElement('canvas');
+        const canvas = document.createElement("canvas");
         let width = img.width;
         let height = img.height;
 
@@ -83,7 +83,7 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
         canvas.height = height;
 
         // Draw image on canvas
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, width, height);
 
         // Function to convert canvas to file
@@ -120,44 +120,40 @@ const CreateWahanaForm = ({ onClose, onSuccess }) => {
     });
   };
 
+  // validation form
+  const validateForm = () => {
+    const errors = {};
+    console.log("create wahana errors are", errors);
+    // Validate title
+    if (!formData.name.trim()) {
+      errors.name = "wahana title is required";
+    }
 
-  
-// validation form
-const validateForm = () => {
-  const errors = {};
-console.log("create wahana errors are", errors)
-  // Validate title
-  if (!formData.name.trim()) {
-    errors.name = "wahana title is required";
-  }
+    // Validate description
+    if (!formData.description.trim()) {
+      errors.description = "wahana description is required";
+    }
 
-  // Validate description
-  if (!formData.description.trim()) {
-    errors.description = "wahana description is required";
-  }
+    // Validte price
+    if (!formData.price) {
+      errors.price = "price is required";
+    }
+    // price in Fiat currency
+    if (!formData.priceFiat) {
+      errors.priceFiat = "price is required";
+    }
 
-  // Validte price
-  if (!formData.price) {
-    errors.price = "price is required";
-  }
-// price in Fiat currency
-  if (!formData.priceFiat) {
-    errors.priceFiat = "price is required";
-  }
+    // Validate banner image
+    if (!formData.banner.data) {
+      errors.banner = "wahana banner is required";
+    }
+    // if (!formData.banner.logo_type) {
+    //   errors.logo = "Event logo is required";
+    // }
 
-  // Validate banner image
-  if (!formData.banner.data) {
-    errors.banner = "wahana banner is required";
-  }
-  // if (!formData.banner.logo_type) {
-  //   errors.logo = "Event logo is required";
-  // }
- 
-  setFormErrors(errors);
-  return Object.keys(errors).length === 0;
-};
-
-
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -167,7 +163,6 @@ console.log("create wahana errors are", errors)
       banner: undefined,
     }));
     if (file) {
-
       try {
         let processedFile = file;
         const maxSize = 200 * 1024; // 200KB
@@ -179,19 +174,19 @@ console.log("create wahana errors are", errors)
 
         // Convert the processed file to blob
         const blob = await imageToFileBlob(processedFile);
-      setFormData({
-        ...formData,
-        banner: { data: blob, logo_type: file.type },
-      });// Set the banner preview
-      setBannerPreview(URL.createObjectURL(processedFile));
+        setFormData({
+          ...formData,
+          banner: { data: blob, logo_type: file.type },
+        }); // Set the banner preview
+        setBannerPreview(URL.createObjectURL(processedFile));
 
-      // Reading the image as an ArrayBuffer for backend submission
-    } catch (error) {
-      setError("Error processing image. Please try again.");
-      console.error("Error processing image:", error);
+        // Reading the image as an ArrayBuffer for backend submission
+      } catch (error) {
+        setError("Error processing image. Please try again.");
+        console.error("Error processing image:", error);
+      }
     }
-  }
-};
+  };
 
   const handleCreateWahana = async (e) => {
     e.preventDefault();
@@ -206,10 +201,10 @@ console.log("create wahana errors are", errors)
           backend,
           venueId: formData.venueId,
           ...formData,
-          featured:isToggled
+          featured: isToggled,
         })
       );
-      onSuccess();
+
       onClose();
     } catch (error) {
       console.error("Error creating wahana:", error);
@@ -218,48 +213,47 @@ console.log("create wahana errors are", errors)
     }
   };
 
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-  
+
     console.log("input change is", value);
-  
+
     // Ensure that priceFiat is a valid number, or fallback to 0
-    const updatedValue = name === "priceFiat"
-      ? (value === "" ? 0 : parseFloat(value))  // If empty, set as 0
-      : name === "price"
-        ? (value === "" ? 0 : Number(value))   // If empty, set as 0 for price
-        : value;  // For other fields, just keep the value as is
-  
+    const updatedValue =
+      name === "priceFiat"
+        ? value === ""
+          ? 0
+          : parseFloat(value) // If empty, set as 0
+        : name === "price"
+        ? value === ""
+          ? 0
+          : Number(value) // If empty, set as 0 for price
+        : value; // For other fields, just keep the value as is
+
     console.log("Updated value is", updatedValue);
-  
+
     setFormData((prevState) => ({
       ...prevState,
       [name]: updatedValue,
     }));
-  
+
     if (formErrors[name]) {
       setFormErrors((prevErrors) => ({
         ...prevErrors,
-        [name]: undefined,  // Clear any existing error for this field
+        [name]: undefined, // Clear any existing error for this field
       }));
     }
   };
-  
-
-
-  
 
   return (
     <div>
-     
       <div className="space-y-4">
         {/* Select Venue */}
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <label className="font-semibold">Select Venue </label>
             <TextHint text="Select the venue for which wahana needs to be created." />
-            </div>
+          </div>
           <select
             value={formData.venueId}
             onChange={(e) =>
@@ -282,113 +276,119 @@ console.log("create wahana errors are", errors)
           <div className="flex items-center gap-2">
             <label className="font-semibold">Wahana Name </label>
             <TextHint text="Enter the name of the wahana." />
-            </div>
-          <div 
-           className={`border ${formErrors.name ? "border-red-500" : "border-border"
-           } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+          </div>
+          <div
+            className={`border ${
+              formErrors.name ? "border-red-500" : "border-border"
+            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
           >
             <input
               type="text"
               name="name"
               value={formData.name}
-             
-              onChange = {handleInputChange }
+              onChange={handleInputChange}
               className="my-3 outline-none w-full bg-transparent"
               required
             />
           </div>
           {formErrors.name && (
-          <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>
-        )}
+            <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>
+          )}
         </div>
 
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <label className="font-semibold">Description </label>
             <TextHint text="Enter the description of the wahana." />
-            </div>
-          <div 
-           className={`border ${formErrors.description ? "border-red-500" : "border-border"
-           } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+          </div>
+          <div
+            className={`border ${
+              formErrors.description ? "border-red-500" : "border-border"
+            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
           >
-         
             <textarea
               name="description"
               rows={5}
               value={formData.description}
-              onChange = {handleInputChange }
+              onChange={handleInputChange}
               className="mt-3 outline-none w-full bg-transparent"
               required
             />
-            
           </div>
           {formErrors.description && (
-          <p className="text-red-500 text-sm mt-1">{formErrors.description}</p>)}
-         
+            <p className="text-red-500 text-sm mt-1">
+              {formErrors.description}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <label className="font-semibold">Price (IDR)</label>
             <TextHint text="Enter the price of the wahana." />
-            </div>
+          </div>
           <div
-           className={`border ${formErrors.description ? "border-red-500" : "border-border"
-           } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+            className={`border ${
+              formErrors.description ? "border-red-500" : "border-border"
+            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
           >
             <input
               value={formData.price}
-              name = "price"
-              type ="number"
+              name="price"
+              type="number"
               // onChange={(e) =>
               //   setFormData({ ...formData, price: parseInt(e.target.value) })
               // }
-              onChange = {handleInputChange }
+              onChange={handleInputChange}
               className="my-3 outline-none w-full bg-transparent"
               required
             />
           </div>
           {formErrors.price && (
-          <p className="text-red-500 text-sm mt-1">{formErrors.price}</p>)}
+            <p className="text-red-500 text-sm mt-1">{formErrors.price}</p>
+          )}
         </div>
-     
-     {/* price in Fiat currency */}
 
-     <div className="flex flex-col gap-1">
+        {/* price in Fiat currency */}
+
+        <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <label className="font-semibold">Price (FIAT)</label>
             <TextHint text="Enter the price of the wahana." />
-            </div>
+          </div>
           <div
-           className={`border ${formErrors.priceFiat ? "border-red-500" : "border-border"
-           } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
+            className={`border ${
+              formErrors.priceFiat ? "border-red-500" : "border-border"
+            } rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border`}
           >
             <input
-              value={ formData.priceFiat || ""}
-              
-              type ="number"
-              name="priceFiat" 
-              step="0.01" 
+              value={formData.priceFiat || ""}
+              type="number"
+              name="priceFiat"
+              step="0.01"
               // onChange={(e) =>
               //   setFormData({ ...formData, price: parseInt(e.target.value) })
               // }
-              onChange = {handleInputChange }
+              onChange={handleInputChange}
               className="my-3 outline-none w-full bg-transparent"
               required
             />
           </div>
           {formErrors.priceFiat && (
-          <p className="text-red-500 text-sm mt-1">{formErrors.priceFiat}</p>)}
+            <p className="text-red-500 text-sm mt-1">{formErrors.priceFiat}</p>
+          )}
         </div>
-
-
 
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <label className="font-semibold">Banner </label>
             <TextHint text="Upload the image of the wahana." />
-            </div>
-          <div className={`flex flex-col items-center justify-center border border-gray-300 p-4 rounded ${formErrors.banner?"border-red-500":"border-border"}`}>
+          </div>
+          <div
+            className={`flex flex-col items-center justify-center border border-gray-300 p-4 rounded ${
+              formErrors.banner ? "border-red-500" : "border-border"
+            }`}
+          >
             <input
               type="file"
               accept=".jpg,.jpeg,.png"
@@ -417,42 +417,32 @@ console.log("create wahana errors are", errors)
               />
             )}
           </div>
-         {formErrors.banner && (
-          <p className="text-red-500 text-sm mt-1">{formErrors.banner}</p>)} 
+          {formErrors.banner && (
+            <p className="text-red-500 text-sm mt-1">{formErrors.banner}</p>
+          )}
         </div>
-        
       </div>
 
-     
-
-
-      <div className = "mt-5">
-        <div className = "flex">
-        <label className="font-semibold mr-2">Featured </label>
-        <TextHint text="Upload the image of the wahana." />
+      <div className="mt-5">
+        <div className="flex">
+          <label className="font-semibold mr-2">Featured </label>
+          <TextHint text="Upload the image of the wahana." />
         </div>
-      <div 
-  onClick={handleToggle} 
-  className={`relative w-12 h-6 flex items-center rounded-full cursor-pointer transition-colors my-2 duration-300 ${
-    isToggled ? 'bg-orange-500' : 'bg-gray-500'
-  }`}
->
-  <div
-    className={`absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-      isToggled ? 'translate-x-6' : 'translate-x-0'
-    }`}
-  ></div>
-</div>
-    </div>
+        <div
+          onClick={handleToggle}
+          className={`relative w-12 h-6 flex items-center rounded-full cursor-pointer transition-colors my-2 duration-300 ${
+            isToggled ? "bg-orange-500" : "bg-gray-500"
+          }`}
+        >
+          <div
+            className={`absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+              isToggled ? "translate-x-6" : "translate-x-0"
+            }`}
+          ></div>
+        </div>
+      </div>
 
-
-
-
-
-
-
-
-    <div className="flex justify-end mt-6 space-x-4">
+      <div className="flex justify-end mt-6 space-x-4">
         <button
           className="px-4 py-2 bg-gray-100 text-gray-800 rounded-full"
           onClick={onClose}

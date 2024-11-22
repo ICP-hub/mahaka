@@ -115,10 +115,6 @@ const AdminWahana = () => {
   //   }
   // }, [loading]);
 
-  useEffect(() => {
-    dispatch(getAllVenues({ backend, pageLimit: 10, currPage: 0 }));
-  }, [dispatch, backend]);
-
   // useEffect(()=>{
   //   if(selectedWahana){
   //     dispatch(getWahana(backend,selectedWahana,selectedVenue))
@@ -343,10 +339,7 @@ const AdminWahana = () => {
           setIsOpen={setIsModalOpen}
           title="Create New Wahana"
         >
-          <CreateWahanaForm
-            onClose={() => setIsModalOpen(false)}
-            onSuccess={() => fetchWahanas(selectedVenue)}
-          />
+          <CreateWahanaForm onClose={() => setIsModalOpen(false)} />
         </ModalOverlay>
 
         {/* edit modal */}
