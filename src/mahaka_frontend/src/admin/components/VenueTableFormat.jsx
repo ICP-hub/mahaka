@@ -159,6 +159,46 @@ const VenueTableFormat = ({ filteredVenues }) => {
   );
 };
 const VenueTableData = ({ venue, onDelete }) => {
+  function convertTimestampToDate(timestamp) {
+    if (typeof timestamp === "bigint") {
+      timestamp = Number(timestamp) * 1000; // Convert BigInt to milliseconds
+    } else if (typeof timestamp === "number") {
+      timestamp = timestamp * 1000; // Convert seconds to milliseconds
+    }
+
+    if (!timestamp || isNaN(timestamp)) {
+      return "Invalid timestamp";
+    }
+
+    const date = new Date(timestamp);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  }
+
+  function convertTimestampToTime(timestamp) {
+    if (typeof timestamp === "bigint") {
+      timestamp = Number(timestamp) * 1000; // Convert BigInt to milliseconds
+    } else if (typeof timestamp === "number") {
+      timestamp = timestamp * 1000; // Convert seconds to milliseconds
+    }
+
+    if (!timestamp || isNaN(timestamp)) {
+      return "Invalid timestamp";
+    }
+
+    const date = new Date(timestamp);
+
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    return `${hours}:${minutes}`;
+  }
+
   return (
     <>
       <div className="custom-grid items-center gap-4 border-b px-6 py-3 md:px-8 text-text bg-card border-border">
@@ -173,14 +213,14 @@ const VenueTableData = ({ venue, onDelete }) => {
         <div>{venue?.Title}</div>
         <div className="hidden sm:block truncate">{venue?.Description}</div>
         <div className="hidden sm:block">
-          {formatDate(venue?.Details?.StartDate)}
+          {convertTimestampToDate(venue?.Details?.StartDate)}
         </div>
         <div className="hidden lg:block">
-          {formatDate(venue?.Details?.EndDate)}
+          {convertTimestampToDate(venue?.Details?.EndDate)}
         </div>
         <div className="hidden lg:block">
-          {FormatTime(venue?.Details?.StartTime)}-
-          {FormatTime(venue?.Details?.EndTime)}
+          {convertTimestampToTime(venue?.Details?.StartTime)}-
+          {convertTimestampToTime(venue?.Details?.EndTime)}
         </div>
         <div className="truncate">{venue?.Details?.Location}</div>
 

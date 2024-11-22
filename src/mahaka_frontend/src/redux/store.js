@@ -5,7 +5,9 @@ import userApiReducer from "./reducers/apiReducers/userApiReducer";
 import eventApiReducer from "./reducers/apiReducers/eventApiReducer";
 import bannerApiReducer from "./reducers/apiReducers/bannerApiReducer";
 import wahanaApiReducer from "./reducers/apiReducers/wahanaApiReducer";
+
 import authenticationReducer from "./reducers/auth/authenticationReducer";
+ 
 
 const store = configureStore({
   reducer: {
@@ -14,7 +16,7 @@ const store = configureStore({
     users: userApiReducer,
     events: eventApiReducer,
     wahana: wahanaApiReducer,
-    banner:bannerApiReducer,
+    banner: bannerApiReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

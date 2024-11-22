@@ -1,13 +1,30 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-// Import Swiper styles
+import { getAllBanners } from "../../../redux/reducers/apiReducers/bannerApiReducer";
 import "swiper/css";
 import "swiper/css/pagination";
-
-// import required modules
+import { useDispatch, useSelector } from "react-redux";
 import { Autoplay, Pagination } from "swiper/modules";
 import Hero from "../HeroCard";
-export default function () {
+
+export default function BannerCarousel() {
+  const { attractionbanners } = useSelector((state) => state.banner);
+  const { backend } = useSelector((state) => state.authentication);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const fetchBanners = async (category) => {
+      try {
+        await dispatch(getAllBanners({ backend, category }));
+      } catch (e) {
+        console.log("Error in fetching banners:", e);
+      }
+    };
+
+    fetchBanners({ Attraction: null });
+  }, [backend, dispatch]);
+
   return (
     <>
       <Swiper
@@ -22,15 +39,11 @@ export default function () {
         modules={[Autoplay, Pagination]}
         className="mySwiper"
       >
-        <SwiperSlide>
-          <Hero />
-        </SwiperSlide>
-        <SwiperSlide>
-          <Hero />
-        </SwiperSlide>
-        <SwiperSlide>
-          <Hero />
-        </SwiperSlide>
+        {attractionbanners?.map((banner, index) => (
+          <SwiperSlide key={index}>
+            <Hero bannerData={banner} />
+          </SwiperSlide>
+        ))}
       </Swiper>
     </>
   );

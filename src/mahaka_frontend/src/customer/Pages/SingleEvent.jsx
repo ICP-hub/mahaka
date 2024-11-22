@@ -9,7 +9,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { getVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
 import { getAllEventsByVenue } from "../../redux/reducers/apiReducers/eventApiReducer";
 import { getAllWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApiReducer";
-import {getDIPdetails} from "../../redux/reducers/apiReducers/dipapireducer"
+import { getDIPdetails } from "../../redux/reducers/apiReducers/dipapireducer";
 import MoreWahanaCard from "../Components/MoreWahanaCard";
 // Import Swiper styles
 import "swiper/css";
@@ -56,32 +56,32 @@ const ticketData = [
     availability: "3 TICKETS LEFT",
     highlightClass: "bg-blue-500",
   },
-  {
-    type: "REGULAR",
-    gradientClass: "bg-gradient-to-r from-gray-200 to-gray-300",
-    name: "John Doe",
-    description:
-      "Lorem ipsum dolor sit amet consectetur. Bibendum est vitae urna pharetra",
-    price: "Rp. 1,500",
-    availability: "AVAILABLE",
-    highlightClass: "bg-gray-500",
-  },
 ];
 const calculateDuration = (StartDate, EndDate) => {
-  const start = new Date(typeof StartDate === 'bigint' ? Number(StartDate) : StartDate);
-  const end = new Date(typeof EndDate === 'bigint' ? Number(EndDate) : EndDate);
-  const durationMs = end - start;
-  const days = Math.floor(durationMs / (1000 * 60 * 60 * 24));
+  // Convert BigInt or other inputs to Date objects
+  const start = new Date(
+    typeof StartDate === "bigint" ? Number(StartDate) * 1000 : StartDate
+  );
+  const end = new Date(
+    typeof EndDate === "bigint" ? Number(EndDate) * 1000 : EndDate
+  );
 
-  if (days === 0) return "1 day";
-  if (days === 1) return "2 days";
-  return `${days + 1} days`;
+  // Calculate duration in milliseconds
+  const durationMs = end - start;
+
+  // Convert duration to days
+  const days = Math.ceil(durationMs / (1000 * 60 * 60 * 24)); // Use Math.ceil to include partial days as full days
+
+  // Return appropriate duration message
+  if (days === 1) return "1 day";
+  return `${days} days`;
 };
 
 export default function SingleEvent() {
   const [activeTab, setActiveTab] = useState("profile");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { ModalOne } = ModalPopup();
+  const [ticketDetails, setTicketDetails] = useState(null);
 
   const handleModalOpen = () => setIsModalOpen(true);
   const handleModalClose = () => setIsModalOpen(false);
@@ -102,6 +102,28 @@ export default function SingleEvent() {
   const { wahanas, loading: wahanaLoading } = useSelector(
     (state) => state.wahana
   );
+
+  useEffect(() => {
+    const fetchTicketDetails = async (venue) => {
+      if (!venue[1]?.Collection_id) {
+        console.error("Venue does not have a collection_id:", venue);
+        return;
+      }
+
+      try {
+        // Fetch ticket details from the actor
+        const details = await backend.getDIPdetails(venue[1]?.Collection_id);
+        console.log(details, "ticketDetails");
+        setTicketDetails(details);
+      } catch (error) {
+        console.error("Error fetching ticket details:", error);
+        setTicketDetails(null);
+      } finally {
+      }
+    };
+    fetchTicketDetails(currentVenue);
+  }, [currentVenue]);
+
   console.log(wahanas, "wahanas");
   console.log(currentVenue);
   const {
@@ -111,6 +133,7 @@ export default function SingleEvent() {
     error: eventError,
   } = useSelector((state) => state.events);
   const { backend } = useSelector((state) => state.authentication);
+
   const [localError, setLocalError] = useState(null);
   const venue =
     currentVenue && Array.isArray(currentVenue) ? currentVenue[1] : null;
@@ -147,17 +170,16 @@ export default function SingleEvent() {
         setLocalError(err.message || "Failed to fetch venue details");
       });
 
-      try {
-        const venuePrincipal = venue.Collection_id;
-        dispatch(getDIPdetails({ backend, principal: venuePrincipal }))
-          .unwrap()
-          .catch((err) => {
-            console.error("Failed to fetch DIP details:", err);
-          });
-      } catch (error) {
-        console.error("Invalid venue Principal:", error);
-      }
-
+    try {
+      const venuePrincipal = venue.Collection_id;
+      dispatch(getDIPdetails({ backend, principal: venuePrincipal }))
+        .unwrap()
+        .catch((err) => {
+          console.error("Failed to fetch DIP details:", err);
+        });
+    } catch (error) {
+      console.error("Invalid venue Principal:", error);
+    }
   }, [dispatch, venueId, backend]);
 
   console.log(eventLoading, "eventLoading");
@@ -167,44 +189,50 @@ export default function SingleEvent() {
   // Assuming the first event is the main event for this venue
   const event = events && Array.isArray(events) ? events : null;
 
-  // const duration =
-  //   venue?.Details.StartDate && venue?.Details.EndDate
-  //     ? calculateDuration(venue.Details.StartDate, venue.Details.EndDate)
-  //     : "";
+  const duration =
+    venue?.Details.StartDate && venue?.Details.EndDate
+      ? calculateDuration(venue.Details.StartDate, venue.Details.EndDate)
+      : "";
 
-  const formatDate = (dateString) => {
-    const date = new Date(typeof dateString === 'bigint' ? Number(dateString) : dateString);
-    return date.toLocaleDateString("en-US", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  };
+  function formatDate(timestamp) {
+    if (typeof timestamp === "bigint") {
+      timestamp = Number(timestamp) * 1000; // Convert BigInt to milliseconds
+    } else if (typeof timestamp === "number") {
+      timestamp = timestamp * 1000; // Convert seconds to milliseconds
+    }
 
-  const FormatTime = (nanoseconds) => {
-    // Input validation
-    if (!nanoseconds && nanoseconds !== 0) {
-      return "Invalid input";
+    if (!timestamp || isNaN(timestamp)) {
+      return "Invalid timestamp";
     }
-    try {
-      const totalMinutes = Math.floor(Number(nanoseconds) / (60 * 1000000000));
-      // Validate range (24 hours in minutes = 1440)
-      if (totalMinutes < 0 || totalMinutes >= 1440) {
-        return "Time out of range";
-      }
-      const hours = Math.floor(totalMinutes / 60);
-      const minutes = totalMinutes % 60;
-      const period = hours >= 12 ? "PM" : "AM";
-      let formattedHours = hours % 12;
-      formattedHours = formattedHours === 0 ? 12 : formattedHours;
-      const displayHours = formattedHours.toString().padStart(2, "0");
-      const displayMinutes = minutes.toString().padStart(2, "0");
-      return `${displayHours}:${displayMinutes} ${period}`;
-    } catch (error) {
-      return "Invalid time format";
+
+    const date = new Date(timestamp);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  }
+
+  function FormatTime(timestamp) {
+    if (typeof timestamp === "bigint") {
+      timestamp = Number(timestamp) * 1000; // Convert BigInt to milliseconds
+    } else if (typeof timestamp === "number") {
+      timestamp = timestamp * 1000; // Convert seconds to milliseconds
     }
-  };
-  
+
+    if (!timestamp || isNaN(timestamp)) {
+      return "Invalid timestamp";
+    }
+
+    const date = new Date(timestamp);
+
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    return `${hours}:${minutes}`;
+  }
 
   return (
     <>
@@ -250,8 +278,9 @@ export default function SingleEvent() {
                   <img
                     src={venue?.banner?.data || Frame13}
                     alt={venue?.title || "Event"}
-                    className={`h-90 w-full rounded-2xl ${venueLoading ? "hidden" : "block"
-                      }`}
+                    className={`h-90 w-full rounded-2xl ${
+                      venueLoading ? "hidden" : "block"
+                    }`}
                     onLoad={() => setIsLoading(false)}
                   />
                 )}
@@ -265,10 +294,11 @@ export default function SingleEvent() {
                   >
                     <li className="me-2" role="presentation">
                       <button
-                        className={`inline-block text-2xl font-black p-4 border-b-2 rounded-t-lg ${activeTab === "profile"
+                        className={`inline-block text-2xl font-black p-4 border-b-2 rounded-t-lg ${
+                          activeTab === "profile"
                             ? "border-blue-500"
                             : "border-transparent"
-                          }`}
+                        }`}
                         onClick={() => handleTabClick("profile")}
                         type="button"
                         role="tab"
@@ -280,10 +310,11 @@ export default function SingleEvent() {
                     </li>
                     <li className="me-2" role="presentation">
                       <button
-                        className={`inline-block text-2xl font-normal p-4 border-b-2 rounded-t-lg ${activeTab === "dashboard"
+                        className={`inline-block text-2xl font-normal p-4 border-b-2 rounded-t-lg ${
+                          activeTab === "dashboard"
                             ? "border-blue-500"
                             : "border-transparent"
-                          } `}
+                        } `}
                         onClick={() => handleTabClick("dashboard")}
                         type="button"
                         role="tab"
@@ -308,31 +339,61 @@ export default function SingleEvent() {
                       role="tabpanel"
                       aria-labelledby="profile-tab"
                     >
-                      <p className="text-lg font-normal">
+                      {/* <p className="text-lg font-normal">
                         Lorem ipsum dolor sit amet consectetur. Nisl sapien id
                         erat senectus ornare egestas diam vitae tincidunt.
                         Curabitur commodo purus sed accumsan tristique velit
                         volutpat amet.
-                      </p>
+                      </p> */}
                       <div>
-                        {ticketData.map((ticket, index) => (
-                          <div
-                            key={index}
-                            className="cursor-pointer"
-                            onClick={handleModalOpen}
-                          >
-                            <Ticket
-                              key={index}
-                              type={ticket.type}
-                              gradientClass={ticket.gradientClass}
-                              name={ticket.name}
-                              description={ticket.description}
-                              price={ticket.price}
-                              availability={ticket.availability}
-                              highlightClass={ticket.highlightClass}
-                            />
-                          </div>
-                        ))}
+                        <div
+                          className="cursor-pointer"
+                          onClick={handleModalOpen}
+                        >
+                          <Ticket
+                            type={"GROUP"}
+                            gradientClass={ticketData[0].gradientClass}
+                            name={"Group Tickets"}
+                            description={ticketDetails?.description}
+                            price={parseInt(ticketDetails?.gTicket_price) || 1}
+                            availability={
+                              parseInt(ticketDetails?.gTicket_limit) || 4
+                            }
+                            highlightClass={ticketData[0].highlightClass}
+                          />
+                        </div>
+                        <div
+                          className="cursor-pointer"
+                          onClick={handleModalOpen}
+                        >
+                          <Ticket
+                            type={"SINGLE"}
+                            gradientClass={ticketData[1].gradientClass}
+                            name={"Single Tickets"}
+                            description={ticketDetails?.description}
+                            price={parseInt(ticketDetails?.sTicket_price) || 1}
+                            availability={
+                              parseInt(ticketDetails?.sTicket_limit) || 4
+                            }
+                            highlightClass={ticketData[1].highlightClass}
+                          />
+                        </div>
+                        <div
+                          className="cursor-pointer"
+                          onClick={handleModalOpen}
+                        >
+                          <Ticket
+                            type={"VIP"}
+                            gradientClass={ticketData[2].gradientClass}
+                            name={"VIP Tickets"}
+                            description={ticketDetails?.description}
+                            price={parseInt(ticketDetails?.vTicket_price) || 1}
+                            availability={
+                              parseInt(ticketDetails?.vTicket_limit) || 4
+                            }
+                            highlightClass={ticketData[2].highlightClass}
+                          />
+                        </div>
                       </div>
                     </motion.div>
                   )}
@@ -358,8 +419,8 @@ export default function SingleEvent() {
                           </li>
                           <li>
                             <strong>Last Entry:</strong>{" "}
-                            {(venue?.Details.EndTime &&
-                              FormatTime(venue.Details.EndTime))}
+                            {venue?.Details.EndTime &&
+                              FormatTime(venue.Details.EndTime)}
                           </li>
                         </ul>
 
@@ -403,8 +464,11 @@ export default function SingleEvent() {
                       "13 Jul- 17 Jul 2024"}
                   </h3>
                   <h3 className="text-lg font-normal">
-                    {venue?.Details.StartTime && FormatTime(venue.Details.StartTime)} -
-                    {(venue?.Details.EndTime && FormatTime(venue.Details.EndTime)) ||
+                    {venue?.Details.StartTime &&
+                      FormatTime(venue.Details.StartTime)}{" "}
+                    -
+                    {(venue?.Details.EndTime &&
+                      FormatTime(venue.Details.EndTime)) ||
                       "12:00AM - 3:00PM"}
                   </h3>
                   <h3 className="text-lg font-normal">
@@ -413,11 +477,11 @@ export default function SingleEvent() {
                 </div>
                 <h2 className="text-2xl font-normal pl-8">
                   Venue ends on :{" "}
-                  {/* <span className="text-red-600">
+                  <span className="text-red-600">
                     {(venue?.Details.EndDate &&
                       formatDate(venue.Details.EndDate)) ||
                       "17 July, 2024"}
-                  </span> */}
+                  </span>
                 </h2>
               </div>
             )}
