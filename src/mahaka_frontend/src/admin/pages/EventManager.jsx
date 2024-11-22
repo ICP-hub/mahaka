@@ -221,8 +221,8 @@ const EventCard = ({ event }) => {
   const startInterVal = formatDateAndTime(parseInt(event.details.StartDate));
   const endInterVal = formatDateAndTime(parseInt(event.details.EndDate));
 
-  console.log("start", startInterVal);
-  console.log("end", endInterVal);
+  // console.log("start", startInterVal);
+  // console.log("end", endInterVal);
 
   return (
     <div className="bg-card flex min-h-96 max-h-fit flex-col rounded-2xl overflow-hidden">

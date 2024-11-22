@@ -28,6 +28,7 @@ export const createEvent = createAsyncThunk(
     } catch (err) {
       console.error("Error creating event ", err);
       notificationManager.error("Error creating event!");
+      throw new Error("Error creating event", err);
     }
   }
 );
@@ -55,7 +56,7 @@ export const getAllEventsByVenue = createAsyncThunk(
       return response;
     } catch (error) {
       console.error("Error fetching events:", error);
-      throw error;
+      throw new Error("Error fetching events", error);
     }
   }
 );
@@ -70,7 +71,7 @@ export const getAllEventsPaginated = createAsyncThunk(
       return response;
     } catch (error) {
       console.error("Error fetching events:", error);
-      throw error;
+      throw new Error("Error fetching events", error);
     }
   }
 );
@@ -90,7 +91,7 @@ export const buyEventTicket = createAsyncThunk(
       return response;
     } catch (error) {
       console.error("Error buying event ticket:", error);
-      throw error;
+      throw new Error("Error buying event ticket", error);
     }
   }
 );
@@ -104,7 +105,7 @@ export const getEvent = createAsyncThunk(
       return response;
     } catch (error) {
       console.error("Error fetching event:", error);
-      throw error;
+      throw new Error("Error fetching event", error);
     }
   }
 );
@@ -124,7 +125,7 @@ export const searchEvents = createAsyncThunk(
       // console.log("search response is ",response.data)
     } catch (error) {
       console.error("error searching the events", error);
-      throw error;
+      throw new Error("Error searching event", error);
     }
   }
 );

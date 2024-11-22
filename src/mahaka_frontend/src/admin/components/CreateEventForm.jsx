@@ -1,8 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createEvent } from "../../redux/reducers/apiReducers/eventApiReducer";
-import flatpickr from "flatpickr";
-import { FcAlarmClock, FcCalendar } from "react-icons/fc";
 import TextHint from "../../customer/Components/TextHint";
 import { Principal } from "@dfinity/principal";
 import notificationManager from "../../common/utils/notificationManager";
@@ -16,7 +14,7 @@ import {
 } from "../../common/components/InputComponents";
 
 // Image to blob function
-function imageToFileBlob(imageFile) {
+export function imageToFileBlob(imageFile) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
@@ -30,7 +28,7 @@ function imageToFileBlob(imageFile) {
 }
 
 // Convert to timestamp date and time
-const convertToTimestamp = (date, time) => {
+export const convertToTimestamp = (date, time) => {
   const dateTime = new Date(`${date}T${time}`);
   return Math.floor(dateTime.getTime() / 1000);
 };

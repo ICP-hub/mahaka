@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { Principal } from "@dfinity/principal";
 import notificationManager from "../../common/utils/notificationManager";
 
-export default function Ticket({
+export default function EventTickets({
   type,
   gradientClass,
   name,
@@ -13,6 +13,7 @@ export default function Ticket({
   highlightClass,
   tickets,
   selectedVenue,
+  id,
 }) {
   const { backend } = useSelector((state) => state.authentication);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,23 +40,29 @@ export default function Ticket({
       console.log(record);
       console.log(selectedVenue);
 
-      const response = await backend.buyOfflineVenueTicket(
+      const response = await backend.buyOfflineEventTicket(
+        id,
         selectedVenue.id,
         { ticket_type: ticketTypeVariant, price: 1, priceFiat: 1 },
         record,
 
-        Principal.fromText("2vxsx-fae"),
+        Principal.fromText(
+          "h7yxq-n6yb2-6js2j-af5hk-h4inj-edrce-oevyj-kbs7a-76kft-vrqrw-nqe"
+        ),
 
-        { Cash: null },
-        1
+        1,
+        { Cash: null }
       );
 
-      console.log("venue ticket purchased successfully:", response);
+      console.log("event ticket purchased successfully:", response);
       notificationManager.success("Ticket purchase successfully");
-
+      const ticket = await backend.getVenueTickets(
+        "h7yxq-n6yb2-6js2j-af5hk-h4inj-edrce-oevyj-kbs7a-76kft-vrqrw-nqe"
+      );
+      console.log(ticket);
       toggleModal();
     } catch (err) {
-      console.error("Error in buying venue tickets:", err);
+      console.error("Error in buying event tickets:", err);
       toggleModal();
     }
   };

@@ -78,7 +78,7 @@ export const updateVenue = createAsyncThunk(
       return response;
     } catch (err) {
       console.error("Error while updating venue", err);
-      action(false);
+      throw new Error("Error creating venue", err);
     }
   }
 );
@@ -104,9 +104,11 @@ export const createVenue = createAsyncThunk(
         description
       );
       action(false);
+      console.log("response creating venue", response);
       return response;
     } catch (error) {
-      throw error;
+      console.log("Error creating venue", error);
+      throw new Error("Error creating venue", error);
     }
   }
 );
@@ -125,7 +127,7 @@ export const buyVenueTicket = createAsyncThunk(
       return response;
     } catch (error) {
       console.error("Error buying venue ticket:", error);
-      throw error;
+      throw new Error("Error creating venue", error);
     }
   }
 );

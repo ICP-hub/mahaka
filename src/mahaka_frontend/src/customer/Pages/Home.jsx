@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback  } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import HeroSider from "../Components/LandingPageComponents/HeroSider";
 import venueImage from "../../assets/images/venue2.png";
 import venueImage1 from "../../assets/images/venue1.png";
@@ -20,11 +20,10 @@ import { GoArrowUpRight } from "react-icons/go";
 import OngoingSlider from "../../customer/Components/LandingPageComponents/OngoingSlider";
 import TestimonialCarousel from "../../customer/Components/LandingPageComponents/Testimonial";
 import { Link } from "react-router-dom";
-import { useSelector,useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { getAllBanners } from "../../redux/reducers/apiReducers/bannerApiReducer";
-
 
 const VenueCard = ({ venue, layout }) => (
   <Link
@@ -54,47 +53,34 @@ const VenueCard = ({ venue, layout }) => (
   </Link>
 );
 
-
-
 export default function Home() {
   const { venues, loading } = useSelector((state) => state.venues);
-  console.log("venues in home",venues)
+  console.log("venues in home", venues);
   const { backend } = useSelector((state) => state.authentication);
-   const {banners} = useSelector((state)=>state.banner)
-   console.log("banners in home", banners?.title)
+  const { banners } = useSelector((state) => state.banner);
+  console.log("banners in home", banners?.title);
   const dispatch = useDispatch();
   const [attractionBanners, setAttractionBanners] = useState([]);
   const [thirdPartyBanners, setThirdPartyBanners] = useState([]);
 
- //console.log("banners is home", banners)
+  //console.log("banners is home", banners)
 
-
-
-//  third party banners
+  //  third party banners
   useEffect(() => {
-
-    const fetchAttractionBanners = async (category)=>{
-      try{
-        await dispatch(getAllBanners({backend, category}))
-      }catch(e){
-        console.log("error in fetching banners",e)
+    const fetchBanners = async (category) => {
+      try {
+        await dispatch(getAllBanners({ backend, category }));
+      } catch (e) {
+        console.log("error in fetching banners", e);
       }
-  
-    }
-      console.log("logging in home")
-     // dispatch(getAllBanners ({backend, category}))
-     fetchAttractionBanners({ Attraction: null }) 
-    
-
-     
+    };
+    console.log("logging in home");
+    // dispatch(getAllBanners ({backend, category}))
+    fetchBanners({ ThirdParty: null });
   }, [backend, dispatch]);
 
-
-
-
- // console.log("Venues in Home:", venues);
+  console.log("Venues in Home:", venues);
   console.log("Banners in Home:", banners);
-
 
   const layoutConfigs = [
     {
@@ -349,61 +335,49 @@ export default function Home() {
         {/* third party BANNER section start*/}
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-1 md:grid-cols-1  gap-[33px]">
-
-          {banners.slice(0, 1).map((banner) => (
-               <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden">
-                <h1 className = "text-gray-600 mx-2 my-2 text-xl font-bold">{banner.title}</h1>
+            {banners.slice(0, 1).map((banner) => (
+              <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden">
                 {/* <p className ="text-slate-700 mx-2 my-2">{banner?.description}</p> */}
-               <img
-                 src={banner?.image}
-                 alt="image"
-                 className="w-full  h-[100%] object-cover object-center"
-               />
-             </div>
-
-            ))}
-
+                <img
+                  src={banner?.image}
+                  alt="image"
+                  className="w-full  h-[100%] object-cover object-center"
+                />
               </div>
+            ))}
+          </div>
         </div>
         {/* third party BANNER section end*/}
         {/* 2 Grid card  start*/}
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 md:grid-cols-2  gap-[33px]">
-
-          {banners.slice(2, 4).map((banner) => (
-               <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden">
-                <h1 className = "text-gray-600 mx-2 my-2 text-xl font-bold">{banner.title}</h1>
+            {banners.slice(2, 4).map((banner) => (
+              <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden">
                 {/* <p className ="text-slate-700 mx-2 my-2">{banner?.description}</p> */}
-               <img
-                 src={banner?.image}
-                 alt="image"
-                 className="w-full  h-[100%] object-cover object-center"
-               />
-             </div>
-
-            ))}
-
+                <img
+                  src={banner?.image}
+                  alt="image"
+                  className="w-full  h-[100%] object-cover object-center"
+                />
               </div>
+            ))}
+          </div>
         </div>
         {/* 2 Grid card  end*/}
         {/* 3 Grid card  start*/}
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-3 md:grid-cols-3  gap-[33px]">
-
-          {banners.slice(2).map((banner) => (
-               <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden">
-                <h1 className = "text-gray-600 mx-2 my-2 text-xl font-bold">{banner.title}</h1>
+            {banners.slice(2).map((banner) => (
+              <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden">
                 {/* <p className ="text-slate-700 mx-2 my-2">{banner?.description}</p> */}
-               <img
-                 src={banner?.image}
-                 alt="image"
-                 className="w-full  h-[100%] object-cover object-center"
-               />
-             </div>
-
-            ))}
-
+                <img
+                  src={banner?.image}
+                  alt="image"
+                  className="w-full  h-[100%] object-cover object-center"
+                />
               </div>
+            ))}
+          </div>
         </div>
         {/* 2 Grid card  end*/}
         {/* OnGoing Event slider Start  */}
