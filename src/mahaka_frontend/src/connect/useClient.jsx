@@ -1,7 +1,7 @@
 import { Actor } from "@dfinity/agent";
 import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
 import { createContext, useContext, useState, useEffect } from "react";
-import { idlFactory as targetIdlFactory } from "../../../declarations/mahaka_backend";
+import { createActor } from "../../../declarations/mahaka_backend";
 
 const AuthContext = createContext();
 const canisterID = process.env.CANISTER_ID_MAHAKA_BACKEND;
@@ -58,14 +58,6 @@ export const useAuthClient = () => {
     }
   }, [user, identity, delegationExpiry]);
 
-  const backend = authenticatedAgent
-    ? Actor.createActor(targetIdlFactory, {
-        agent: authenticatedAgent,
-        canisterId: canisterID,
-      })
-    : null;
-  console.log("backedn", backend, "agent", authenticatedAgent);
-
   return {
     isConnected,
     wallet,
@@ -74,7 +66,9 @@ export const useAuthClient = () => {
     logout: disconnect,
     balance: icpBalance,
     principal: user?.principal,
-    backend,
+    backend: createActor(canisterID, {
+      agentOptions: { identity, verifyQuerySignatures: false },
+    }),
   };
 };
 

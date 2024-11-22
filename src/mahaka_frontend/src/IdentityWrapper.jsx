@@ -10,6 +10,7 @@ export default function IdentityWrapper() {
   const [isMounted, setIsMounted] = useState(false);
 
   const canisterID = process.env.CANISTER_ID_MAHAKA_BACKEND;
+  const canisterIDFiat = process.env.CANISTER_ID_FIATPAYMENT;
   const signers = [NFIDW, Plug];
 
   useEffect(() => {
@@ -24,7 +25,7 @@ export default function IdentityWrapper() {
       theme={IdentityKitTheme.SYSTEM}
       authType={IdentityKitAuthType.DELEGATION}
       signerClientOptions={{
-        targets: [canisterID], // Ensure the correct canister ID is used
+        targets: [canisterID, canisterIDFiat],
       }}
     >
       <Provider store={store}>
