@@ -5,7 +5,7 @@ import Ticket from "../../customer/Components/Ticket";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {getDIPdetails} from "../../redux/reducers/apiReducers/dipapireducer"
+import { getDIPdetails } from "../../redux/reducers/apiReducers/dipapireducer";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { getVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
 import { getEvent } from "../../redux/reducers/apiReducers/eventApiReducer";
@@ -29,8 +29,8 @@ const ticketData = [
     name: "Ticket Name",
     description:
       "Lorem ipsum dolor sit amet consectetur. Bibendum est vitae urna pharetra",
-    price: "Rp. 1,500",
-    availability: "AVAILABLE",
+    price: " 1,500",
+    availability: " 5",
     highlightClass: "bg-orange-500",
   },
   {
@@ -39,8 +39,8 @@ const ticketData = [
     name: "Ticket Name",
     description:
       "Lorem ipsum dolor sit amet consectetur. Bibendum est vitae urna pharetra",
-    price: "Rp. 1,500",
-    availability: "SOLD OUT",
+    price: " 1,500",
+    availability: " 4",
     highlightClass: "bg-cyan-500",
   },
   {
@@ -49,14 +49,16 @@ const ticketData = [
     name: "Ticket Name",
     description:
       "Lorem ipsum dolor sit amet consectetur. Bibendum est vitae urna pharetra",
-    price: "Rp. 1,500",
-    availability: "3 TICKETS LEFT",
+    price: " 1,500",
+    availability: "3  ",
     highlightClass: "bg-blue-500",
   },
 ];
 const calculateDuration = (StartDate, EndDate) => {
-  const start = new Date(typeof StartDate === 'bigint' ? Number(StartDate) : StartDate);
-  const end = new Date(typeof EndDate === 'bigint' ? Number(EndDate) : EndDate);
+  const start = new Date(
+    typeof StartDate === "bigint" ? Number(StartDate) : StartDate
+  );
+  const end = new Date(typeof EndDate === "bigint" ? Number(EndDate) : EndDate);
   const durationMs = end - start;
   const days = Math.floor(durationMs / (1000 * 60 * 60 * 24));
 
@@ -123,16 +125,16 @@ const EventPage = () => {
         setLocalError(err.message || "Failed to fetch events for the venue");
       });
 
-      try {
-        const venuePrincipal = currentEvent.event_collectionid;
-        dispatch(getDIPdetails({ backend, principal: venuePrincipal }))
-          .unwrap()
-          .catch((err) => {
-            console.error("Failed to fetch DIP details:", err);
-          });
-      } catch (error) {
-        console.error("Invalid venue Principal:", error);
-      }
+    try {
+      const venuePrincipal = currentEvent.event_collectionid;
+      dispatch(getDIPdetails({ backend, principal: venuePrincipal }))
+        .unwrap()
+        .catch((err) => {
+          console.error("Failed to fetch DIP details:", err);
+        });
+    } catch (error) {
+      console.error("Invalid venue Principal:", error);
+    }
   }, [dispatch, venueId, backend]);
 
   // Assuming the first event is the main event for this venue
@@ -142,38 +144,45 @@ const EventPage = () => {
       ? calculateDuration(venue.details.StartDate, venue.details.EndDate)
       : "";
 
-      const formatDate = (dateString) => {
-        const date = new Date(typeof dateString === 'bigint' ? Number(dateString) : dateString);
-        return date.toLocaleDateString("en-US", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-        });
-      };
+  function formatDate(timestamp) {
+    if (typeof timestamp === "bigint") {
+      timestamp = Number(timestamp) * 1000; // Convert BigInt to milliseconds
+    } else if (typeof timestamp === "number") {
+      timestamp = timestamp * 1000; // Convert seconds to milliseconds
+    }
 
-      const FormatTime = (nanoseconds) => {
-        // Input validation
-        if (!nanoseconds && nanoseconds !== 0) {
-          return "Invalid input";
-        }
-        try {
-          const totalMinutes = Math.floor(Number(nanoseconds) / (60 * 1000000000));
-          // Validate range (24 hours in minutes = 1440)
-          if (totalMinutes < 0 || totalMinutes >= 1440) {
-            return "Time out of range";
-          }
-          const hours = Math.floor(totalMinutes / 60);
-          const minutes = totalMinutes % 60;
-          const period = hours >= 12 ? "PM" : "AM";
-          let formattedHours = hours % 12;
-          formattedHours = formattedHours === 0 ? 12 : formattedHours;
-          const displayHours = formattedHours.toString().padStart(2, "0");
-          const displayMinutes = minutes.toString().padStart(2, "0");
-          return `${displayHours}:${displayMinutes} ${period}`;
-        } catch (error) {
-          return "Invalid time format";
-        }
-      };
+    if (!timestamp || isNaN(timestamp)) {
+      return "Invalid timestamp";
+    }
+
+    const date = new Date(timestamp);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  }
+
+  function FormatTime(timestamp) {
+    if (typeof timestamp === "bigint") {
+      timestamp = Number(timestamp) * 1000; // Convert BigInt to milliseconds
+    } else if (typeof timestamp === "number") {
+      timestamp = timestamp * 1000; // Convert seconds to milliseconds
+    }
+
+    if (!timestamp || isNaN(timestamp)) {
+      return "Invalid timestamp";
+    }
+
+    const date = new Date(timestamp);
+
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    return `${hours}:${minutes}`;
+  }
 
   return (
     <>
@@ -331,7 +340,7 @@ const EventPage = () => {
                           <li>
                             <strong>Last Entry:</strong>{" "}
                             {(venue?.details.EndTime &&
-                             FormatTime( venue.details.EndTime)) ||
+                              FormatTime(venue.details.EndTime)) ||
                               "4:00 PM"}
                           </li>
                         </ul>
@@ -375,8 +384,11 @@ const EventPage = () => {
                       "13 Jul- 17 Jul 2024"}
                   </h3>
                   <h3 className="text-lg font-normal">
-                    {venue?.details.StartTime && FormatTime(venue.details.StartTime)} -
-                    {(venue?.details.EndTime && FormatTime(venue.details.EndTime)) ||
+                    {venue?.details.StartTime &&
+                      FormatTime(venue.details.StartTime)}{" "}
+                    -
+                    {(venue?.details.EndTime &&
+                      FormatTime(venue.details.EndTime)) ||
                       "12:00AM - 3:00PM"}
                   </h3>
                   <h3 className="text-lg font-normal">

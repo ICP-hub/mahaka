@@ -20,6 +20,18 @@ import {
   createStaggerVariant,
 } from "../../common/animationVariants";
 
+// Timstamp convert
+export function formatDateAndTime(timestamp) {
+  const dateObject = new Date(timestamp * 1000);
+  const date = dateObject.toDateString();
+  const time = dateObject.toLocaleTimeString("en-GB", { hour12: false });
+  return {
+    date: date,
+    time: time,
+  };
+}
+
+// Main component
 const EventManager = () => {
   const { venues } = useSelector((state) => state.venues);
   const { events, eventByVenue, eventsLoading, singleEventLoading } =
@@ -207,17 +219,6 @@ const EventManager = () => {
 const EventCard = ({ event }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const toggleExpand = () => setIsExpanded((pv) => !pv);
-
-  function formatDateAndTime(timestamp) {
-    const dateObject = new Date(timestamp * 1000);
-    const date = dateObject.toDateString();
-    const time = dateObject.toLocaleTimeString("en-GB", { hour12: false });
-    return {
-      date: date,
-      time: time,
-    };
-  }
-
   const startInterVal = formatDateAndTime(parseInt(event.details.StartDate));
   const endInterVal = formatDateAndTime(parseInt(event.details.EndDate));
 

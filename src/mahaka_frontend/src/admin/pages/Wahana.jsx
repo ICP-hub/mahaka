@@ -3,7 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import { ImSpinner9 } from "react-icons/im";
 import { getAllWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApiReducer";
-import { getAllWahanas, setPage} from "../../redux/reducers/apiReducers/wahanaApiReducer";
+import {
+  getAllWahanas,
+  setPage,
+} from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import { searchWahanas } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import { deleteWahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 // import { getWahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
@@ -63,7 +66,8 @@ import { IoCloseCircle } from "react-icons/io5";
 const AdminWahana = () => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
-  const { wahanas, loading, currentPage, wahanasPerPage, totalPages} = useSelector((state) => state.wahana);
+  const { wahanas, loading, currentPage, wahanasPerPage, totalPages } =
+    useSelector((state) => state.wahana);
   console.log("logging the loadign for wahanas are", wahanas);
   const { venues } = useSelector((state) => state.venues);
 
@@ -111,10 +115,6 @@ const AdminWahana = () => {
   //   }
   // }, [loading]);
 
-  useEffect(() => {
-    dispatch(getAllVenues({ backend, pageLimit: 10, currPage: 0 }));
-  }, [dispatch, backend]);
-
   // useEffect(()=>{
   //   if(selectedWahana){
   //     dispatch(getWahana(backend,selectedWahana,selectedVenue))
@@ -125,22 +125,19 @@ const AdminWahana = () => {
 
   useEffect(() => {
     if (selectedVenue) {
-      
       fetchWahanas(selectedVenue);
       // setPage(page-1)
-      
     } else {
       dispatch(getAllWahanas({ backend, chunkSize: 10, pageNo: 0 }));
     }
   }, [selectedVenue, page]);
 
-
   // page sets to 1 when venue is selected
-  useEffect(()=>{
-    if(selectedVenue){
-      setPage(1)
+  useEffect(() => {
+    if (selectedVenue) {
+      setPage(1);
     }
-  },[selectedVenue])
+  }, [selectedVenue]);
 
   const fetchWahanas = (venueId) => {
     dispatch(
@@ -151,7 +148,6 @@ const AdminWahana = () => {
         venueId: venueId,
       })
     );
-     
   };
 
   const handleDescription = (description) => {
@@ -186,12 +182,8 @@ const AdminWahana = () => {
     setDeleteModalVisible(false); // Close the modal
   };
   const handlePageChange = (pageNumber) => {
-  
     setPage(pageNumber);
- 
   };
-
-
 
   // const handleNextPage = () => {
   //   dispatch(setPage(currentPage + 1));
@@ -213,9 +205,8 @@ const AdminWahana = () => {
   //   dispatch(getAllWahanas({ backend, chunkSize: 3, pageNo: page }));
   // };
 
-
   return (
-    <div className="relative h-full">
+    <div className=" flex flex-auto flex-col relative min-h-screen">
       {descriptionModal && (
         <div className="fixed inset-0 z-40 min-h-60 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-4 rounded-lg shadow-lg min-h-50 min-w-80 lg:min-h-50 lg:max-w-100 mx-4 overflow-y-auto">
@@ -319,23 +310,25 @@ const AdminWahana = () => {
           </button>
 
           {/* Page number buttons */}
-          {Array.from({ length:Number(totalPages) }, (_, i) => i + 1).map((pageNum) => (
-            <button
-              key={pageNum}
-              className={`mx-1 px-3 py-1 rounded ${
-                page === pageNum ? "bg-[#564BF1] text-white" : "bg-gray-200"
-              }`}
-              onClick={() => handlePageChange(pageNum)}
-            >
-              {pageNum}
-            </button>
-          ))}
+          {Array.from({ length: Number(totalPages) }, (_, i) => i + 1).map(
+            (pageNum) => (
+              <button
+                key={pageNum}
+                className={`mx-1 px-3 py-1 rounded ${
+                  page === pageNum ? "bg-[#564BF1] text-white" : "bg-gray-200"
+                }`}
+                onClick={() => handlePageChange(pageNum)}
+              >
+                {pageNum}
+              </button>
+            )
+          )}
 
           {/* Next button */}
           <button
             className={`px-3 py-1 rounded bg-gray-200`}
             onClick={() => handlePageChange(page + 1)}
-             disabled={page === Number(totalPages)}
+            disabled={page === Number(totalPages)}
           >
             Next
           </button>
@@ -346,10 +339,7 @@ const AdminWahana = () => {
           setIsOpen={setIsModalOpen}
           title="Create New Wahana"
         >
-          <CreateWahanaForm
-            onClose={() => setIsModalOpen(false)}
-            onSuccess={() => fetchWahanas(selectedVenue)}
-          />
+          <CreateWahanaForm onClose={() => setIsModalOpen(false)} />
         </ModalOverlay>
 
         {/* edit modal */}
@@ -370,10 +360,6 @@ const AdminWahana = () => {
             />
           </ModalOverlay>
         )}
-
-
-       
-
       </div>
     </div>
   );
@@ -484,8 +470,6 @@ const WahanaMain = ({
               />
             ))}
           </div>
-
-
         )}
       </div>
     </div>

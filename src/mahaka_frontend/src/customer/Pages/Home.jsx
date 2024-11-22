@@ -365,12 +365,22 @@ export default function Home() {
           <div className="grid lg:grid-cols-1 md:grid-cols-1  gap-[33px]">
             {thirdPartyBanners.slice(0, 1).map((banner) => (
               <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden">
-               <p className ="text-slate-700 mx-2 my-2">{banner?.title}</p> 
-                <img
-                  src={banner?.image}
-                  alt="image"
-                  className="w-full  h-[100%] object-cover object-center"
-                />
+                {/* <p className ="text-slate-700 mx-2 my-2">{banner?.description}</p> */}
+                <a
+                  href={
+                    banner?.redirectUrl?.startsWith("http")
+                      ? banner.redirectUrl
+                      : `https://${banner?.redirectUrl}`
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src={banner?.image}
+                    alt="image"
+                    className="w-full  h-[100%] object-cover object-center"
+                  />
+                </a>
               </div>
             ))}
           </div>
@@ -381,12 +391,22 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 md:grid-cols-2  gap-[33px]">
             {thirdPartyBanners.slice(1, 3).map((banner) => (
               <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden">
-                 <p className ="text-slate-700 mx-2 my-2">{banner?.title}</p> 
-                <img
-                  src={banner?.image}
-                  alt="image"
-                  className="w-full  h-[100%] object-cover object-center"
-                />
+                {/* <p className ="text-slate-700 mx-2 my-2">{banner?.description}</p> */}
+                <a
+                  href={
+                    banner?.redirectUrl?.startsWith("http")
+                      ? banner.redirectUrl
+                      : `https://${banner?.redirectUrl}`
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src={banner?.image}
+                    alt="image"
+                    className="w-full  h-[100%] object-cover object-center"
+                  />
+                </a>
               </div>
             ))}
           </div>
@@ -397,12 +417,22 @@ export default function Home() {
           <div className="grid lg:grid-cols-3 md:grid-cols-3  gap-[33px]">
             {thirdPartyBanners.slice(3).map((banner) => (
               <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden">
-                <p className ="text-slate-700 mx-2 my-2">{banner?.title}</p> 
-                <img
-                  src={banner?.image}
-                  alt="image"
-                  className="w-full  h-[100%] object-cover object-center"
-                />
+                {/* <p className ="text-slate-700 mx-2 my-2">{banner?.description}</p> */}
+                <a
+                  href={
+                    banner?.redirectUrl?.startsWith("http")
+                      ? banner.redirectUrl
+                      : `https://${banner?.redirectUrl}`
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src={banner?.image}
+                    alt="image"
+                    className="w-full  h-[100%] object-cover object-center"
+                  />
+                </a>
               </div>
             ))}
           </div>

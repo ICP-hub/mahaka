@@ -5,6 +5,7 @@ import flatpickr from "flatpickr";
 import { FcAlarmClock, FcCalendar } from "react-icons/fc";
 import { Principal } from "@dfinity/principal";
 import TextHint from "../../customer/Components/TextHint";
+import notificationManager from "../../common/utils/notificationManager";
 import {
   FormFieldDate,
   FormFieldImageUpload,
@@ -14,7 +15,6 @@ import {
   FormFieldTime,
 } from "../../common/components/InputComponents";
 import { convertToTimestamp, imageToFileBlob } from "./CreateEventForm";
-import notificationManager from "../../common/utils/notificationManager";
 
 const CreateVenueForm = ({ setIsModalOpen }) => {
   const { backend, principal } = useSelector((state) => state.authentication);
