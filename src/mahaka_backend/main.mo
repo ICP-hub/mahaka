@@ -449,9 +449,9 @@ actor mahaka {
           //           };
           //      };
           // };
-          Cycles.add<system>(500_500_000_000);
+          Cycles.add<system>(800_500_000_000);
           let venueCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), collection_details.collection_args);
-          ignore await venueCollection.wallet_receive();
+          //ignore await venueCollection.wallet_receive();
           let new_custodian = await venueCollection.addcustodians(user);
           Debug.print(" New added custodian is : " # debug_show (new_custodian));
           let nftcustodians = await venueCollection.showcustodians();
@@ -773,7 +773,7 @@ actor mahaka {
           //           };
           //      };
           // };
-          Cycles.add<system>(500_500_000_000);
+          Cycles.add<system>(800_500_000_000);
           let eventCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), eCollection.collection_args);
           let new_custodian = await eventCollection.addcustodians(user);
           Debug.print("New added custodian is: " # debug_show(new_custodian));
@@ -3027,7 +3027,7 @@ actor mahaka {
           //           };
           //      };
           // };
-          Cycles.add<system>(500_000_000_000);
+          Cycles.add<system>(800_500_000_000);
           let initial_mints = [{
                account = { owner = Principal.fromActor(mahaka); subaccount = null };
                amount = _totalSupply;
