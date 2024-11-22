@@ -43,8 +43,13 @@ export const getVenue = createAsyncThunk(
 export const deleteVenue = createAsyncThunk(
   "venues/deleteVenue",
   async ({ backend, venueId }) => {
-    await backend.deleteVenue(venueId);
-    return venueId;
+    try {
+      const response = await backend.deleteVenue(venueId);
+      return venueId;
+    } catch (err) {
+      console.error("Error deleting venue", err);
+      throw err;
+    }
   }
 );
 
@@ -182,7 +187,7 @@ const venueSlice = createSlice({
         state.deleteLoading = true;
       })
       .addCase(deleteVenue.fulfilled, (state, action) => {
-        state.loading = false;
+        state.deleteLoading = false;
         state.venues = state.venues.filter(
           (venue) => venue.id !== action.payload
         );

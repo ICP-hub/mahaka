@@ -9,7 +9,7 @@ const NavigationRight = ({ isOpen, children }) => {
           animate={{ marginRight: 0 }}
           exit={{ marginRight: -640 }}
           transition={{ duration: 0.3 }}
-          className="absolute md:relative right-0 top-0 left-0 bottom-0 w-full bg-card h-full md:w-160 z-20 overflow-y-auto overflow-x-hidden custom-scroll md:border-l md:border-border"
+          className="absolute md:relative right-0 top-0 left-0 bottom-0 w-full bg-card min-h-screen md:w-160 z-20 overflow-y-auto overflow-x-hidden custom-scroll md:border-l md:border-border"
         >
           {children}
         </motion.div>
