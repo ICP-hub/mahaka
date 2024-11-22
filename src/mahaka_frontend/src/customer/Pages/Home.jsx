@@ -63,6 +63,8 @@ export default function Home() {
    const {banners} = useSelector((state)=>state.banner)
    console.log("banners in home", banners?.title)
   const dispatch = useDispatch();
+  const [attractionBanners, setAttractionBanners] = useState([]);
+  const [thirdPartyBanners, setThirdPartyBanners] = useState([]);
 
  //console.log("banners is home", banners)
 
@@ -71,7 +73,7 @@ export default function Home() {
 //  third party banners
   useEffect(() => {
 
-    const fetchBanners = async (category)=>{
+    const fetchAttractionBanners = async (category)=>{
       try{
         await dispatch(getAllBanners({backend, category}))
       }catch(e){
@@ -81,14 +83,16 @@ export default function Home() {
     }
       console.log("logging in home")
      // dispatch(getAllBanners ({backend, category}))
-     fetchBanners({ ThirdParty: null }) 
+     fetchAttractionBanners({ Attraction: null }) 
     
+
+     
   }, [backend, dispatch]);
 
 
 
 
-  console.log("Venues in Home:", venues);
+ // console.log("Venues in Home:", venues);
   console.log("Banners in Home:", banners);
 
 

@@ -193,7 +193,7 @@ const CreateBannerForm = ({onClose, onSuccess})=>{
       ).unwrap();
       
       onClose();
-      console.log("Banner created successfully:", result);
+      console.log("Banner created successfully:");
       
       
     } catch (error) {
