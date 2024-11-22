@@ -59,9 +59,7 @@ const MgtUserActivity = () => {
                     {parseInt(ticket.ticketId)}
                   </td>
                   <td className="px-6 py-4 text-gray-800">{ticket.category}</td>
-                  <td className="px-6 py-4 text-gray-800">
-                    {parseInt(ticket.price)}
-                  </td>
+                  <td className="px-6 py-4 text-gray-800">4</td>
                   <td className="px-6 py-4 text-gray-800">
                     {parseInt(ticket.numOfVisitors)}
                   </td>
