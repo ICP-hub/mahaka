@@ -3027,7 +3027,7 @@ actor mahaka {
           //           };
           //      };
           // };
-          Cycles.add<system>(800_000_000_000);
+          Cycles.add<system>(800_500_000_000);
           let initial_mints = [{
                account = { owner = Principal.fromActor(mahaka); subaccount = null };
                amount = _totalSupply;
