@@ -103,10 +103,10 @@ module {
     };
 
     public type venueDetails = {
-        StartDate : Time.Time;
-        StartTime : Time.Time;
-        EndDate : Time.Time;
-        EndTime : Time.Time;
+        // StartDate : Time.Time;
+        // StartTime : Time.Time;
+        // EndDate : Time.Time;
+        // EndTime : Time.Time;
         Location : Text;
     };
 
