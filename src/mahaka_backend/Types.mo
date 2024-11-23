@@ -198,6 +198,12 @@ module {
         #Online
     };
 
+    public type Price = {
+        #Nat : Nat;
+        #Float : Float;
+    };
+
+
     public type category = {
         #Venue;
         #Event;
@@ -213,7 +219,7 @@ module {
         ticketIssuer : Principal;
         recepient : Principal;
         ticketType : TicketType;
-        price : Nat or Float;
+        price : Price;
     };
 
     public type ArgsStore = {
@@ -227,7 +233,7 @@ module {
         numOfVisitors : Nat;
         categoryId : venueId; 
         paymentType : PaymentType;
-        ticketPrice: Float or Nat;
+        ticketPrice: Float;
         offlineOrOnline : TicketType;
         saleType : Text;
         recepient : Principal; 
