@@ -2782,6 +2782,49 @@ actor mahaka {
           };
      };
 
+     public shared ({ caller }) func createUser(principalId : Principal, email : Text, firstName : Text, lastName : Text) : async Result.Result<(Types.User, Types.Index), Types.UpdateUserError> {
+          // if (Principal.isAnonymous(caller)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
+          // let roleResult = await getRoleByPrincipal(caller);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(roleRes)) {
+          //           if (not ((await Validation.check_for_sysAdmin(roleRes)) or (await Validation.check_for_Admin(roleRes)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
+          if (email == "") { return #err(#EmptyEmail) };
+          if (firstName == "") { return #err(#EmptyFirstName) };
+          if (lastName == "") { return #err(#EmptyLastName) };
+
+          let user : Types.User = {
+               id = principalId;
+               email = email;
+               firstName = firstName;
+               lastName = lastName;
+               role = #user;
+               assignedVenue = "";
+          };
+          switch(Users.get(principalId)){
+
+               case null {
+                    let user_blob = to_candid(user);
+                    let user_index = await stable_add(user_blob, Users_state);
+                    Users.put(principalId, user_index);
+                    return #ok(user, user_index);
+               };
+               case (?v){
+                    let user_blob = to_candid(user);
+                    let user_index = await update_stable(v, user_blob, Users_state);
+                    return #ok(user, user_index);
+               };
+          };
+     };
+
     public shared ({ caller }) func updateUserUserDetails(
           email: Text, 
           firstName: Text, 
