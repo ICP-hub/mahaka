@@ -77,6 +77,31 @@ export const updateUser = createAsyncThunk(
   }
 );
 
+// Update user profile
+export const updateUserUserDetails = createAsyncThunk(
+  "users/updateUserUserDetails",
+  async ({ backend, user, onToggle }, { rejectWithValue }) => {
+    try {
+      const response = await backend.updateUserUserDetails(
+        user.email,
+        user.firstname,
+        user.lastname
+      );
+      console.log("response updating user data", response);
+      // if (response.ok) {
+      //   notificationManager.success("User updated!");
+      //   onToggle(false);
+      //   return response;
+      // }
+      // throw new Error("Failed to update user");
+    } catch (error) {
+      // notificationManager.error("Failed to update member details!");
+      console.error("Error creating member", error);
+      // return rejectWithValue(error || "An unexpected error occurred");
+    }
+  }
+);
+
 // Remove user
 export const deleteUserByPrincipal = createAsyncThunk(
   "users/deleteUserByPrincipal",
