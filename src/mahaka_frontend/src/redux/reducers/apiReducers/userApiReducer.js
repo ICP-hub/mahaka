@@ -87,13 +87,13 @@ export const updateUserUserDetails = createAsyncThunk(
         user.firstname,
         user.lastname
       );
-      console.log("response updating user data", response);
-      // if (response.ok) {
-      //   notificationManager.success("User updated!");
-      //   onToggle(false);
-      //   return response;
-      // }
-      // throw new Error("Failed to update user");
+      // console.log("response updating user data", response);
+      if (response.ok) {
+        notificationManager.success("User updated!");
+        onToggle(false);
+        return response;
+      }
+      throw new Error("Failed to update user");
     } catch (error) {
       // notificationManager.error("Failed to update member details!");
       console.error("Error creating member", error);
@@ -212,6 +212,21 @@ const userSlice = createSlice({
       })
       .addCase(deleteUserByPrincipal.rejected, (state, action) => {
         state.deleteLoading = false;
+        state.error = action.error.message;
+      })
+
+      // update user userDetails
+      .addCase(updateUserUserDetails.pending, (state) => {
+        state.newLoading = true;
+      })
+      .addCase(updateUserUserDetails.fulfilled, (state, action) => {
+        console.log(action);
+        state.newLoading = false;
+        state.currentUserByCaller = action.payload.ok[0];
+        state.error = null;
+      })
+      .addCase(updateUserUserDetails.rejected, (state, action) => {
+        state.newLoading = false;
         state.error = action.error.message;
       });
   },

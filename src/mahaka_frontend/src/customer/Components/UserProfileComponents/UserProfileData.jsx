@@ -73,13 +73,15 @@ const UserProfileData = () => {
 };
 
 const ProfileDetailsComponent = ({ editModalOpen, setEditModalOpen }) => {
-  const { currentUserByCaller } = useSelector((state) => state.users);
+  const { currentUserByCaller, newLoading } = useSelector(
+    (state) => state.users
+  );
   const { principal, backend } = useSelector((state) => state.authentication);
   const dispatch = useDispatch();
   const [formValues, setFormValues] = useState({
-    firstname: "",
-    lastname: "",
-    email: "",
+    firstname: currentUserByCaller ? currentUserByCaller.firstName : "",
+    lastname: currentUserByCaller ? currentUserByCaller.lastName : "",
+    email: currentUserByCaller ? currentUserByCaller.email : "",
   });
 
   const handleInputChange = (name, value) => {
@@ -160,9 +162,10 @@ const ProfileDetailsComponent = ({ editModalOpen, setEditModalOpen }) => {
         <div>
           <button
             className="bg-indigo-600 text-white p-3 rounded-md"
+            disabled={newLoading}
             onClick={handleFormSubmit}
           >
-            Update profile
+            {newLoading ? "Updating..." : "Update profile"}
           </button>
         </div>
       </motion.div>
