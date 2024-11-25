@@ -5,7 +5,7 @@ import Footer from "./Footer";
 
 export default function Master() {
   return (
-    <div className="flex flex-col overflow-y-auto h-screen light">
+    <div className="light flex flex-col overflow-y-auto h-screen">
       <Header />
       <div className="h-full">
         <Outlet />

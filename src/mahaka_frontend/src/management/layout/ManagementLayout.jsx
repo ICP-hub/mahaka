@@ -4,9 +4,14 @@ import NavigationVertical from "./navigation/NavigationVertical";
 import ScreenOverlayBlur from "../../common/ScreenOverlay";
 import useNavigationControl from "../../common/hooks/useNavigationControl";
 import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllEventsByVenue } from "../../redux/reducers/apiReducers/eventApiReducer";
 
 const ManagementLayout = () => {
   const { state, toggleNavigation } = useNavigationControl();
+  const { currentUserByCaller } = useSelector((state) => state.users);
+  const { backend } = useSelector((state) => state.authentication);
+  const dispatch = useDispatch();
 
   // Initialize `selected` state from localStorage or default to 'light'
   const [selected, setSelected] = useState(
@@ -21,6 +26,19 @@ const ManagementLayout = () => {
       toggleNavigation(false);
     }
   };
+
+  useEffect(() => {
+    if (currentUserByCaller) {
+      dispatch(
+        getAllEventsByVenue({
+          backend,
+          chunkSize: 10,
+          pageNo: 0,
+          venueId: currentUserByCaller.assignedVenue,
+        })
+      );
+    }
+  }, currentUserByCaller);
 
   return (
     <>

@@ -35,14 +35,14 @@ export const convertToTimestamp = (date, time) => {
 /* ----------------------------------------------------------------------------------------------------- */
 /*  @ Main component
 /* ----------------------------------------------------------------------------------------------------- */
-const CreateEventForm = ({ setIsModalOpen }) => {
+const CreateEventForm = ({ setIsModalOpen, venueIdentity }) => {
   const { venues } = useSelector((state) => state.venues);
   const { backend, principal } = useSelector((state) => state.authentication);
   const { createEventLoader } = useSelector((state) => state.events);
   const dispatch = useDispatch();
   // Select venue, event title, event description, start date,start time, end date, end time, location, general ticket limit, student ticket limit, vip ticket limit, event banner, event logo
   const [formValues, setFormValues] = useState({
-    venueId: "",
+    venueId: venueIdentity ? venueIdentity : "",
     title: "",
     description: "",
     location: "",
@@ -161,13 +161,15 @@ const CreateEventForm = ({ setIsModalOpen }) => {
 
   return (
     <div className="flex flex-col space-y-8 py-4">
-      <FormFieldOptions
-        label="Choose a venue"
-        value={formValues.venueId}
-        onChange={(value) => handleInputChange("venueId", value)}
-        optionInit="Select a venue"
-        options={venues}
-      />
+      {!venueIdentity && (
+        <FormFieldOptions
+          label="Choose a venue"
+          value={formValues.venueId}
+          onChange={(value) => handleInputChange("venueId", value)}
+          optionInit="Select a venue"
+          options={venues}
+        />
+      )}
       <FormFieldInput
         type="text"
         label="Event title"
