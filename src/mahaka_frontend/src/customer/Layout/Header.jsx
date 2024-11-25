@@ -77,9 +77,11 @@ export default function Header() {
           </div>
         </div>
       </div>
-      {isNavOpen && (
-        <NavVertical isNavOpen={isNavOpen} onNavOpen={setIsNavOpen} />
-      )}
+      <AnimatePresence>
+        {isNavOpen && (
+          <NavVertical isNavOpen={isNavOpen} onNavOpen={setIsNavOpen} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -161,22 +163,23 @@ const NavVertical = ({ isNavOpen, onNavOpen }) => {
   const { user } = useIdentityKit();
   return (
     <motion.nav
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, x: -512 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ x: -512 }}
       transition={{ stiffness: 300 }}
-      className="md:hidden absolute border-t border-gray-500 inset-x-0 bg-[#124076] text-white z-50"
+      className="md:hidden absolute border-t border-gray-500 inset-x-0 bg-[#124076] text-white z-50 h-screen"
     >
-      <div className="flex flex-col container mx-auto px-6 py-4">
+      <div className="flex flex-col container mx-auto px-6 text-4xl font-black">
         {NavLinks.map((link, index) => (
           // Replace button with Link later
-          <Link to={link.url} key={index}>
-            <div key={index} className="p-4">
+          <Link to={link.url} key={index} onClick={() => onNavOpen(false)}>
+            <div key={index} className="py-4">
               <h4>{link.title}</h4>
             </div>
           </Link>
         ))}
         {!user && (
-          <div className="p-4">
+          <div className="py-4">
             <ConnectBtn />
           </div>
         )}

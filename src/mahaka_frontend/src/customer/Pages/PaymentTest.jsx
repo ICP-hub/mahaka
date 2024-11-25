@@ -11,6 +11,7 @@ import DatePicker from "../../common/DatePicker";
 import VisitorPicker from "../Components/single-event/VisitorPicker";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../connect/useClient";
+import { HttpAgent } from "@dfinity/agent";
 
 const PaymentTest = () => {
   const authenticatedAgent = useAgent();
@@ -30,8 +31,16 @@ const PaymentTest = () => {
   }`;
   const { backend, principal } = useAuth();
   // const { backend } = useSelector((state) => state.authentication);
+  const { identity } = useIdentityKit();
+  const ICP_API_HOST = "https://icp-api.io/";
+  const [unauthenticatedAgent, setUnauthenticatedAgent] = useState(null);
 
-  console.log("eventId", eventIds);
+  useEffect(() => {
+    (async () => {
+      const agent = new HttpAgent({ host: ICP_API_HOST });
+      setUnauthenticatedAgent(agent);
+    })();
+  }, []);
   const eventprincipal = Principal.fromText(eventIds.slice(5));
   useEffect(() => {
     const fetchVenue = async () => {
@@ -46,6 +55,7 @@ const PaymentTest = () => {
 
     fetchVenue();
   }, [backend]);
+
   // const handlePayment = async () => {
   //   if (!user) {
   //     alert("Please login first");
@@ -160,14 +170,20 @@ const PaymentTest = () => {
   //   }
   // };
   const handlePayment = async (e) => {
+    e.preventDefault();
     setLoading(true);
     const coffeeAmount = 0.0001;
 
+    if (!unauthenticatedAgent) {
+      console.error("Agent not initialized");
+      return;
+    }
+
     const actor = Actor.createActor(idlFactory, {
-      agent: authenticatedAgent,
+      agent: unauthenticatedAgent,
       canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
     });
-    console.log("actor", actor);
+
     const transferArgs = {
       from_subaccount: [],
       spender: {
@@ -183,10 +199,12 @@ const PaymentTest = () => {
     };
 
     try {
+      console.log("transferArgs:", transferArgs);
       const response = await actor.icrc2_approve(transferArgs);
       console.log("res of icp payment", response);
+
       if (response.Ok) {
-        console.log("res of paymnet", response);
+        console.log("Payment successful:", response.Ok);
       } else {
         throw new Error(response.Err || "Payment failed");
       }
@@ -194,9 +212,7 @@ const PaymentTest = () => {
       console.error("Payment error:", error);
     } finally {
       setLoading(false);
-      setTimeout(() => {
-        e.target.disabled = false;
-      }, 5000);
+      e.target.disabled = false;
     }
   };
   const handlePayment2 = async (e) => {

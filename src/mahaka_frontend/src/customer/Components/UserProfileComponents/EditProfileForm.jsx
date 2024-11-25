@@ -32,9 +32,7 @@ function EditProfileForm({ setIsModalOpen }) {
       email,
       firstName,
       lastName,
-      // Add profile image if needed
     };
-    // console.log("Updating data:", updatedData);
     dispatch(
       updateUser({
         backend: backend,
@@ -81,31 +79,6 @@ function EditProfileForm({ setIsModalOpen }) {
             onChange={(e) => setEmail(e.target.value)}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
           />
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Profile Image
-          </label>
-          <div className="mt-1 flex items-center justify-center px-6 pt-5 pb-6 border-2 border-dashed border-gray-300 rounded-md">
-            <div className="space-y-1 text-center">
-              <div className="flex text-sm text-gray-600">
-                <label
-                  htmlFor="file-upload"
-                  className="relative cursor-pointer bg-white rounded-md font-medium text-orange-500 hover:text-orange-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-orange-500"
-                >
-                  <span>Upload Image</span>
-                  <input
-                    id="file-upload"
-                    name="file-upload"
-                    type="file"
-                    className="sr-only"
-                    onChange={handleImageUpload}
-                  />
-                </label>
-              </div>
-              <p className="text-xs text-gray-500">JPEG, PNG less than 5MB</p>
-            </div>
-          </div>
         </div>
         <div>
           <button

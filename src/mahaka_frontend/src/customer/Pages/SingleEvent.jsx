@@ -3,7 +3,7 @@ import Frame15 from "../../assets/images/Frame15.png";
 import fram2 from "../../assets/images/fram2.png";
 import Ticket from "../../customer/Components/Ticket";
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { getVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
@@ -89,9 +89,17 @@ export default function SingleEvent() {
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   };
+  const navigate = useNavigate();
   const { id } = useParams();
   const venueId = `${decodeURIComponent(id)}${window.location.hash}`;
   console.log(venueId);
+  const location = useLocation();
+  const ids = `${decodeURIComponent(id)}${location.hash}`;
+
+  const nextpage = () => {
+    const updatedIds = ids.replace(/#/g, "_");
+    navigate(`/venues/${updatedIds}/primium/payment2`);
+  };
 
   const dispatch = useDispatch();
   const {
@@ -346,10 +354,7 @@ export default function SingleEvent() {
                         volutpat amet.
                       </p> */}
                       <div>
-                        <div
-                          className="cursor-pointer"
-                          onClick={handleModalOpen}
-                        >
+                        <div className="cursor-pointer" onClick={nextpage}>
                           <Ticket
                             type={"GROUP"}
                             gradientClass={ticketData[0].gradientClass}
@@ -362,10 +367,7 @@ export default function SingleEvent() {
                             highlightClass={ticketData[0].highlightClass}
                           />
                         </div>
-                        <div
-                          className="cursor-pointer"
-                          onClick={handleModalOpen}
-                        >
+                        <div className="cursor-pointer" onClick={nextpage}>
                           <Ticket
                             type={"SINGLE"}
                             gradientClass={ticketData[1].gradientClass}
@@ -378,10 +380,7 @@ export default function SingleEvent() {
                             highlightClass={ticketData[1].highlightClass}
                           />
                         </div>
-                        <div
-                          className="cursor-pointer"
-                          onClick={handleModalOpen}
-                        >
+                        <div className="cursor-pointer" onClick={nextpage}>
                           <Ticket
                             type={"VIP"}
                             gradientClass={ticketData[2].gradientClass}

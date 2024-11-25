@@ -53,11 +53,7 @@ export const FormFieldOptions = ({
         onChange={(e) => onChange(e.target.value)}
       >
         {optionInit && (
-          <option
-            value=""
-            disabled
-            className="bg-transparent w-full my-3 text-black"
-          >
+          <option value="" disabled className="w-full my-3 text-black">
             {optionInit}
           </option>
         )}
