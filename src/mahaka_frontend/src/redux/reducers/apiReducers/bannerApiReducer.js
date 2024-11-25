@@ -50,6 +50,28 @@ export const getAllBanners = createAsyncThunk(
   }
 );
 
+
+
+// Async thunk to clear banners
+export const clearAllBanners = createAsyncThunk(
+  'banner/clearAllBanners',
+  async ({category, backend}) => {
+    try {
+      console.log("category in clear all in reducer is", category);
+      // Replace this with your actual backend API call
+      const response = await backend.clearAllBanners(category); // Assume `backend` is your API handler
+      if (response.ok) {
+        return response.ok; // Success message
+      } else {
+        throw new Error(response.err); // Handle error
+      }
+    } catch (error) {
+      console.log("Error in clear banners",e)
+    }
+  }
+);
+
+
 //   create slice
 const bannerSlice = createSlice({
   name: "banner",
@@ -63,7 +85,14 @@ const bannerSlice = createSlice({
       })
       .addCase(addBanner.fulfilled, (state, action) => {
         state.bannerLoading = false;
-        state.banners.push(action.payload);
+        if (action.meta.arg.category.Attraction !== undefined) {
+          // Update only attractionBanners
+          state.attractionbanners.push(action.payload);
+        } else if (action.meta.arg.category.ThirdParty !== undefined) {
+          // Update only thirdPartyBanners
+          state.banners.push(action.payload);
+        }
+       
         // state.banners = [...state.banners, action.payload];
         state.error = null;
         notificationManager.success("banner created successfully");
@@ -73,6 +102,32 @@ const bannerSlice = createSlice({
       .addCase(addBanner.rejected, (state, action) => {
         state.bannerLoading = false;
         state.error = action.error.message;
+      })
+
+      // clear all banners
+
+      .addCase(clearAllBanners.pending, (state) => {
+        state.bannerLoading = true
+       
+        state.error = null;
+      })
+      .addCase(clearAllBanners.fulfilled, (state, action) => {
+        state.bannerLoading = false
+       
+       
+        if (action.meta.arg.category.Attraction !== undefined) {
+          // Update only attractionBanners
+          state.attractionbanners = [];
+        } else if (action.meta.arg.category.ThirdParty !== undefined) {
+          // Update only thirdPartyBanners
+          state.banners = [];
+        }
+        console.log("Banners are cleared successfully")
+      })
+      .addCase(clearAllBanners.rejected, (state, action) => {
+        
+        state.error = action.payload;
+       // console.log("Error in clear banner",state.error)
       })
 
       // get all banners

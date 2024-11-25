@@ -57,39 +57,39 @@ export default function Home() {
   const { venues, loading } = useSelector((state) => state.venues);
   console.log("venues in home", venues);
   const { backend } = useSelector((state) => state.authentication);
-  const {  attractionBanners, thirdPartyBanners } = useSelector((state) => state.banner);
+  const {  attractionbanners, banners } = useSelector((state) => state.banner);
  //const {  thirdPartyBanners } = useSelector((state) => state.banner);
 //  const { banners } = useSelector((state) => state.banner);
  // console.log("only third party  banners in home",  thirdPartyBanners);
 
- console.log("Attraction Banners home:", attractionBanners);
- console.log("Third Party Banners home:", thirdPartyBanners);
+ console.log("Attraction Banners home:", attractionbanners);
+ console.log("Third Party Banners home:", banners);
   const dispatch = useDispatch();
 
 
-  useEffect(() => {
-    const fetchBanners = async (category) => {
-      console.log("useeffect category", category);
-      try {
-        await dispatch(getAllBanners({ backend, category }));
-      } catch (e) {
-        console.log("Error in fetching banners:", e);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchBanners = async (category) => {
+  //     console.log("useeffect category", category);
+  //     try {
+  //       await dispatch(getAllBanners({ backend, category }));
+  //     } catch (e) {
+  //       console.log("Error in fetching banners:", e);
+  //     }
+  //   };
   
-    // Fetch both categories concurrently
+  //   // Fetch both categories concurrently
   
-    // Wait for both fetches to complete
-    const fetchBannersSequentially = async () => {
+  //   // Wait for both fetches to complete
+  //   const fetchBannersSequentially = async () => {
 
-
-     await fetchBanners({ Attraction: null });
-      await fetchBanners({ ThirdParty: null });
+  //     await fetchBanners({ ThirdParty: null });
+  //    await fetchBanners({ Attraction: null });
+    
      
-    };
+  //   };
   
-    fetchBannersSequentially();
-  }, []);
+  //   fetchBannersSequentially();
+  // }, []);
   
 
 // // attraction banners
@@ -178,7 +178,7 @@ export default function Home() {
 
   return (
     <>
-      <HeroSider attractionBanners = {attractionBanners}/>
+      <HeroSider/>
       <section className="py-12">
         {/* -------------------------------------venues section start------------------------------ */}
 
@@ -363,7 +363,7 @@ export default function Home() {
         {/* third party BANNER section start*/}
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-1 md:grid-cols-1  gap-[33px]">
-            {thirdPartyBanners.slice(0, 1).map((banner) => (
+            {banners.slice(0, 1).map((banner) => (
               <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden">
                 {/* <p className ="text-slate-700 mx-2 my-2">{banner?.description}</p> */}
                 <a
@@ -389,7 +389,7 @@ export default function Home() {
         {/* 2 Grid card  start*/}
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 md:grid-cols-2  gap-[33px]">
-            {thirdPartyBanners.slice(1, 3).map((banner) => (
+            {banners.slice(1, 3).map((banner) => (
               <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden">
                 {/* <p className ="text-slate-700 mx-2 my-2">{banner?.description}</p> */}
                 <a
@@ -415,7 +415,7 @@ export default function Home() {
         {/* 3 Grid card  start*/}
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-3 md:grid-cols-3  gap-[33px]">
-            {thirdPartyBanners.slice(3).map((banner) => (
+            {banners.slice(3).map((banner) => (
               <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden">
                 {/* <p className ="text-slate-700 mx-2 my-2">{banner?.description}</p> */}
                 <a

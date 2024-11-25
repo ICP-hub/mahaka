@@ -138,37 +138,77 @@ const VenueTableFormat = ({ filteredVenues }) => {
   );
 };
 const VenueTableData = ({ venue, onDelete }) => {
+  function convertTimestampToDate(timestamp) {
+    if (typeof timestamp === "bigint") {
+      timestamp = Number(timestamp) * 1000; // Convert BigInt to milliseconds
+    } else if (typeof timestamp === "number") {
+      timestamp = timestamp * 1000; // Convert seconds to milliseconds
+    }
+
+    if (!timestamp || isNaN(timestamp)) {
+      return "Invalid timestamp";
+    }
+
+    const date = new Date(timestamp);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  }
+
+  function convertTimestampToTime(timestamp) {
+    if (typeof timestamp === "bigint") {
+      timestamp = Number(timestamp) * 1000; // Convert BigInt to milliseconds
+    } else if (typeof timestamp === "number") {
+      timestamp = timestamp * 1000; // Convert seconds to milliseconds
+    }
+
+    if (!timestamp || isNaN(timestamp)) {
+      return "Invalid timestamp";
+    }
+
+    const date = new Date(timestamp);
+
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    return `${hours}:${minutes}`;
+  }
+
   return (
     <>
       <div className="custom-grid items-center gap-4 border-b px-6 py-3 md:px-8 text-text bg-card border-border">
         <div className="flex items-center">
           <div className="relative mr-6 flex h-12 w-12 flex-0 items-center justify-center overflow-hidden rounded border border-border">
-          <img
-              src={venue.logo && venue.logo.data ? venue.logo.data : VenueDemoImg}
+            <img
+              src={venue?.logo?.data ? venue?.logo?.data : VenueDemoImg}
               alt="Venue_img"
-              className="w-8"
             />
           </div>
         </div>
-        <div>{venue.Title}</div>
-        <div className="hidden sm:block truncate">{venue.Description}</div>
+        <div>{venue?.Title}</div>
+        <div className="hidden sm:block truncate">{venue?.Description}</div>
         <div className="hidden sm:block">
-          {formatDate(venue.Details.StartDate)}
+          {convertTimestampToDate(venue?.Details?.StartDate)}
         </div>
         <div className="hidden lg:block">
-          {formatDate(venue.Details.EndDate)}
+          {convertTimestampToDate(venue?.Details?.EndDate)}
         </div>
         <div className="hidden lg:block">
-        {FormatTime(venue?.Details?.StartTime)}-{FormatTime(venue?.Details?.EndTime)}
+          {convertTimestampToTime(venue?.Details?.StartTime)}-
+          {convertTimestampToTime(venue?.Details?.EndTime)}
         </div>
-        <div className="truncate">{venue.Details.Location}</div>
+        <div className="truncate">{venue?.Details?.Location}</div>
 
         {/* Wrap both icons inside a flex container */}
         <div className="flex items-center justify-center space-x-2">
           <Link
             to={`/management/venues/venue/${encodeURIComponent(
-              venue.Title
-            )}/${encodeURIComponent(venue.id)}`}
+              venue?.Title
+            )}/${encodeURIComponent(venue?.id)}`}
             className="flex items-center"
           >
             <HiOutlineDotsHorizontal
@@ -178,12 +218,12 @@ const VenueTableData = ({ venue, onDelete }) => {
           </Link>
 
           {/* Delete Icon */}
-          {/* <button
+          <button
             className="text-red-500 hover:text-red-700"
             onClick={onDelete}
           >
             <MdDelete size={24} />
-          </button> */}
+          </button>
         </div>
       </div>
       {/* <AnimatePresence>
@@ -191,6 +231,8 @@ const VenueTableData = ({ venue, onDelete }) => {
       </AnimatePresence> */}
     </>
   );
+  
+  
 };
 // const DetailCard = ({ venue }) => {
 //   return (

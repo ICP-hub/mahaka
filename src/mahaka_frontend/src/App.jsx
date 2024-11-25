@@ -50,6 +50,33 @@ function App() {
     dispatch(getAllVenues({ backend: backend, pageLimit: 100, currPage: 0 }));
   }, []);
 
+  
+
+  useEffect(() => {
+    const fetchBanners = async (category) => {
+      console.log("useeffect category", category);
+      try {
+        await dispatch(getAllBanners({ backend, category }));
+      } catch (e) {
+        console.log("Error in fetching banners:", e);
+      }
+    };
+  
+    // Fetch both categories concurrently
+  
+    // Wait for both fetches to complete
+    const fetchBannersSequentially = async () => {
+
+      await fetchBanners({ ThirdParty: null });
+     await fetchBanners({ Attraction: null });
+    
+     
+    };
+  
+    fetchBannersSequentially();
+  }, [dispatch,backend]);
+  
+
   useEffect(() => {
     dispatch(getAllEventsPaginated({ backend: backend }));
   }, []);

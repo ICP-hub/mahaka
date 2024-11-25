@@ -57,19 +57,19 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
   };
 
   const handleEventSubmit = () => {
-    if (!principal) {
-      notificationManager.error("Please login first");
-      return;
-    }
-    const isFormValid = Object.values(formValues).every(
-      (value) => value !== "" && value !== null
-    );
-    if (!isFormValid) {
-      notificationManager.error(
-        "Please check all the fields before proceeding"
-      );
-      return;
-    }
+    // if (!principal) {
+    //   notificationManager.error("Please login first");
+    //   return;
+    // }
+    // const isFormValid = Object.values(formValues).every(
+    //   (value) => value !== "" && value !== null
+    // );
+    // if (!isFormValid) {
+    //   notificationManager.error(
+    //     "Please check all the fields before proceeding"
+    //   );
+    //   return;
+    // }
     // time stamps
     const startTimestamp = convertToTimestamp(
       formValues.startDate,
@@ -106,7 +106,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
             symbol: "VENUE",
             vTicket_limit: parseInt(formValues.vipTicketLimit),
           },
-          custodian: Principal.fromText(principal),
+          custodian: Principal.fromText("2vxsx-fae"),
         },
         title: formValues.title,
         capacity: parseInt(formValues.capacity),
