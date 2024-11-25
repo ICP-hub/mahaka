@@ -1,22 +1,280 @@
-// import React, { useState, useEffect } from "react";
-// import { useDispatch, useSelector } from "react-redux";
-// import { HiMagnifyingGlass } from "react-icons/hi2";
-// // import { ImSpinner9 } from "react-icons/im";
-// import { getAllEventsByVenue } from "../../redux/reducers/apiReducers/eventApiReducer";
-// import { searchEvents } from "../../redux/reducers/apiReducers/eventApiReducer";
-// import { getAllEvents } from "../../redux/reducers/apiReducers/eventApiReducer";
-// import { deleteEvent} from "../../redux/reducers/apiReducers/eventApiReducer";
-// // import { getWahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
-// import { searchWahanas } from "../../redux/reducers/apiReducers/wahanaApiReducer";
-// import ModalOverlay from "../../customer/Components/Modal-overlay";
-// import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
-// import { MdDelete } from "react-icons/md";
-// import { FaArrowRight } from "react-icons/fa";
-// import { IoCloseCircle } from "react-icons/io5";
-// import { formatDate } from "../../common/utils/dateFormater";
+import { useMemo, useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllEventsByVenue } from "../../redux/reducers/apiReducers/eventApiReducer";
+import {
+  createStaggerContainer,
+  createStaggerVariant,
+} from "../../common/animationVariants";
+import {
+  HiArrowRightCircle,
+  HiCheckBadge,
+  HiChevronDown,
+  HiChevronUp,
+  HiMiniMapPin,
+  HiOutlineMagnifyingGlass,
+} from "react-icons/hi2";
+import CreateEventForm from "../../admin/components/CreateEventForm";
+import { AnimatePresence, motion } from "framer-motion";
+import { formatDateAndTime } from "../../admin/pages/EventManager";
+import ModalOverlay from "../../customer/Components/Modal-overlay";
 
 const MgtEvents = () => {
-  return <div>event jsx</div>;
+  const { eventByVenue, singleEventLoading } = useSelector(
+    (state) => state.events
+  );
+  const { currentUserByCaller } = useSelector((state) => state.users);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const containerVariants = createStaggerContainer(0.4);
+  const cardVariants = createStaggerVariant(0.3);
+
+  console.log(singleEventLoading);
+
+  return (
+    <div className="flex flex-auto flex-col relative min-h-screen">
+      <div className="flex min-w-0 flex-col">
+        <div className="dark relative flex-0 overflow-hidden bg-gray-800 px-4 py-8 sm:p-16">
+          <svg
+            viewBox="0 0 960 540"
+            width="100%"
+            height="100%"
+            preserveAspectRatio="xMidYMax slice"
+            xmlns="http://www.w3.org/2000/svg"
+            className="absolute inset-0 pointer-events-none"
+          >
+            <g
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="100"
+              className="text-gray-700 opacity-25"
+            >
+              <circle r="234" cx="196" cy="23"></circle>
+              <circle r="234" cx="790" cy="491"></circle>
+            </g>
+          </svg>
+          <div className="relative z-10 flex flex-col items-center text-text">
+            <div className="text-xl font-semibold">MAHAKA'S</div>
+            <div className="mt-1 text-center text-4xl font-extrabold leading-tight tracking-tight sm:text-7xl">
+              EXCLUSIVE EVENTS
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-auto p-6 sm:p-10">
+          <div className="mx-auto flex w-full max-w-xs flex-auto flex-col sm:max-w-5xl">
+            <div className="flex w-full max-w-xs flex-col sm:items-center sm:max-w-none sm:flex-row">
+              <div className="w-full sm:w-72 bg-card p-4 rounded-xl">
+                <div className="relative flex items-center flex-auto">
+                  <div>
+                    <HiOutlineMagnifyingGlass size={24} />
+                  </div>
+                  <div className="w-full mx-1">
+                    <input
+                      type="text"
+                      placeholder="Search for events..."
+                      className="outline-none bg-transparent w-full"
+                    />
+                  </div>
+                  <div className="ml-auto">
+                    <HiArrowRightCircle size={24} className="cursor-pointer" />
+                  </div>
+                </div>
+              </div>
+              <div className="sm:ml-auto mt-4 sm:mt-0 flex items-center justify-center w-full sm:w-fit h-full">
+                <button
+                  className="bg-indigo-600 rounded-xl cursor-pointer w-full text-white p-4"
+                  disabled={!currentUserByCaller}
+                  onClick={() => setIsModalOpen(true)}
+                >
+                  Add a new event
+                </button>
+              </div>
+            </div>
+            {!currentUserByCaller || singleEventLoading ? (
+              <div className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3">
+                <SkeletonLoader />
+                <SkeletonLoader />
+                <SkeletonLoader />
+              </div>
+            ) : eventByVenue && eventByVenue.length > 0 ? (
+              <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="show"
+                className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3"
+              >
+                {eventByVenue.map((event, index) => (
+                  <motion.div key={index} variants={cardVariants}>
+                    <EventCard event={event} />
+                  </motion.div>
+                ))}
+              </motion.div>
+            ) : (
+              <div className="mt-8">No Events Found</div>
+            )}
+          </div>
+        </div>
+      </div>
+      {/* Create event modal */}
+      {isModalOpen && (
+        <ModalOverlay
+          isOpen={isModalOpen}
+          setIsOpen={setIsModalOpen}
+          title="Create Event"
+        >
+          <CreateEventForm
+            setIsModalOpen={setIsModalOpen}
+            venueIdentity={currentUserByCaller.assignedVenue}
+          />
+        </ModalOverlay>
+      )}
+    </div>
+  );
+};
+
+// event cards
+const EventCard = ({ event }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const toggleExpand = () => setIsExpanded((pv) => !pv);
+  const startInterVal = formatDateAndTime(parseInt(event.details.StartDate));
+  const endInterVal = formatDateAndTime(parseInt(event.details.EndDate));
+
+  // console.log("start", startInterVal);
+  // console.log("end", endInterVal);
+
+  return (
+    <div className="bg-card flex min-h-96 max-h-fit flex-col rounded-2xl overflow-hidden">
+      <div className="relative">
+        <div className="absolute top-4 left-4 rounded-full p-1 border border-indigo-200 h-12 w-12 overflow-hidden">
+          <img
+            src={event.logo.data}
+            alt="logo_img"
+            className="object-cover h-full w-full rounded-full"
+          />
+        </div>
+        <div className="h-48 w-full border border-white">
+          <img
+            src={event.banner.data}
+            alt="banner_img"
+            className="h-full w-full"
+          />
+        </div>
+      </div>
+      <div className="flex flex-col p-4">
+        <div className="flex items-center justify-between">
+          <div className="rounded-full px-3 py-0.5 text-sm font-semibold bg-blue-100 text-blue-800 dark:bg-blue-500 dark:text-blue-50 truncate">
+            {event.venueId.split("#")[0]}
+          </div>
+          <div className="flex items-center">
+            <HiCheckBadge size={24} className="text-green-500" />
+          </div>
+        </div>
+        <div className="mt-4 text-lg font-medium">{event.title}</div>
+        <div className="text-secondary mt-0.5 line-clamp-2">
+          {event.description}
+        </div>
+        <div className="flex items-center text-md leading-5 mt-2 uppercase font-medium">
+          <HiMiniMapPin size={14} />
+          <div className="ml-1.5">{event.details.Location}</div>
+        </div>
+        <div className="flex items-center justify-between mt-2">
+          <div className="flex flex-col font-medium">
+            <div>Start Date</div>
+            <div>{startInterVal.date}</div>
+            <div>{startInterVal.time}</div>
+          </div>
+          <button
+            onClick={toggleExpand}
+            className="h-8 w-8 rounded-full hover:bg-hover flex items-center justify-center"
+          >
+            {isExpanded ? <HiChevronUp /> : <HiChevronDown />}
+          </button>
+        </div>
+      </div>
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{
+              opacity: 0,
+              height: 0,
+            }}
+            animate={{
+              opacity: 1,
+              height: "auto",
+            }}
+            exit={{
+              opacity: 0,
+              height: 0,
+            }}
+          >
+            <div className="border-t border-border p-4">
+              <div className="flex justify-between">
+                <div className="flex flex-col font-medium w-1/2">
+                  <div>End Date</div>
+                  <div>{endInterVal.date}</div>
+                  <div>{endInterVal.time}</div>
+                </div>
+                <div className="flex flex-col font-medium w-1/2">
+                  <div>Event ID</div>
+                  <div className="text-xs">{event.id}</div>
+                </div>
+              </div>
+              <div className="mt-4 flex flex-col">
+                <div className="font-medium">Ticket Limits</div>
+                <div className="grid grid-cols-3 gap-1 mt-2">
+                  <div className="p-2 flex flex-col rounded-md font-medium bg-gray-300 text-slate-900">
+                    <div className="flex items-center justify-center">
+                      GENERAL
+                    </div>
+                    <div className="flex items-center justify-center">
+                      {parseInt(event.gTicket_limit)}
+                    </div>
+                  </div>
+                  <div className="p-2 flex flex-col rounded-md font-medium bg-gray-300 text-slate-900">
+                    <div className="flex items-center justify-center">
+                      STUDENT
+                    </div>
+                    <div className="flex items-center justify-center">
+                      {parseInt(event.sTicket_limit)}
+                    </div>
+                  </div>
+                  <div className="p-2 flex flex-col rounded-md font-medium bg-gray-300 text-slate-900">
+                    <div className="flex items-center justify-center">VIP</div>
+                    <div className="flex items-center justify-center">
+                      {parseInt(event.vTicket_limit)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+// Loader
+const SkeletonLoader = () => {
+  return (
+    <div className="animate-pulse flex flex-col p-4 bg-gray-400 rounded-xl shadow-md min-h-96">
+      {/* title and delete btn */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="bg-gray-600 w-11 h-11 rounded-full"></div>
+      </div>
+
+      {/* Bottom section*/}
+      <div className="space-y-2 mt-auto">
+        <div className="flex">
+          <div className="h-4 bg-gray-600 rounded w-1/2"></div>
+          <div className="h-4 bg-gray-600 rounded w-10 ml-auto"></div>
+        </div>
+        <div className="h-2 bg-gray-600 rounded w-1/2 my-5"></div>
+        <div className="h-2 bg-gray-600 rounded w-1/2"></div>
+        <div className="h-4 bg-gray-600 rounded w-10 "></div>
+        <div className="h-2 bg-gray-600 rounded w-1/2"></div>
+      </div>
+    </div>
+  );
   //     const dispatch = useDispatch();
   //     const { backend } = useSelector((state) => state.authentication);
   //     const { events,  eventsLoading, totalPages , currentPage} = useSelector((state) => state.events);

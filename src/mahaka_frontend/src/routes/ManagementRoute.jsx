@@ -8,7 +8,7 @@ import MgtUserActivity from "../management/pages/UserActivity";
 import MgtWahana from "../management/pages/Wahana";
 import MgtVoucher from "../management/pages/Voucher";
 import MgtTicket from "../management/pages/Ticket";
-import MgtEvent from "../management/pages/Event"
+import MgtEvent from "../management/pages/Event";
 
 /* management routes */
 export const managementRoutes = [
@@ -17,7 +17,7 @@ export const managementRoutes = [
     element: <ManagementLayout />,
     children: [
       // Redirect to dashboard component
-      { index: true, element: <Navigate to="/management/wahana" /> },
+      { index: true, element: <Navigate to="/management/events" /> },
       {
         path: "venues/venue/:title/:id",
         element: <MgtVenueDetailPage />,
@@ -29,8 +29,7 @@ export const managementRoutes = [
       { path: "wahana", element: <MgtWahana /> },
       { path: "voucher", element: <MgtVoucher /> },
       { path: "ticket", element: <MgtTicket /> },
-      { path: "events", element: <MgtEvent /> }
-
+      { path: "events", element: <MgtEvent /> },
     ],
   },
 ];

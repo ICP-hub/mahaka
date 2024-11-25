@@ -61,7 +61,7 @@ const EventManager = () => {
     }
   }, [selectedVenue, events, eventByVenue]);
 
-  console.log(filteredEvents, "fe");
+  // console.log(filteredEvents, "fe");
 
   useEffect(() => {
     if (selectedVenue.option !== "All") {
@@ -76,7 +76,7 @@ const EventManager = () => {
     }
   }, [selectedVenue]);
 
-  console.log("filtered", filteredEvents);
+  // console.log("filtered", filteredEvents);
 
   const containerVariants = createStaggerContainer(0.4);
   const cardVariants = createStaggerVariant(0.3);

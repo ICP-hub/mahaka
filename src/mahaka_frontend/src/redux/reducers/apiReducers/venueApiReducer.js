@@ -21,7 +21,7 @@ export const getAllVenues = createAsyncThunk(
   "venues/getAllVenues",
   async ({ backend, pageLimit, currPage }) => {
     const response = await backend.getAllVenues(pageLimit, currPage);
-    console.log("response:", response);
+    // console.log("response:", response);
     return {
       data: response.data,
       totalPages: Number(response.Total_pages),
@@ -109,10 +109,10 @@ export const createVenue = createAsyncThunk(
         description
       );
       action(false);
-      console.log("response creating venue", response);
+      // console.log("response creating venue", response);
       return response;
     } catch (error) {
-      console.log("Error creating venue", error);
+      console.error("Error creating venue", error);
       throw new Error("Error creating venue", error);
     }
   }
@@ -128,7 +128,7 @@ export const buyVenueTicket = createAsyncThunk(
         ticket_type,
         record
       );
-      console.log("Venue ticket purchase response:", response);
+      // console.log("Venue ticket purchase response:", response);
       return response;
     } catch (error) {
       console.error("Error buying venue ticket:", error);
@@ -159,7 +159,6 @@ const venueSlice = createSlice({
         state.loading = true;
       })
       .addCase(getAllVenues.fulfilled, (state, action) => {
-        console.log("add case for get all venues", action);
         state.loading = false;
         state.venues = action.payload.data;
         state.totalPages = action.payload.totalPages;

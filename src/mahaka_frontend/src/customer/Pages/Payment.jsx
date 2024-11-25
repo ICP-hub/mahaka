@@ -12,6 +12,7 @@ const PaymentComponent = () => {
   const authenticatedAgent = useAgent();
   const { user, icpBalance } = useIdentityKit();
   const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
+  const { identity } = useSelector((state) => state.authentication);
 
   const handlePayment = async () => {
     if (!user) {
@@ -20,10 +21,10 @@ const PaymentComponent = () => {
 
     // Create Actor for payment
     const actor = Actor.createActor(idlFactory, {
-      agent: authenticatedAgent,
+      agent: identity,
       canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
     });
-    console.log("object", actor, authenticatedAgent);
+    // console.log("object", actor, authenticatedAgent);
     const acc = {
       owner: Principal.fromText(process.env.CANISTER_ID_MAHAKA_BACKEND),
       subaccount: [],

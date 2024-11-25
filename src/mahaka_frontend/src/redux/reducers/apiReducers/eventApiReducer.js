@@ -146,8 +146,10 @@ const eventSlice = createSlice({
         state.createEventLoader = true;
       })
       .addCase(createEvent.fulfilled, (state, action) => {
+        // console.log(action);
         state.createEventLoader = false;
         state.events = [...state.events, action.payload.ok];
+        state.eventByVenue = [...state.eventByVenue, action.payload.ok];
         state.error = null;
         notificationManager.success("Event created successfully");
       })
