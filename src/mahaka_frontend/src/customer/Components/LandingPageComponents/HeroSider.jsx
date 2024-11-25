@@ -8,7 +8,7 @@ import { Autoplay, Pagination } from "swiper/modules";
 import Hero from "../HeroCard";
 
 export default function BannerCarousel() {
-  const { attractionbanners } = useSelector((state) => state.banner);
+  const { attractionbanners ,  bannerLoading} = useSelector((state) => state.banner);
   const { backend } = useSelector((state) => state.authentication);
 
   console.log("attraction banners in herosider",attractionbanners)
@@ -42,7 +42,9 @@ export default function BannerCarousel() {
       >
         {attractionbanners?.map((banner, index) => (
           <SwiperSlide key={index}>
-            <Hero bannerData={banner} />
+            <Hero bannerData={banner}
+            bannerLoading ={ bannerLoading}
+            />
           </SwiperSlide>
         ))}
       </Swiper>

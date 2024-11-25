@@ -68,7 +68,7 @@ const confirmDeleteBanner = (bannerDelete)=>{
 }
 
 
-if (bannerLoading) return <Loader />;
+// if (bannerLoading) return <Loader />;
 
 
 
@@ -160,7 +160,7 @@ if (bannerLoading) return <Loader />;
     onClick={() => delete_banner()}
   >
     <div className="bg-secondary px-3 py-2 rounded-full text-white">
-      - Clear Banners
+       Clear Banners
     </div>
   </button>
 
@@ -175,7 +175,7 @@ if (bannerLoading) return <Loader />;
 </div>
 
 
-
+{bannerLoading ? <Loader/>:(
        
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
   {/* First Section */}
@@ -227,9 +227,9 @@ if (bannerLoading) return <Loader />;
     ))}
   </div>
 }
-
- 
 </div>
+)
+}
 
 
 
@@ -254,7 +254,7 @@ if (bannerLoading) return <Loader />;
 
 const Loader = ()=>{
   return(
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 mx-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 mx-4 my-4">
             <SkeletonLoader />
             <SkeletonLoader />
 

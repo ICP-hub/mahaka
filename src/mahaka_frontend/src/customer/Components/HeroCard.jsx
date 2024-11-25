@@ -2,14 +2,19 @@ import React from "react";
 import "../style/index.css";
 import { Link } from "react-router-dom";
 
-export default function HeroCard({ bannerData }) {
+export default function HeroCard({ bannerData, bannerLoading }) {
   console.log(bannerData);
+  console.log("banner loading in home.jsx",bannerLoading);
 
   // Extract the image URL from bannerData
   const backgroundImage = bannerData?.image || ""; // Replace `imageUrl` with the correct key from your bannerData
 
+
+ 
   return (
     <div className="max-w-7xl w-full m-auto my-18 px-4 lg:px-1">
+   
+   
       <div
         className="max-w-7xl m-auto text-white rounded-2xl  "
         style={{
@@ -47,6 +52,8 @@ export default function HeroCard({ bannerData }) {
           </div>
         </div>
       </div>
+
     </div>
+              
   );
 }

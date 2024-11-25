@@ -57,7 +57,7 @@ export default function Home() {
   const { venues, loading } = useSelector((state) => state.venues);
   console.log("venues in home", venues);
   const { backend } = useSelector((state) => state.authentication);
-  const {  attractionbanners, banners } = useSelector((state) => state.banner);
+  const {  attractionbanners, banners ,  bannerLoading} = useSelector((state) => state.banner);
  //const {  thirdPartyBanners } = useSelector((state) => state.banner);
 //  const { banners } = useSelector((state) => state.banner);
  // console.log("only third party  banners in home",  thirdPartyBanners);
@@ -66,49 +66,20 @@ export default function Home() {
  console.log("Third Party Banners home:", banners);
   const dispatch = useDispatch();
 
+// const SkeletonLoader = ()=>{
 
-  // useEffect(() => {
-  //   const fetchBanners = async (category) => {
-  //     console.log("useeffect category", category);
-  //     try {
-  //       await dispatch(getAllBanners({ backend, category }));
-  //     } catch (e) {
-  //       console.log("Error in fetching banners:", e);
-  //     }
-  //   };
-  
-  //   // Fetch both categories concurrently
-  
-  //   // Wait for both fetches to complete
-  //   const fetchBannersSequentially = async () => {
+//   return (
+//     <>
+//     <div className = "p-3">
+//       <div className = "bg-gray-500 h-30 min-w-full">
 
-  //     await fetchBanners({ ThirdParty: null });
-  //    await fetchBanners({ Attraction: null });
+//       </div>
+//     </div>
     
-     
-  //   };
-  
-  //   fetchBannersSequentially();
-  // }, []);
-  
-
-// // attraction banners
-// useEffect(() => {
-//   const fetchBanners = async (category) => {
-//     try {
-//       await dispatch(getAllBanners({ backend, category }));
-//     } catch (e) {
-//       console.log("error in fetching banners", e);
-//     }
-//   };
-//   console.log("logging in home");
-//   // dispatch(getAllBanners ({backend, category}))
-//   fetchBanners({ ThirdParty: null });
-// }, [backend, dispatch]);
-
-  
-  //console.log("Venues in Home:", venues);
-  //console.log("Banners in Home:", banners);
+    
+//     </>
+//   )
+// }
 
   const layoutConfigs = [
     {
@@ -176,9 +147,41 @@ export default function Home() {
     },
   ];
 
+  const SkeletonLoaderAttraction = ()=>{
+
+    return (
+      <>
+      <div className = "mx-10 mt-15">
+        <div className = "bg-gray-400 h-40 md:h-80 rounded-lg min-w-full animate-pulse p-4">
+          <div className = "flex flex-col md:mt-10 mx-3 ">
+            <div className = "bg-gray-300 h-4 md:h-5 w-[25%] my-2 rounded-lg"></div>
+            <div className = "bg-gray-300 h-3 md:h-6 w-[20%]   my-2 rounded-lg"></div>
+            <div className = "bg-gray-300 h-3 md:h-4 w-[25%] my-2 rounded-lg"></div>
+            <div className = "bg-gray-300 h-5 md:h-10 w-[14%]  my-2 rounded-lg"></div>
+          </div>
+        </div>
+      </div>
+      </>
+    )
+  }
+  
+  const SkeletonLoaderThirdParty = ()=>{
+
+    return (
+      <>
+      <div>
+        <div className = "bg-gray-400 h-50 w-auto rounded-lg animate-pulse shadow-lg">
+        </div>
+      </div>
+      </>
+    )
+  }
+  
   return (
     <>
+    {bannerLoading?<SkeletonLoaderAttraction/>:
       <HeroSider/>
+    }
       <section className="py-12">
         {/* -------------------------------------venues section start------------------------------ */}
 
@@ -361,6 +364,15 @@ export default function Home() {
         {/* --------------------------------venues section end-------------------------------- */}
 
         {/* third party BANNER section start*/}
+        {bannerLoading ?
+        (
+        <div className = "my-10 mx-10">
+          
+        <div className = "bg-gray-400 h-50 w-full rounded-lg animate-pulse shadow-lg">
+        </div>
+        </div>
+        )
+        :
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-1 md:grid-cols-1  gap-[33px]">
             {banners.slice(0, 1).map((banner) => (
@@ -385,8 +397,30 @@ export default function Home() {
             ))}
           </div>
         </div>
+         }
         {/* third party BANNER section end*/}
         {/* 2 Grid card  start*/}
+        {/* {bannerLoading ?
+        <div>
+        <div className = "my-5 mx-10 flex">
+          
+        <div className = "bg-gray-400 h-50 w-auto rounded-lg animate-pulse">
+        </div>
+        <div className = "bg-gray-400 h-50 w-auto rounded-lg animate-pulse">
+        </div>
+        </div>
+        </div> */}
+         {bannerLoading ?
+         (
+        <div className = "my-10 mx-10 flex gap-6">
+          
+        <div className = "bg-gray-400 h-50 w-full rounded-lg animate-pulse">
+          </div>
+        <div className = "bg-gray-400 h-50 w-full rounded-lg animate-pulse ">
+        </div>
+        </div>
+         )
+        :
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 md:grid-cols-2  gap-[33px]">
             {banners.slice(1, 3).map((banner) => (
@@ -411,8 +445,18 @@ export default function Home() {
             ))}
           </div>
         </div>
+       }
         {/* 2 Grid card  end*/}
         {/* 3 Grid card  start*/}
+        {bannerLoading ?
+        (
+        <div className = "grid grid-cols-1 md:grid-cols-3 gap-6 my-5 mx-10">
+        <SkeletonLoaderThirdParty/>
+        <SkeletonLoaderThirdParty/>
+        <SkeletonLoaderThirdParty/>
+        </div>
+        )
+        :
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-3 md:grid-cols-3  gap-[33px]">
             {banners.slice(3).map((banner) => (
@@ -437,6 +481,8 @@ export default function Home() {
             ))}
           </div>
         </div>
+         }
+        
         {/* 2 Grid card  end*/}
         {/* OnGoing Event slider Start  */}
         <OngoingSlider />
