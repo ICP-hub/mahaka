@@ -24,6 +24,7 @@ import { useSelector, useDispatch } from "react-redux";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { getAllBanners } from "../../redux/reducers/apiReducers/bannerApiReducer";
+import { getAllWahanas } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 
 const VenueCard = ({ venue, layout }) => (
   <Link
@@ -55,11 +56,13 @@ const VenueCard = ({ venue, layout }) => (
 
 export default function Home() {
   const { venues, loading } = useSelector((state) => state.venues);
+  const { wahanas } = useSelector((state) => state.wahana);
   console.log("venues in home", venues);
   const { backend } = useSelector((state) => state.authentication);
   const { banners } = useSelector((state) => state.banner);
   console.log("banners in home", banners?.title);
   const dispatch = useDispatch();
+  console.log(wahanas, "wahanas");
 
   //console.log("banners is home", banners)
 
@@ -68,6 +71,7 @@ export default function Home() {
     const fetchBanners = async (category) => {
       try {
         await dispatch(getAllBanners({ backend, category }));
+        await dispatch(getAllWahanas({ backend, chunkSize: 10, pageNo: 0 }));
       } catch (e) {
         console.log("error in fetching banners", e);
       }
@@ -416,7 +420,7 @@ export default function Home() {
           <section className="flex flex-col justify-center items-center">
             <div className="max-w-4xl text-center">
               <h1 className="text-[48px] font-black">
-                What's On: Events and Activities
+                What's On: Wahana and Activities
               </h1>
               <p className="text-lg font-normal">
                 Explore our lush habitats, meet exotic creatures, and create
@@ -429,47 +433,27 @@ export default function Home() {
           {/* cards box start  */}
           <div className="grid lg:grid-cols-3 md:grid-cols-2   gap-[33px] mt-12">
             {/* first Card  start*/}
-            <div className="overflow-hidden">
-              <div className="rounded-2xl w-full h-full">
-                <img src={Frame7} alt="" className="object-cover " />
-                <div className=" pt-7">
-                  <h1 className="text-3xl font-black">Jungle Safari</h1>
-                  <p className="text-base font-normal">
-                    Explore our lush habitats, meet exotic creatures, and create
-                    unforgettable memories. Whether you're planning a family
-                    adventure, a school trip, or a solo
-                  </p>
+            {wahanas
+              ?.filter((wahana) => wahana.featured)
+              ?.map((wahana) => (
+                <div className="overflow-hidden" key={wahana.id}>
+                  <div className="rounded-2xl w-full h-full shadow-md">
+                    <img
+                      src={wahana.banner.data}
+                      alt={wahana.title}
+                      className="object-cover w-full h-120 rounded-2xl"
+                    />
+                    <div className="p-4">
+                      <h1 className="text-3xl font-black">
+                        {wahana.ride_title}
+                      </h1>
+                      <p className="text-base font-normal mt-2">
+                        {wahana.description}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            {/* Second card  start*/}
-            <div className="overflow-hidden">
-              <div className="rounded-2xl w-full h-full">
-                <img src={Frame8} alt="" className="object-cover " />
-                <div className="pt-7">
-                  <h1 className="text-3xl font-black">Jungle Safari</h1>
-                  <p className="text-base font-normal">
-                    Explore our lush habitats, meet exotic creatures, and create
-                    unforgettable memories. Whether you're planning a family
-                    adventure, a school trip, or a solo
-                  </p>
-                </div>
-              </div>
-            </div>
-            {/* 3rd Card start  */}
-            <div className="overflow-hidden">
-              <div className="rounded-2xl w-full h-full">
-                <img src={Frame9} alt="" className="object-cover " />
-                <div className="pt-7">
-                  <h1 className="text-3xl font-black">Jungle Safari</h1>
-                  <p className="text-base font-normal">
-                    Explore our lush habitats, meet exotic creatures, and create
-                    unforgettable memories. Whether you're planning a family
-                    adventure, a school trip, or a solo
-                  </p>
-                </div>
-              </div>
-            </div>
+              ))}
           </div>
           {/* cards box end  */}
           <section className="flex flex-col justify-center items-center pt-10">

@@ -20,9 +20,9 @@ export default function Footer() {
   )}`;
   return (
     <footer className="bg-[#124076] px-6 md:px-8 pt-12 text-neutral-100 md:flex-row tracking-wider">
-      <div className="mx-auto grid w-full max-w-6xl grid-cols-2 gap-12 md:grid-cols-[1fr,_175px,_175px,_175px]">
+      <div className="mx-auto grid w-full  grid-cols-2 gap-12 md:grid-cols-[1fr,_175px,_175px,_175px]">
         <div className="flex flex-col items-start gap-4">
-          <span className="font-black italic text-4xl">MAHAKA</span>
+          <span className="font-black italic text-4xl ml-10">MAHAKA</span>
         </div>
         <div className="space-y-4">
           <span className="block font-bold">Socials</span>
@@ -70,7 +70,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="-mx-4 mt-12 border-t-[1px] border-border p-4">
-        <div className="mx-auto flex max-w-6xl flex-col-reverse items-center justify-between gap-4 text-xs sm:flex-row">
+        <div className="mx-auto flex ml-6  flex-col-reverse items-center justify-between gap-4 text-xs sm:flex-row">
           <span>© 2024 MAHAKA, LLC. All rights reserved.</span>
         </div>
       </div>
