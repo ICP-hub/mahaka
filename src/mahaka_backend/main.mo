@@ -2621,6 +2621,47 @@ actor mahaka {
           return paginateTickets(allTickets, chunkSize, pageNo);
      };
 
+     public shared func getAllTickets(
+          chunkSize: Nat,
+          pageNo: Nat
+     ): async Result.Result<{ data: [Types.TicketSaleInfo]; current_page: Nat; total_pages: Nat }, Text> {
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or 
+          //                (await Validation.check_for_Staff(role)) or 
+          //                (await Validation.check_for_Manager(role)) or 
+          //                (await Validation.check_for_Bod(role)))
+          //           ) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
+          let venueTickets = async {
+               await fetchAllCategoryTickets(_VenueTicketsMap);
+          };
+          let eventTickets = async {
+               await fetchAllCategoryTickets(_EventTicketsMap);
+          };
+          let wahanaTickets = async {
+               await fetchAllCategoryTickets(_WahanaTicketsMap);
+          };
+
+          // Combine tickets from all categories
+          let allTickets = List.append(
+               await venueTickets,
+               List.append(await eventTickets, await wahanaTickets)
+          );
+
+          // Paginate and return
+          return paginateTickets(allTickets, chunkSize, pageNo);
+     };
+
      private func fetchCategoryTickets(
           categoryMap: TrieMap.TrieMap<Text, Types.Index>,
           caller : Principal
@@ -2632,15 +2673,37 @@ actor mahaka {
                let obj: ?List.List<Types.TicketSaleInfo> = from_candid(ticketBlob);
                switch obj {
                     case null {
-                         
+                         // No tickets to append
                     };
                     case (?deserializedTickets) {
                          tickets := List.append(
                               tickets,
                               List.filter<Types.TicketSaleInfo>(deserializedTickets, func (ticket) {
-                              ticket.recepient == caller or ticket.ticketIssuer == caller
+                                   ticket.recepient == caller or ticket.ticketIssuer == caller
                               })
                          );
+                    };
+               };
+          };
+
+          return tickets;
+     };
+
+     private func fetchAllCategoryTickets(
+          categoryMap: TrieMap.TrieMap<Text, Types.Index>
+     ): async List.List<Types.TicketSaleInfo> {
+          var tickets = List.nil<Types.TicketSaleInfo>();
+
+          for ((_, ticketsIndex) in categoryMap.entries()) {
+               let ticketBlob = await stable_get(ticketsIndex, Ticket_state);
+               let obj: ?List.List<Types.TicketSaleInfo> = from_candid(ticketBlob);
+
+               switch obj {
+                    case null {
+                         // No tickets to append
+                    };
+                    case (?deserializedTickets) {
+                         tickets := List.append(tickets, deserializedTickets);
                     };
                };
           };
