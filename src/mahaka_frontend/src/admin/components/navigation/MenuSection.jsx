@@ -26,7 +26,7 @@ const MenuSection = () => {
       icon: <HiOutlineStar size={24} />,
     },
     { path: "/admin/members", label: "Members", icon: <MdPerson size={24} /> },
-    { path: "/admin/banner", label: "banner", icon: <MdEqualizer size={24} /> },
+    { path: "/admin/banner", label: "Banner", icon: <MdEqualizer size={24} /> },
     // { path: "/admin/sales", label: "Sales", icon: <MdEqualizer size={24} /> },
     // {
     //   path: "/admin/purchaseTicket",
