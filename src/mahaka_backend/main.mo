@@ -485,11 +485,34 @@ actor mahaka {
           return #ok(venue_id,Venue);
      };
 
-     public shared ({caller}) func getVenue(Venue_id : Text) : async (Principal, Types.Venue) {
+     public shared ({caller}) func getVenue(Venue_id : Text) : async Result.Result<Types.Venue, Types.CommonErrors> {
           let venue_blob: ?Types.Index = _venueMap.get(Venue_id);
           switch (venue_blob) {
                case null {
                     throw Error.reject("Venue not found");
+                    return #err(#VenueNotFound);
+               };
+               case (?v){
+                    let venue_blob = await stable_get(v, Venue_state);
+                    let venue : ?Types.Venue = from_candid(venue_blob);
+                    switch (venue) {
+                         case null {
+                              throw Error.reject("Venue not found");
+                              return #err(#VenueNotFound);
+                         };
+                         case (?v) {
+                              return #ok(v);
+                         };
+                    };
+               };
+          };
+     };
+
+     func getVenueforUpdates(Venue_id : Text) : async Types.Venue {
+          let venue_blob: ?Types.Index = _venueMap.get(Venue_id);
+          switch (venue_blob) {
+               case null {
+                    throw Error.reject("Venue not found");                
                };
                case (?v){
                     let venue_blob = await stable_get(v, Venue_state);
@@ -499,7 +522,7 @@ actor mahaka {
                               throw Error.reject("Venue not found");
                          };
                          case (?v) {
-                              return (caller, v);
+                              return v;
                          };
                     };
                };
@@ -600,7 +623,7 @@ actor mahaka {
                     throw Error.reject("Venue not found");
                };
                case(?v){
-                    let (_, venue) = await getVenue(Venue_id);
+                    let venue = await getVenueforUpdates(Venue_id);
                     let Venue : Types.Venue = {
                          id = venue.id;
                          Title = venue.Title;
@@ -629,7 +652,7 @@ actor mahaka {
                     throw Error.reject("Venue not found");
                };
                case(?v){
-                    let (_, venue) = await getVenue(Venue_id);
+                    let venue = await getVenueforUpdates(Venue_id);
                     let Venue : Types.Venue = {
                          id = venue.id;
                          Title = venue.Title;
@@ -1418,6 +1441,7 @@ actor mahaka {
           paymentType: Types.PaymentType,
           ticketPrice: Types.Price,
           offlineOrOnline : Types.TicketType,
+          saleDate : Time.Time,
           saleType: Text,
           recepient : Principal,
           caller : Principal
@@ -1449,7 +1473,7 @@ actor mahaka {
                               categoryId = categoryId;
                               paymentType = paymentType;
                               numOfVisitors = 1;
-                              saleDate = Time.now();
+                              saleDate = saleDate;
                               ticketIssuer = caller;
                               ticketType = offlineOrOnline; 
                               recepient = recepient;
@@ -1482,6 +1506,7 @@ actor mahaka {
           wahanaId: Text,
           paymentType: Types.PaymentType,
           offlineOrOnline : Types.TicketType,
+          saleDate : Time.Time,
           price: Types.Price,
           recepient : Principal,
           caller : Principal
@@ -1512,7 +1537,7 @@ actor mahaka {
                               categoryId = wahanaId;
                               paymentType = paymentType;
                               numOfVisitors = 1;
-                              saleDate = Time.now();
+                              saleDate = saleDate;
                               ticketIssuer = caller;
                               ticketType = offlineOrOnline; 
                               recepient = recepient;
@@ -1566,6 +1591,7 @@ actor mahaka {
                                    args.paymentType,
                                    #Float(args.ticketPrice),
                                    args.offlineOrOnline,
+                                   args.saleDate,
                                    args.saleType,
                                    args.recepient,
                                    args.caller
@@ -1604,6 +1630,7 @@ actor mahaka {
                                    args.wahanaId,
                                    args.paymentType,
                                    args.offlineOrOnline,
+                                   args.saleDate,
                                    #Float(args.price),
                                    args.recepient,
                                    args.caller
@@ -1674,81 +1701,91 @@ actor mahaka {
           _metadata: nftTypes.MetadataDesc,
           receiver: Principal,
           paymentType: Types.PaymentType,
+          saleDate : Time.Time,
           numOfVisitors: Nat
      ) : async Result.Result<[nftTypes.MintReceiptPart] or Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>>, Types.MintError or Text> {
           
-          let collectionId = await Utils.extractCanisterId(venueId);
-          let collectionActor = actor (collectionId) : actor {
+          let venueResult = await getVenue(venueId);
+          switch(venueResult){
+               case (#ok(venue)){
+                    let collectionId = await Utils.extractCanisterId(venueId);
+                    let collectionActor = actor (collectionId) : actor {
                          logoDip721: () -> async Types.LogoResult;
                          mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
                     };
-          switch (paymentType) {
-               case (#Cash) {
-                    // throw Error.reject("Cash option is not available");
-                    return #err("Cash option is not available");
-                    // await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receivers, numOfVisitors, venueId, paymentType, _ticket_type.price, "venue", caller);
-               };
-               case (#ICP) {
-                    
-                    
-                    let transferResult = await performICPTransfer(caller, (_ticket_type.price * 10**8) * numOfVisitors );
-                    switch (transferResult) {
-                         case (#Ok(_)) {
-                              await processMint(collectionActor, _metadata, _ticket_type, receiver, numOfVisitors, venueId, paymentType, #Nat(_ticket_type.price), #Online, "venue", receiver, caller);
+                    switch (paymentType) {
+                         case (#Cash) {
+                              // throw Error.reject("Cash option is not available");
+                              return #err("Cash option is not available");
+                              // await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receivers, numOfVisitors, venueId, paymentType, _ticket_type.price, "venue", caller);
                          };
-                         case (#Err(error)) {
-                              // throw Error.reject(debug_show ("Transfer Error", error));
-                              return #err(handleTransferError(error));
-                         };
-                    };
-               };
-               case (#Card) {
-                    var items : [FiatTypes.Item] = [];
-                    
-                    for (i in Iter.range(0, numOfVisitors - 1)) {
-                         items := Array.append(items, [{
-                              id = i;
-                              categoryId = venueId;
-                              name = "Venue Ticket";
-                              quantity = 1;
-                              price = _ticket_type.priceFiat;
-                         }]);
-                    };
-                    let visitorsCount = Float.fromInt(numOfVisitors);
-                    let invoice : FiatTypes.Request.CreateInvoiceBody = {
-                         amount = _ticket_type.priceFiat * visitorsCount ;
-                         paymentMethod = "Stripe";
-                         currency = "USD";
-                         items = items
-                    };
-                    let create_invoice_response : Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>> = await FiatPayCanister.create_invoice(caller, invoice);
-                    Debug.print(debug_show(create_invoice_response));
-                    switch (create_invoice_response.body) {
-                         case (#success(responseBody)) {
-                              let invoice_id = responseBody.id;
-                              let args : Types.ArgsStore = {
-                                   collectionActor = collectionActor;
-                                   metadata = _metadata;
-                                   ticketType = _ticket_type;
-                                   receiver = receiver;
-                                   numOfVisitors = numOfVisitors;
-                                   categoryId = venueId;
-                                   paymentType = paymentType;
-                                   ticketPrice = _ticket_type.priceFiat;
-                                   offlineOrOnline = #Online;
-                                   saleType = "venue";
-                                   recepient = receiver;
-                                   caller = caller;
+                         case (#ICP) {
+                              
+                              
+                              let transferResult = await performICPTransfer(caller, (_ticket_type.price * 10**8) * numOfVisitors );
+                              switch (transferResult) {
+                                   case (#Ok(_)) {
+                                        await processMint(collectionActor, _metadata, _ticket_type, receiver, numOfVisitors, venueId, paymentType, #Nat(_ticket_type.price), #Online, saleDate, "venue", receiver, caller);
+                                   };
+                                   case (#Err(error)) {
+                                        // throw Error.reject(debug_show ("Transfer Error", error));
+                                        return #err(handleTransferError(error));
+                                   };
                               };
-                              pendingPayments := Array.append<(Nat,Types.ArgsStore)>([(invoice_id,args)],pendingPayments);
-                              return #ok(create_invoice_response.body);
                          };
-                         case (#err(error)) {
-                              return #err(debug_show(error));
+                         case (#Card) {
+                              var items : [FiatTypes.Item] = [];
+                              
+                              for (i in Iter.range(0, numOfVisitors - 1)) {
+                                   items := Array.append(items, [{
+                                        id = i;
+                                        categoryId = venueId;
+                                        categoryTitle = venue.Title;
+                                        name = "Venue Ticket";
+                                        quantity = 1;
+                                        price = _ticket_type.priceFiat;
+                                   }]);
+                              };
+                              let visitorsCount = Float.fromInt(numOfVisitors);
+                              let invoice : FiatTypes.Request.CreateInvoiceBody = {
+                                   amount = _ticket_type.priceFiat * visitorsCount ;
+                                   paymentMethod = "Stripe";
+                                   currency = "USD";
+                                   items = items
+                              };
+                              let create_invoice_response : Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>> = await FiatPayCanister.create_invoice(caller, invoice);
+                              Debug.print(debug_show(create_invoice_response));
+                              switch (create_invoice_response.body) {
+                                   case (#success(responseBody)) {
+                                        let invoice_id = responseBody.id;
+                                        let args : Types.ArgsStore = {
+                                             collectionActor = collectionActor;
+                                             metadata = _metadata;
+                                             ticketType = _ticket_type;
+                                             receiver = receiver;
+                                             numOfVisitors = numOfVisitors;
+                                             categoryId = venueId;
+                                             paymentType = paymentType;
+                                             ticketPrice = _ticket_type.priceFiat;
+                                             offlineOrOnline = #Online;
+                                             saleDate = saleDate;
+                                             saleType = "venue";
+                                             recepient = receiver;
+                                             caller = caller;
+                                        };
+                                        pendingPayments := Array.append<(Nat,Types.ArgsStore)>([(invoice_id,args)],pendingPayments);
+                                        return #ok(create_invoice_response.body);
+                                   };
+                                   case (#err(error)) {
+                                        return #err(debug_show(error));
+                                   };
+                              };
                          };
                     };
                };
+               case (#err(e)) { return #err(#EventError); };
           };
+          
      };
 
 
@@ -1758,6 +1795,7 @@ actor mahaka {
           _ticket_type: Types.ticket_info,
           _metadata: nftTypes.MetadataDesc,
           receiver: Principal,
+          saleDate : Time.Time,
           numOfVisitors: Nat,
           paymentType: Types.PaymentType
      ) : async Result.Result<[nftTypes.MintReceiptPart] or Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>>, Types.MintError or Text> {
@@ -1778,7 +1816,7 @@ actor mahaka {
                               let transferResult = await performICPTransfer(caller, _ticket_type.price * numOfVisitors);
                               switch (transferResult) {
                                    case (#Ok(_)) {
-                                        await processMint(collectionActor, _metadata, _ticket_type, receiver, numOfVisitors, _eventId, paymentType, #Nat(_ticket_type.price), #Online, "venue", receiver, caller);
+                                        await processMint(collectionActor, _metadata, _ticket_type, receiver, numOfVisitors, _eventId, paymentType, #Nat(_ticket_type.price), #Online, saleDate, "event", receiver, caller);
                                    };
                                    case (#Err(error)) {
                                         // throw Error.reject(debug_show ("Transfer Error", error));
@@ -1793,6 +1831,7 @@ actor mahaka {
                                    items := Array.append(items, [{
                                         id = i;
                                         categoryId = _eventId;
+                                        categoryTitle = event.title;
                                         name = "Event Ticket";
                                         quantity = 1;
                                         price = _ticket_type.priceFiat;
@@ -1820,6 +1859,7 @@ actor mahaka {
                                              paymentType = paymentType;
                                              ticketPrice = _ticket_type.priceFiat;
                                              offlineOrOnline = #Online;
+                                             saleDate = saleDate;
                                              saleType = "venue";
                                              recepient = receiver;
                                              caller = caller;
@@ -1842,6 +1882,7 @@ actor mahaka {
           venueId: Text,
           wahanaId: Text,
           receiver: Principal,
+          saleDate : Time.Time,
           numOfVisitors: Nat,
           paymentType: Types.PaymentType
      ) : async Result.Result<[icrcTypes.TxIndex] or Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>>, icrcTypes.TransferError or Types.MintError or Text> {
@@ -1870,7 +1911,7 @@ actor mahaka {
                               let transferResult = await performICPTransfer(caller, wahana.priceICP * numOfVisitors);
                               switch (transferResult) {
                                    case (#Ok(_)) {
-                                        await processTransfer(collectionActor, receiver, numOfVisitors, wahanaId, paymentType, #Online, #Nat(wahana.priceICP), receiver, caller);
+                                        await processTransfer(collectionActor, receiver, numOfVisitors, wahanaId, paymentType, #Online, saleDate, #Nat(wahana.priceICP), receiver, caller);
                                    };
                                    case (#Err(error)) {
                                         // throw Error.reject(debug_show ("Transfer Error", error));
@@ -1884,6 +1925,7 @@ actor mahaka {
                                    items := Array.append(items, [{
                                         id = i;
                                         categoryId = wahanaId;
+                                        categoryTitle = wahana.ride_title;
                                         name = "Wahana Ticket";
                                         quantity = 1;
                                         price = wahana.priceFiat;
@@ -1908,6 +1950,7 @@ actor mahaka {
                                              wahanaId = wahanaId;
                                              paymentType = paymentType;
                                              offlineOrOnline = #Online;
+                                             saleDate = saleDate;
                                              price = wahana.priceFiat;
                                              recepient = receiver;
                                              caller = caller;
@@ -1936,6 +1979,7 @@ actor mahaka {
           _ticket_type: Types.ticket_info,
           _metadata: nftTypes.MetadataDesc,
           receiver: Principal,
+          saleDate : Time.Time,
           paymentType: Types.PaymentType,
           numOfVisitors: Nat
      ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError or Text> {
@@ -1961,13 +2005,13 @@ actor mahaka {
           };
           switch (paymentType) {
                case (#Cash) {
-                    await processMint(collectionActor, _metadata, _ticket_type, receiver, numOfVisitors, venueId, paymentType, #Float(_ticket_type.priceFiat), #Offline, "venue", receiver, caller);
+                    await processMint(collectionActor, _metadata, _ticket_type, receiver, numOfVisitors, venueId, paymentType, #Float(_ticket_type.priceFiat), #Offline,  saleDate, "venue", receiver, caller);
                };
                case (#ICP) {
                     let transferResult = await performICPTransfer(caller, _ticket_type.price * numOfVisitors);
                     switch (transferResult) {
                          case (#Ok(_)) {
-                              await processMint(collectionActor, _metadata, _ticket_type, receiver, numOfVisitors, venueId, paymentType, #Nat(_ticket_type.price), #Offline, "venue", receiver, caller);
+                              await processMint(collectionActor, _metadata, _ticket_type, receiver, numOfVisitors, venueId, paymentType, #Nat(_ticket_type.price), #Offline, saleDate, "venue", receiver, caller);
                          };
                          case (#Err(error)) {
                               // throw Error.reject(debug_show ("Transfer Error", error));
@@ -1989,6 +2033,7 @@ actor mahaka {
           _ticket_type: Types.ticket_info,
           _metadata: nftTypes.MetadataDesc,
           receiver: Principal,
+          saleDate : Time.Time,
           numOfVisitors: Nat,
           paymentType: Types.PaymentType
      ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError or Text> {
@@ -2016,13 +2061,13 @@ actor mahaka {
                     };
                     switch (paymentType) {
                          case (#Cash) {
-                              await processMint(collectionActor, _metadata, _ticket_type, receiver, numOfVisitors, _eventId, paymentType, #Float(_ticket_type.priceFiat), #Offline, "event", receiver, caller);
+                              await processMint(collectionActor, _metadata, _ticket_type, receiver, numOfVisitors, _eventId, paymentType, #Float(_ticket_type.priceFiat), #Offline, saleDate, "event", receiver, caller);
                          };
                          case (#ICP) {
                               let transferResult = await performICPTransfer(caller, _ticket_type.price * numOfVisitors);
                               switch (transferResult) {
                                    case (#Ok(_)) {
-                                        await processMint(collectionActor, _metadata, _ticket_type, receiver, numOfVisitors, _eventId, paymentType, #Nat(_ticket_type.price), #Offline, "venue", receiver, caller);
+                                        await processMint(collectionActor, _metadata, _ticket_type, receiver, numOfVisitors, _eventId, paymentType, #Nat(_ticket_type.price), #Offline, saleDate, "event", receiver, caller);
                                    };
                                    case (#Err(error)) {
                                         // throw Error.reject(debug_show ("Transfer Error", error));
@@ -2045,6 +2090,7 @@ actor mahaka {
           wahanaId: Text,
           receiver: Principal,
           numOfVisitors: Nat,
+          saleDate : Time.Time,
           paymentType: Types.PaymentType
      ) : async Result.Result<[icrcTypes.TxIndex], icrcTypes.TransferError or Types.MintError or Text> {
           // let roleResult = await getRoleByPrincipal(user);
@@ -2078,13 +2124,13 @@ actor mahaka {
                     };
                     switch (paymentType) {
                          case (#Cash) {
-                              await processTransfer(collectionActor, receiver, numOfVisitors, wahanaId, paymentType, #Offline, #Float(wahana.priceFiat), receiver, caller);
+                              await processTransfer(collectionActor, receiver, numOfVisitors, wahanaId, paymentType, #Offline, saleDate,  #Float(wahana.priceFiat), receiver, caller);
                          };
                          case (#ICP) {
                               let transferResult = await performICPTransfer(caller, wahana.priceICP * numOfVisitors);
                               switch (transferResult) {
                                    case (#Ok(_)) {
-                                        await processTransfer(collectionActor, receiver, numOfVisitors, wahanaId, paymentType, #Offline, #Nat(wahana.priceICP), receiver, caller);
+                                        await processTransfer(collectionActor, receiver, numOfVisitors, wahanaId, paymentType, #Offline, saleDate, #Nat(wahana.priceICP), receiver, caller);
                                    };
                                    case (#Err(error)) {
                                         // throw Error.reject(debug_show ("Transfer Error", error));

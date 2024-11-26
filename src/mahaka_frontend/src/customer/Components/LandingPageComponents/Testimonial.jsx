@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 // import { useSwipeable } from 'react-swipeable';
 import Frame from "../../../assets/images/Frame.png";
 import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
+import { getAllTestimonials } from "../../../redux/reducers/apiReducers/testimonialApiReducer";
+import { useSelector, useDispatch } from "react-redux";
 
 const testimonials = [
   {
@@ -52,6 +54,9 @@ const testimonials = [
 ];
 
 const TestimonialCarousel = () => {
+  const {testimonials, testimonialLoading  } = useSelector((state)=>state.testimonial)
+  const dispatch = useDispatch();
+  console.log("testimonials logging",testimonials)
   const [currentIndex, setCurrentIndex] = useState(0);
   const controls = useAnimationControls();
 
@@ -104,6 +109,8 @@ const TestimonialCarousel = () => {
     }
     return "opacity-100";
   };
+
+ 
 
   return (
     <div className="relative mx-auto flex flex-col items-center w-full max-w-7xl p-4 overflow-hidden">
@@ -172,10 +179,10 @@ const TestimonialCard = ({ testimonial }) => {
     <div className="flex flex-col min-w-[300px] p-8 shadow-lg rounded-lg bg-[#F9F9F9]">
       <img src={Frame} alt="frame" className="h-12 w-16 mb-4" />
       <p className="mb-4 text-2xl font-medium text-gray-700 text-justify">
-        {testimonial.text}
+        {testimonial.title}
       </p>
       <p className="text-lg font-light text-gray-600 mt-12">
-        {testimonial.author}
+        {testimonial.location}
       </p>
       <p className="text-sm text-gray-600">{testimonial.description}</p>
     </div>

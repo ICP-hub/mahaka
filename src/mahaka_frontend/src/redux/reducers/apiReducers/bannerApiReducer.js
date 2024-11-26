@@ -36,6 +36,7 @@ export const addBanner = createAsyncThunk(
   }
 );
 
+// get all banners
 export const getAllBanners = createAsyncThunk(
   "banner/getAllBanners",
   async ({ backend, category }) => {
@@ -48,6 +49,29 @@ export const getAllBanners = createAsyncThunk(
       throw error;
     }
   }
+);
+
+// delete banner by image
+export const deleteBannerByImage = createAsyncThunk(
+  "banner/deleteBannerByImage",
+
+
+
+  async ({ backend, image }) => {
+    
+    await backend.deleteBannerByImage(image);
+    return image;
+  }
+  // async ({ backend, image}) => {
+  //   const response =  await backend.deleteBannerByImage(image);
+  //   if (response) {
+  //     // If deletion is successful, return the image URL
+  //     return image;
+  //   } else {
+  //     // If there is an error, throw the error message
+  //     throw new Error(result.err);
+  //   }
+  // }
 );
 
 
@@ -103,6 +127,33 @@ const bannerSlice = createSlice({
         state.bannerLoading = false;
         state.error = action.error.message;
       })
+
+      // delete  banner by image
+      .addCase(deleteBannerByImage.pending, (state) => {
+        state.bannerLoading = true;
+      })
+      .addCase(deleteBannerByImage.fulfilled, (state, action) => {
+        state.bannerLoading = false;
+        console.log("single banner delete",action)
+       
+          state.attractionbanners = state.attractionbanners.filter(
+              (banner) => banner.image !== action.payload
+             );
+         
+         
+          state.banners = state.banners.filter(
+            (banner) => banner.image !== action.payload
+           );
+
+           console.log("single banner delete successfully")
+         
+      })
+      .addCase(deleteBannerByImage.rejected, (state, action) => {
+        console.log("Deleted banner rejected:", action.payload);
+        state.loading = false;
+        state.error = action.error.message;
+      })
+
 
       // clear all banners
 

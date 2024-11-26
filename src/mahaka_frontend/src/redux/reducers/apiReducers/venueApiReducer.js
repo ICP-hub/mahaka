@@ -14,6 +14,8 @@ const initialState = {
   totalPages: 0,
   currentPage: 0,
   deleteLoading: false,
+  searchedVenues: null,
+  searchVenueLoading: false,
 };
 
 // async operations
@@ -139,12 +141,18 @@ export const buyVenueTicket = createAsyncThunk(
 export const searchVenues = createAsyncThunk(
   "venues/searchVenues",
   async ({ backend, searchText, pageLimit, currPage }) => {
-    const response = await backend.searchVenues(
-      searchText,
-      pageLimit,
-      currPage
-    );
-    return { data: response.data, totalPages: response.totalPages, currPage };
+    try {
+      const response = await backend.searchVenues(
+        searchText,
+        pageLimit,
+        currPage
+      );
+      console.log("response search venue", response);
+      return { data: response.data };
+    } catch (err) {
+      console.error("Error Searching venue", err);
+      throw new Error("Error searching venue", err);
+    }
   }
 );
 
@@ -251,17 +259,16 @@ const venueSlice = createSlice({
         notificationManager.error("Failed to purchase venue ticket");
       })
       .addCase(searchVenues.pending, (state) => {
-        state.loading = true;
+        state.searchVenueLoading = true;
       })
       .addCase(searchVenues.fulfilled, (state, action) => {
-        state.loading = false;
-        state.venues = action.payload.data;
-        state.totalPages = action.payload.totalPages;
-        state.currentPage = action.payload.currPage;
+        state.searchVenueLoading = false;
+        state.searchedVenues = action.payload.data;
         state.error = null;
       })
       .addCase(searchVenues.rejected, (state, action) => {
-        state.loading = false;
+        state.searchVenueLoading = false;
+        state.searchedVenues = [];
         state.error = action.error.message;
       });
   },

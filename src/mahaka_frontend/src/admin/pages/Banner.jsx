@@ -6,6 +6,8 @@ import { createWahana } from "../../redux/reducers/apiReducers/wahanaApiReducer"
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { clearAllBanners } from "../../redux/reducers/apiReducers/bannerApiReducer";
+import { deleteBannerByImage } from "../../redux/reducers/apiReducers/bannerApiReducer";
+import { MdDelete } from "react-icons/md";
 
 const AdminBanner = ()=>{
   const dispatch = useDispatch()
@@ -14,7 +16,9 @@ const AdminBanner = ()=>{
   console.log("Attraction Banners in baner:", attractionbanners);
   console.log("Third Party Banners in banner:", banners);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [deleteSingleModalVisible, setDeleteSingleModalVisible] = useState(false);
   const [bannerDelete, setBannerDelete] = useState([]);
+  const [singleBannerDelete, setSingleBannerDelete] = useState([]);
 
  
 
@@ -25,32 +29,12 @@ console.log("delete category in banner.jsx", bannerDelete.category)
 
 
 
-
-
-// useEffect(() => {
-//   const fetchBanners = async (category) => {
-//     console.log("useeffect category", category);
-//     try {
-//       await dispatch(getAllBanners({ backend, category }));
-//     } catch (e) {
-//       console.log("Error in fetching banners:", e);
-//     }
-//   };
-
-//   // Fetch both categories concurrently
-
-//   // Wait for both fetches to complete
-//   const fetchBannersSequentially = async () => {
-
-//     await fetchBanners({ ThirdParty: null });
-//    await fetchBanners({ Attraction: null });
-  
-   
-//   };
-
-//   fetchBannersSequentially();
-// }, [dispatch]);
-
+const confirmDeleteBannerByImage = (singleBannerDelete) => {
+  console.log("single banner delete",singleBannerDelete)
+ 
+   dispatch(deleteBannerByImage({backend,image:singleBannerDelete }))
+   setDeleteSingleModalVisible(false); // Close the modal
+};
 
 const delete_banner = () => {
   // console.log("handle delete",selectedWahana)
@@ -78,6 +62,32 @@ const confirmDeleteBanner = (bannerDelete)=>{
     return(
         <>
       <div>
+
+      {/* single banner delete modal */}
+
+      {deleteSingleModalVisible && (
+        <div className="fixed inset-0 z-50 flex items-center rounded justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded shadow-lg">
+            <h2 className="text-xl mb-4">
+              Are you sure you want to delete this banner?
+            </h2>
+            <div className="flex justify-end mt-6">
+              <button
+                className="bg-red-600 text-white px-4 py-2 rounded-full mr-4"
+                onClick={()=> confirmDeleteBannerByImage(singleBannerDelete)}
+              >
+                Delete
+              </button>
+              <button
+                className="bg-gray-300 px-4 py-2 rounded-full"
+                onClick={() => setDeleteSingleModalVisible(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {deleteModalVisible && (
         <div className="fixed inset-0 z-50 flex items-center rounded justify-center bg-black bg-opacity-50">
@@ -198,6 +208,9 @@ const confirmDeleteBanner = (bannerDelete)=>{
           className="h-16 w-16 rounded-full object-cover object-center border border-blue-600 "
         />
         <h3 className="ml-4 text-xl font-semibold text-gray-700">{banner.title}</h3>
+        <div className ="ml-auto" onClick = {()=>setSingleBannerDelete(banner.image)}>
+        <button className = "ml-auto" onClick = {()=> setDeleteSingleModalVisible(true)}> <MdDelete size={25}/></button>
+      </div>
       </div>
     ))}
      {/* <div className = "flex justify-end">
@@ -223,6 +236,9 @@ const confirmDeleteBanner = (bannerDelete)=>{
           className="h-16 w-16 rounded-full object-cover border border-blue-600"
         />
         <h3 className="ml-4 text-lg font-semibold text-gray-700">{banner.title}</h3>
+        <div className ="ml-auto" onClick = {()=>setSingleBannerDelete(banner.image)}>
+        <button className = "ml-auto" onClick = {()=> setDeleteSingleModalVisible(true)}> <MdDelete size={25}/></button>
+      </div>
       </div>
     ))}
   </div>

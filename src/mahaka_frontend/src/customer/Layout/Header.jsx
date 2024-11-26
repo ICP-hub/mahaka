@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   HiMagnifyingGlass,
   HiMiniBars3,
+  HiMiniXMark,
   HiOutlineTicket,
   HiOutlineUser,
 } from "react-icons/hi2";
@@ -25,9 +26,12 @@ import {
   GrUserManager,
   GrUserSettings,
 } from "react-icons/gr";
-import { MdOutlineManageAccounts } from "react-icons/md";
+// import { MdOutlineManageAccounts } from "react-icons/md";
 import notificationManager from "../../common/utils/notificationManager";
 import { useAuth } from "../../connect/useClient";
+import { searchVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
+import { searchEvents } from "../../redux/reducers/apiReducers/eventApiReducer";
+import { searchWahanas } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 
 const NavLinks = [
   { title: "HOME", url: "/" },
@@ -54,25 +58,25 @@ export default function Header() {
     <div className="bg-[#124076]">
       <div className="flex px-6 md:px-8 container mx-auto user_header items-center z-999">
         <LogoSection />
-        <div className="hidden md:flex items-center justify-center w-full">
-          <div className="flex items-center relative gap-8">
+        <div className="hidden md:flex items-center w-full">
+          <div className="flex items-center relative gap-8 w-full px-6">
             <SearchBox />
-            <div className="flex items-center">
+            {/* <div className="flex items-center">
               <NavHorizontal />
-            </div>
+            </div> */}
           </div>
         </div>
         <div className="flex items-center space-x-4 ml-auto">
           <TranslationForCustomer />
-          <div className="md:hidden flex items-center space-x-2">
+          <div className="flex items-center space-x-2">
             <div className="p-1 rounded-full relative h-10 w-10 flex items-center justify-center hover:bg-hover">
               <button onClick={toggleNavigation}>
                 <HiMiniBars3 size={24} />
               </button>
             </div>
-            {isConnected && <ConnectBtn />}
+            {/* {isConnected && <ConnectBtn />} */}
           </div>
-          <div className="hidden md:flex">
+          <div>
             <ConnectBtn />
           </div>
         </div>
@@ -91,98 +95,247 @@ const LogoSection = () => {
 };
 
 const SearchBox = () => {
+  const dispatch = useDispatch();
+  const { backend } = useSelector((state) => state.authentication);
+  const { searchVenueLoading, searchedVenues } = useSelector(
+    (state) => state.venues
+  );
+  const { searchedEvents, searchEventLoading } = useSelector(
+    (state) => state.events
+  );
+  const { searchedWahana, searchedWahanaLoading } = useSelector(
+    (state) => state.wahana
+  );
+
+  const [selectedOption, setSelectedOption] = useState("Venues");
+  const [enableSearch, setEnableSearch] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const [searchedResults, setSearchedResults] = useState(null);
+
+  const options = ["Venues", "Events", "Wahanas"];
+
+  const handleSelectedOption = (option) => {
+    setSelectedOption(option);
+    setIsOpen(false);
+  };
+
+  const handleSearch = () => {
+    setEnableSearch(true);
+    if (selectedOption === "Venues") {
+      dispatch(
+        searchVenues({
+          backend: backend,
+          searchText: searchInput,
+          pageLimit: 10,
+          currPage: 0,
+        })
+      );
+    }
+    if (selectedOption === "Events") {
+      dispatch(
+        searchEvents({
+          backend: backend,
+          searchText: searchInput,
+          chunkSize: 10,
+          pageNo: 0,
+        })
+      );
+    }
+    if (selectedOption === "Wahanas") {
+      dispatch(
+        searchWahanas({
+          backend: backend,
+          searchText: searchInput,
+          chunkSize: 10,
+          pageNo: 0,
+        })
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (selectedOption === "Venues") {
+      setSearchedResults(searchedVenues);
+    } else if (selectedOption === "Events") {
+      setSearchedResults(searchedEvents);
+    } else if (selectedOption === "Wahanas") {
+      setSearchedResults(searchedWahana);
+    }
+  }, [searchedVenues, searchedEvents, searchedWahana]);
+
   return (
-    <div className="flex items-center">
-      <div className="border border-white flex min-h-12 items-center px-2 rounded-lg">
+    <div className="flex items-center w-full relative">
+      <div className="border-2 border-gray-300 flex min-h-12 items-center px-4 rounded-md w-full">
         <input
+          onFocus={() => setIsOpen(false)}
           type="text"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
           placeholder="Search for events, venues and more"
           className="bg-transparent outline-none w-full placeholder:text-white placeholder:truncate"
         />
-        <HiMagnifyingGlass size={24} />
+        <div className="mx-2 relative right-6">
+          <button
+            className="rounded bg-[#F08E1E] cursor-pointer min-w-18 h-6 flex items-center justify-center disabled:bg-gray-500"
+            disabled={enableSearch}
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            {selectedOption}
+          </button>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, damping: 1 }}
+              className="absolute right-0 top-10 min-w-32 bg-white text-black shadow-[rgba(0,_0,_0,_0.30)_0px_5px_15px] overflow-hidden p-1"
+            >
+              {options
+                .filter((option) => option !== selectedOption)
+                .map((option) => (
+                  <div
+                    key={option}
+                    className="px-4 py-2 cursor-pointer hover:bg-gray-200 font-medium z-50"
+                    onClick={() => handleSelectedOption(option)}
+                  >
+                    {option}
+                  </div>
+                ))}
+            </motion.div>
+          )}
+        </div>
+        <button
+          className="absolute right-4 h-8 w-8 rounded-full hover:bg-hover flex items-center justify-center"
+          onClick={handleSearch}
+        >
+          <HiMagnifyingGlass size={20} />
+        </button>
       </div>
+      {enableSearch && (
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="absolute inset-x-0 top-full bg-white text-black shadow-[rgba(0,_0,_0,_0.30)_0px_5px_15px] w-full"
+        >
+          <div className="flex items-center flex-auto text-sm font-semibold px-4 h-8">
+            <div>Search results</div>
+            <button
+              className="ml-auto h-6 w-6 rounded-full flex items-center justify-center hover:bg-gray-300"
+              onClick={() => setEnableSearch(false)}
+            >
+              <HiMiniXMark size={16} />
+            </button>
+          </div>
+          <div>
+            {searchVenueLoading ||
+            searchEventLoading ||
+            searchedWahanaLoading ? (
+              <div className="px-4 h-10">Loading...</div>
+            ) : searchedResults && searchedResults.length > 0 ? (
+              searchedResults.map((item, index) => (
+                <Link
+                  to={
+                    selectedOption === "Events"
+                      ? `${item.venueId}/events/${item.id}`
+                      : selectedOption === "Venues"
+                      ? `/venues/${item.id}`
+                      : selectedOption === "Wahanas"
+                      ? `${item.id}/wahanas/${item.venueId}`
+                      : "#"
+                  }
+                  key={index}
+                  className="px-4 h-10 flex items-center hover:bg-gray-200 capitalize truncate"
+                  onClick={() => setEnableSearch(false)}
+                >
+                  {selectedOption === "Venues" && item.Title}
+                  {selectedOption === "Events" && item.title}
+                  {selectedOption === "Wahanas" && item.ride_title}
+                </Link>
+              ))
+            ) : (
+              <div className="px-4 h-10">No Results Found</div>
+            )}
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 };
 
-const NavHorizontal = () => {
-  const swipeLeft = {
-    initial: { backgroundColor: "transparent", x: "-100%", opacity: 0 },
-    hover: {
-      backgroundColor: "white",
-      x: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.3,
-      },
-    },
-  };
+// const NavHorizontal = () => {
+//   const swipeLeft = {
+//     initial: { backgroundColor: "transparent", x: "-100%", opacity: 0 },
+//     hover: {
+//       backgroundColor: "white",
+//       x: 0,
+//       opacity: 1,
+//       transition: {
+//         duration: 0.3,
+//       },
+//     },
+//   };
 
-  const swipeRight = {
-    initial: { backgroundColor: "transparent", x: "100%", opacity: 0 },
-    hover: {
-      backgroundColor: "white",
-      x: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.3,
-      },
-    },
-  };
+//   const swipeRight = {
+//     initial: { backgroundColor: "transparent", x: "100%", opacity: 0 },
+//     hover: {
+//       backgroundColor: "white",
+//       x: 0,
+//       opacity: 1,
+//       transition: {
+//         duration: 0.3,
+//       },
+//     },
+//   };
 
-  return (
-    <nav className="flex items-center gap-12 font-medium over">
-      {NavLinks.map((link, index) => (
-        // Replace button with Link later
-        <Link to={link.url} key={index}>
-          <motion.div
-            key={index}
-            initial="initial"
-            whileHover="hover"
-            className="min-w-max"
-          >
-            <h4>{link.title}</h4>
-            <div className="flex">
-              <motion.div
-                variants={swipeRight}
-                className="h-0.5 w-full bg-white"
-              ></motion.div>
-              <motion.div
-                variants={swipeLeft}
-                className="h-0.5 w-full"
-              ></motion.div>
-            </div>
-          </motion.div>
-        </Link>
-      ))}
-    </nav>
-  );
-};
+//   return (
+//     <nav className="flex items-center gap-12 font-medium over">
+//       {NavLinks.map((link, index) => (
+//         // Replace button with Link later
+//         <Link to={link.url} key={index}>
+//           <motion.div
+//             key={index}
+//             initial="initial"
+//             whileHover="hover"
+//             className="min-w-max"
+//           >
+//             <h4>{link.title}</h4>
+//             <div className="flex">
+//               <motion.div
+//                 variants={swipeRight}
+//                 className="h-0.5 w-full bg-white"
+//               ></motion.div>
+//               <motion.div
+//                 variants={swipeLeft}
+//                 className="h-0.5 w-full"
+//               ></motion.div>
+//             </div>
+//           </motion.div>
+//         </Link>
+//       ))}
+//     </nav>
+//   );
+// };
 
 const NavVertical = ({ isNavOpen, onNavOpen }) => {
-  const { user } = useIdentityKit();
+  // const { user } = useIdentityKit();
   return (
     <motion.nav
-      initial={{ opacity: 0, x: -512 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ x: -512 }}
-      transition={{ stiffness: 300 }}
-      className="md:hidden absolute border-t border-gray-500 inset-x-0 bg-[#124076] text-white z-50 h-screen"
+      layout="position"
+      initial={{ x: "-100%" }}
+      animate={{ x: 0 }}
+      exit={{ x: "-100%" }}
+      transition={{ stiffness: 100, damping: 25, duration: 0.5 }}
+      className="absolute border-gray-500 inset-x-0 bg-[#124076] text-white z-50 h-screen"
     >
-      <div className="flex flex-col container mx-auto px-6 text-4xl font-black">
+      <div className="flex flex-col container mx-auto p-4 md:p-6 text-4xl md:text-7xl font-black">
         {NavLinks.map((link, index) => (
           // Replace button with Link later
           <Link to={link.url} key={index} onClick={() => onNavOpen(false)}>
             <div key={index} className="py-4">
-              <h4>{link.title}</h4>
+              <h4 className="hover:text-indigo-300">{link.title}</h4>
             </div>
           </Link>
         ))}
-        {!user && (
-          <div className="py-4">
-            <ConnectBtn />
-          </div>
-        )}
       </div>
     </motion.nav>
   );
@@ -197,10 +350,10 @@ const ConnectBtn = () => {
   const handleCloseMenu = () => {
     setIsMenuOpen(false);
   };
-  const ConnectBtn1 = ({ onClick, ...props }) => (
+  const ConnectBtn1 = ({ onClick }) => (
     <button
       onClick={onClick}
-      className="min-h-12 px-2 bg-[#F08E1E] text-white font-medium rounded-lg hover:bg-orange-600 max-w-max min-w-max"
+      className="min-h-12 px-4 bg-[#F08E1E] text-white font-medium rounded-full hover:bg-orange-600 max-w-max min-w-max"
     >
       Connect wallet
     </button>

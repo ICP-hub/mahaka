@@ -5,9 +5,9 @@ import Footer from "./Footer";
 
 export default function Master() {
   return (
-    <div className="light flex flex-col overflow-y-auto h-screen">
+    <div className="light flex flex-col">
       <Header />
-      <div className="h-full">
+      <div className="overflow-y-auto h-screen">
         <Outlet />
         <Footer />
       </div>

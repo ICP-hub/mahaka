@@ -11,6 +11,8 @@ import { ConnectWallet, useIdentityKit } from "@nfid/identitykit/react";
 import { updateAuthData } from "./redux/reducers/auth/authenticationReducer";
 import { getUserDetailsByCaller } from "./redux/reducers/apiReducers/userApiReducer";
 import { getAllEventsPaginated } from "./redux/reducers/apiReducers/eventApiReducer";
+import { getAllTestimonials} from "./redux/reducers/apiReducers/testimonialApiReducer";
+import { createTestimonial } from "./redux/reducers/apiReducers/testimonialApiReducer";
 // import { createVenue , updateVenue } from "./redux/reducers/apiReducers/venueApiReducer";
 
 function App() {
@@ -81,8 +83,54 @@ function App() {
     dispatch(getAllEventsPaginated({ backend: backend }));
   }, []);
 
+  useEffect(()=>{
+    dispatch(getAllTestimonials({backend:backend}))
+  },[])
+
+
+
+  const testimonial = {
+   
+    title: "anil", // 
+  description: "anil", // 
+  location: "anil",
+  }
+  
+  // const handleTest = async () => {
+  //   try {
+  //     const result = await backend.createTestimonial(
+  //       testimonial.description,
+  //       testimonial.title,
+  //       testimonial.location
+          
+  //       )
+  //      // Unwrap to handle the result directly
+  //     console.log("Successfully created testimonial", result);
+  //   } catch (error) {
+  //     console.log("Error in creating the testimonial", error);
+  //   }
+  // };
+
+
+  // const handleTest = async () => {
+  //   try {
+  //     const result = await dispatch(
+  //       createTestimonial({
+  //         backend,
+  //         title: "anil",
+  //         description: "anil",
+  //         location: "hyderabad"
+  //       })
+  //     ).unwrap(); // Unwrap to handle the result directly
+  //     console.log("Successfully created testimonial", result);
+  //   } catch (error) {
+  //     console.log("Error in creating the testimonial", error);
+  //   }
+  // };
+
   return (
     <div>
+      {/* <button className = "border p-3" onClick ={handleTest}>create test</button> */}
       <RouterProvider router={appRoutes} />
       <NotificationToast />
     </div>

@@ -89,6 +89,12 @@ const WahanaPage = () => {
   const venueId = `${decodeURIComponent(ids).replace(/_/g, "#")}${
     window.location.hash
   }`;
+
+  const navigate = useNavigate();
+  const nextpage = (ticket) => {
+    const updatedIds = ids.replace(/#/g, "_");
+    navigate(`/venues/${updatedIds}/${ticket}/payment2`);
+  };
   console.log("Decoded Venue ID:", venueId);
   console.log("Decoded Wahana ID:", eventIds);
 
@@ -244,20 +250,26 @@ const WahanaPage = () => {
                       aria-labelledby="profile-tab"
                     >
                       <div>
-                        <div
-                          className="cursor-pointer"
-                          onClick={handleModalOpen}
-                        >
-                          <Ticket
-                            type={"SINGLE"}
-                            gradientClass={ticketData[1].gradientClass}
-                            name={"Single Tickets"}
-                            description={wahanas.description}
-                            price={parseInt(wahanas.priceICP) || 1}
-                            availability={""}
-                            highlightClass={ticketData[1].highlightClass}
-                          />
-                        </div>
+                        {ticketData.map((ticket, index) => (
+                          <div
+                            key={index}
+                            className="cursor-pointer"
+                            onClick={() => {
+                              nextpage("SINGLE");
+                            }}
+                          >
+                            <Ticket
+                              key={index}
+                              type={ticket.type}
+                              gradientClass={ticket.gradientClass}
+                              name={ticket.name}
+                              description={ticket.description}
+                              price={ticket.price}
+                              availability={ticket.availability}
+                              highlightClass={ticket.highlightClass}
+                            />
+                          </div>
+                        ))}
                       </div>
                     </motion.div>
                   )}

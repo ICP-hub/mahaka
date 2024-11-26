@@ -60,9 +60,9 @@ export default function Home() {
   console.log("venues in home", venues);
   const { backend } = useSelector((state) => state.authentication);
   const {  attractionbanners, banners ,  bannerLoading} = useSelector((state) => state.banner);
- //const {  thirdPartyBanners } = useSelector((state) => state.banner);
+ const {  testimonials } = useSelector((state) => state.testimonial);
 //  const { banners } = useSelector((state) => state.banner);
- // console.log("only third party  banners in home",  thirdPartyBanners);
+ console.log("testimonials in home",  testimonials);
 
  console.log("Attraction Banners home:", attractionbanners);
  console.log("Third Party Banners home:", banners);
