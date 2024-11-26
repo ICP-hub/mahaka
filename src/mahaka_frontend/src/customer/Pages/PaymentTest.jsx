@@ -20,13 +20,16 @@ const PaymentTest = () => {
   const [vanuedetail, setVanueDetail] = useState(null);
   const location = useLocation();
   const fullPath = location.pathname + location.hash;
-  const match = fullPath.match(/venues\/(.+?)\/primium\/payment2/);
-  const eventId = match ? match[1] : null;
+  const match = fullPath.match(/venues\/(.+?)\/(.+?)\/payment2/);
+
+  const canisterId = match?.[1] || "Not found";
+  const ticketType = match?.[2] || "Not found";
   const [numberOFVisitor, setNumberOFVisitor] = useState(1);
   const [paymenttype, setPaymentType] = useState("Card");
   const [loading, setLoading] = useState(false);
+  const [loadingdata, setLoadingData] = useState(false);
   const navigate = useNavigate();
-  const eventIds = `${decodeURIComponent(eventId).replace(/_/g, "#")}${
+  const eventIds = `${decodeURIComponent(canisterId).replace(/_/g, "#")}${
     window.location.hash
   }`;
   const { backend, principal } = useAuth();
@@ -34,6 +37,7 @@ const PaymentTest = () => {
   const { identity } = useIdentityKit();
   const ICP_API_HOST = "https://icp-api.io/";
   const [unauthenticatedAgent, setUnauthenticatedAgent] = useState(null);
+  const [ticketprice, setTicketPrice] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -41,20 +45,42 @@ const PaymentTest = () => {
       setUnauthenticatedAgent(agent);
     })();
   }, []);
-  const eventprincipal = Principal.fromText(eventIds.slice(5));
+  function extractCanisterId(url) {
+    const match = url.match(
+      /[a-z2-7]{5}-[a-z2-7]{5}-[a-z2-7]{5}-[a-z2-7]{5}-[a-z2-7]{3}/
+    );
+    return match ? match[0] : null;
+  }
+
+  const eventprincipal = Principal.fromText(extractCanisterId(fullPath));
   useEffect(() => {
     const fetchVenue = async () => {
+      setLoadingData(true);
       try {
         const data1 = await backend.getDIPdetails(eventprincipal);
+
         setVanueDetail(data1);
-        console.log("data is ", data1);
+        console.log("vandaataaa", data1);
       } catch (error) {
-        console.error("Error fetching :", error);
+        console.error("Error fetching:", error);
+      } finally {
+        setLoadingData(false);
       }
     };
 
     fetchVenue();
   }, [backend]);
+  useEffect(() => {
+    if (vanuedetail) {
+      if (ticketType === "GROUP") {
+        setTicketPrice(vanuedetail.gTicket_price || 0);
+      } else if (ticketType === "SINGLE") {
+        setTicketPrice(vanuedetail.sTicket_price || 0);
+      } else if (ticketType === "VIP") {
+        setTicketPrice(vanuedetail.vTicket_price || 0);
+      }
+    }
+  }, [vanuedetail, ticketType]);
 
   // const handlePayment = async () => {
   //   if (!user) {
@@ -170,6 +196,10 @@ const PaymentTest = () => {
   //   }
   // };
   const handlePayment = async (e) => {
+    if (principal == undefined) {
+      alert("jgh");
+      return;
+    }
     e.preventDefault();
     setLoading(true);
     const coffeeAmount = 0.0001;
@@ -216,6 +246,10 @@ const PaymentTest = () => {
     }
   };
   const handlePayment2 = async (e) => {
+    if (principal == undefined) {
+      alert("jgh");
+      return;
+    }
     setLoading(true);
     setIsPaymentProcessing(true);
     const _venueId = eventIds;
@@ -253,7 +287,7 @@ const PaymentTest = () => {
       console.log("res", response);
       if ("ok" in response) {
         console.log("Purchase response:", response);
-        navigate(`/venues/${eventId}/primium/payment2/checkout`);
+        navigate(`/venues/${canisterId}/primium/payment2/checkout`);
       } else {
         throw new Error(response.err || "Purchase failed");
       }
@@ -271,10 +305,27 @@ const PaymentTest = () => {
           <h2 className="text-3xl font-black ">Ticket Details </h2>
           <hr className="my-3 text-[#ACACAC]" />
           <div className="mb-5">
-            <p className="text-xl font-semibold">Vanue id:-{eventIds}</p>
-            <p className="text-xl text-green-400 font-semibold">
-              Number of Ticket left :- {Number(vanuedetail?.gTicket_limit)}{" "}
-            </p>
+            {loadingdata ? (
+              <p className="text-xl font-semibold">
+                Vanue id:-{" "}
+                <span className="px-20 rounded-lg py-[2px] animate-spin bg-gray-200"></span>
+              </p>
+            ) : (
+              <p className="text-xl font-semibold">Vanue id:-{eventIds}</p>
+            )}
+            {loadingdata ? (
+              <p className="text-xl text-green-400 font-semibold mt-2">
+                Number of Tickets Left: :{" "}
+                <span className="px-6 rounded-lg  py-[2px] animate-spin bg-gray-200"></span>
+              </p>
+            ) : (
+              <p className="text-xl text-green-400 font-semibold">
+                Number of Tickets Left:{" "}
+                {vanuedetail?.gTicket_limit !== undefined
+                  ? Number(vanuedetail.maxLimit)
+                  : "N/A"}
+              </p>
+            )}
           </div>
           <div className="py-4 space-y-12 ">
             <DatePicker />
@@ -283,7 +334,7 @@ const PaymentTest = () => {
               setNumberOFVisitor={setNumberOFVisitor}
             />
           </div>
-          <div className="mb-5">
+          {/* <div className="mb-5">
             <input type="checkbox" id="saveCard" className="mr-2 " />
             <label htmlFor="saveCard">Save card details</label>
           </div>
@@ -292,7 +343,7 @@ const PaymentTest = () => {
             Lorem ipsum dolor sit amet consectetur. Malesuada sed senectus id
             tincidunt amet scelerisque diamam velit blandit. Bibendum fusce sed
             enim cursus sed in in. Quis malesuada mattis.
-          </p>
+          </p> */}
         </div>
         <div className="order-1 md:order-2 bg-[#F9FAFA] p-16">
           <h2 className="text-3xl font-black ">Order Summary</h2>
@@ -304,12 +355,19 @@ const PaymentTest = () => {
               className="w-12 h-12 object-cover rounded-md mr-4"
             />
             <div>
-              <h3 className="text-2xl font-black">Ticket Name</h3>
-              <p className="text-base font-normal text-[#ACACAC]">Premium</p>
+              <h3 className="text-2xl font-black">{vanuedetail?.name}</h3>
+              <p className="text-base font-normal text-[#ACACAC]">
+                {ticketType}
+              </p>
             </div>
             <div className="ml-auto">
               <p className="text-2xl font-black">
-                Rp. {Number(vanuedetail?.gTicket_price)}
+                Rp.{" "}
+                {loadingdata ? (
+                  <span className="px-4 rounded-lg  py-[2px] animate-spin bg-gray-200"></span>
+                ) : (
+                  Number(ticketprice)
+                )}
               </p>
               <p className="text-base font-normal text-[#ACACAC]">
                 Qty: {numberOFVisitor}
@@ -320,14 +378,24 @@ const PaymentTest = () => {
           <div className="flex justify-between ">
             <span className="text-lg font-normal text-[#0A0D13]">Subtotal</span>
             <span className="text-lg font-black text-[#0A0D13]">
-              Rp. {Number(vanuedetail?.gTicket_price) * numberOFVisitor}
+              Rp.{" "}
+              {loadingdata ? (
+                <span className="px-4 rounded-lg  py-[2px] animate-spin bg-gray-200"></span>
+              ) : (
+                Number(ticketprice) * numberOFVisitor
+              )}
             </span>
           </div>
           <hr className="my-4 text-[#ACACAC]" />
           <div className="flex justify-between font-bold text-xl">
             <span className="text-lg font-normal text-[#0A0D13]">Total</span>
             <span className="text-3xl font-black text-[#0A0D13]">
-              Rp. {Number(vanuedetail?.gTicket_price) * numberOFVisitor}
+              Rp.{" "}
+              {loadingdata ? (
+                <span className="px-4 rounded-lg  py-[2px] animate-spin bg-gray-200"></span>
+              ) : (
+                Number(ticketprice) * numberOFVisitor
+              )}
             </span>
           </div>
           <div className="py-4">

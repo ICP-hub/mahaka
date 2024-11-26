@@ -89,8 +89,12 @@ const EventPage = () => {
   const venueId = `${decodeURIComponent(ids).replace(/_/g, "#")}${
     window.location.hash
   }`;
-
+  const navigate = useNavigate();
   console.log(venueId, eventIds);
+  const nextpage = (ticket) => {
+    const updatedIds = ids.replace(/#/g, "_");
+    navigate(`/venues/${updatedIds}/${ticket}/payment2`);
+  };
 
   const dispatch = useDispatch();
   const {
@@ -313,22 +317,26 @@ const EventPage = () => {
                       aria-labelledby="profile-tab"
                     >
                       <div>
-                        <div
-                          className="cursor-pointer"
-                          onClick={handleModalOpen}
-                        >
-                          <Ticket
-                            type={"SINGLE"}
-                            gradientClass={ticketData[1].gradientClass}
-                            name={"Single Tickets"}
-                            description={ticketDetails?.description}
-                            price={parseInt(ticketDetails?.sTicket_price) || 1}
-                            availability={
-                              parseInt(ticketDetails?.sTicket_limit) || 4
-                            }
-                            highlightClass={ticketData[1].highlightClass}
-                          />
-                        </div>
+                        {ticketData.map((ticket, index) => (
+                          <div
+                            key={index}
+                            className="cursor-pointer"
+                            onClick={() => {
+                              nextpage("SINGLE");
+                            }}
+                          >
+                            <Ticket
+                              key={index}
+                              type={ticket.type}
+                              gradientClass={ticket.gradientClass}
+                              name={ticket.name}
+                              description={ticket.description}
+                              price={ticket.price}
+                              availability={ticket.availability}
+                              highlightClass={ticket.highlightClass}
+                            />
+                          </div>
+                        ))}
                       </div>
                     </motion.div>
                   )}

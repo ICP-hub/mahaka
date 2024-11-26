@@ -70,7 +70,7 @@ const CardCheckout = ({}) => {
 
   return (
     <>
-      <div className=" mt-10 ml-10 flex items-center gap-6">
+      <div className=" my-10 ml-10 flex items-center gap-6">
         <button
           className="px-2 py-1 bg-amber-500 rounded-sm text-xl text-white"
           onClick={() => {
@@ -81,7 +81,7 @@ const CardCheckout = ({}) => {
         </button>
         <h1 className="text-xl font-semibold ">Invoices </h1>
       </div>
-      <div className="mt-10 mx-10">
+      <div className="my-20 mx-10">
         <div className="flex justify-between bg-[#1241767f] font-semibold px-4 py-3 border text-white border-[#124076] rounded-t">
           <div className="w-1/6 text-center">Invoice No</div>
           <div className="w-1/6 text-center">Amount</div>
