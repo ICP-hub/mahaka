@@ -40,6 +40,7 @@ module {
         quantity: Int;
         price: Float;
         categoryId : Text;
+        categoryTitle : Text
     };
     
     public module InvoiceStatus = {

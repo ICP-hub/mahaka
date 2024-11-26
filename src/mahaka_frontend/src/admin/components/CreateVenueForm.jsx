@@ -34,10 +34,10 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
     vipTicketPrice: "",
     banner: null,
     logo: null,
-    startDate: "",
-    startTime: "",
-    endDate: "",
-    endTime: "",
+    // startDate: "",
+    // startTime: "",
+    // endDate: "",
+    // endTime: "",
   });
 
   // Handle value changes
@@ -71,14 +71,14 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
     //   return;
     // }
     // time stamps
-    const startTimestamp = convertToTimestamp(
-      formValues.startDate,
-      formValues.startTime
-    );
-    const endTimestamp = convertToTimestamp(
-      formValues.endDate,
-      formValues.endTime
-    );
+    // const startTimestamp = convertToTimestamp(
+    //   formValues.startDate,
+    //   formValues.startTime
+    // );
+    // const endTimestamp = convertToTimestamp(
+    //   formValues.endDate,
+    //   formValues.endTime
+    // );
 
     dispatch(
       createVenue({
@@ -111,11 +111,11 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         title: formValues.title,
         capacity: parseInt(formValues.capacity),
         details: {
-          StartDate: startTimestamp,
-          StartTime: startTimestamp,
+          // StartDate: startTimestamp,
+          // StartTime: startTimestamp,
           Location: formValues.location,
-          EndDate: endTimestamp,
-          EndTime: endTimestamp,
+          // EndDate: endTimestamp,
+          // EndTime: endTimestamp,
         },
         description: formValues.description,
         action: setIsModalOpen,
@@ -141,33 +141,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         label="Location"
         value={formValues.location}
         onChange={(value) => handleInputChange("location", value)}
-      />
-
-      <div className="grid grid-cols-2 gap-4">
-        <FormFieldDate
-          label="Start Date"
-          value={formValues.startDate}
-          onChange={(value) => handleInputChange("startDate", value)}
-        />
-        <FormFieldTime
-          label="Start Time"
-          value={formValues.startTime}
-          onChange={(value) => handleInputChange("startTime", value)}
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <FormFieldDate
-          label="End Date"
-          value={formValues.endDate}
-          onChange={(value) => handleInputChange("endDate", value)}
-        />
-        <FormFieldTime
-          label="End Time"
-          value={formValues.endTime}
-          onChange={(value) => handleInputChange("endTime", value)}
-        />
-      </div>
+      />    
 
       <div className="grid grid-cols-2 gap-4">
         <FormFieldInput

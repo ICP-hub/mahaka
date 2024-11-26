@@ -14,6 +14,8 @@ const initialState = {
   buyTicketLoading: false,
   singleEventLoading: false,
   deleteEventLoader: false,
+  searchedEvents: null,
+  searchEventLoading: false,
 };
 
 // creating an event
@@ -121,8 +123,8 @@ export const searchEvents = createAsyncThunk(
         chunkSize,
         pageNo
       );
+      console.log("search response is ", response);
       return response.data;
-      // console.log("search response is ",response.data)
     } catch (error) {
       console.error("error searching the events", error);
       throw new Error("Error searching event", error);
@@ -161,17 +163,21 @@ const eventSlice = createSlice({
       // search events
 
       .addCase(searchEvents.pending, (state) => {
-        state.singleEventLoading = true;
+        // state.singleEventLoading = true;
+        state.searchEventLoading = true;
       })
       .addCase(searchEvents.fulfilled, (state, action) => {
-        state.singleEventLoading = false;
-        state.events = action.payload;
+        // state.singleEventLoading = false;
+        // state.events = action.payload;
+        state.searchEventLoading = false;
+        state.searchedEvents = action.payload;
         state.error = null;
       })
       .addCase(searchEvents.rejected, (state, action) => {
-        state.singleEventLoading = false;
-        // state.error = action.error.message;
-        state.error = action.error.message || "An error occurred";
+        // state.singleEventLoading = false;
+        state.searchEventLoading = false;
+        state.searchedEvents = [];
+        state.error = "Error searching event";
       })
 
       // Handle deleteEvent

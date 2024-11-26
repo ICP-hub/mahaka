@@ -107,9 +107,10 @@ const VenueTableFormat = ({ filteredVenues }) => {
               <div></div>
               <div>Venue name</div>
               <div className="hidden sm:block">Description</div>
-              <div className="hidden sm:block">Start On</div>
+              <div className="hidden sm:block">Max Capacity</div>
+              {/* <div className="hidden sm:block">Start On</div>
               <div className="hidden lg:block">End On</div>
-              <div className="hidden lg:block">Time</div>
+              <div className="hidden lg:block">Time</div> */}
               <div>Location</div>
               <div className="flex w-full items-center justify-center">
                 Details
@@ -215,6 +216,10 @@ const VenueTableData = ({ venue, onDelete }) => {
         <div>{venue?.Title}</div>
         <div className="hidden sm:block truncate">{venue?.Description}</div>
         <div className="hidden sm:block">
+          {parseInt(venue?.capacity)}
+        </div>
+
+        {/* <div className="hidden sm:block">
           {convertTimestampToDate(venue?.Details?.StartDate)}
         </div>
         <div className="hidden lg:block">
@@ -223,7 +228,7 @@ const VenueTableData = ({ venue, onDelete }) => {
         <div className="hidden lg:block">
           {convertTimestampToTime(venue?.Details?.StartTime)}-
           {convertTimestampToTime(venue?.Details?.EndTime)}
-        </div>
+        </div> */}
         <div className="truncate">{venue?.Details?.Location}</div>
 
         {/* Wrap both icons inside a flex container */}
@@ -352,6 +357,9 @@ const VenueTableLoader = () => {
         Description
       </div>
       <div className="hidden sm:block text-gray-400 bg-gray-400 animate-pulse rounded">
+        Maximum Capacity
+      </div>
+      {/* <div className="hidden sm:block text-gray-400 bg-gray-400 animate-pulse rounded">
         Start On
       </div>
       <div className="hidden lg:block text-gray-400 bg-gray-400 animate-pulse rounded">
@@ -359,7 +367,7 @@ const VenueTableLoader = () => {
       </div>
       <div className="hidden lg:block text-gray-400 bg-gray-400 animate-pulse rounded">
         Time
-      </div>
+      </div> */}
       <div className="text-gray-400 bg-gray-400 animate-pulse rounded">
         Location
       </div>

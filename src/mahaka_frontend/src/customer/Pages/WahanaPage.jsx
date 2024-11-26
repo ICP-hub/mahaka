@@ -74,7 +74,7 @@ const WahanaPage = () => {
   const { ids, eventId } = useParams();
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
-  const { currentWahana:wahanas, loading } = useSelector(
+  const { currentWahana: wahanas, loading } = useSelector(
     (state) => state.wahana
   );
   const [localError, setLocalError] = useState(null);
@@ -89,6 +89,12 @@ const WahanaPage = () => {
   const venueId = `${decodeURIComponent(ids).replace(/_/g, "#")}${
     window.location.hash
   }`;
+
+  const navigate = useNavigate();
+  const nextpage = (ticket) => {
+    const updatedIds = ids.replace(/#/g, "_");
+    navigate(`/venues/${updatedIds}/${ticket}/payment2`);
+  };
   console.log("Decoded Venue ID:", venueId);
   console.log("Decoded Wahana ID:", eventIds);
 
@@ -243,18 +249,14 @@ const WahanaPage = () => {
                       role="tabpanel"
                       aria-labelledby="profile-tab"
                     >
-                      <p className="text-lg font-normal">
-                        Lorem ipsum dolor sit amet consectetur. Nisl sapien id
-                        erat senectus ornare egestas diam vitae tincidunt.
-                        Curabitur commodo purus sed accumsan tristique velit
-                        volutpat amet.
-                      </p>
                       <div>
                         {ticketData.map((ticket, index) => (
                           <div
                             key={index}
                             className="cursor-pointer"
-                            onClick={handleModalOpen}
+                            onClick={() => {
+                              nextpage("SINGLE");
+                            }}
                           >
                             <Ticket
                               key={index}
@@ -289,7 +291,7 @@ const WahanaPage = () => {
                           </li>
                           <li>
                             <strong>Price:</strong> IDR{" "}
-                            {parseInt(wahanas.price)}
+                            {parseInt(wahanas.priceICP)}
                           </li>
                         </ul>
 
@@ -326,7 +328,7 @@ const WahanaPage = () => {
                   <h1 className="text-2xl font-black">Wahana Details</h1>
                   <h3 className="text-lg font-normal">
                     {" "}
-                    IDR {parseInt(wahanas?.price)}
+                    IDR {parseInt(wahanas?.priceICP)}
                   </h3>
                 </div>
               </div>

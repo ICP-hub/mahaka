@@ -81,14 +81,14 @@ const VenueDetailPage = () => {
                 {parseInt(currentVenue[1].capacity)}
               </div>
             </div>
-            <div className="flex sm:items-center">
+            {/* <div className="flex sm:items-center">
               <p>Start Date</p>
               <div className="ml-6 leading-6">Nov 25, 2024</div>
             </div>
             <div className="flex sm:items-center">
               <p>End Date</p>
               <div className="ml-6 leading-6">Nov 28, 2024</div>
-            </div>
+            </div> */}
             <div className="flex sm:items-center">
               <p>Venue id</p>
               <div className="ml-6 leading-6">{currentVenue[1].id}</div>
@@ -183,11 +183,11 @@ const LoadingScreen = () => {
                   elit aliquip est nisi officia lorem occaecat ea lorem officia
                   veniam.
                 </p>
-                <p className="bg-gray-400 animate-pulse text-gray-400 rounded-md">
+                {/* <p className="bg-gray-400 animate-pulse text-gray-400 rounded-md">
                   Nulla tempor id excepteur irure do do veniam eiusmod esse
                   ipsum sint dolore commodo enim officia nulla nulla proident in
                   dolor et aliquip sit nulla sit proident duis aute deserunt.
-                </p>
+                </p> */}
               </div>
             </div>
           </div>

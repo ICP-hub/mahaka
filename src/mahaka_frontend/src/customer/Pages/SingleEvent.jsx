@@ -82,7 +82,6 @@ export default function SingleEvent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { ModalOne } = ModalPopup();
   const [ticketDetails, setTicketDetails] = useState(null);
-
   const handleModalOpen = () => setIsModalOpen(true);
   const handleModalClose = () => setIsModalOpen(false);
 
@@ -96,9 +95,9 @@ export default function SingleEvent() {
   const location = useLocation();
   const ids = `${decodeURIComponent(id)}${location.hash}`;
 
-  const nextpage = () => {
+  const nextpage = (ticket) => {
     const updatedIds = ids.replace(/#/g, "_");
-    navigate(`/venues/${updatedIds}/primium/payment2`);
+    navigate(`/venues/${updatedIds}/${ticket}/payment2`);
   };
 
   const dispatch = useDispatch();
@@ -354,7 +353,10 @@ export default function SingleEvent() {
                         volutpat amet.
                       </p> */}
                       <div>
-                        <div className="cursor-pointer" onClick={nextpage}>
+                        <div
+                          className="cursor-pointer"
+                          onClick={() => nextpage("GROUP")}
+                        >
                           <Ticket
                             type={"GROUP"}
                             gradientClass={ticketData[0].gradientClass}
@@ -367,7 +369,10 @@ export default function SingleEvent() {
                             highlightClass={ticketData[0].highlightClass}
                           />
                         </div>
-                        <div className="cursor-pointer" onClick={nextpage}>
+                        <div
+                          className="cursor-pointer"
+                          onClick={() => nextpage("SINGLE")}
+                        >
                           <Ticket
                             type={"SINGLE"}
                             gradientClass={ticketData[1].gradientClass}
@@ -380,7 +385,10 @@ export default function SingleEvent() {
                             highlightClass={ticketData[1].highlightClass}
                           />
                         </div>
-                        <div className="cursor-pointer" onClick={nextpage}>
+                        <div
+                          className="cursor-pointer"
+                          onClick={() => nextpage("VIP")}
+                        >
                           <Ticket
                             type={"VIP"}
                             gradientClass={ticketData[2].gradientClass}
@@ -453,35 +461,13 @@ export default function SingleEvent() {
                 <div className="p-8">
                   <h1 className="text-2xl font-black">Venue Details</h1>
                   <h3 className="text-lg font-normal"> </h3>
-                  <h3 className="text-lg font-normal">
-                    {" "}
-                    {venue?.Details.StartDate &&
-                      formatDate(venue.Details.StartDate)}{" "}
-                    -
-                    {(venue?.Details.EndDate &&
-                      formatDate(venue.Details.EndDate)) ||
-                      "13 Jul- 17 Jul 2024"}
-                  </h3>
-                  <h3 className="text-lg font-normal">
-                    {venue?.Details.StartTime &&
-                      FormatTime(venue.Details.StartTime)}{" "}
-                    -
-                    {(venue?.Details.EndTime &&
-                      FormatTime(venue.Details.EndTime)) ||
-                      "12:00AM - 3:00PM"}
-                  </h3>
+                   
+                  
                   <h3 className="text-lg font-normal">
                     Location of the Venue - {venue?.Details.Location}
                   </h3>
                 </div>
-                <h2 className="text-2xl font-normal pl-8">
-                  Venue ends on :{" "}
-                  <span className="text-red-600">
-                    {(venue?.Details.EndDate &&
-                      formatDate(venue.Details.EndDate)) ||
-                      "17 July, 2024"}
-                  </span>
-                </h2>
+                 
               </div>
             )}
           </div>

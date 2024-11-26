@@ -176,6 +176,7 @@ module {
 
     public type CommonErrors = {
         #WahanaNotFound;
+        #VenueNotFound;
         #EventNotFound;
         #DataNotFound;
     };
@@ -235,6 +236,7 @@ module {
         paymentType : PaymentType;
         ticketPrice: Float;
         offlineOrOnline : TicketType;
+        saleDate : Time.Time;
         saleType : Text;
         recepient : Principal; 
         caller : Principal
@@ -256,6 +258,7 @@ module {
         wahanaId : Text; 
         paymentType : PaymentType;
         offlineOrOnline : TicketType;
+        saleDate : Time.Time;
         price: Float;
         recepient : Principal; 
         caller : Principal
