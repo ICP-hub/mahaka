@@ -27,6 +27,7 @@ const MenuSection = () => {
     },
     { path: "/admin/members", label: "Members", icon: <MdPerson size={24} /> },
     { path: "/admin/banner", label: "banner", icon: <MdEqualizer size={24} /> },
+    { path: "/admin/testimonial", label: "testimonial", icon: <MdMap size={24} /> },
     // { path: "/admin/sales", label: "Sales", icon: <MdEqualizer size={24} /> },
     // {
     //   path: "/admin/purchaseTicket",
