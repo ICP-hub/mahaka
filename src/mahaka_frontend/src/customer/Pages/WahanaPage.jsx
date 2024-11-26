@@ -74,7 +74,7 @@ const WahanaPage = () => {
   const { ids, eventId } = useParams();
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
-  const { currentWahana:wahanas, loading } = useSelector(
+  const { currentWahana: wahanas, loading } = useSelector(
     (state) => state.wahana
   );
   const [localError, setLocalError] = useState(null);
@@ -243,31 +243,21 @@ const WahanaPage = () => {
                       role="tabpanel"
                       aria-labelledby="profile-tab"
                     >
-                      <p className="text-lg font-normal">
-                        Lorem ipsum dolor sit amet consectetur. Nisl sapien id
-                        erat senectus ornare egestas diam vitae tincidunt.
-                        Curabitur commodo purus sed accumsan tristique velit
-                        volutpat amet.
-                      </p>
                       <div>
-                        {ticketData.map((ticket, index) => (
-                          <div
-                            key={index}
-                            className="cursor-pointer"
-                            onClick={handleModalOpen}
-                          >
-                            <Ticket
-                              key={index}
-                              type={ticket.type}
-                              gradientClass={ticket.gradientClass}
-                              name={ticket.name}
-                              description={ticket.description}
-                              price={ticket.price}
-                              availability={ticket.availability}
-                              highlightClass={ticket.highlightClass}
-                            />
-                          </div>
-                        ))}
+                        <div
+                          className="cursor-pointer"
+                          onClick={handleModalOpen}
+                        >
+                          <Ticket
+                            type={"SINGLE"}
+                            gradientClass={ticketData[1].gradientClass}
+                            name={"Single Tickets"}
+                            description={wahanas.description}
+                            price={parseInt(wahanas.priceICP) || 1}
+                            availability={""}
+                            highlightClass={ticketData[1].highlightClass}
+                          />
+                        </div>
                       </div>
                     </motion.div>
                   )}
@@ -289,7 +279,7 @@ const WahanaPage = () => {
                           </li>
                           <li>
                             <strong>Price:</strong> IDR{" "}
-                            {parseInt(wahanas.price)}
+                            {parseInt(wahanas.priceICP)}
                           </li>
                         </ul>
 
@@ -326,7 +316,7 @@ const WahanaPage = () => {
                   <h1 className="text-2xl font-black">Wahana Details</h1>
                   <h3 className="text-lg font-normal">
                     {" "}
-                    IDR {parseInt(wahanas?.price)}
+                    IDR {parseInt(wahanas?.priceICP)}
                   </h3>
                 </div>
               </div>

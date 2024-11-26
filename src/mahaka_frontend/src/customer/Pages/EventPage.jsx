@@ -71,6 +71,8 @@ const EventPage = () => {
   const [activeTab, setActiveTab] = useState("profile");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { ModalOne } = ModalPopup();
+  const [ticketDetails, setTicketDetails] = useState(null);
+  const { backend } = useSelector((state) => state.authentication);
 
   const handleModalOpen = () => setIsModalOpen(true);
   const handleModalClose = () => setIsModalOpen(false);
@@ -104,9 +106,30 @@ const EventPage = () => {
     error: eventError,
   } = useSelector((state) => state.events);
 
-  const { backend } = useSelector((state) => state.authentication);
   const [localError, setLocalError] = useState(null);
   const venue = currentEvent ? currentEvent : null;
+
+  useEffect(() => {
+    const fetchTicketDetails = async (venue) => {
+      console.log(venue, "venue");
+      if (!venue?.event_collectionid) {
+        console.error("Venue does not have a collection_id:", venue);
+        return;
+      }
+
+      try {
+        // Fetch ticket details from the actor
+        const details = await backend.getDIPdetails(venue?.event_collectionid);
+        console.log(details, "ticketDetails");
+        setTicketDetails(details);
+      } catch (error) {
+        console.error("Error fetching ticket details:", error);
+        setTicketDetails(null);
+      } finally {
+      }
+    };
+    fetchTicketDetails(currentEvent);
+  }, [currentEvent]);
 
   useEffect(() => {
     if (!venueId) {
@@ -289,31 +312,23 @@ const EventPage = () => {
                       role="tabpanel"
                       aria-labelledby="profile-tab"
                     >
-                      <p className="text-lg font-normal">
-                        Lorem ipsum dolor sit amet consectetur. Nisl sapien id
-                        erat senectus ornare egestas diam vitae tincidunt.
-                        Curabitur commodo purus sed accumsan tristique velit
-                        volutpat amet.
-                      </p>
                       <div>
-                        {ticketData.map((ticket, index) => (
-                          <div
-                            key={index}
-                            className="cursor-pointer"
-                            onClick={handleModalOpen}
-                          >
-                            <Ticket
-                              key={index}
-                              type={ticket.type}
-                              gradientClass={ticket.gradientClass}
-                              name={ticket.name}
-                              description={ticket.description}
-                              price={ticket.price}
-                              availability={ticket.availability}
-                              highlightClass={ticket.highlightClass}
-                            />
-                          </div>
-                        ))}
+                        <div
+                          className="cursor-pointer"
+                          onClick={handleModalOpen}
+                        >
+                          <Ticket
+                            type={"SINGLE"}
+                            gradientClass={ticketData[1].gradientClass}
+                            name={"Single Tickets"}
+                            description={ticketDetails?.description}
+                            price={parseInt(ticketDetails?.sTicket_price) || 1}
+                            availability={
+                              parseInt(ticketDetails?.sTicket_limit) || 4
+                            }
+                            highlightClass={ticketData[1].highlightClass}
+                          />
+                        </div>
                       </div>
                     </motion.div>
                   )}

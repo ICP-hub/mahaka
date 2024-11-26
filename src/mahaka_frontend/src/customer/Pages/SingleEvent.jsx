@@ -453,35 +453,13 @@ export default function SingleEvent() {
                 <div className="p-8">
                   <h1 className="text-2xl font-black">Venue Details</h1>
                   <h3 className="text-lg font-normal"> </h3>
-                  <h3 className="text-lg font-normal">
-                    {" "}
-                    {venue?.Details.StartDate &&
-                      formatDate(venue.Details.StartDate)}{" "}
-                    -
-                    {(venue?.Details.EndDate &&
-                      formatDate(venue.Details.EndDate)) ||
-                      "13 Jul- 17 Jul 2024"}
-                  </h3>
-                  <h3 className="text-lg font-normal">
-                    {venue?.Details.StartTime &&
-                      FormatTime(venue.Details.StartTime)}{" "}
-                    -
-                    {(venue?.Details.EndTime &&
-                      FormatTime(venue.Details.EndTime)) ||
-                      "12:00AM - 3:00PM"}
-                  </h3>
+                   
+                  
                   <h3 className="text-lg font-normal">
                     Location of the Venue - {venue?.Details.Location}
                   </h3>
                 </div>
-                <h2 className="text-2xl font-normal pl-8">
-                  Venue ends on :{" "}
-                  <span className="text-red-600">
-                    {(venue?.Details.EndDate &&
-                      formatDate(venue.Details.EndDate)) ||
-                      "17 July, 2024"}
-                  </span>
-                </h2>
+                 
               </div>
             )}
           </div>
