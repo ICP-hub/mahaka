@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useIdentityKit } from "@nfid/identitykit/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { createActor } from "../../../../declarations/Fiatpayment/index";
+import { useAuth } from "../../connect/useClient";
 
 const PaymentStatusUpdate = () => {
   const location = useLocation();
@@ -11,48 +12,84 @@ const PaymentStatusUpdate = () => {
   const [loading, setLoading] = useState(true);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [responseMessage, setResponseMessage] = useState("");
+  const [invoiceDetail, setInvoiceDetail] = useState(null);
 
   const canisterIDFiat = process.env.CANISTER_ID_FIATPAYMENT;
-
+  const { backend } = useAuth();
   const fullPath = location.pathname + location.hash;
   const match = fullPath.match(/\/([^/]+)\/([^/]+)\/([^/]+)/);
 
-  console.log("ds", `"${match[1]}"`);
-  console.log(match[2]);
-  console.log("idm", match[3]);
-
-  console.log("path", fullPath);
   const mockData = {
     paymentMethod: "stripe",
     invoiceNo: Number(match[3]),
-    isSuccess: match[2] === "success" ? true : false,
+    isSuccess: match[2] === "success",
   };
-  const backendActor = createActor(canisterIDFiat, {
-    agentOptions: { identity, verifyQuerySignatures: false },
-  });
-  console.log("daa", mockData);
+
   useEffect(() => {
-    const updateInvoiceStatus = async () => {
+    const backendActor = createActor(canisterIDFiat, {
+      agentOptions: { identity, verifyQuerySignatures: true },
+    });
+
+    const handlePaymentStatusUpdate = async () => {
       try {
         setLoading(true);
 
-        const response = await backendActor.change_invoice_status({
+        const updateResponse = await backendActor.change_invoice_status({
           paymentMethod: mockData.paymentMethod,
           invoiceNo: mockData.invoiceNo,
           isSuccess: mockData.isSuccess,
         });
 
-        if (response.status && response.body.success) {
-          setPaymentStatus("success");
-          setResponseMessage(
-            `Transaction Successful! Invoice: ${response.body.success.invoiceNo}, Method: ${response.body.success.paymentMethod}`
+        if (!updateResponse.status || "err" in updateResponse.body) {
+          setPaymentStatus("failure");
+          setResponseMessage("Failed to update invoice status.");
+          return;
+        }
+
+        const invoiceResponse = await backendActor.get_invoice(
+          mockData.invoiceNo
+        );
+
+        if (!invoiceResponse.status || "err" in invoiceResponse.body) {
+          setPaymentStatus("failure");
+          setResponseMessage("Invoice not found or invalid.");
+          return;
+        }
+
+        const invoice = invoiceResponse.body.success;
+        setInvoiceDetail(invoice);
+        console.log("invoice", invoiceResponse);
+        const ticketMapping = {
+          "Event Ticket": { Event: null },
+          "Wahhana Ticket": { Wahana: null },
+          "Venue Ticket": { Venue: null },
+        };
+
+        const matchedItem = invoice.items.find((item) =>
+          Object.keys(ticketMapping).includes(item.name)
+        );
+
+        if (matchedItem) {
+          const processResponse = await backend.processPendingPayment(
+            mockData.invoiceNo,
+            ticketMapping[matchedItem.name]
           );
+
+          if ("ok" in processResponse) {
+            setPaymentStatus("success");
+            setResponseMessage(`${matchedItem.name} processed successfully.`);
+          } else {
+            setPaymentStatus("failure");
+            setResponseMessage(
+              processResponse.err || `Failed to process ${matchedItem.name}.`
+            );
+          }
         } else {
           setPaymentStatus("failure");
-          setResponseMessage(response.message || "Failed to update invoice.");
+          setResponseMessage("Unsupported item in the invoice.");
         }
       } catch (error) {
-        console.error("Error updating invoice:", error);
+        console.error("Error during payment update:", error);
         setPaymentStatus("failure");
         setResponseMessage("An error occurred while processing the payment.");
       } finally {
@@ -60,8 +97,8 @@ const PaymentStatusUpdate = () => {
       }
     };
 
-    updateInvoiceStatus();
-  }, []);
+    handlePaymentStatusUpdate();
+  }, [canisterIDFiat, identity, mockData]);
 
   const handleNavigateHome = () => {
     navigate("/");
