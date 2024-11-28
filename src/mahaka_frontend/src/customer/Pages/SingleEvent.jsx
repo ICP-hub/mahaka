@@ -5,13 +5,13 @@ import Ticket from "../../customer/Components/Ticket";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Swiper, SwiperSlide } from "swiper/react";
 import { getVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
 import { getAllEventsByVenue } from "../../redux/reducers/apiReducers/eventApiReducer";
 import { getAllWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import { getDIPdetails } from "../../redux/reducers/apiReducers/dipapireducer";
 import MoreWahanaCard from "../Components/MoreWahanaCard";
 // Import Swiper styles
+import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
 
