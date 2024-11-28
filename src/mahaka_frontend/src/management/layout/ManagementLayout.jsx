@@ -35,7 +35,7 @@ const ManagementLayout = () => {
           backend,
           chunkSize: 10,
           pageNo: 0,
-          venueId: currentUserByCaller.assignedVenue,
+          venueId: currentUserByCaller.assignedVenue.id,
         })
       );
     }
@@ -47,7 +47,7 @@ const ManagementLayout = () => {
       dispatch(
         getVenue({
           backend: backend,
-          venueId: currentUserByCaller.assignedVenue,
+          venueId: currentUserByCaller.assignedVenue.id,
         })
       );
     }
