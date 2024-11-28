@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
 
 import { HiArrowLeftCircle, HiOutlineMapPin } from "react-icons/hi2";
-import { formatDateAndTime } from "./EventManager";
+// import { formatDateAndTime } from "./EventManager";
 
 const VenueDetailPage = () => {
   const dispatch = useDispatch();
@@ -18,20 +18,11 @@ const VenueDetailPage = () => {
 
   if (loading || !currentVenue) return <LoadingScreen />;
 
-  const startInterVal = formatDateAndTime(
-    parseInt(currentVenue[1].Details.StartDate)
-  );
-  const endInterVal = formatDateAndTime(
-    parseInt(currentVenue[1].Details.EndDate)
-  );
-
-  console.log(startInterVal);
-
   return (
     <div className="flex w-full flex-col">
       <div className="relative h-40 w-full bg-accent-100 px-8 dark:bg-accent-700 sm:h-48 sm:px-12">
         <img
-          src={currentVenue[1].banner.data}
+          src={currentVenue.banner.data}
           alt="framer_3"
           className="absolute inset-0 h-full w-full object-cover"
         ></img>
@@ -47,7 +38,7 @@ const VenueDetailPage = () => {
           <div className="-mt-16 flex flex-auto items-end">
             <div className="ring-bg-card flex h-32 w-32 items-center justify-center overflow-hidden rounded-full ring-4">
               <img
-                src={currentVenue[1].logo.data}
+                src={currentVenue.logo.data}
                 alt="frame_4"
                 className="h-full w-full object-cover"
               ></img>
@@ -59,12 +50,12 @@ const VenueDetailPage = () => {
             </div> */}
           </div>
           <div className="mt-3 truncate text-4xl font-bold">
-            {currentVenue[1].Title}
+            {currentVenue.Title}
           </div>
           <div className="mt-2 flex flex-wrap items-center">
-            <div className="mb-3 mr-3 flex items-center justify-center rounded-full bg-gray-100 px-3 py-1 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300">
+            <div className="mb-3 mr-3 flex items-center justify-center rounded-full bg-icon px-3 py-1 leading-normal text-white dark:bg-gray-700 dark:text-gray-300">
               <span className="whitespace-nowrap text-sm font-medium">
-                Creator : {currentVenue[1].creator.toText()}
+                Creator : {currentVenue.creator.toText()}
               </span>
             </div>
           </div>
@@ -72,13 +63,13 @@ const VenueDetailPage = () => {
             <div className="flex sm:items-center">
               <HiOutlineMapPin size={24} />
               <div className="ml-6 leading-6">
-                {currentVenue[1].Details.Location}
+                {currentVenue.Details.Location}
               </div>
             </div>
             <div className="flex sm:items-center">
               <p>Maximum Capacity</p>
-              <div className="ml-6 leading-6">
-                {parseInt(currentVenue[1].capacity)}
+              <div className="ml-6 leading-6 font-medium">
+                {parseInt(currentVenue.capacity)}
               </div>
             </div>
             {/* <div className="flex sm:items-center">
@@ -91,12 +82,24 @@ const VenueDetailPage = () => {
             </div> */}
             <div className="flex sm:items-center">
               <p>Venue id</p>
-              <div className="ml-6 leading-6">{currentVenue[1].id}</div>
+              <div className="ml-6 leading-6">{currentVenue.id}</div>
             </div>
+            {/* <div className="flex sm:items-center">
+              <p>Total events</p>
+              <div className="ml-6 leading-6 font-medium">
+                {currentVenue.Events[0].length}
+              </div>
+            </div>
+            <div className="flex sm:items-center">
+              <p>Total wahanas</p>
+              <div className="ml-6 leading-6 font-medium">
+                {currentVenue.Wahanas[0].length}
+              </div>
+            </div> */}
             <div className="flex">
               <p>Venue Description</p>
               <div className="prose prose-sm ml-6 max-w-none">
-                <p>{currentVenue[1].Description}</p>
+                <p>{currentVenue.Description}</p>
               </div>
             </div>
           </div>
@@ -106,7 +109,7 @@ const VenueDetailPage = () => {
   );
 };
 
-const LoadingScreen = () => {
+export const LoadingScreen = () => {
   return (
     <div className="flex w-full flex-col">
       <div className="relative h-40 w-full bg-accent-100 px-8 dark:bg-accent-700 sm:h-48 sm:px-12">
@@ -295,7 +298,7 @@ export default VenueDetailPage;
 //   // }
 
 //   const venue =
-//     currentVenue && Array.isArray(currentVenue) ? currentVenue[1] : null;
+//     currentVenue && Array.isArray(currentVenue) ? currentVenue : null;
 
 //   if (!venue) {
 //     return <div className="p-6">No venue data available.</div>;

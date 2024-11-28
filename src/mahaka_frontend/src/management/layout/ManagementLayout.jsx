@@ -6,6 +6,7 @@ import useNavigationControl from "../../common/hooks/useNavigationControl";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllEventsByVenue } from "../../redux/reducers/apiReducers/eventApiReducer";
+import { getVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
 
 const ManagementLayout = () => {
   const { state, toggleNavigation } = useNavigationControl();
@@ -38,7 +39,19 @@ const ManagementLayout = () => {
         })
       );
     }
-  }, currentUserByCaller);
+  }, [currentUserByCaller]);
+
+  // user wise venue
+  useEffect(() => {
+    if (currentUserByCaller) {
+      dispatch(
+        getVenue({
+          backend: backend,
+          venueId: currentUserByCaller.assignedVenue,
+        })
+      );
+    }
+  }, [currentUserByCaller]);
 
   return (
     <>
