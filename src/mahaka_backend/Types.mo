@@ -117,8 +117,8 @@ module {
         logo : LogoResult;
         banner : LogoResult;
         Details : venueDetails;
-        Events : List.List<Text>;
-        Wahanas : List.List<Text>;
+        Events : [Text];
+        Wahanas : [Text];
         capacity : Nat;
         Collection_id : Principal;
         creator : Principal;
@@ -129,13 +129,18 @@ module {
         EventIds : List.List<Text>;
     };
 
+    public type assignedVenueDetails = {
+        id : Text;
+        title : Text
+    };
+
     public type User = {
         id : Principal;
         firstName : Text;
         lastName : Text;
         email : Text;
         role : Roles;
-        assignedVenue : Text;
+        assignedVenue : assignedVenueDetails;
     };
 
     public type Testimonial = {

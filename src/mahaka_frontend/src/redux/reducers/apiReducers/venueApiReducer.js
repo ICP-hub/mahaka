@@ -111,7 +111,7 @@ export const createVenue = createAsyncThunk(
         description
       );
       action(false);
-      // console.log("response creating venue", response);
+      console.log("response creating venue", response);
       return response;
     } catch (error) {
       console.error("Error creating venue", error);
@@ -182,7 +182,7 @@ const venueSlice = createSlice({
       })
       .addCase(getVenue.fulfilled, (state, action) => {
         state.loading = false;
-        state.currentVenue = action.payload;
+        state.currentVenue = action.payload.ok;
         state.error = null;
       })
       .addCase(getVenue.rejected, (state, action) => {

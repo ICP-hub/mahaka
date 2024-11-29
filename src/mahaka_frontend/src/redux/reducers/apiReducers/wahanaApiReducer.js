@@ -15,42 +15,32 @@ const initialState = {
   currentWahana: null, // Add currentWahana to hold the selected wahana
   searchedWahana: null,
   searchedWahanaLoading: false,
+  wahanasByVenue: null,
+  singleWahanaLoading: false,
+  deleteWahanaLoading: false,
 };
 
 // Creating a wahana
 export const createWahana = createAsyncThunk(
   "wahana/createWahana",
-  async ({
-    backend,
-    venueId,
-    name,
-    symbol,
-    decimal,
-    totalSupply,
-    description,
-    featured,
-    banner,
-    details,
-    priceFiat,
-
-    price,
-  }) => {
+  async ({ backend, wahanaData, setIsModalOpen }) => {
+    console.log(wahanaData);
     try {
-      console.log("wahana reducer featured", featured);
       const response = await backend.createWahana(
-        venueId,
-        name,
-        symbol,
-        decimal,
-        totalSupply,
-        description,
-        details,
-        featured,
-        banner,
-        priceFiat,
-        price
+        wahanaData.venueId,
+        wahanaData.title,
+        wahanaData.symbol,
+        wahanaData.decimal,
+        wahanaData.totalSupply,
+        wahanaData.description,
+        wahanaData.details,
+        wahanaData.isFeatured,
+        wahanaData.banner,
+        wahanaData.priceIDR,
+        wahanaData.priceICP
       );
-      console.log("wahana created successfully");
+      // console.log("wahana created successfully", response);
+      setIsModalOpen(false);
       return response;
     } catch (error) {
       console.error("Error creating wahana:", error);
@@ -123,7 +113,7 @@ export const getWahana = createAsyncThunk(
       console.log(selectedVenue);
 
       const response = await backend.getWahana(selectedWahana, selectedVenue);
-      console.log(response, "response");
+      // console.log(response, "response");
       return response;
     } catch (error) {
       console.error("Error getting wahanas:", error);
@@ -139,7 +129,7 @@ export const getAllWahanas = createAsyncThunk(
   async ({ backend, chunkSize, pageNo }) => {
     try {
       const response = await backend.getAllWahanas(chunkSize, pageNo);
-      console.log(response, "response");
+      // console.log(response, "response of getting wahanas");
       return response;
     } catch (error) {
       console.error("error fetching all wahanas", e);
@@ -170,9 +160,18 @@ export const searchWahanas = createAsyncThunk(
 // delete wahana
 export const deleteWahana = createAsyncThunk(
   "wahana/deleteWahana",
-  async ({ backend, deleteVenueId, deleteWahanaId }) => {
-    await backend.deleteWahana(deleteVenueId, deleteWahanaId);
-    return deleteWahanaId;
+  async ({ backend, venueId, wahanaId, setIsDelete }) => {
+    try {
+      const response = await backend.deleteWahana(venueId, wahanaId);
+      console.log("delete wahana response", response);
+      setIsDelete(false);
+      notificationManager.success("Wahana deleted successfully!");
+      return wahanaId;
+    } catch (err) {
+      notificationManager.error("Failed to delete wahana");
+      setIsDelete(false);
+      console.error("error deleting wahana", err);
+    }
   }
 );
 
@@ -194,10 +193,9 @@ const wahanaSlice = createSlice({
       .addCase(createWahana.fulfilled, (state, action) => {
 
         state.createWahanaLoader = false;
-        state.wahanas = [...state.wahanas, action.payload.ok];
-          state.wahanaByVenue = [...state.wahanaByVenue, action.payload.ok];
-          state.error = null
-        console.log(action.payload, "create wahana");
+        // console.log(action.payload, "create wahana");
+        state.wahanas.push(action.payload.ok);
+        state.error = null;
         notificationManager.success("Wahana created successfully");
       })
       .addCase(createWahana.rejected, (state, action) => {
@@ -248,32 +246,19 @@ const wahanaSlice = createSlice({
 
       //Getting all wahanas
       .addCase(getAllWahanas.pending, (state) => {
-        state.status = "loading";
+        // state.status = "loading";
         state.loading = true;
         state.error = null;
       })
       .addCase(getAllWahanas.fulfilled, (state, action) => {
         state.loading = false;
-
-        if (action.payload && action.payload.ok.data) {
-          //state.wahanas = action.payload.ok.data;
-          state.wahanas = [...action.payload.ok.data]
-          state.currentPage = action.payload.ok.current_page;
-          state.totalPages = action.payload.ok.Total_pages;
-          // console.log("current wahana page is", state.currentPage)
-        } else {
-          console.warn("Received empty or invalid response from API");
-         // state.wahanas = [];
-          state.currentPage = 1;
-          state.totalPages = 1;
-        }
-        state.error = null;
-        state.status = "succeeded";
+        state.wahanas = action.payload.ok.data;
       })
-      .addCase(getAllWahanas.rejected, (state, action) => {
+      .addCase(getAllWahanas.rejected, (state) => {
+        state.loading = false;
         state.status = "failed";
-        //state.wahanas = [];
-        (state.loading = false), (state.error = action.error.message);
+        state.wahanas = [];
+        // (state.loading = false), (state.error = action.error.message);
         // notificationManager.error("Failed to fetch wahanas");
       })
 
@@ -295,44 +280,35 @@ const wahanaSlice = createSlice({
       // delete wahana
 
       .addCase(deleteWahana.pending, (state) => {
-        state.loading = true;
+        state.deleteWahanaLoading = true;
       })
       .addCase(deleteWahana.fulfilled, (state, action) => {
         console.log("Deleted wahana ID:", action.payload);
-        state.loading = false;
+        state.deleteWahanaLoading = false;
         state.wahanas = state.wahanas.filter(
+          (wahana) => wahana.id !== action.payload
+        );
+        state.wahanasByVenue = state.wahanasByVenue.filter(
           (wahana) => wahana.id !== action.payload
         );
         state.error = null;
       })
       .addCase(deleteWahana.rejected, (state, action) => {
-        console.log("Deleted wahana rejected:", action.payload);
-        state.loading = false;
+        state.deleteWahanaLoading = false;
         state.error = action.error.message;
       })
 
       // Handle getallWahanasbyVenue
       .addCase(getAllWahanasbyVenue.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        state.singleWahanaLoading = true;
       })
       .addCase(getAllWahanasbyVenue.fulfilled, (state, action) => {
-        state.loading = false;
-        if (action.payload && action.payload.ok.data) {
-          state.wahanaByVenue = action.payload.ok.data;
-          state.currentPage = action.payload.ok.current_Page;
-          state.totalPages = action.payload.ok.Total_pages;
-         // console.log("current wahana page is", state.currentPage);
-        } else {
-          console.warn("Received empty or invalid response from API");
-          state.wahanaByVenue = [];
-          state.currentPage = 1;
-          state.totalPages = 1;
-        }
+        state.singleWahanaLoading = false;
+        state.wahanasByVenue = action.payload.ok.data;
       })
       .addCase(getAllWahanasbyVenue.rejected, (state, action) => {
-        state.loading = false;
-        state.wahanaByVenue = [];
+        state.singleWahanaLoading = false;
+        state.wahanasByVenue = [];
         state.error = action.error.message;
         //notificationManager.error("Failed to fetch wahanas");
       });

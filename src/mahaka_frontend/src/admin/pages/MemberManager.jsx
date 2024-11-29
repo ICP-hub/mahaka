@@ -193,7 +193,7 @@ const UpdateMember = ({ member, onToggle, isEditing, setIsEditing }) => {
       role: { [role]: null },
       email: email,
       principal: principalId,
-      venue: selectedVenue,
+      venue: { id: selectedVenue.id, title: selectedVenue.Title },
     };
 
     dispatch(
@@ -296,7 +296,9 @@ const EditDetails = ({
   const permissions = rolePermissions[role] || [];
 
   const handleSelectedVenue = (event) => {
-    setSelectedVenue(event.target.value);
+    const selectedVenueId = event.target.value;
+    const venue = venues.find((venue) => venue.id === selectedVenueId);
+    setSelectedVenue(venue);
   };
 
   const handleDeleteMember = () => {
@@ -402,7 +404,7 @@ const EditDetails = ({
         <div className="font-medium">Assigned Venue*</div>
         <select
           className="w-full border border-border rounded-md px-2 min-h-12 bg-card focus-within:border-secondary"
-          value={selectedVenue}
+          value={selectedVenue ? selectedVenue.id : ""}
           onChange={handleSelectedVenue}
         >
           <option value="" disabled>
@@ -445,11 +447,11 @@ const ViewDetails = ({ member, venues }) => {
   if (!member) return null;
   const permissions = rolePermissions[Object.keys(member.role)[0]] || [];
 
-  const venueTitle = venues.map(({ id, Title }) => {
-    if (id === member.assignedVenue) {
-      return Title;
-    }
-  });
+  // const venueTitle = venues.map(({ id, Title }) => {
+  //   if (id === member.assignedVenue) {
+  //     return Title;
+  //   }
+  // });
 
   return (
     <div>
@@ -488,7 +490,7 @@ const ViewDetails = ({ member, venues }) => {
           <HiOutlineFlag size={24} />
           <div className="ml-6 min-w-0 space-y-1">
             <div className="flex items-center leading-6 cursor-pointer">
-              <div>{venueTitle}</div>
+              <div>{member.assignedVenue.title}</div>
             </div>
           </div>
         </div>
