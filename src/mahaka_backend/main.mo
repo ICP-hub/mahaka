@@ -105,6 +105,12 @@ actor mahaka {
           var elems_count : Nat64 = 0;
      };
 
+
+     // Dashboard stats
+     private stable var totalTickets : Nat = 0;
+     private stable var totalRevenue : Float = 0.0;
+     private stable var users : Nat = 0;
+
      // Payment recepient
      private stable var recepient : Principal = Principal.fromText("7yywi-leri6-n33rr-vskr6-yb4nd-dvj6j-xg2b4-reiw6-dljs7-slclz-2ae");
 
@@ -137,7 +143,8 @@ actor mahaka {
 
      let FiatPayCanister = actor "bd3sg-teaaa-aaaaa-qaaba-cai" : actor {
         create_invoice : shared (Principal,FiatTypes.Request.CreateInvoiceBody) -> async Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>>;
-        get_invoice : (Nat)->async Http.Response<Http.ResponseStatus<FiatTypes.Invoice, {}>>
+        get_invoice : (Nat)->async Http.Response<Http.ResponseStatus<FiatTypes.Invoice, {}>>;
+        get_all_invoices_to_admin : () -> async Http.Response<Http.ResponseStatus<[FiatTypes.Invoice], {}>>
     };
 
      system func preupgrade(){
@@ -433,18 +440,83 @@ actor mahaka {
      /*                   Dashboard                           */
      /*********************************************************/
 
-     public shared ({caller}) func dashboardStats() : async Nat {
+     func getTop3EventsRevenue(): async List.List<{
+          eventId: Text;
+          totalRevenue: Float;
+     }> {
+          let eventTickets = await fetchAllCategoryTickets(_EventTicketsMap);
 
-          let totalTickets = switch(await getAllTickets(0,100000000000)){
+          var revenueByEvent = TrieMap.TrieMap<Text,Float>(Text.equal, Text.hash);
+          for (ticket in List.toArray(eventTickets).vals()) {
+               let eventId = ticket.categoryId;
+               let price : Float = ticket.price;
+
+               revenueByEvent.put(
+                    eventId,
+                    switch (revenueByEvent.get(eventId)) {
+                         case (null) {
+                               price
+                         };
+                         case (?existing) { 
+                              existing + price 
+                         };
+                    }
+               );
+          };
+
+          let revenueArray: [(Text,Float)] = Iter.toArray(revenueByEvent.entries());
+
+          let res : [(Text, Float)] = Array.sort<(Text, Float)>(revenueArray, func (a, b) {
+               let (_, revenue1) = a;
+               let (_, revenue2) = b;
+
+               if (revenue1 > revenue2) {
+                    return #greater;
+               } else if (revenue1 < revenue2) {
+                    return #less;
+               } else {
+                    return #equal;
+               };
+          });
+
+          let top3List = Array.take(res,3);
+          let result = List.map<(Text, Float), { eventId: Text; totalRevenue: Float }>(
+               List.fromArray(top3List),
+               func (entry) {
+                    let (eventId, totalRevenue) = entry;
+                    {
+                         eventId = eventId;
+                         totalRevenue = totalRevenue;
+                    }
+               }
+          );
+
+          return result;
+     };
+
+
+
+
+     public shared ({caller}) func dashboardStats() : async Types.DashboardStats {
+
+          let top3Events : List.List<{eventId: Text; totalRevenue: Float;}> = await getTop3EventsRevenue();
+          let allInvoices = await FiatPayCanister.get_all_invoices_to_admin();
+          let latestTxs : [Types.Invoice] = switch(allInvoices.body){
                case(#err(e)){
                     []
                };
-               case(#ok(obj)){
-                    obj.data
-               };
+               case(#success(invoices)){
+                    let latestOnes =  Array.take(invoices,4);
+                    latestOnes
+               }
           };
-          return Array.size(totalTickets);
-
+          return {
+               totalRevenue = totalRevenue;
+               totalTickets = totalTickets;
+               totalUsers = users;
+               top3Events = top3Events;
+               latestTxs = latestTxs;
+          };
      };
    
      /*********************************************************/
@@ -1262,11 +1334,17 @@ actor mahaka {
                                    e.Events,
                                    func x { x.id != eventId }
                               );
+                              let updated_eventIds_list = List.filter<Text>(
+                                   e.EventIds,
+                                   func x { x != eventId }
+                              );
                               let updated_event_data = {
-                                   e with Events = updated_events_list
+                                   Events = updated_events_list;
+                                   EventIds = updated_eventIds_list;
                               };
                               let event_blob = to_candid(updated_event_data);
                               let event_index = await update_stable(Event_index, event_blob, Events_state);
+                              let updatedVenue = await updateVenuewithEvents(venue_id,List.toArray(updated_event_data.EventIds));
                               _EventsMap.put(venue_id, Event_index);
                               return #ok(true, event_index);
                          };
@@ -1459,10 +1537,10 @@ actor mahaka {
           numOfVisitors: Nat,
           categoryId: Text,
           paymentType: Types.PaymentType,
-          ticketPrice: Types.Price,
+          ticketPrice: Float,
           offlineOrOnline : Types.TicketType,
           saleDate : Time.Time,
-          saleType: Text,
+          saleType: Types.category,
           recepient : Principal,
           caller : Principal
      ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError> {
@@ -1478,28 +1556,23 @@ actor mahaka {
                switch (_ticketResult) {
                     case (#Ok(mintReceipt)) {
                          mintReceipts := List.push(mintReceipt, mintReceipts);
-
-                         let priceToStore: Types.Price = switch (ticketPrice) {
-                              case (#Nat(price)) {
-                                   #Nat(price)
-                              };
-                              case (#Float(price)) {
-                                   #Float(price)
-                              };
-                         };
-                         Debug.print(debug_show(priceToStore));
+                         Debug.print(debug_show(ticketPrice));
                          let ticketSaleInfo: Types.TicketSaleInfo = {
                               ticketId = Nat64.toNat(mintReceipt.token_id);
+                              category = saleType;
                               categoryId = categoryId;
                               paymentType = paymentType;
                               numOfVisitors = 1;
                               saleDate = saleDate;
+                              createdAt = Time.now();
                               ticketIssuer = caller;
                               ticketType = offlineOrOnline; 
                               recepient = recepient;
-                              price = priceToStore;
+                              price = ticketPrice;
                          };
                          let res = await recordTicketSale(categoryId, ticketSaleInfo, saleType);
+                         totalTickets := totalTickets + 1;
+                         totalRevenue := totalRevenue + ticketPrice;
                     };
                     case (#Err(e)) {
                          return #err(#MintErr);
@@ -1527,7 +1600,7 @@ actor mahaka {
           paymentType: Types.PaymentType,
           offlineOrOnline : Types.TicketType,
           saleDate : Time.Time,
-          price: Types.Price,
+          ticketPrice: Float,
           recepient : Principal,
           caller : Principal
      ) : async Result.Result<[icrcTypes.TxIndex], icrcTypes.TransferError> {
@@ -1554,16 +1627,20 @@ actor mahaka {
                          transferReceipts := List.push(transferReceipt, transferReceipts);
                          let ticketSaleInfo: Types.TicketSaleInfo = {
                               ticketId = transferReceipt;
+                              category = #Wahana;
                               categoryId = wahanaId;
                               paymentType = paymentType;
                               numOfVisitors = 1;
                               saleDate = saleDate;
+                              createdAt = Time.now();
                               ticketIssuer = caller;
                               ticketType = offlineOrOnline; 
                               recepient = recepient;
-                              price = price;
+                              price = ticketPrice;
                          };
-                         let res = await recordTicketSale(wahanaId, ticketSaleInfo, "wahana");
+                         let res = await recordTicketSale(wahanaId, ticketSaleInfo, #Wahana);
+                         totalTickets := totalTickets + 1;
+                         totalRevenue := totalRevenue + ticketPrice;
                     };
                     case (#Err(e)) {
                          return #err(e);
@@ -1609,7 +1686,7 @@ actor mahaka {
                                    args.numOfVisitors,
                                    args.categoryId,
                                    args.paymentType,
-                                   #Float(args.ticketPrice),
+                                   args.ticketPrice,
                                    args.offlineOrOnline,
                                    args.saleDate,
                                    args.saleType,
@@ -1651,7 +1728,7 @@ actor mahaka {
                                    args.paymentType,
                                    args.offlineOrOnline,
                                    args.saleDate,
-                                   #Float(args.price),
+                                   args.price,
                                    args.recepient,
                                    args.caller
                               );
@@ -1676,44 +1753,44 @@ actor mahaka {
           };
      };
 
-     private func performICPTransfer(
-          user : Principal,
-          amount : Nat,
-     ) : async Types.Result_3 {
+     // private func performICPTransfer(
+     //      user : Principal,
+     //      amount : Nat,
+     // ) : async Types.Result_3 {
 
-          let fromAccount : Types.Account = {
-               owner = user;
-               subaccount = null;
-          };
+     //      let fromAccount : Types.Account = {
+     //           owner = user;
+     //           subaccount = null;
+     //      };
 
-          let toAccount : Types.Account = {
-               owner = recepient;
-               subaccount = null;
-          };
-          let balanceCheck = Principal.toLedgerAccount(user, null);
-          let balanceResult = await LedgerCanister.account_balance({
-               account = balanceCheck;
-          });
-          Debug.print(
-               "Transferring "
-               # " balance "
-               # debug_show (balanceResult)
-          );
-          if (Nat64.toNat(balanceResult.e8s) < amount) {
-               throw Error.reject("Insufficient balance to create collection. Please ensure you have enough ICP.");
-          };
-          let transferArgs : Types.TransferFromArgs = {
-            to = toAccount;
-            fee = null;
-            spender_subaccount = null;
-            from = fromAccount;
-            memo = null;
-            created_at_time = null;
-            amount = amount;
-        };
-        let transferResponse = await LedgerCanister.icrc2_transfer_from(transferArgs);
-        transferResponse
-     };
+     //      let toAccount : Types.Account = {
+     //           owner = recepient;
+     //           subaccount = null;
+     //      };
+     //      let balanceCheck = Principal.toLedgerAccount(user, null);
+     //      let balanceResult = await LedgerCanister.account_balance({
+     //           account = balanceCheck;
+     //      });
+     //      Debug.print(
+     //           "Transferring "
+     //           # " balance "
+     //           # debug_show (balanceResult)
+     //      );
+     //      if (Nat64.toNat(balanceResult.e8s) < amount) {
+     //           throw Error.reject("Insufficient balance to create collection. Please ensure you have enough ICP.");
+     //      };
+     //      let transferArgs : Types.TransferFromArgs = {
+     //        to = toAccount;
+     //        fee = null;
+     //        spender_subaccount = null;
+     //        from = fromAccount;
+     //        memo = null;
+     //        created_at_time = null;
+     //        amount = amount;
+     //    };
+     //    let transferResponse = await LedgerCanister.icrc2_transfer_from(transferArgs);
+     //    transferResponse
+     // };
 
      public shared ({caller}) func buyVenueTicket(
           venueId: Types.venueId,
@@ -1739,20 +1816,6 @@ actor mahaka {
                               return #err("Cash option is not available");
                               // await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receivers, numOfVisitors, venueId, paymentType, _ticket_type.price, "venue", caller);
                          };
-                         case (#ICP) {
-                              
-                              
-                              let transferResult = await performICPTransfer(caller, (_ticket_type.price * 10**8) * numOfVisitors );
-                              switch (transferResult) {
-                                   case (#Ok(_)) {
-                                        await processMint(collectionActor, _metadata, _ticket_type, receiver, numOfVisitors, venueId, paymentType, #Nat(_ticket_type.price), #Online, saleDate, "venue", receiver, caller);
-                                   };
-                                   case (#Err(error)) {
-                                        // throw Error.reject(debug_show ("Transfer Error", error));
-                                        return #err(handleTransferError(error));
-                                   };
-                              };
-                         };
                          case (#Card) {
                               var items : [FiatTypes.Item] = [];
                               
@@ -1763,12 +1826,12 @@ actor mahaka {
                                         categoryTitle = venue.Title;
                                         name = "Venue Ticket";
                                         quantity = 1;
-                                        price = _ticket_type.priceFiat;
+                                        price = _ticket_type.price;
                                    }]);
                               };
                               let visitorsCount = Float.fromInt(numOfVisitors);
                               let invoice : FiatTypes.Request.CreateInvoiceBody = {
-                                   amount = _ticket_type.priceFiat * visitorsCount ;
+                                   amount = _ticket_type.price * visitorsCount ;
                                    paymentMethod = "Stripe";
                                    currency = "IDR";
                                    items = items
@@ -1786,10 +1849,10 @@ actor mahaka {
                                              numOfVisitors = numOfVisitors;
                                              categoryId = venueId;
                                              paymentType = paymentType;
-                                             ticketPrice = _ticket_type.priceFiat;
+                                             ticketPrice = _ticket_type.price;
                                              offlineOrOnline = #Online;
                                              saleDate = saleDate;
-                                             saleType = "venue";
+                                             saleType = #Venue;
                                              recepient = receiver;
                                              caller = caller;
                                         };
@@ -1832,18 +1895,6 @@ actor mahaka {
                               return #err("Cash option is not available");
                               // await processMint(collectionActor, _metadata, _ticket_type.ticket_type, receivers, numOfVisitors, _eventId, paymentType, _ticket_type.price, "event", caller);
                          };
-                         case (#ICP) {
-                              let transferResult = await performICPTransfer(caller, _ticket_type.price * numOfVisitors);
-                              switch (transferResult) {
-                                   case (#Ok(_)) {
-                                        await processMint(collectionActor, _metadata, _ticket_type, receiver, numOfVisitors, _eventId, paymentType, #Nat(_ticket_type.price), #Online, saleDate, "event", receiver, caller);
-                                   };
-                                   case (#Err(error)) {
-                                        // throw Error.reject(debug_show ("Transfer Error", error));
-                                        return #err(handleTransferError(error));
-                                   };
-                              };
-                         };
                          case (#Card) {
                               var items : [FiatTypes.Item] = [];
                               
@@ -1854,12 +1905,12 @@ actor mahaka {
                                         categoryTitle = event.title;
                                         name = "Event Ticket";
                                         quantity = 1;
-                                        price = _ticket_type.priceFiat;
+                                        price = _ticket_type.price;
                                    }]);
                               };
                               let visitorsCount = Float.fromInt(numOfVisitors);
                               let invoice : FiatTypes.Request.CreateInvoiceBody = {
-                                   amount = _ticket_type.priceFiat * visitorsCount;
+                                   amount = _ticket_type.price * visitorsCount;
                                    paymentMethod = "Stripe";
                                    currency = "IDR";
                                    items = items
@@ -1877,10 +1928,10 @@ actor mahaka {
                                              numOfVisitors = numOfVisitors;
                                              categoryId = _eventId;
                                              paymentType = paymentType;
-                                             ticketPrice = _ticket_type.priceFiat;
+                                             ticketPrice = _ticket_type.price;
                                              offlineOrOnline = #Online;
                                              saleDate = saleDate;
-                                             saleType = "venue";
+                                             saleType = #Event;
                                              recepient = receiver;
                                              caller = caller;
                                         };
@@ -1927,18 +1978,6 @@ actor mahaka {
                               return #err("Cash option is not available");
                               // await processTransfer(collectionActor, receivers, numOfVisitors, wahanaId, paymentType, wahana.price,caller);
                          };
-                         case (#ICP) {
-                              let transferResult = await performICPTransfer(caller, wahana.priceICP * numOfVisitors);
-                              switch (transferResult) {
-                                   case (#Ok(_)) {
-                                        await processTransfer(collectionActor, receiver, numOfVisitors, wahanaId, paymentType, #Online, saleDate, #Nat(wahana.priceICP), receiver, caller);
-                                   };
-                                   case (#Err(error)) {
-                                        // throw Error.reject(debug_show ("Transfer Error", error));
-                                        return #err(handleTransferError(error));
-                                   };
-                              };
-                         };
                          case (#Card) {
                               var items : [FiatTypes.Item] = [];
                               for (i in Iter.range(0, numOfVisitors - 1)) {
@@ -1948,12 +1987,12 @@ actor mahaka {
                                         categoryTitle = wahana.ride_title;
                                         name = "Wahana Ticket";
                                         quantity = 1;
-                                        price = wahana.priceFiat;
+                                        price = wahana.price;
                                    }]);
                               };
                               let visitorsCount = Float.fromInt(numOfVisitors);
                               let invoice : FiatTypes.Request.CreateInvoiceBody = {
-                                   amount = wahana.priceFiat * visitorsCount;
+                                   amount = wahana.price * visitorsCount;
                                    paymentMethod = "Stripe";
                                    currency = "IDR";
                                    items = items
@@ -1971,7 +2010,7 @@ actor mahaka {
                                              paymentType = paymentType;
                                              offlineOrOnline = #Online;
                                              saleDate = saleDate;
-                                             price = wahana.priceFiat;
+                                             price = wahana.price;
                                              recepient = receiver;
                                              caller = caller;
                                         };
@@ -2025,19 +2064,7 @@ actor mahaka {
           };
           switch (paymentType) {
                case (#Cash) {
-                    await processMint(collectionActor, _metadata, _ticket_type, receiver, numOfVisitors, venueId, paymentType, #Float(_ticket_type.priceFiat), #Offline,  saleDate, "venue", receiver, caller);
-               };
-               case (#ICP) {
-                    let transferResult = await performICPTransfer(caller, _ticket_type.price * numOfVisitors);
-                    switch (transferResult) {
-                         case (#Ok(_)) {
-                              await processMint(collectionActor, _metadata, _ticket_type, receiver, numOfVisitors, venueId, paymentType, #Nat(_ticket_type.price), #Offline, saleDate, "venue", receiver, caller);
-                         };
-                         case (#Err(error)) {
-                              // throw Error.reject(debug_show ("Transfer Error", error));
-                              return #err(handleTransferError(error));
-                         };
-                    };
+                    await processMint(collectionActor, _metadata, _ticket_type, receiver, numOfVisitors, venueId, paymentType, _ticket_type.price, #Offline,  saleDate, #Venue, receiver, caller);
                };
                case (#Card) {
                     // throw Error.reject("Card option is not available");
@@ -2081,19 +2108,7 @@ actor mahaka {
                     };
                     switch (paymentType) {
                          case (#Cash) {
-                              await processMint(collectionActor, _metadata, _ticket_type, receiver, numOfVisitors, _eventId, paymentType, #Float(_ticket_type.priceFiat), #Offline, saleDate, "event", receiver, caller);
-                         };
-                         case (#ICP) {
-                              let transferResult = await performICPTransfer(caller, _ticket_type.price * numOfVisitors);
-                              switch (transferResult) {
-                                   case (#Ok(_)) {
-                                        await processMint(collectionActor, _metadata, _ticket_type, receiver, numOfVisitors, _eventId, paymentType, #Nat(_ticket_type.price), #Offline, saleDate, "event", receiver, caller);
-                                   };
-                                   case (#Err(error)) {
-                                        // throw Error.reject(debug_show ("Transfer Error", error));
-                                        return #err(handleTransferError(error));
-                                   };
-                              };
+                              await processMint(collectionActor, _metadata, _ticket_type, receiver, numOfVisitors, _eventId, paymentType, _ticket_type.price, #Offline, saleDate, #Event, receiver, caller);
                          };
                          case (#Card) {
                               // throw Error.reject("Card option is not available");
@@ -2144,19 +2159,7 @@ actor mahaka {
                     };
                     switch (paymentType) {
                          case (#Cash) {
-                              await processTransfer(collectionActor, receiver, numOfVisitors, wahanaId, paymentType, #Offline, saleDate,  #Float(wahana.priceFiat), receiver, caller);
-                         };
-                         case (#ICP) {
-                              let transferResult = await performICPTransfer(caller, wahana.priceICP * numOfVisitors);
-                              switch (transferResult) {
-                                   case (#Ok(_)) {
-                                        await processTransfer(collectionActor, receiver, numOfVisitors, wahanaId, paymentType, #Offline, saleDate, #Nat(wahana.priceICP), receiver, caller);
-                                   };
-                                   case (#Err(error)) {
-                                        // throw Error.reject(debug_show ("Transfer Error", error));
-                                        return #err(handleTransferError(error));
-                                   };
-                              };
+                              await processTransfer(collectionActor, receiver, numOfVisitors, wahanaId, paymentType, #Offline, saleDate,  wahana.price, receiver, caller);
                          };
                          case (#Card) {
                               // throw Error.reject("Card option is not available");
@@ -2839,18 +2842,18 @@ actor mahaka {
      public shared ({caller}) func recordTicketSale(
           categoryId: Text,
           saleInfo: Types.TicketSaleInfo,
-          saleType: Text
+          saleType: Types.category
      ) : async Result.Result<Text, Text> {
           switch (saleType) {
-               case ("venue") {
+               case (#Venue) {
                     let index = await updateTicketSales(categoryId, saleInfo, _VenueTicketsMap, Ticket_state);
                     return #ok("Ticket sale recorded for venue");
                };
-               case ("event") {
+               case (#Event) {
                     let index = await updateTicketSales(categoryId, saleInfo, _EventTicketsMap, Ticket_state);
                     return #ok("Ticket sale recorded for event");
                };
-               case ("wahana") {
+               case (#Wahana) {
                     let index = await updateTicketSales(categoryId, saleInfo, _WahanaTicketsMap, Ticket_state);
                     return #ok("Ticket sale recorded for wahana");
                };
@@ -2902,6 +2905,9 @@ actor mahaka {
                     let user_blob = to_candid(user);
                     let user_index = await stable_add(user_blob, Users_state);
                     Users.put(principalId, user_index);
+                    if(role == #user){
+                         users := users + 1;
+                    };
                     return #ok(user, user_index);
                };
                case (?v){
@@ -2945,6 +2951,7 @@ actor mahaka {
                     let user_blob = to_candid(user);
                     let user_index = await stable_add(user_blob, Users_state);
                     Users.put(principalId, user_index);
+                    users := users + 1;
                     return #ok(user, user_index);
                };
                case (?v){
@@ -3193,8 +3200,7 @@ actor mahaka {
           _details : Types.wahanaDetails,
           featured : Bool,
           banner : Types.LogoResult, 
-          priceFiat : Float,
-          priceICP : Nat
+          price : Float,
      ) : async Result.Result<Types.Wahana_details, Types.UpdateUserError> {
           // if (Principal.isAnonymous(user)) {
           //      return #err(#UserNotAuthenticated); 
@@ -3246,8 +3252,7 @@ actor mahaka {
                banner = banner;
                description = description;
                details = _details;
-               priceFiat = priceFiat;
-               priceICP = priceICP;
+               price = price;
                ride_title = _name;
                creator = user;
                venueId = venueId;
@@ -3687,11 +3692,17 @@ actor mahaka {
                                    w.Wahanas,
                                    func (x: Types.Wahana_details) : Bool { x.id != wahanaId }
                               );
-                              let updated_event_data = {
-                                   w with Wahanas = updated_wahanas_list 
+                              let updated_wahanaIds_list = List.filter<Text>(
+                                   w.WahanaIds,
+                                   func x { x != wahanaId }
+                              );
+                              let updated_wahana_data = {
+                                   Wahanas = updated_wahanas_list ;
+                                   WahanaIds = updated_wahanaIds_list; 
                               };
-                              let wahana_blob = to_candid(updated_event_data);
+                              let wahana_blob = to_candid(updated_wahana_data);
                               let wahana_index = await update_stable(Wahana_index, wahana_blob, Wahana_state);
+                              let updatedVenue = await updateVenuewithWahanas(venue_id,List.toArray(updated_wahana_data.WahanaIds));
                               _WahanaMap.put(venue_id, wahana_index);
                               return #ok((true, wahana_index));
                          };
