@@ -37,7 +37,7 @@ const MgtTicket = () => {
 
   useEffect(() => {
     dispatch(
-      getVenue({ backend, venueId: currentUserByCaller?.assignedVenue })
+      getVenue({ backend, venueId: currentUserByCaller?.assignedVenue?.id })
     );
 
     // Automatically select the first venue and fetch its ticket details
@@ -48,12 +48,12 @@ const MgtTicket = () => {
         backend,
         chunkSize: 100,
         pageNo: 0,
-        venueId: currentVenue.ok?.id,
+        venueId: currentVenue?.id,
       })
     );
     // Automatically select the first venue and fetch its ticket details
     if (!venuesLoading && currentVenue) {
-      const defaultVenue = currentVenue.ok;
+      const defaultVenue = currentVenue;
       console.log(currentVenue);
 
       fetchTicketDetails(defaultVenue);
@@ -172,77 +172,39 @@ const MgtTicket = () => {
 
       {/* Venue Selection */}
 
-      {venuesLoading ? <div>loading...</div> : <p>{currentVenue.ok?.Title}</p>}
+      {venuesLoading ? (
+        <div>loading...</div>
+      ) : (
+        <p className="text-2xl">{currentVenue?.Title}</p>
+      )}
 
       {/* Show Loader or Ticket Details */}
       {loadingDetails ? (
         <p>Loading ticket details...</p>
       ) : ticketDetails ? (
         <div>
-          <div>
-            <Swiper
-              spaceBetween={40}
-              slidesPerView={1}
-              breakpoints={{
-                640: {
-                  slidesPerView: 1,
-                },
-                768: {
-                  slidesPerView: 1,
-                },
-                1024: {
-                  slidesPerView: 2,
-                },
-              }}
-              autoplay={{
-                delay: 3000,
-                disableOnInteraction: false,
-              }}
-              pagination={{
-                clickable: true,
-              }}
-              modules={[Autoplay, Pagination]}
-              className="mySwiper px-4 sm:px-6 lg:px-8 mx-auto"
-            >
-              <SwiperSlide>
-                <Ticket
-                  type={"GROUP"}
-                  gradientClass={ticketData[0].gradientClass}
-                  name={"Group Tickets"}
-                  description={ticketDetails?.description || "description"}
-                  price={parseInt(ticketDetails?.gTicket_price) || 1}
-                  availability={parseInt(ticketDetails?.gTicket_limit) || 4}
-                  highlightClass={ticketData[0].highlightClass}
-                  selectedVenue={currentVenue.ok?.id}
-                />
-              </SwiperSlide>
+          <div className="flex justify-between  ">
+            <Ticket
+              type={"GROUP"}
+              gradientClass={ticketData[0].gradientClass}
+              name={"Group Tickets"}
+              description={ticketDetails?.description || "description"}
+              price={parseInt(ticketDetails?.gTicket_price) || 1}
+              availability={parseInt(ticketDetails?.gTicket_limit) || 4}
+              highlightClass={ticketData[0].highlightClass}
+              selectedVenue={currentVenue?.id}
+            />
 
-              <SwiperSlide>
-                <Ticket
-                  type={"SINGLE"}
-                  gradientClass={ticketData[1].gradientClass}
-                  name={"Single Tickets"}
-                  description={ticketDetails?.description || "description"}
-                  price={parseInt(ticketDetails?.sTicket_price) || 1}
-                  availability={parseInt(ticketDetails?.sTicket_limit) || 4}
-                  highlightClass={ticketData[1].highlightClass}
-                  selectedVenue={currentVenue.ok?.id}
-                />
-              </SwiperSlide>
-
-              <SwiperSlide>
-                <Ticket
-                  type={"VIP"}
-                  gradientClass={ticketData[2].gradientClass}
-                  name={"VIP Tickets"}
-                  description={ticketDetails?.description || "description"}
-                  price={parseInt(ticketDetails?.vTicket_price) || 1}
-                  availability={parseInt(ticketDetails?.vTicket_limit) || 4}
-                  highlightClass={ticketData[2].highlightClass}
-                  selectedVenue={currentVenue.ok?.id}
-                />
-              </SwiperSlide>
-            </Swiper>
+            <Ticket
+              type={"SINGLE"}
+              gradientClass={ticketData[1].gradientClass}
+              name={"Single Tickets"}
+              description={ticketDetails?.description || "description"}
+              price={parseInt(ticketDetails?.sTicket_price) || 1}
+              availability={parseInt(ticketDetails?.sTicket_limit) || 4}
+              highlightClass={ticketData[1].highlightClass}
+              selectedVenue={currentVenue?.id}
+            />
           </div>
         </div>
       ) : (
@@ -298,12 +260,12 @@ const MgtTicket = () => {
                 <SwiperSlide>
                   <EventTickets
                     type={"SINGLE"}
-                    gradientClass={ticketData.ok.gradientClass}
+                    gradientClass={ticketData.gradientClass}
                     tickets={eventDetails}
                     selectedVenue={selectedEvent}
                     id={selectedVenue?.id}
                     availability={parseInt(ticketDetails?.sTicket_limit) || 4}
-                    highlightClass={ticketData.ok.highlightClass}
+                    highlightClass={ticketData.highlightClass}
                   />
                 </SwiperSlide>
               </Swiper>

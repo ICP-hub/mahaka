@@ -61,7 +61,7 @@ export default function Ticket({
   };
 
   return (
-    <div className="flex justify-center py-5">
+    <div className="flex justify-center w-1/2 p-2 py-5">
       {/* Ticket Card */}
       <div
         onClick={toggleModal}

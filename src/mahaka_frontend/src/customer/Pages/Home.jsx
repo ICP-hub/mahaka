@@ -59,30 +59,43 @@ export default function Home() {
   const { wahanas } = useSelector((state) => state.wahana);
   console.log("venues in home", venues);
   const { backend } = useSelector((state) => state.authentication);
-  const {  attractionbanners, banners ,  bannerLoading} = useSelector((state) => state.banner);
- const {  testimonials } = useSelector((state) => state.testimonial);
-//  const { banners } = useSelector((state) => state.banner);
- console.log("testimonials in home",  testimonials);
+  const { attractionbanners, banners, bannerLoading } = useSelector(
+    (state) => state.banner
+  );
+  const { testimonials } = useSelector((state) => state.testimonial);
+  //  const { banners } = useSelector((state) => state.banner);
+  console.log("testimonials in home", testimonials);
 
- console.log("Attraction Banners home:", attractionbanners);
- console.log("Third Party Banners home:", banners);
+  console.log("Attraction Banners home:", attractionbanners);
+  console.log("Third Party Banners home:", banners);
   const dispatch = useDispatch();
   console.log(wahanas, "wahanas");
 
-// const SkeletonLoader = ()=>{
+  // const SkeletonLoader = ()=>{
 
-//   return (
-//     <>
-//     <div className = "p-3">
-//       <div className = "bg-gray-500 h-30 min-w-full">
+  //   return (
+  //     <>
+  //     <div className = "p-3">
+  //       <div className = "bg-gray-500 h-30 min-w-full">
 
-//       </div>
-//     </div>
-    
-    
-//     </>
-//   )
-// }
+  //       </div>
+  //     </div>
+
+  //     </>
+  //   )
+  // }
+
+  const chunkArray = (arr, sizes) => {
+    let result = [];
+    let currentIndex = 0;
+
+    sizes.forEach((size) => {
+      result.push(arr.slice(currentIndex, currentIndex + size));
+      currentIndex += size;
+    });
+
+    return result;
+  };
 
   const layoutConfigs = [
     {
@@ -150,41 +163,36 @@ export default function Home() {
     },
   ];
 
-  const SkeletonLoaderAttraction = ()=>{
-
+  const SkeletonLoaderAttraction = () => {
     return (
       <>
-      <div className = "mx-10 mt-15">
-        <div className = "bg-gray-400 h-40 md:h-80 rounded-lg min-w-full animate-pulse p-4">
-          <div className = "flex flex-col md:mt-10 mx-3 ">
-            <div className = "bg-gray-300 h-4 md:h-5 w-[25%] my-2 rounded-lg"></div>
-            <div className = "bg-gray-300 h-3 md:h-6 w-[20%]   my-2 rounded-lg"></div>
-            <div className = "bg-gray-300 h-3 md:h-4 w-[25%] my-2 rounded-lg"></div>
-            <div className = "bg-gray-300 h-5 md:h-10 w-[14%]  my-2 rounded-lg"></div>
+        <div className="mx-10 mt-15">
+          <div className="bg-gray-400 h-40 md:h-80 rounded-lg min-w-full animate-pulse p-4">
+            <div className="flex flex-col md:mt-10 mx-3 ">
+              <div className="bg-gray-300 h-4 md:h-5 w-[25%] my-2 rounded-lg"></div>
+              <div className="bg-gray-300 h-3 md:h-6 w-[20%]   my-2 rounded-lg"></div>
+              <div className="bg-gray-300 h-3 md:h-4 w-[25%] my-2 rounded-lg"></div>
+              <div className="bg-gray-300 h-5 md:h-10 w-[14%]  my-2 rounded-lg"></div>
+            </div>
           </div>
         </div>
-      </div>
       </>
-    )
-  }
-  
-  const SkeletonLoaderThirdParty = ()=>{
+    );
+  };
 
+  const SkeletonLoaderThirdParty = () => {
     return (
       <>
-      <div>
-        <div className = "bg-gray-400 h-50 w-auto rounded-lg animate-pulse shadow-lg">
+        <div>
+          <div className="bg-gray-400 h-50 w-auto rounded-lg animate-pulse shadow-lg"></div>
         </div>
-      </div>
       </>
-    )
-  }
-  
+    );
+  };
+
   return (
     <>
-    {bannerLoading?<SkeletonLoaderAttraction/>:
-      <HeroSider/>
-    }
+      {bannerLoading ? <SkeletonLoaderAttraction /> : <HeroSider />}
       <section className="py-12">
         {/* -------------------------------------venues section start------------------------------ */}
 
@@ -367,125 +375,52 @@ export default function Home() {
         {/* --------------------------------venues section end-------------------------------- */}
 
         {/* third party BANNER section start*/}
-        {bannerLoading ?
-        (
-        <div className = "my-10 mx-10">
-          
-        <div className = "bg-gray-400 h-50 w-full rounded-lg animate-pulse shadow-lg">
-        </div>
-        </div>
-        )
-        :
-        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-1 md:grid-cols-1  gap-[33px]">
-            {banners.slice(0, 1).map((banner) => (
-              <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden">
-                {/* <p className ="text-slate-700 mx-2 my-2">{banner?.description}</p> */}
-                <a
-                  href={
-                    banner?.redirectUrl?.startsWith("http")
-                      ? banner.redirectUrl
-                      : `https://${banner?.redirectUrl}`
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <img
-                    src={banner?.image}
-                    alt="image"
-                    className="w-full  h-[100%] object-cover object-center"
-                  />
-                </a>
+
+        {bannerLoading ? (
+          <div className="my-10 mx-10">
+            <div className="bg-gray-400 h-50 w-full px-4 rounded-lg animate-pulse shadow-lg"></div>
+          </div>
+        ) : (
+          <div className="max-w-7xl mx-auto py-8 sm:px-6">
+            {/* Group banners into chunks of 1, 2, 3 (or more if needed) */}
+            {chunkArray(banners, [1, 2, 3]).map((group, index) => (
+              <div
+                key={index}
+                className={`grid ${
+                  index === 0
+                    ? "lg:grid-cols-1 md:grid-cols-1"
+                    : index === 1
+                    ? "lg:grid-cols-2 md:grid-cols-2"
+                    : "lg:grid-cols-3 md:grid-cols-3"
+                } gap-[33px] my-5 mx-10`}
+              >
+                {group.map((banner, bannerIndex) => (
+                  <div
+                    key={bannerIndex}
+                    className="w-full h-[204px] shadow-lg rounded-2xl overflow-hidden"
+                  >
+                    <a
+                      href={
+                        banner?.redirectUrl?.startsWith("http")
+                          ? banner.redirectUrl
+                          : `https://${banner?.redirectUrl}`
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <img
+                        src={banner?.image}
+                        alt="banner"
+                        className="w-full h-[100%] object-cover object-center"
+                      />
+                    </a>
+                  </div>
+                ))}
               </div>
             ))}
           </div>
-        </div>
-         }
-        {/* third party BANNER section end*/}
-        {/* 2 Grid card  start*/}
-        {/* {bannerLoading ?
-        <div>
-        <div className = "my-5 mx-10 flex">
-          
-        <div className = "bg-gray-400 h-50 w-auto rounded-lg animate-pulse">
-        </div>
-        <div className = "bg-gray-400 h-50 w-auto rounded-lg animate-pulse">
-        </div>
-        </div>
-        </div> */}
-         {bannerLoading ?
-         (
-        <div className = "my-10 mx-10 flex gap-6">
-          
-        <div className = "bg-gray-400 h-50 w-full rounded-lg animate-pulse">
-          </div>
-        <div className = "bg-gray-400 h-50 w-full rounded-lg animate-pulse ">
-        </div>
-        </div>
-         )
-        :
-        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 md:grid-cols-2  gap-[33px]">
-            {banners.slice(1, 3).map((banner) => (
-              <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden">
-                {/* <p className ="text-slate-700 mx-2 my-2">{banner?.description}</p> */}
-                <a
-                  href={
-                    banner?.redirectUrl?.startsWith("http")
-                      ? banner.redirectUrl
-                      : `https://${banner?.redirectUrl}`
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <img
-                    src={banner?.image}
-                    alt="image"
-                    className="w-full  h-[100%] object-cover object-center"
-                  />
-                </a>
-              </div>
-            ))}
-          </div>
-        </div>
-       }
-        {/* 2 Grid card  end*/}
-        {/* 3 Grid card  start*/}
-        {bannerLoading ?
-        (
-        <div className = "grid grid-cols-1 md:grid-cols-3 gap-6 my-5 mx-10">
-        <SkeletonLoaderThirdParty/>
-        <SkeletonLoaderThirdParty/>
-        <SkeletonLoaderThirdParty/>
-        </div>
-        )
-        :
-        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-3 md:grid-cols-3  gap-[33px]">
-            {banners.slice(3).map((banner) => (
-              <div className="w-full  h-[204px]  shadow-lg rounded-2xl overflow-hidden">
-                {/* <p className ="text-slate-700 mx-2 my-2">{banner?.description}</p> */}
-                <a
-                  href={
-                    banner?.redirectUrl?.startsWith("http")
-                      ? banner.redirectUrl
-                      : `https://${banner?.redirectUrl}`
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <img
-                    src={banner?.image}
-                    alt="image"
-                    className="w-full  h-[100%] object-cover object-center"
-                  />
-                </a>
-              </div>
-            ))}
-          </div>
-        </div>
-         }
-        
+        )}
+
         {/* 2 Grid card  end*/}
         {/* OnGoing Event slider Start  */}
         <OngoingSlider />
