@@ -92,8 +92,8 @@ const EventPage = () => {
   const navigate = useNavigate();
   console.log(venueId, eventIds);
   const nextpage = (ticket) => {
-    const updatedIds = ids.replace(/#/g, "_");
-    navigate(`/venues/${updatedIds}/${ticket}/payment2`);
+    navigate(`/${ids}/events/${eventId}/${ticket}/payment`);
+    // :ids/events/:eventId/payment
   };
 
   const dispatch = useDispatch();

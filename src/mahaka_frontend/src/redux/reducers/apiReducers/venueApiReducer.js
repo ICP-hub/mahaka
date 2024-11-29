@@ -182,7 +182,7 @@ const venueSlice = createSlice({
       })
       .addCase(getVenue.fulfilled, (state, action) => {
         state.loading = false;
-        state.currentVenue = action.payload;
+        state.currentVenue = action.payload.ok;
         state.error = null;
       })
       .addCase(getVenue.rejected, (state, action) => {

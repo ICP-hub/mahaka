@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { listUsers } from "../../redux/reducers/apiReducers/userApiReducer";
+import { getAllWahanas } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 
 const AdminLayout = () => {
   const { state, toggleNavigation } = useNavigationControl();
@@ -30,6 +31,11 @@ const AdminLayout = () => {
   // Init members in admin side
   useEffect(() => {
     dispatch(listUsers({ backend: backend, pageLimit: 100, currPage: 0 }));
+  }, []);
+
+  // Fetch wahanas
+  useEffect(() => {
+    dispatch(getAllWahanas({ backend: backend, chunkSize: 10, pageNo: 0 }));
   }, []);
 
   return (

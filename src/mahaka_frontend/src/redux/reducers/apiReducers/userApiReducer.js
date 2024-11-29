@@ -60,7 +60,7 @@ export const updateUser = createAsyncThunk(
         user.firstName,
         user.lastName,
         user.role,
-        user.venue
+        { id: user.venue.id, title: user.venue.title }
       );
       console.log("response adding member", response);
       if (response.ok) {

@@ -48,12 +48,12 @@ const MgtTicket = () => {
         backend,
         chunkSize: 100,
         pageNo: 0,
-        venueId: currentVenue[1]?.id,
+        venueId: currentVenue.ok?.id,
       })
     );
     // Automatically select the first venue and fetch its ticket details
     if (!venuesLoading && currentVenue) {
-      const defaultVenue = currentVenue[1];
+      const defaultVenue = currentVenue.ok;
       console.log(currentVenue);
 
       fetchTicketDetails(defaultVenue);
@@ -172,7 +172,7 @@ const MgtTicket = () => {
 
       {/* Venue Selection */}
 
-      {loading ? <div>loading...</div> : <p>{currentVenue[1]?.Title}</p>}
+      {venuesLoading ? <div>loading...</div> : <p>{currentVenue.ok?.Title}</p>}
 
       {/* Show Loader or Ticket Details */}
       {loadingDetails ? (
@@ -213,7 +213,7 @@ const MgtTicket = () => {
                   price={parseInt(ticketDetails?.gTicket_price) || 1}
                   availability={parseInt(ticketDetails?.gTicket_limit) || 4}
                   highlightClass={ticketData[0].highlightClass}
-                  selectedVenue={currentVenue[1]?.id}
+                  selectedVenue={currentVenue.ok?.id}
                 />
               </SwiperSlide>
 
@@ -226,7 +226,7 @@ const MgtTicket = () => {
                   price={parseInt(ticketDetails?.sTicket_price) || 1}
                   availability={parseInt(ticketDetails?.sTicket_limit) || 4}
                   highlightClass={ticketData[1].highlightClass}
-                  selectedVenue={currentVenue[1]?.id}
+                  selectedVenue={currentVenue.ok?.id}
                 />
               </SwiperSlide>
 
@@ -239,7 +239,7 @@ const MgtTicket = () => {
                   price={parseInt(ticketDetails?.vTicket_price) || 1}
                   availability={parseInt(ticketDetails?.vTicket_limit) || 4}
                   highlightClass={ticketData[2].highlightClass}
-                  selectedVenue={currentVenue[1]?.id}
+                  selectedVenue={currentVenue.ok?.id}
                 />
               </SwiperSlide>
             </Swiper>
@@ -298,12 +298,12 @@ const MgtTicket = () => {
                 <SwiperSlide>
                   <EventTickets
                     type={"SINGLE"}
-                    gradientClass={ticketData[1].gradientClass}
+                    gradientClass={ticketData.ok.gradientClass}
                     tickets={eventDetails}
                     selectedVenue={selectedEvent}
                     id={selectedVenue?.id}
                     availability={parseInt(ticketDetails?.sTicket_limit) || 4}
-                    highlightClass={ticketData[1].highlightClass}
+                    highlightClass={ticketData.ok.highlightClass}
                   />
                 </SwiperSlide>
               </Swiper>

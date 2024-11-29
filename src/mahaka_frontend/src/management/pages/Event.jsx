@@ -28,7 +28,7 @@ const MgtEvents = () => {
   const containerVariants = createStaggerContainer(0.4);
   const cardVariants = createStaggerVariant(0.3);
 
-  console.log(singleEventLoading);
+  // console.log(singleEventLoading);
 
   return (
     <div className="flex flex-auto flex-col relative min-h-screen">
@@ -123,7 +123,7 @@ const MgtEvents = () => {
         >
           <CreateEventForm
             setIsModalOpen={setIsModalOpen}
-            venueIdentity={currentUserByCaller.assignedVenue}
+            venueIdentity={currentUserByCaller.assignedVenue.id}
           />
         </ModalOverlay>
       )}
@@ -151,7 +151,7 @@ const EventCard = ({ event }) => {
             className="object-cover h-full w-full rounded-full"
           />
         </div>
-        <div className="h-48 w-full border border-white">
+        <div className="h-60 w-full border border-white">
           <img
             src={event.banner.data}
             alt="banner_img"
@@ -168,7 +168,11 @@ const EventCard = ({ event }) => {
             <HiCheckBadge size={24} className="text-green-500" />
           </div>
         </div>
-        <div className="mt-4 text-lg font-medium">{event.title}</div>
+        <div className="mt-4 text-lg font-medium capitalize">{event.title}</div>
+        <div className="flex items-center text-md leading-5 mt-2 font-medium">
+          <div>Creator</div>
+          <div className="ml-1.5 truncate">{event.creator.toText()}</div>
+        </div>
         <div className="text-secondary mt-0.5 line-clamp-2">
           {event.description}
         </div>

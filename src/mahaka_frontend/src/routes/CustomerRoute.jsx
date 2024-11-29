@@ -3,7 +3,6 @@ import AboutMahaka from "../customer/Pages/AboutMahaka";
 import ContactMahaka from "../customer/Pages/ContactMahaka";
 import Home from "../customer/Pages/Home";
 import PaymentComponent from "../customer/Pages/Payment";
-import WahanaPayment from "../customer/Pages/WahanaPayment";
 import ServicesMahaka from "../customer/Pages/ServicesMahaka";
 import SingleEvent from "../customer/Pages/SingleEvent";
 import UserProfile from "../customer/Pages/UserProfile";
@@ -18,6 +17,8 @@ import { Navigate } from "react-router-dom";
 import PaymentTest from "../customer/Pages/PaymentTest";
 import CardCheckout from "../customer/Pages/CardCheckout";
 import PaymentStatusUpdate from "../customer/Pages/PaymentStatusUpdate.jsx";
+import EventPayment from "../customer/Pages/EventPayment.jsx";
+import WahanaPayment from "../customer/Pages/WahanaPayment.jsx";
 
 export const customerRoutes = [
   {
@@ -28,11 +29,17 @@ export const customerRoutes = [
       { path: "venues/:id", element: <SingleEvent /> },
       { path: "venues/:id/:id/payment2", element: <PaymentTest /> },
       { path: "venues/:id/:id/payment2/checkout", element: <CardCheckout /> },
+      { path: "payment/checkout", element: <CardCheckout /> },
       { path: "/stripe/:id/:id", element: <PaymentStatusUpdate /> },
       { path: ":ids/events/:eventId", element: <EventPage /> },
+      {
+        path: ":ids/events/:eventId/:ticketype/payment",
+        element: <EventPayment />,
+      },
       { path: ":ids/wahanas/:eventId", element: <WahanaPage /> },
+      { path: ":ids/wahanas/:eventId/payment", element: <WahanaPayment /> },
       { path: "payment", element: <PaymentComponent /> },
-      { path: "wahana-payment", element: <WahanaPayment /> },
+      // { path: "wahana-payment", element: <WahanaPayment /> },
       {
         path: "user",
         element: <UserProfile />,

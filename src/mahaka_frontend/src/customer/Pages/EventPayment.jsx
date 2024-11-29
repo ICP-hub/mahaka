@@ -5,7 +5,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { idlFactory } from "../../connect/token-cicp-ladger";
 import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
 import { Actor } from "@dfinity/agent";
-// import { useAuth } from "../../redux/reducers/auth/authReducer";
 import { Principal } from "@dfinity/principal";
 import DatePicker from "../../common/DatePicker";
 import VisitorPicker from "../Components/single-event/VisitorPicker";
@@ -13,26 +12,34 @@ import { useLocation } from "react-router-dom";
 import { useAuth } from "../../connect/useClient";
 import { HttpAgent } from "@dfinity/agent";
 
-const WahanaPayment = () => {
+const EventPayment = () => {
   const authenticatedAgent = useAgent();
   const { user, icpBalance } = useIdentityKit();
   const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
-  const [wahanadetail, setwahanadetail] = useState(null);
+  const [eventdetail, seteventdetail] = useState(null);
   const location = useLocation();
-  const { ids, eventId } = useParams();
-  const vanueid = `${decodeURIComponent(ids).replace(/_/g, "#")}${
-    window.location.hash
-  }`;
-  const wahanaid = `${decodeURIComponent(eventId).replace(/_/g, "#")}${
-    window.location.hash
-  }`;
-  const ticketType = "SINGLE";
+  const fullPath = location.pathname + location.hash;
+
+  const match = fullPath.match(/^(.+?)\/events\/(.+?)\/(.+?)\/payment/);
+
+  const vanue = match[1];
+  const vanueid = vanue.startsWith("/") ? vanue.slice(1) : vanue;
+
+  const eventId = match[2];
+  const ticketType = match[3];
+  console.log("vanu", vanueid);
+
   const [numberOFVisitor, setNumberOFVisitor] = useState(1);
   const [paymenttype, setPaymentType] = useState("Card");
   const [loading, setLoading] = useState(false);
   const [loadingdata, setLoadingData] = useState(false);
   const navigate = useNavigate();
-
+  const eventIds = `${decodeURIComponent(eventId).replace(/_/g, "#")}${
+    window.location.hash
+  }`;
+  const vanueids = `${decodeURIComponent(vanueid).replace(/_/g, "#")}${
+    window.location.hash
+  }`;
   const { backend, principal } = useAuth();
   // const { backend } = useSelector((state) => state.authentication);
   const { identity } = useIdentityKit();
@@ -46,20 +53,21 @@ const WahanaPayment = () => {
       setUnauthenticatedAgent(agent);
     })();
   }, []);
-
+  function extractCanisterId(url) {
+    const match = url.match(
+      /[a-z2-7]{5}-[a-z2-7]{5}-[a-z2-7]{5}-[a-z2-7]{5}-[a-z2-7]{3}/
+    );
+    return match ? match[0] : null;
+  }
+  const eventprincipal = Principal.fromText(extractCanisterId(eventId));
   useEffect(() => {
-    const fetchVenue = async () => {
+    const fetchEvent = async () => {
       setLoadingData(true);
       try {
-        const data1 = await backend.getWahana(wahanaid, vanueid);
+        const data1 = await backend.getDIPdetails(eventprincipal);
 
-        setwahanadetail(data1);
-        if (paymenttype == "Card") {
-          setTicketPrice(data1?.ok?.priceFiat);
-        } else {
-          setTicketPrice(data1?.ok?.priceICP);
-        }
-        console.log("wahana", data1);
+        seteventdetail(data1);
+        console.log("event detail", data1);
       } catch (error) {
         console.error("Error fetching:", error);
       } finally {
@@ -67,9 +75,133 @@ const WahanaPayment = () => {
       }
     };
 
-    fetchVenue();
-  }, [backend, ticketType]);
+    fetchEvent();
+  }, [backend]);
+  useEffect(() => {
+    if (eventdetail) {
+      if (ticketType === "GROUP") {
+        setTicketPrice(eventdetail.gTicket_price || 0);
+      } else if (ticketType === "SINGLE") {
+        setTicketPrice(eventdetail.sTicket_price || 0);
+      } else if (ticketType === "VIP") {
+        setTicketPrice(eventdetail.vTicket_price || 0);
+      }
+    }
+  }, [eventdetail, ticketType]);
 
+  // const handlePayment = async () => {
+  //   if (!user) {
+  //     alert("Please login first");
+  //   }
+
+  //   // Create Actor for payment
+  //   const actor = Actor.createActor(idlFactory, {
+  //     agent: authenticatedAgent,
+  //     canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
+  //   });
+  //   console.log("object", actor, authenticatedAgent);
+  //   const acc = {
+  //     owner: Principal.fromText(process.env.CANISTER_ID_MAHAKA_BACKEND),
+  //     subaccount: [],
+  //   };
+
+  //   const icrc2_approve_args = {
+  //     from_subaccount: [],
+  //     spender: acc,
+  //     fee: [],
+  //     memo: [],
+  //     amount: BigInt(10000),
+  //     created_at_time: [],
+  //     expected_allowance: [],
+  //     expires_at: [],
+  //   };
+
+  //   try {
+  //     setIsPaymentProcessing(true);
+  //     const response = await actor.icrc2_approve(icrc2_approve_args);
+  //     console.log("Response from payment approve", response);
+
+  //     if (response.Ok) {
+  //       console.log("Payment approved! run further steps");
+  //     } else {
+  //       console.error("Payment failed");
+  //     }
+  //   } catch (err) {
+  //     console.error("Error in payment approve", err);
+  //   } finally {
+  //     setIsPaymentProcessing(false);
+  //   }
+
+  //   // const transferArgs = {
+  //   //   from_subaccount: [],
+  //   //   spender: {
+  //   //     owner: Principal.fromText("bd3sg-teaaa-aaaaa-qaaba-cai"),
+  //   //     subaccount: [],
+  //   //   },
+  //   //   amount: BigInt(coffeeAmount * 10 ** 8 + 10000),
+  //   //   fee: [],
+  //   //   memo: [],
+  //   //   created_at_time: [],
+  //   //   expected_allowance: [],
+  //   //   expires_at: [],
+  //   // };
+  //   // console.log("Transfer Args:", transferArgs);
+  //   // try {
+  //   //   const response = await actor.icrc2_approve(transferArgs);
+  //   //   console.log("Response from icrc2_approve:", response);
+  //   //   if (response && response.Ok) {
+  //   //     setMessage(`Transferred ${coffeeAmount} ICP`);
+  //   //     setPaymentStatus("Payment successful");
+  //   //     await buyEventTicketHandler();
+  //   //   } else {
+  //   //     console.error("Unexpected response format or error:", response);
+  //   //     throw new Error(response?.Err || "Payment failed");
+  //   //   }
+  //   // } catch (error) {
+  //   //   setMessage("Payment failed");
+  //   //   setPaymentStatus("Payment failed");
+  //   //   console.error("Payment error:", error);
+  //   // } finally {
+  //   //   setLoading(false);
+  //   //   setProcessing(false);
+  //   //   setTimeout(() => setMessage("Make Payment"), 5000);
+  //   // }
+  // };
+
+  // const buyEventTicketHandler = async () => {
+  //   try {
+  //     const ticketTypeVariant = { [ticketType]: null };
+  //     const record = [
+  //       {
+  //         data: new Uint8Array([1, 2, 3]),
+  //         description: "Ticket metadata",
+  //         key_val_data: [
+  //           { key: "eventName", val: { TextContent: "Amazing Concert" } },
+  //           { key: "date", val: { TextContent: "2024-12-31" } },
+  //         ],
+  //         purpose: { Rendered: null },
+  //       },
+  //     ];
+
+  //     const response = await backend.buyVenueTicket(
+  //       "current venue#br5f7-7uaaa-aaaaa-qaaca-cai",
+  //       { ticket_type: ticketTypeVariant, price: 1 },
+  //       record,
+  //       [
+  //         Principal.fromText(
+  //           "h7yxq-n6yb2-6js2j-af5hk-h4inj-edrce-oevyj-kbs7a-76kft-vrqrw-nqe"
+  //         ),
+  //       ],
+  //       { ICP: null },
+  //       1
+  //     );
+
+  //     console.log("Event ticket purchased successfully:", response);
+  //     navigate("/ticket");
+  //   } catch (err) {
+  //     console.error("Error in buying event tickets:", err);
+  //   }
+  // };
   const handlePayment = async (e) => {
     if (principal == undefined) {
       alert("jgh");
@@ -120,54 +252,81 @@ const WahanaPayment = () => {
       e.target.disabled = false;
     }
   };
+  console.log("s", vanueids);
+
   const handlePayment2 = async (e) => {
-    if (principal == undefined) {
-      alert("connect wallet");
+    if (!principal) {
+      alert("Please connect your wallet");
       return;
     }
+
     setLoading(true);
     setIsPaymentProcessing(true);
-    const _venueId = vanueid;
 
-    const _ticket_type = { GroupPass: null };
+    const _eventIds = eventIds;
+    const _ticket_type =
+      ticketType === "GROUP"
+        ? { GroupPass: null }
+        : ticketType === "VIP"
+        ? { VipPass: null }
+        : { SinglePass: null }; // Dynamically set ticket type based on user selection
+
+    // Metadata example; replace with actual data as needed
     const _metadata = [
       {
-        data: new Uint8Array([0x12, 0x34]),
-        description: "Sample ticket image",
+        data: new Uint8Array([0x12, 0x34]), // Replace with actual image data if available
+        description: "Event ticket details",
         key_val_data: [
-          { key: "exampleKey", val: { TextContent: "exampleValue" } },
+          {
+            key: "eventName",
+            val: { TextContent: eventdetail?.name || "Event" },
+          },
+          { key: "date", val: { TextContent: eventdetail?.date || "TBD" } },
+          {
+            key: "venue",
+            val: { TextContent: eventdetail?.venue || "Venue Name" },
+          },
         ],
         purpose: { Rendered: null },
       },
     ];
-    const receiver = principal;
-    const numOfVisitors = BigInt(numberOFVisitor);
 
+    const receiver = principal;
+    const numOfVisitors = BigInt(numberOFVisitor); // Ensure this is correct
     const paymentType = { Card: null };
 
-    console.log("backend", backend);
     try {
-      const response = await backend.buyWahanaToken(
-        _venueId,
-        wahanaid,
-        receiver,
-        numOfVisitors,
-        paymentType
+      const response = await backend.buyEventTicket(
+        vanueids,
+        _eventIds,
+        {
+          ticket_type: _ticket_type,
+          priceFiat: parseFloat(eventdetail?.gTicket_price || 0), // Ensure price is float
+          price: BigInt(eventdetail?.price || 100_000), // Replace with actual price value
+        },
+        _metadata, // Metadata array for the event
+        receiver, // Wallet address of the receiver
+        numOfVisitors, // Number of tickets/visitors
+        paymentType // Payment type (Card/ICP/Cash)
       );
-      console.log("res", response);
+
+      console.log("Response:", response);
+
       if ("ok" in response) {
-        console.log("Purchase response:", response);
-        navigate(`/payment/checkout`);
+        console.log("Purchase successful:", response.ok);
+        navigate(`/venues/${vanueid}/primium/payment2/checkout`); // Ensure `vanueid` is defined
       } else {
         throw new Error(response.err || "Purchase failed");
       }
     } catch (error) {
       console.error("Payment error:", error);
+      alert(`Payment failed: ${error.message}`);
     } finally {
       setLoading(false);
       setIsPaymentProcessing(false);
     }
   };
+
   return (
     <div className="w-full bg-white m-auto">
       <div className="max-w-7xl w-full  mx-auto   rounded-lg shadow-md grid grid-cols-1 md:grid-cols-2 md:gap-6">
@@ -181,7 +340,7 @@ const WahanaPayment = () => {
                 <span className="px-20 rounded-lg py-[2px] animate-spin bg-gray-200"></span>
               </p>
             ) : (
-              <p className="text-xl font-semibold">wahana id:-{wahanaid}</p>
+              <p className="text-xl font-semibold">Eventid id:-{eventIds}</p>
             )}
             {loadingdata ? (
               <p className="text-xl text-green-400 font-semibold mt-2">
@@ -190,7 +349,10 @@ const WahanaPayment = () => {
               </p>
             ) : (
               <p className="text-xl text-green-400 font-semibold">
-                Number of Tickets Left: 100
+                Number of Tickets Left:{" "}
+                {eventdetail?.gTicket_limit !== undefined
+                  ? Number(eventdetail.maxLimit)
+                  : "N/A"}
               </p>
             )}
           </div>
@@ -222,9 +384,7 @@ const WahanaPayment = () => {
               className="w-12 h-12 object-cover rounded-md mr-4"
             />
             <div>
-              <h3 className="text-2xl font-black">
-                {wahanadetail?.ok.ride_title}
-              </h3>
+              <h3 className="text-2xl font-black">{eventdetail?.name}</h3>
               <p className="text-base font-normal text-[#ACACAC]">
                 {ticketType}
               </p>
@@ -326,146 +486,4 @@ const WahanaPayment = () => {
   );
 };
 
-export default WahanaPayment;
-// import React from 'react';
-// import payimg from  '../../assets/images/payment.png'
-// import{useSelector} from "react-redux"
-// import {useState} from "react"
-// import { useNavigate } from 'react-router-dom';
-
-// const WahanaPayment = () => {
-//   const navigate = useNavigate();
-//   const { backend } = useSelector((state) => state.authentication);
-//   // console.log("backend events are",events)
-//   const [ticketType, setTicketType] = useState("SinglePass");
-//   const [price, setPrice] = useState(100);
-//   const [processing, setProcessing] = useState(false)
-
-//   const buyEventTicketHandler = async () => {
-//     if(processing){
-//       return
-//     }
-//     setProcessing(true)
-
-//     try {
-//       const venueId = "dasara#br5f7-7uaaa-aaaaa-qaaca-cai";
-//       const eventId = "dasara event#b77ix-eeaaa-aaaaa-qaada-cai";
-//       const ticketTypeVariant = { [ticketType]: null };
-//       const record = [
-//         {
-//           data: new Uint8Array([1, 2, 3]),
-//           description: "Ticket metadata",
-//           key_val_data: [
-//             {
-//               key: "eventName",
-//               val: { TextContent: "Amazing Concert" }
-//             },
-//             {
-//               key: "date",
-//               val: { TextContent: "2024-12-31" }
-//             }
-//           ],
-//           purpose: { Rendered: null }
-//         }
-//       ];
-
-//       const response = await backend.buyEventTicket(
-//         venueId,
-//         eventId,
-//         { ticket_type: ticketTypeVariant, price: price },
-//         record
-//       );
-
-//       console.log("Event ticket purchased successfully:", response);
-//           } catch (err) {
-//             console.error("Error in buying event tickets:", err);
-//           }finally {
-//             setProcessing(false);  // Allow new event creation after process is done
-//           }
-//           navigate("/ticket")
-//         };
-//   return (
-//     <div className="w-full max-h-screen bg-white m-auto">
-//       <div className="max-w-7xl w-full  mx-auto   rounded-lg shadow-md grid grid-cols-1 md:grid-cols-2 md:gap-6">
-//         <div className="order-2 md:order-1 bg-white p-16 ">
-//           <h2 className="text-3xl font-black ">Payment</h2>
-//           <hr className="my-3 text-[#ACACAC]" />
-//           <div className="py-4">
-//             <label className="block text-2xl font-black text-[#0A0D13]">Pay With:</label>
-//             <div className="flex items-center mt-2">
-//               <input type="radio" id="card" name="payment" className="mr-2" defaultChecked />
-//               <label htmlFor="card" className="mr-4 text-lg font-black ">Card</label>
-//               <input type="radio" id="icp" name="payment" className="mr-2" />
-//               <label htmlFor="icp" className='text-lg font-normal'>ICP Wallet</label>
-//             </div>
-//           </div>
-//           <div className="mb-4">
-//             <label className="block text-lg font-black text-[#0A0D13]">Card Number</label>
-//             <input
-//               type="text"
-//               className="mt-2 w-full p-2 border-[1.5px] border-[#ACACAC] rounded-md"
-//               placeholder="1234 5678 9101 1121"
-//             />
-//           </div>
-//           <div className="mb-4 grid grid-cols-2 gap-4">
-//             <div>
-//               <label className="block text-lg font-black text-[#0A0D13]">Expiration Date</label>
-//               <input
-//                 type="text"
-//                 className="mt-2 w-full p-2 border-[1.5px] border-[#ACACAC]  rounded-md"
-//                 placeholder="MM/YY"
-//               />
-//             </div>
-//             <div>
-//               <label className="block text-lg font-black text-[#0A0D13]">CVV</label>
-//               <input
-//                 type="text"
-//                 className="mt-2 w-full p-2 border-[1.5px] border-[#ACACAC]  rounded-md"
-//                 placeholder="***"
-//               />
-//             </div>
-//           </div>
-//           <div className="mb-5">
-//             <input type="checkbox" id="saveCard" className="mr-2 " />
-//             <label htmlFor="saveCard">Save card details</label>
-//           </div>
-
-//           <button className="w-full bg-orange-500 text-white py-2 rounded-md" type = "submit" disabled={processing} onClick={buyEventTicketHandler}> {processing?"Processing..":"Process Payment"}</button>
-
-//           <p className="text-[#ACACAC] text-base font-normal mt-5">
-//             Lorem ipsum dolor sit amet consectetur. Malesuada sed senectus id tincidunt amet scelerisque
-//             diamam velit blandit. Bibendum fusce sed enim cursus sed in in. Quis malesuada mattis.
-//           </p>
-//         </div>
-//         <div className="order-1 md:order-2 bg-[#F9FAFA] p-16">
-//           <h2 className="text-3xl font-black ">Order Summary</h2>
-//           <hr className="my-3 text-[#ACACAC]" />
-//           <div className="flex items-center mb-8 mt-8 w-full ">
-//             <img src={payimg} alt="Ticket" className="w-12 h-12 object-cover rounded-md mr-4" />
-//             <div>
-//               <h3 className="text-2xl font-black">Ticket Name</h3>
-//               <p className="text-base font-normal text-[#ACACAC]">Premium</p>
-//             </div>
-//             <div className="ml-auto">
-//               <p className="text-2xl font-black">Rp. 49.80</p>
-//               <p className="text-base font-normal text-[#ACACAC]">Qty: 2</p>
-//             </div>
-//           </div>
-//           <hr className="my-4 text-[#ACACAC]" />
-//           <div className="flex justify-between ">
-//             <span className="text-lg font-normal text-[#0A0D13]">Subtotal</span>
-//             <span className="text-lg font-black text-[#0A0D13]">Rp. 49.80</span>
-//           </div>
-//           <hr className="my-4 text-[#ACACAC]" />
-//           <div className="flex justify-between font-bold text-xl">
-//             <span className='text-lg font-normal text-[#0A0D13]'>Total</span>
-//             <span className='text-3xl font-black text-[#0A0D13]'>Rp. 49.80</span>
-//           </div>
-//         </div>
-//       </div>
-
-//     </div>
-//   );
-// };
-
-// export default WahanaPayment;
+export default EventPayment;

@@ -28,26 +28,6 @@ const ticketData = [
     availability: "AVAILABLE",
     highlightClass: "bg-orange-500",
   },
-  {
-    type: "VVIP",
-    gradientClass: "bg-gradient-to-r from-cyan-200 to-cyan-300",
-    name: "Ticket Name",
-    description:
-      "Lorem ipsum dolor sit amet consectetur. Bibendum est vitae urna pharetra",
-    price: "Rp. 1,500",
-    availability: "SOLD OUT",
-    highlightClass: "bg-cyan-500",
-  },
-  {
-    type: "GROUP",
-    gradientClass: "bg-gradient-to-r from-blue-200 to-blue-300",
-    name: "Ticket Name",
-    description:
-      "Lorem ipsum dolor sit amet consectetur. Bibendum est vitae urna pharetra",
-    price: "Rp. 1,500",
-    availability: "3 TICKETS LEFT",
-    highlightClass: "bg-blue-500",
-  },
 ];
 const calculateDuration = (StartDate, EndDate) => {
   const start = new Date(StartDate);
@@ -93,7 +73,7 @@ const WahanaPage = () => {
   const navigate = useNavigate();
   const nextpage = (ticket) => {
     const updatedIds = ids.replace(/#/g, "_");
-    navigate(`/venues/${updatedIds}/${ticket}/payment2`);
+    navigate(`/${ids}/wahanas/${eventId}/payment`);
   };
   console.log("Decoded Venue ID:", venueId);
   console.log("Decoded Wahana ID:", eventIds);

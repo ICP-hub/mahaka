@@ -1,15 +1,16 @@
-import { useDispatch } from "react-redux";
-// import { logout } from "../../redux/reducers/auth/authReducer";
+import { useIdentityKit } from "@nfid/identitykit/react";
 import { useNavigate } from "react-router-dom";
+import notificationManager from "../utils/notificationManager";
 
 export const useLogout = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { disconnect } = useIdentityKit();
 
-  // const logoutAndRedirect = () => {
-  //   dispatch(NFIDLogout());
-  //   navigate("/");
-  // };
+  const logoutAndRedirect = () => {
+    disconnect();
+    navigate("/");
+    notificationManager.success("Logout Successfully");
+  };
 
-  // return logoutAndRedirect;
+  return logoutAndRedirect;
 };

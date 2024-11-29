@@ -1,18 +1,9 @@
 import { RiLogoutCircleRLine } from "react-icons/ri";
 import ButtonWrapper from "../../../common/ButtonWrapper";
-import { useNavigate } from "react-router-dom";
-import { useIdentityKit } from "@nfid/identitykit/react";
-import notificationManager from "../../../common/utils/notificationManager";
+import { useLogout } from "../../../common/hooks/useLogout";
 
 const LogoSection = () => {
-  const navigate = useNavigate();
-  const { disconnect } = useIdentityKit();
-
-  const logoutAndRedirect = () => {
-    disconnect();
-    navigate("/");
-    notificationManager.success("Logout Successfully");
-  };
+  const logoutAndRedirect = useLogout();
 
   return (
     <div className="flex w-full items-center p-4 pl-6">

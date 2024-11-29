@@ -428,8 +428,28 @@ actor mahaka {
                };
           };
      };
+
+     /*********************************************************/
+     /*                   Dashboard                           */
+     /*********************************************************/
+
+     public shared ({caller}) func dashboardStats() : async Nat {
+
+          let totalTickets = switch(await getAllTickets(0,100000000000)){
+               case(#err(e)){
+                    []
+               };
+               case(#ok(obj)){
+                    obj.data
+               };
+          };
+          return Array.size(totalTickets);
+
+     };
    
-//     --------------------------------------------------------------------------------------------------------------------
+     /*********************************************************/
+     /*                       Venue                           */
+     /*********************************************************/
 
      
      public shared ({caller = user}) func createVenue(
@@ -472,8 +492,8 @@ actor mahaka {
                Collection_id : Principal = venueCollectionId;
                Description : Text = _description;
                Details : Types.venueDetails = _details;
-               Events : List.List<Text> = List.nil<Text>();
-               Wahanas : List.List<Text> = List.nil<Text>();
+               Events : [Text] = [];
+               Wahanas : [Text] = [];
                Title : Text = _title;
                capacity : Nat = _capacity;
                id : Text = venue_id;
@@ -631,7 +651,7 @@ actor mahaka {
                          logo = venue.logo;
                          banner = venue.banner;
                          Details = venue.Details;
-                         Events = List.fromArray(events);
+                         Events = events;
                          Wahanas = venue.Wahanas;
                          capacity = venue.capacity;
                          Collection_id = venue.Collection_id;
@@ -660,7 +680,7 @@ actor mahaka {
                          logo = venue.logo;
                          banner = venue.banner;
                          Details = venue.Details;
-                         Wahanas = List.fromArray(wahanas);
+                         Wahanas = wahanas;
                          Events = venue.Events;
                          capacity = venue.capacity;
                          Collection_id = venue.Collection_id;
@@ -862,7 +882,7 @@ actor mahaka {
                };
           };
 
-          let updatedVenue = await updateVenuewithEvents(venueId,List.toArray(updatedEvents.EventIds));
+          let updatedVenue = await updateVenuewithEvents(venueId, List.toArray(updatedEvents.EventIds));
 
           let eventBlob = to_candid(updatedEvents);
           let eventIndex = switch (existingEvents) {
@@ -1750,7 +1770,7 @@ actor mahaka {
                               let invoice : FiatTypes.Request.CreateInvoiceBody = {
                                    amount = _ticket_type.priceFiat * visitorsCount ;
                                    paymentMethod = "Stripe";
-                                   currency = "USD";
+                                   currency = "IDR";
                                    items = items
                               };
                               let create_invoice_response : Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>> = await FiatPayCanister.create_invoice(caller, invoice);
@@ -1841,7 +1861,7 @@ actor mahaka {
                               let invoice : FiatTypes.Request.CreateInvoiceBody = {
                                    amount = _ticket_type.priceFiat * visitorsCount;
                                    paymentMethod = "Stripe";
-                                   currency = "USD";
+                                   currency = "IDR";
                                    items = items
                               };
                               let create_invoice_response : Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>> = await FiatPayCanister.create_invoice(caller, invoice);
@@ -1935,7 +1955,7 @@ actor mahaka {
                               let invoice : FiatTypes.Request.CreateInvoiceBody = {
                                    amount = wahana.priceFiat * visitorsCount;
                                    paymentMethod = "Stripe";
-                                   currency = "USD";
+                                   currency = "IDR";
                                    items = items
                               };
                               let create_invoice_response : Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>> = await FiatPayCanister.create_invoice(caller, invoice);
@@ -2492,7 +2512,7 @@ actor mahaka {
                     };
                     case (?deserializedTickets) {
                          for (ticket in List.toArray(deserializedTickets).vals()) {
-                              if (ticket.recepient == caller or ticket.ticketIssuer == caller) {
+                              if (ticket.recepient == caller) {
                                    allTickets := List.push<Types.TicketSaleInfo>(ticket, allTickets);
                               };
                          };
@@ -2548,7 +2568,7 @@ actor mahaka {
                     };
                     case (?deserializedTickets) {
                          for (ticket in List.toArray(deserializedTickets).vals()) {
-                              if (ticket.recepient == caller or ticket.ticketIssuer == caller) {
+                              if (ticket.recepient == caller) {
                               allTickets := List.push(ticket, allTickets);
                               };
                          };
@@ -2604,7 +2624,7 @@ actor mahaka {
                     };
                     case (?deserializedTickets) {
                          for (ticket in List.toArray(deserializedTickets).vals()) {
-                              if (ticket.recepient == caller or ticket.ticketIssuer == caller) {
+                              if (ticket.recepient == caller) {
                               allTickets := List.push(ticket, allTickets);
                               };
                          };
@@ -2725,7 +2745,7 @@ actor mahaka {
                          tickets := List.append(
                               tickets,
                               List.filter<Types.TicketSaleInfo>(deserializedTickets, func (ticket) {
-                                   ticket.recepient == caller or ticket.ticketIssuer == caller
+                                   ticket.recepient == caller
                               })
                          );
                     };
@@ -2846,7 +2866,7 @@ actor mahaka {
      /*                   User CRUD                           */
      /*********************************************************/
 
-    public shared ({ caller }) func updateUser(principalId : Principal, email : Text, firstName : Text, lastName : Text, role : Types.Roles, assignedVenue : Text) : async Result.Result<(Types.User, Types.Index), Types.UpdateUserError> {
+    public shared ({ caller }) func updateUser(principalId : Principal, email : Text, firstName : Text, lastName : Text, role : Types.Roles, assignedVenueDetails : Types.assignedVenueDetails) : async Result.Result<(Types.User, Types.Index), Types.UpdateUserError> {
           // if (Principal.isAnonymous(caller)) {
           //      return #err(#UserNotAuthenticated); 
           // }; 
@@ -2865,7 +2885,8 @@ actor mahaka {
           if (firstName == "") { return #err(#EmptyFirstName) };
           if (lastName == "") { return #err(#EmptyLastName) };
           //    if (role == "") { return #err(#EmptyRole) };
-          if (assignedVenue == "") { return #err(#EmptyLastName) };
+          if (assignedVenueDetails.id == "") { return #err(#EmptyAssignedVenue) };
+          if (assignedVenueDetails.title == "") { return #err(#EmptyAssignedVenue) };
 
           let user : Types.User = {
                id = principalId;
@@ -2873,7 +2894,7 @@ actor mahaka {
                firstName = firstName;
                lastName = lastName;
                role = role;
-               assignedVenue = assignedVenue;
+               assignedVenue = assignedVenueDetails;
           };
           switch(Users.get(principalId)){
 
@@ -2916,7 +2937,7 @@ actor mahaka {
                firstName = firstName;
                lastName = lastName;
                role = #user;
-               assignedVenue = "";
+               assignedVenue = { id = "" ; title = ""};
           };
           switch(Users.get(principalId)){
 
@@ -2982,7 +3003,7 @@ actor mahaka {
      
 
 
-     public shared ({ caller }) func addAdmins(principalId : Principal, email : Text, firstName : Text, lastName : Text, role : Types.Roles, assignedVenue : Text) : async Result.Result<(Types.User, Types.Index), Types.UpdateUserError> {
+     public shared ({ caller }) func addAdmins(principalId : Principal, email : Text, firstName : Text, lastName : Text, role : Types.Roles, assignedVenue : Types.assignedVenueDetails) : async Result.Result<(Types.User, Types.Index), Types.UpdateUserError> {
           // if (Principal.isAnonymous(caller)) {
           //      return #err(#UserNotAuthenticated); 
           // }; 
@@ -3004,7 +3025,8 @@ actor mahaka {
           if (firstName == "") { return #err(#EmptyFirstName) };
           if (lastName == "") { return #err(#EmptyLastName) };
           //    if (role == "") { return #err(#EmptyRole) };
-          if (assignedVenue == "") { return #err(#EmptyLastName) };
+          if (assignedVenue.id == "") { return #err(#EmptyAssignedVenue) };
+          if (assignedVenue.title == "") { return #err(#EmptyAssignedVenue) };
 
           let user : Types.User = {
                id = principalId;
