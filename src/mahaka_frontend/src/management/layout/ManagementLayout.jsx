@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllEventsByVenue } from "../../redux/reducers/apiReducers/eventApiReducer";
 import { getVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
+import { getAllWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 
 const ManagementLayout = () => {
   const { state, toggleNavigation } = useNavigationControl();
@@ -47,6 +48,20 @@ const ManagementLayout = () => {
       dispatch(
         getVenue({
           backend: backend,
+          venueId: currentUserByCaller.assignedVenue.id,
+        })
+      );
+    }
+  }, [currentUserByCaller]);
+
+  // User wise wahana
+  useEffect(() => {
+    if (currentUserByCaller) {
+      dispatch(
+        getAllWahanasbyVenue({
+          backend,
+          chunkSize: 10,
+          pageNo: 0,
           venueId: currentUserByCaller.assignedVenue.id,
         })
       );

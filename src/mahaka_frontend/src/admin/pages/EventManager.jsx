@@ -4,13 +4,13 @@ import {
   HiCheckBadge,
   HiChevronDown,
   HiChevronUp,
-  HiClock,
+  // HiClock,
   HiMiniMapPin,
   HiOutlineMagnifyingGlass,
 } from "react-icons/hi2";
 import { useDispatch, useSelector } from "react-redux";
-import img1 from "../../assets/images/frame3.png";
-import img2 from "../../assets/images/fram6.png";
+// import img1 from "../../assets/images/frame3.png";
+// import img2 from "../../assets/images/fram6.png";
 import { AnimatePresence, motion } from "framer-motion";
 import ModalOverlay from "../../customer/Components/Modal-overlay";
 import CreateEventForm from "../components/CreateEventForm";
@@ -126,21 +126,32 @@ const EventManager = () => {
                         </div>
                         {isOptionMenuOpen && (
                           <>
-                            <div
-                              className="py-4 hover:bg-hover last:rounded-b-xl"
-                              onClick={() => handleSelectOption("All", "")}
-                            >
-                              <div className="px-4">All</div>
-                            </div>
-                            {venues.map(({ id, Title }) => (
-                              <div
-                                key={id}
-                                className="py-4 hover:bg-hover last:rounded-b-xl"
-                                onClick={() => handleSelectOption(Title, id)}
-                              >
-                                <div className="px-4">{Title}</div>
-                              </div>
-                            ))}
+                            {["All", ...venues.map(({ Title }) => Title)].map(
+                              (option) => {
+                                if (option === selectedVenue.option) {
+                                  return null;
+                                }
+
+                                return (
+                                  <div
+                                    key={option}
+                                    className="py-4 hover:bg-hover last:rounded-b-xl"
+                                    onClick={() => {
+                                      if (option === "All") {
+                                        handleSelectOption(option, "");
+                                      } else {
+                                        const venue = venues.find(
+                                          ({ Title }) => Title === option
+                                        );
+                                        handleSelectOption(option, venue.id);
+                                      }
+                                    }}
+                                  >
+                                    <div className="px-4">{option}</div>
+                                  </div>
+                                );
+                              }
+                            )}
                           </>
                         )}
                       </div>
@@ -235,7 +246,7 @@ const EventCard = ({ event }) => {
             className="object-cover h-full w-full rounded-full"
           />
         </div>
-        <div className="h-48 w-full border border-white">
+        <div className="h-60 w-full border border-white">
           <img
             src={event.banner.data}
             alt="banner_img"
@@ -252,7 +263,11 @@ const EventCard = ({ event }) => {
             <HiCheckBadge size={24} className="text-green-500" />
           </div>
         </div>
-        <div className="mt-4 text-lg font-medium">{event.title}</div>
+        <div className="mt-4 text-lg font-medium capitalize">{event.title}</div>
+        <div className="flex items-center text-md leading-5 mt-2 font-medium">
+          <div>Creator</div>
+          <div className="ml-1.5 truncate">{event.creator.toText()}</div>
+        </div>
         <div className="text-secondary mt-0.5 line-clamp-2">
           {event.description}
         </div>
