@@ -192,7 +192,6 @@ const wahanaSlice = createSlice({
       .addCase(createWahana.fulfilled, (state, action) => {
         state.createWahanaLoader = false;
         // console.log(action.payload, "create wahana");
-
         state.wahanas.push(action.payload.ok);
         state.error = null;
         notificationManager.success("Wahana created successfully");
@@ -287,9 +286,9 @@ const wahanaSlice = createSlice({
         state.wahanas = state.wahanas.filter(
           (wahana) => wahana.id !== action.payload
         );
-        // state.wahanasByVenue = state.wahanasByVenue.filter(
-        //   (wahana) => wahana.id !== action.payload
-        // );
+        state.wahanasByVenue = state.wahanasByVenue.filter(
+          (wahana) => wahana.id !== action.payload
+        );
         state.error = null;
       })
       .addCase(deleteWahana.rejected, (state, action) => {

@@ -404,7 +404,7 @@ const EditDetails = ({
         <div className="font-medium">Assigned Venue*</div>
         <select
           className="w-full border border-border rounded-md px-2 min-h-12 bg-card focus-within:border-secondary"
-          value={selectedVenue}
+          value={selectedVenue ? selectedVenue.id : ""}
           onChange={handleSelectedVenue}
         >
           <option value="" disabled>
