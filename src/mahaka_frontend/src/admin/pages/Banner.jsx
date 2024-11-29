@@ -91,7 +91,7 @@ const confirmDeleteBanner = (bannerDelete)=>{
 
       {deleteModalVisible && (
         <div className="fixed inset-0 z-50 flex items-center rounded justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded shadow-lg">
+          <div className="bg-card p-6 rounded shadow-lg">
             
           {/* select category */}
           <div className="flex flex-col gap-1 min-w-100">
@@ -164,7 +164,7 @@ const confirmDeleteBanner = (bannerDelete)=>{
         </div>
 
 
-        <div className="flex w-full sm:flex-row bg-white p-7 justify-end items-center">
+        <div className="flex w-full sm:flex-row bg-card p-7 justify-end items-center">
   <button
     className="mt-8 sm:mt-0 mr-4"
     onClick={() => delete_banner()}
@@ -192,7 +192,7 @@ const confirmDeleteBanner = (bannerDelete)=>{
     {
     attractionbanners?.length ===0 ? 
     (<div>
-      <h1 className = "text-2xl font-bold mx-3 flex justify-center text-gray-800 shadow-lg p-4 rounded-lg">NO Attraction Banners</h1>
+      <h1 className = "text-2xl font-bold mx-3 flex justify-center text-gray-500 shadow-lg p-4 rounded-lg">NO Attraction Banners</h1>
     </div>):
 
      <div className="bg-white rounded-lg shadow-lg p-6 space-y-4">
@@ -221,7 +221,7 @@ const confirmDeleteBanner = (bannerDelete)=>{
 
   {/* Second Section */}
   {banners?.length===0?(<div>
-    <h1 className = "text-2xl font-bold mx-3 flex justify-center text-gray-800 shadow-lg  p-4 rounded-lg">NO ThirdParty Banners</h1>
+    <h1 className = "text-2xl font-bold mx-3 flex justify-center text-gray-500 shadow-lg  p-4 rounded-lg">NO ThirdParty Banners</h1>
   </div>):
   <div className="bg-white rounded-lg shadow-lg p-6 space-y-4">
     <h2 className="text-2xl font-bold text-gray-800 mb-4 justify-start flex">ThirdParty Banners</h2>
