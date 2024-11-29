@@ -332,7 +332,7 @@ const WahanaCard = ({ wahana }) => {
                     <div className="text-xs">{wahana.id}</div>
                   </div>
                 </div>
-                <div className="flex items-center flex-auto mt-4">
+                {/* <div className="flex items-center flex-auto mt-4">
                   <div className="font-mono text-xl">ICP</div>
                   <div className="ml-auto flex items-baseline">
                     <div className="font-bold text-4xl">
@@ -342,11 +342,11 @@ const WahanaCard = ({ wahana }) => {
                       /Person
                     </div>
                   </div>
-                </div>
+                </div> */}
                 <div className="flex items-center flex-auto mt-4">
                   <div className="font-mono text-xl">IDR</div>
                   <div className="ml-auto flex items-baseline">
-                    <div className="font-bold text-4xl">{wahana.priceFiat}</div>
+                    <div className="font-bold text-4xl">{wahana.price}</div>
                     <div className="text-secondary font-semibold text-lg">
                       /Person
                     </div>

@@ -37,10 +37,19 @@ export const createEvent = createAsyncThunk(
 
 // deleting an event
 export const deleteEvent = createAsyncThunk(
-  "events/deleteEvent",
-  async ({ backend, venueId, custodianId }) => {
-    const response = await backend.deleteEvent(venueId, custodianId);
-    return response;
+  "event/deleteEvent",
+  async ({ backend, venueId, eventId, setIsDelete }) => {
+    try {
+      const response = await backend.deleteEvent(venueId, eventId);
+      console.log("delete event response", response);
+      setIsDelete(false);
+      notificationManager.success("Event deleted successfully!");
+      return eventId;
+    } catch (err) {
+      notificationManager.error("Failed to delete Event");
+      setIsDelete(false);
+      console.error("error deleting event", err);
+    }
   }
 );
 
@@ -187,15 +196,16 @@ const eventSlice = createSlice({
       .addCase(deleteEvent.fulfilled, (state, action) => {
         state.deleteEventLoader = false;
         state.events = state.events.filter(
-          (event) => event.id !== action.meta.arg.custodianId
+          (event) => event.id !== action.payload
+        );
+        state.eventByVenue = state.eventByVenue.filter(
+          (event) => event.id !== action.payload
         );
         state.error = null;
-        notificationManager.success("Event deleted successfully");
       })
       .addCase(deleteEvent.rejected, (state, action) => {
         state.deleteEventLoader = false;
         state.error = action.error.message;
-        notificationManager.error("Failed to delete event");
       })
 
       // Handle getAllEventsByVenue

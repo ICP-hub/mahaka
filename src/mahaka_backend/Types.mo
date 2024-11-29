@@ -9,6 +9,40 @@ import TypesICRC "../ICRC/Types";
 
 module {
 
+
+    public type DashboardStats = {
+        totalRevenue :Float;
+        totalTickets : Nat;
+        totalUsers : Nat;
+        top3Events : List.List<{
+            eventId: Text;
+            totalRevenue: Float;
+        }>;
+        latestTxs : [Invoice];
+    };
+
+    public type Invoice = {
+        id: Nat;
+        owner: Principal;
+        amount: Float;
+        status: Text;
+        items: [Item];
+        transactionId: Text;
+        paymentLink: Text;
+        paymentMethod: Text;
+        currency: Text;
+        createdAt: Int;
+    };
+
+    public type Item = {
+        id: Nat;
+        name: Text;
+        quantity: Int;
+        price: Float;
+        categoryId : Text;
+        categoryTitle : Text
+    };
+
     public type venueId = Text;
 
     public type Roles = {
@@ -49,8 +83,7 @@ module {
         description : Text;
         details : wahanaDetails;
         banner : LogoResult;
-        priceFiat : Float;
-        priceICP : Nat;
+        price : Float;
         creator : Principal;
         venueId : Text;
         featured : Bool;
@@ -63,8 +96,7 @@ module {
 
     public type ticket_info = {
         ticket_type : Types.ticket_type;
-        price : Nat;
-        priceFiat : Float;
+        price : Float;
     };
 
     public type venueCollectionParams = {
@@ -196,7 +228,6 @@ module {
     public type PaymentType = {
         #Cash;
         #Card;
-        #ICP
     };
 
     public type TicketType = {
@@ -218,14 +249,16 @@ module {
 
     public type TicketSaleInfo = {
         ticketId : Nat;
+        category : category;
         categoryId : Text;
         paymentType : PaymentType;
         numOfVisitors : Nat;
         saleDate : Time.Time;
+        createdAt : Time.Time;
         ticketIssuer : Principal;
         recepient : Principal;
         ticketType : TicketType;
-        price : Price;
+        price : Float;
     };
 
     public type ArgsStore = {
@@ -242,7 +275,7 @@ module {
         ticketPrice: Float;
         offlineOrOnline : TicketType;
         saleDate : Time.Time;
-        saleType : Text;
+        saleType : category;
         recepient : Principal; 
         caller : Principal
     };
