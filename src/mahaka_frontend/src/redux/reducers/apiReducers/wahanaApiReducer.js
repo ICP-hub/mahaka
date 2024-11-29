@@ -5,6 +5,7 @@ import { MdDetails } from "react-icons/md";
 // Initial state for Wahana
 const initialState = {
   wahanas: [],
+  wahanaByVenue : [],
   loading: false,
   error: null,
   currentPage: 1,
@@ -191,11 +192,12 @@ const wahanaSlice = createSlice({
         state.createWahanaLoader = true;
       })
       .addCase(createWahana.fulfilled, (state, action) => {
-        state.createWahanaLoader = false;
-        console.log(action.payload, "create wahana");
 
-        state.wahanas.push(action.payload.ok);
-        state.error = null;
+        state.createWahanaLoader = false;
+        state.wahanas = [...state.wahanas, action.payload.ok];
+          state.wahanaByVenue = [...state.wahanaByVenue, action.payload.ok];
+          state.error = null
+        console.log(action.payload, "create wahana");
         notificationManager.success("Wahana created successfully");
       })
       .addCase(createWahana.rejected, (state, action) => {
@@ -254,13 +256,14 @@ const wahanaSlice = createSlice({
         state.loading = false;
 
         if (action.payload && action.payload.ok.data) {
-          state.wahanas = action.payload.ok.data;
+          //state.wahanas = action.payload.ok.data;
+          state.wahanas = [...action.payload.ok.data]
           state.currentPage = action.payload.ok.current_page;
           state.totalPages = action.payload.ok.Total_pages;
           // console.log("current wahana page is", state.currentPage)
         } else {
           console.warn("Received empty or invalid response from API");
-          state.wahanas = [];
+         // state.wahanas = [];
           state.currentPage = 1;
           state.totalPages = 1;
         }
@@ -269,7 +272,7 @@ const wahanaSlice = createSlice({
       })
       .addCase(getAllWahanas.rejected, (state, action) => {
         state.status = "failed";
-        state.wahanas = [];
+        //state.wahanas = [];
         (state.loading = false), (state.error = action.error.message);
         // notificationManager.error("Failed to fetch wahanas");
       })
@@ -316,20 +319,20 @@ const wahanaSlice = createSlice({
       .addCase(getAllWahanasbyVenue.fulfilled, (state, action) => {
         state.loading = false;
         if (action.payload && action.payload.ok.data) {
-          state.wahanas = action.payload.ok.data;
+          state.wahanaByVenue = action.payload.ok.data;
           state.currentPage = action.payload.ok.current_Page;
           state.totalPages = action.payload.ok.Total_pages;
-          console.log("current wahana page is", state.currentPage);
+         // console.log("current wahana page is", state.currentPage);
         } else {
           console.warn("Received empty or invalid response from API");
-          state.wahanas = [];
+          state.wahanaByVenue = [];
           state.currentPage = 1;
           state.totalPages = 1;
         }
       })
       .addCase(getAllWahanasbyVenue.rejected, (state, action) => {
         state.loading = false;
-        state.currentWahana = [];
+        state.wahanaByVenue = [];
         state.error = action.error.message;
         //notificationManager.error("Failed to fetch wahanas");
       });

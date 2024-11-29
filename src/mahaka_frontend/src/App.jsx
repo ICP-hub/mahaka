@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllVenues } from "./redux/reducers/apiReducers/venueApiReducer";
 import { addBanner } from "./redux/reducers/apiReducers/bannerApiReducer";
 import { getAllBanners } from "./redux/reducers/apiReducers/bannerApiReducer";
+import { getAllWahanas } from "./redux/reducers/apiReducers/wahanaApiReducer";
 import NotificationToast from "./common/NotificationToast";
 import "flatpickr/dist/flatpickr.min.css";
 import { ConnectWallet, useIdentityKit } from "@nfid/identitykit/react";
@@ -52,11 +53,15 @@ function App() {
     dispatch(getAllVenues({ backend: backend, pageLimit: 100, currPage: 0 }));
   }, []);
 
+  useEffect(() => {
+    dispatch(getAllWahanas({ backend: backend, pageLimit: 100, currPage: 0 }));
+  }, []);
+
   
 
   useEffect(() => {
     const fetchBanners = async (category) => {
-      console.log("useeffect category", category);
+     // console.log("useeffect category", category);
       try {
         await dispatch(getAllBanners({ backend, category }));
       } catch (e) {
@@ -89,12 +94,12 @@ function App() {
 
 
 
-  const testimonial = {
+  // const testimonial = {
    
-    title: "anil", // 
-  description: "anil", // 
-  location: "anil",
-  }
+  //   title: "anil", // 
+  // description: "anil", // 
+  // location: "anil",
+  // }
   
   // const handleTest = async () => {
   //   try {

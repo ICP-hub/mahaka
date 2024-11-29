@@ -10,9 +10,9 @@ const CreateWahanaForm = ({ onClose }) => {
   const { backend } = useSelector((state) => state.authentication);
   const { venues } = useSelector((state) => state.venues);
   const [formErrors, setFormErrors] = useState({});
-  console.log("create wahana errors are", formErrors);
+  //console.log("create wahana errors are", formErrors);
   const [isToggled, setIsToggled] = useState(false);
-  console.log("logging wahana toggle", isToggled);
+  //console.log("logging wahana toggle", isToggled);
 
   const handleToggle = () => {
     setIsToggled((prevState) => !prevState);
@@ -123,7 +123,7 @@ const CreateWahanaForm = ({ onClose }) => {
   // validation form
   const validateForm = () => {
     const errors = {};
-    console.log("create wahana errors are", errors);
+    //console.log("create wahana errors are", errors);
     // Validate title
     if (!formData.name.trim()) {
       errors.name = "wahana title is required";
@@ -183,7 +183,7 @@ const CreateWahanaForm = ({ onClose }) => {
         // Reading the image as an ArrayBuffer for backend submission
       } catch (error) {
         setError("Error processing image. Please try again.");
-        console.error("Error processing image:", error);
+        //console.error("Error processing image:", error);
       }
     }
   };
@@ -216,7 +216,7 @@ const CreateWahanaForm = ({ onClose }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
-    console.log("input change is", value);
+   // console.log("input change is", value);
 
     // Ensure that priceFiat is a valid number, or fallback to 0
     const updatedValue =
@@ -230,7 +230,7 @@ const CreateWahanaForm = ({ onClose }) => {
           : Number(value) // If empty, set as 0 for price
         : value; // For other fields, just keep the value as is
 
-    console.log("Updated value is", updatedValue);
+   // console.log("Updated value is", updatedValue);
 
     setFormData((prevState) => ({
       ...prevState,

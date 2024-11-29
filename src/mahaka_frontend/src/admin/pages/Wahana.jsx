@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo  } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { HiMagnifyingGlass } from "react-icons/hi2";
+import { AnimatePresence, motion } from "framer-motion";
 import { ImSpinner9 } from "react-icons/im";
 import { getAllWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApiReducer";
+import { HiOutlineSelector } from "react-icons/hi";
 import {
   getAllWahanas,
   setPage,
@@ -19,6 +21,10 @@ import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { FaArrowRight } from "react-icons/fa";
 import { IoCloseCircle } from "react-icons/io5";
+import {
+  createStaggerContainer,
+  createStaggerVariant,
+} from "../../common/animationVariants";
 // import wahanaDummy2 from "../../assets/images/Frame11.png";
 // import wahanaDummy3 from "../../assets/images/Frame7.png";
 // import wahanaDummy4 from "../../assets/images/Frame8.png";
@@ -66,19 +72,20 @@ import { IoCloseCircle } from "react-icons/io5";
 const AdminWahana = () => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
-  const { wahanas, loading, currentPage, wahanasPerPage, totalPages } =
+  const { wahanas, loading, currentPage, wahanasPerPage, totalPages, wahanaByVenue } =
     useSelector((state) => state.wahana);
-  console.log("logging the loadign for wahanas are", wahanas);
+  console.log("logging the  wahanas are", wahanas);
+  console.log("logging the  wahanas by venue are", wahanaByVenue);
   const { venues } = useSelector((state) => state.venues);
 
-  const [selectedVenue, setSelectedVenue] = useState(null);
-  console.log("selected venue is ", selectedVenue);
+ // const [selectedVenue, setSelectedVenue] = useState(null);
+  //console.log("selected venue option is ", selectedVenue.option);
   const [selectedWahana, setSelectedWahana] = useState(null);
-  console.log("logging the selected wahana is", selectedWahana);
+  //console.log("logging the selected wahana is", selectedWahana);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
-  console.log("edit modal open", editModalOpen);
+ // console.log("edit modal open", editModalOpen);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [deleteWahanaId, setDeleteWahanaId] = useState(null);
   const [deleteVenueId, setDeleteVenueId] = useState(null);
@@ -86,8 +93,21 @@ const AdminWahana = () => {
   const [descriptionModal, setDescriptionModal] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [page, setPage] = useState(1);
+  const [isOptionMenuOpen, setIsOptionMenuOpen] = useState(false);
+  const [selectedVenue, setSelectedVenue] = useState({
+    option: "All",
+    id: "",
+  });
 
-  console.log("search wahanas is", searchInput);
+  const toggleOptionMenu = () => setIsOptionMenuOpen((pv) => !pv);
+  const handleSelectOption = (option, id) => {
+    setSelectedVenue((pv) => ({ ...pv, option: option, id: id }));
+    setIsOptionMenuOpen(false);
+  };
+
+
+  
+ // console.log("search wahanas is", searchInput);
   // const [editModalOpen, setEditModalOpen] = useState(false);
 
   // console.log("selected venue is",selectedVenue)
@@ -102,56 +122,51 @@ const AdminWahana = () => {
           pageNo: 0,
         })
       );
-    } else {
-      dispatch(getAllWahanas({ backend, chunkSize: 3, pageNo: page - 1 }));
     }
-  }, [searchInput, dispatch]);
+    //  else {
+    //   dispatch(getAllWahanas({ backend, chunkSize: 3, pageNo: page - 1 }));
+    // }
+  }, [searchInput]);
 
-  // useEffect(() => {
-  //   if (loading && initialLoad) {
-  //     setInitialLoad(true);
-  //   } else if (!loading && initialLoad) {
-  //     setInitialLoad(false);
-  //   }
-  // }, [loading]);
-
-  // useEffect(()=>{
-  //   if(selectedWahana){
-  //     dispatch(getWahana(backend,selectedWahana,selectedVenue))
-  //     console.log("editin g wahana", wahanas)
-  //   }
-
-  // },[selectedWahana])
+  
+  const filteredWahanas = useMemo(() => {
+    if (selectedVenue.option === "All") {
+      return wahanas;
+    } else {
+      return wahanaByVenue;
+    }
+  }, [selectedVenue, wahanas, wahanaByVenue]);
 
   useEffect(() => {
-    if (selectedVenue) {
+    if (selectedVenue.option !== "All") {
       fetchWahanas(selectedVenue);
       // setPage(page-1)
-    } else {
-      dispatch(getAllWahanas({ backend, chunkSize: 10, pageNo: 0 }));
-    }
+    } 
+    // else {
+    //   dispatch(getAllWahanas({ backend, chunkSize: 10, pageNo: 0 }));
+    // }
   }, [selectedVenue, page]);
 
   // page sets to 1 when venue is selected
-  useEffect(() => {
-    if (selectedVenue) {
-      setPage(1);
-    }
-  }, [selectedVenue]);
+  // useEffect(() => {
+  //   if (selectedVenue) {
+  //     setPage(1);
+  //   }
+  // }, [selectedVenue]);
 
-  const fetchWahanas = (venueId) => {
+  const fetchWahanas = (selectedVenue) => {
     dispatch(
       getAllWahanasbyVenue({
         backend,
         chunkSize: 10,
         pageNo: 0,
-        venueId: venueId,
+        venueId: selectedVenue.id,
       })
     );
   };
 
   const handleDescription = (description) => {
-    console.log("wahana description is ", description);
+   // console.log("wahana description is ", description);
 
     setDescriptionModal(true);
     setWahanaDescription(description);
@@ -161,11 +176,7 @@ const AdminWahana = () => {
     setDescriptionModal(false);
   };
 
-  // fetching all wahanas
-
-  // const fetchAllWahanas = ()=>{
-  //   dispatch(getAllWahanas({backend, chunkSize:100, pageNo:0}))
-  // }
+  
 
   const delete_Wahana = (wahanaId, venueId) => {
     // console.log("handle delete",selectedWahana)
@@ -176,8 +187,8 @@ const AdminWahana = () => {
   };
 
   const confirmDeleteWahana = () => {
-    console.log("handle delete ids are", deleteWahanaId);
-    console.log("handle delete ids are", deleteVenueId);
+   // console.log("handle delete ids are", deleteWahanaId);
+    //console.log("handle delete ids are", deleteVenueId);
     dispatch(deleteWahana({ backend, deleteVenueId, deleteWahanaId }));
     setDeleteModalVisible(false); // Close the modal
   };
@@ -185,26 +196,10 @@ const AdminWahana = () => {
     setPage(pageNumber);
   };
 
-  // const handleNextPage = () => {
-  //   dispatch(setPage(currentPage + 1));
-  // };
+  
 
-  // const handlePreviousPage = () => {
-  //   if (currentPage > 1) {
-  //     dispatch(setPage(currentPage - 1));
-  //   }
-  // };
-
-  // const totalPages = Math.ceil(wahanas.length / 3);
-  // console.log("wahanas length are",wahanas.length)
-  //  console.log("total pages are", totalPages)
-
-  // const handlePageChange = (page) => {
-  //   console.log("handle page is",page)
-  //   dispatch(setCurrentPage(page));
-  //   dispatch(getAllWahanas({ backend, chunkSize: 3, pageNo: page }));
-  // };
-
+  const containerVariants = createStaggerContainer(0.4);
+  const cardVariants = createStaggerVariant(0.3);
   return (
     <div className=" flex flex-auto flex-col relative min-h-screen">
       {descriptionModal && (
@@ -280,7 +275,7 @@ const AdminWahana = () => {
         </div>
 
         <WahanaMain
-          wahanaData={wahanas}
+          wahanaData={filteredWahanas }
           venues={venues}
           selectedVenue={selectedVenue}
           setSelectedVenue={setSelectedVenue}
@@ -294,6 +289,11 @@ const AdminWahana = () => {
           handleDescription={handleDescription}
           searchInput={searchInput}
           setSearchInput={setSearchInput}
+          containerVariants = {containerVariants }
+          isOptionMenuOpen = {isOptionMenuOpen}
+          handleSelectOption = { handleSelectOption }
+          toggleOptionMenu = {toggleOptionMenu}
+          cardVariants = {cardVariants}
         />
         <div className="flex justify-end m-6 items-center space-x-2">
           {/* Prev button */}
@@ -380,30 +380,39 @@ const WahanaMain = ({
   handleDescription,
   searchInput,
   setSearchInput,
+  containerVariants,
+  isOptionMenuOpen,
+  handleSelectOption,
+  toggleOptionMenu,
+  cardVariants
+  
 }) => {
   const SkeletonLoader = () => {
     return (
-      <div className="animate-pulse flex flex-col p-4 bg-gray-300 rounded-lg shadow-md min-w-65 min-h-80 mt-8 mx-3">
+      <div className="animate-pulse flex flex-col p-4 bg-gray-400 rounded-lg shadow-md w-auto min-h-100 mt-8 mx-3">
         {/* title and delete btn */}
         <div className="flex items-center justify-between mb-4">
-          <div className="bg-gray-400 h-4 w-[25%] rounded"></div>
-          <div className="bg-gray-400 h-4 w-8 rounded"></div>
+          <div className="bg-gray-600 h-4 w-[25%] rounded-lg"></div>
+          <div className="bg-gray-600 w-11 h-11 rounded-full"></div>
         </div>
 
         {/* Bottom section*/}
         <div className="space-y-2 mt-auto">
-          <div className="h-3 bg-gray-400 rounded w-1/2"></div>
-          <div className="h-5 bg-gray-400 rounded w-1/2"></div>
-          <div className="h-3 bg-gray-400 rounded w-1/2"></div>
+          <div className="h-3 bg-gray-600 rounded w-1/2"></div>
+          <div className="h-5 bg-gray-600 rounded w-1/2"></div>
+          <div className="h-7 bg-gray-600 rounded w-1/2"></div>
         </div>
       </div>
     );
   };
+
+  // const containerVariants = createStaggerContainer(0.4);
+  
   return (
     <div className="flex flex-auto p-6 sm:p-10">
       <div className="mx-auto flex w-full max-w-xs flex-auto flex-col sm:max-w-5xl">
         <div className="flex w-full max-w-xs flex-col justify-center sm:max-w-none sm:flex-row ">
-          <select
+          {/* <select
             value={selectedVenue || ""}
             onChange={(e) => setSelectedVenue(e.target.value)}
             className="bg-card text-icon px-4 min-h-12 rounded-full border border-border sm:w-36"
@@ -416,7 +425,53 @@ const WahanaMain = ({
                 {venues.Title}
               </option>
             ))}
-          </select>
+          </select> */}
+
+<div className="sm:w-36 bg-card rounded-xl p-4 relative cursor-pointer">
+                <div className="flex flex-auto">
+                  <div className="flex flex-col absolute top-0 inset-x-0 rounded-xl bg-card z-20">
+                    <div className="flex justify-between">
+                      <div className="w-full">
+                        <div
+                          className="p-4 truncate flex"
+                        onClick={toggleOptionMenu}
+                        >
+                          {selectedVenue.option}
+                        
+
+                        <div className = "ml-auto">
+                        <HiOutlineSelector size={25}/>
+                        </div>
+                        </div>
+
+                        {isOptionMenuOpen && (
+                          <>
+                            <div
+                              className="py-4 hover:bg-hover last:rounded-b-xl"
+                              onClick={() => handleSelectOption("All", "")}
+                            >
+                              <div className="px-4">All</div>
+                            </div>
+                            {venues.map(({ id, Title }) => (
+                              <div
+                                key={id}
+                                className="py-4 hover:bg-hover last:rounded-b-xl"
+                                onClick={() => handleSelectOption(Title, id)}
+                              >
+                                <div className="px-4">{Title}</div>
+                              </div>
+                            ))}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="ml-auto flex items-center">#</div>
+                </div>
+              </div>
+
+
 
           <div className="px-4 mt-4 sm:ml-4 sm:mt-0 sm:w-72 min-h-12 lg:min-w-[68%] md:min-w-[55%] rounded-full border border-border flex items-center bg-card text-icon">
             <HiMagnifyingGlass size={20} />
@@ -447,8 +502,19 @@ const WahanaMain = ({
             No wahanas found!
           </div>
         ) : (
-          <div className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3">
+       
+
+
+         
+
+            <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="show"
+               className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3"
+              >
             {wahanaData?.map((wahana) => (
+               <motion.div key={wahana.id} variants={cardVariants}>
               <WahanaCard
                 key={wahana.id}
                 wahana={{
@@ -468,8 +534,10 @@ const WahanaMain = ({
                 loading={loading}
                 handleDescription={handleDescription}
               />
+               </motion.div>
             ))}
-          </div>
+             </motion.div>
+         
         )}
       </div>
     </div>
@@ -478,9 +546,9 @@ const WahanaMain = ({
 
 const WahanaCard = ({ wahana, delete_Wahana, loading, handleDescription }) => {
   const name = wahana.venueId.split("#")[0];
-  console.log("venue name is", name);
+ // console.log("venue name is", name);
 
-  console.log("loginggg wahana check venue id ", wahana.venueId);
+ // console.log("loginggg wahana check venue id ", wahana.venueId);
   // console.log("logging wahana price is",wahana?.price)
   // console.log("logging edited venue id is", venueId)
   //  console.log("wahana price is ", wahana.price)

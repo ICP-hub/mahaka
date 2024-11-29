@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import { useDispatch, useSelector } from "react-redux";
 // Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -10,6 +11,8 @@ import { Autoplay, Pagination } from 'swiper/modules';
 
 import OngoingCard from '../OngoingCard';
 export default function () {
+  const { events, eventByVenue, eventsLoading, singleEventLoading } =
+  useSelector((state) => state.events);
   return (
     <>
      <Swiper
@@ -24,12 +27,14 @@ export default function () {
         modules={[Autoplay,Pagination]}
         className="mySwiper"
       >
-        <SwiperSlide><OngoingCard/></SwiperSlide>
-        <SwiperSlide><OngoingCard/></SwiperSlide>
-        <SwiperSlide><OngoingCard/></SwiperSlide>
-        <SwiperSlide><OngoingCard/></SwiperSlide>
-        <SwiperSlide><OngoingCard/></SwiperSlide>
-        <SwiperSlide><OngoingCard/></SwiperSlide>
+        {events?.map((event, index) => (
+          <SwiperSlide key={index}>
+            <OngoingCard eventData={event}
+            eventsLoading ={ eventsLoading}
+            />
+          </SwiperSlide>
+        ))}
+       
       </Swiper>
     </>
   )

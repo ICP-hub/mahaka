@@ -41,7 +41,7 @@ export const getAllBanners = createAsyncThunk(
   "banner/getAllBanners",
   async ({ backend, category }) => {
     try {
-      console.log("category in reducer", category);
+      //console.log("category in reducer", category);
       const response = await backend.getAllBanners(category);
       console.log("banners fetched response is", response);
       return response;

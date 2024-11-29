@@ -60,14 +60,16 @@ export default function Home() {
   console.log("venues in home", venues);
   const { backend } = useSelector((state) => state.authentication);
   const {  attractionbanners, banners ,  bannerLoading} = useSelector((state) => state.banner);
- const {  testimonials } = useSelector((state) => state.testimonial);
+ const {  testimonials, testimonialLoading } = useSelector((state) => state.testimonial);
+ const { events, eventByVenue, eventsLoading, singleEventLoading } =
+ useSelector((state) => state.events);
 //  const { banners } = useSelector((state) => state.banner);
- console.log("testimonials in home",  testimonials);
+// console.log("testimonials in home",  testimonials);
 
- console.log("Attraction Banners home:", attractionbanners);
- console.log("Third Party Banners home:", banners);
+ //console.log("Attraction Banners home:", attractionbanners);
+// console.log("Third Party Banners home:", banners);
   const dispatch = useDispatch();
-  console.log(wahanas, "wahanas");
+ // console.log(wahanas, "wahanas");
 
 // const SkeletonLoader = ()=>{
 
@@ -167,6 +169,23 @@ export default function Home() {
       </>
     )
   }
+
+  const SkeletonLoaderEvents = ()=>{
+
+    return (
+      <>
+      <div className = "mx-10 mt-15">
+        <div className = "bg-gray-400 h-40 md:h-80 rounded-lg min-w-full animate-pulse p-4">
+          <div className = "flex  flex-col items-center md:mt-40">
+            <div className = "bg-gray-300 h-4 md:h-5 w-[25%] my-2 rounded-md"></div>
+            <div className = "bg-gray-300 h-7 md:h-6 w-[40%]   my-2 rounded-md"></div>
+            <div className = "bg-gray-300 h-5 md:h-10 w-[10%]  my-2 rounded-md"></div>
+          </div>
+        </div>
+      </div>
+      </>
+    )
+  }
   
   const SkeletonLoaderThirdParty = ()=>{
 
@@ -179,6 +198,27 @@ export default function Home() {
       </>
     )
   }
+
+
+  // testimonial skeleton loader
+  const SkeletonLoaderTestimonial = ()=>{
+
+      return (
+        <>
+        <div>
+          <div className = "bg-gray-400 h-60 w-auto rounded-lg animate-pulse shadow-lg p-4">
+            <div  className = "bg-gray-300 h-5 w-[50%] rounded-md mt-5"></div>
+
+            <div className = "mt-20">
+            <div  className = "bg-gray-300 h-4 w-[50%] rounded-md my-5"></div>
+            <div  className = "bg-gray-300 h-4 w-[50%] rounded-md my-5"></div>
+
+            </div>
+          </div>
+        </div>
+        </>
+      )
+    }
   
   return (
     <>
@@ -488,7 +528,12 @@ export default function Home() {
         
         {/* 2 Grid card  end*/}
         {/* OnGoing Event slider Start  */}
+        {eventsLoading?
+        <SkeletonLoaderEvents/>
+        :
+
         <OngoingSlider />
+          }
         {/* OnGoing Event slider end  */}
         {/* Events and ctivity Section Start  */}
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 ">
@@ -539,10 +584,23 @@ export default function Home() {
         </div>
         {/* Events and ctivity Section end  */}
         {/* Testimonial start  */}
+
+  {testimonialLoading ?
+  (
+  <div className = "grid grid-cols-1 md:grid-cols-3 gap-6 my-5 mx-10">
+  <SkeletonLoaderTestimonial/>
+  <SkeletonLoaderTestimonial/>
+  <SkeletonLoaderTestimonial/>
+  </div>
+  )
+  
+  :
+
         <div className="mt-15">
           {" "}
           <TestimonialCarousel />
         </div>
+}
         {/* Testimonial End  */}
       </section>
     </>
