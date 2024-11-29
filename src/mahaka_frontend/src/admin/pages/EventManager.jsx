@@ -211,7 +211,7 @@ const EventManager = () => {
                 ))}
               </motion.div>
             ) : (
-              <div className="mt-8">No Events Found</div>
+              <div className="text-center text-gray-500 md:text-5xl text-3xl font-bold mt-10">No Events Found</div>
             )}
           </div>
         </div>
