@@ -198,6 +198,9 @@ const eventSlice = createSlice({
         state.events = state.events.filter(
           (event) => event.id !== action.payload
         );
+        state.eventByVenue = state.eventByVenue.filter(
+          (event) => event.id !== action.payload
+        );
         state.error = null;
       })
       .addCase(deleteEvent.rejected, (state, action) => {

@@ -257,7 +257,7 @@ const EventCard = ({ event }) => {
   return (
     <>
       {isDelete && (
-        <DeleteModal
+        <DeleteEventModal
           closeModal={() => setIsDelete(false)}
           onEventDelete={handleDeleteEvent}
         />
@@ -417,7 +417,7 @@ const SkeletonLoader = () => {
 };
 
 // Delete modal
-const DeleteModal = ({ closeModal, onEventDelete }) => {
+export const DeleteEventModal = ({ closeModal, onEventDelete }) => {
   const { deleteEventLoader } = useSelector((state) => state.events);
   return (
     <div className="fixed inset-0 z-999 flex items-center rounded justify-center bg-black bg-opacity-50">
