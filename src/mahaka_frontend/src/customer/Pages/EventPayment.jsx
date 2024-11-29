@@ -40,6 +40,8 @@ const EventPayment = () => {
   const vanueids = `${decodeURIComponent(vanueid).replace(/_/g, "#")}${
     window.location.hash
   }`;
+  const [timestemp, setTimeStemp] = useState(0);
+
   const { backend, principal } = useAuth();
   // const { backend } = useSelector((state) => state.authentication);
   const { identity } = useIdentityKit();
@@ -292,7 +294,7 @@ const EventPayment = () => {
     ];
 
     const receiver = principal;
-    const numOfVisitors = BigInt(numberOFVisitor); // Ensure this is correct
+    const numOfVisitors = BigInt(numberOFVisitor);
     const paymentType = { Card: null };
 
     try {
@@ -301,13 +303,14 @@ const EventPayment = () => {
         _eventIds,
         {
           ticket_type: _ticket_type,
-          priceFiat: parseFloat(eventdetail?.gTicket_price || 0), // Ensure price is float
-          price: BigInt(eventdetail?.price || 100_000), // Replace with actual price value
+          priceFiat: parseFloat(eventdetail?.gTicket_price || 0),
+          price: BigInt(eventdetail?.price || 100_000),
         },
-        _metadata, // Metadata array for the event
-        receiver, // Wallet address of the receiver
-        numOfVisitors, // Number of tickets/visitors
-        paymentType // Payment type (Card/ICP/Cash)
+        _metadata,
+        receiver,
+        timestemp,
+        numOfVisitors,
+        paymentType
       );
 
       console.log("Response:", response);
@@ -357,7 +360,7 @@ const EventPayment = () => {
             )}
           </div>
           <div className="py-4 space-y-12 ">
-            <DatePicker />
+            <DatePicker timestemp={timestemp} setTimeStemp={setTimeStemp} />
             <VisitorPicker
               numberOFVisitor={numberOFVisitor}
               setNumberOFVisitor={setNumberOFVisitor}

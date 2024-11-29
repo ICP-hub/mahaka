@@ -1,40 +1,27 @@
 import React, { useState } from "react";
-// import { HiCalendar } from "react-icons/hi";
 import ColorCalender from "../assets/images/calender-color.svg";
 import { HiArrowLeftCircle } from "react-icons/hi2";
 import { HiArrowRightCircle } from "react-icons/hi2";
 
-const DatePicker = () => {
+const DatePicker = ({ timestemp, setTimeStemp }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
   const [currentDate, setCurrentDate] = useState(new Date());
   const today = new Date();
 
   const toggleCalendar = () => setIsOpen(!isOpen);
 
   const handleDateClick = (day) => {
-    const newDate = new Date(
+    const selectedDate = new Date(
       currentDate.getFullYear(),
       currentDate.getMonth(),
       day
     );
-    // Set the selected date only if it's within the current month
-    if (newDate.getMonth() === currentDate.getMonth()) {
-      setSelectedDate(newDate);
+    const diffDays = (selectedDate - today) / (1000 * 60 * 60 * 24);
+
+    if (diffDays >= 0 && diffDays <= 7) {
+      setTimeStemp(selectedDate.getTime());
       setIsOpen(false);
     }
-  };
-
-  const handlePrevMonth = () => {
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
-    );
-  };
-
-  const handleNextMonth = () => {
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
-    );
   };
 
   const daysInMonth = new Date(
@@ -61,7 +48,7 @@ const DatePicker = () => {
       >
         <input
           type="text"
-          value={selectedDate ? selectedDate.toDateString() : ""}
+          value={timestemp ? new Date(timestemp).toDateString() : ""}
           placeholder="Select a date"
           readOnly
           className="w-full bg-transparent border-none text-gray-800 font-semibold"
@@ -75,7 +62,7 @@ const DatePicker = () => {
       {isOpen && (
         <div className="mt-2 w-full bg-white border border-gray-300 shadow-lg rounded-lg z-10">
           <div className="flex items-center justify-between p-2 bg-gray-100 border-b border-gray-300">
-            <button onClick={handlePrevMonth}>
+            <button onClick={() => setCurrentDate(new Date())}>
               <HiArrowLeftCircle size={32} color="#f08e1e" />
             </button>
             <span className="font-semibold">
@@ -84,7 +71,7 @@ const DatePicker = () => {
                 year: "numeric",
               })}
             </span>
-            <button onClick={handleNextMonth}>
+            <button onClick={() => setCurrentDate(new Date())}>
               <HiArrowRightCircle size={32} color="#f08e1e" />
             </button>
           </div>
@@ -99,43 +86,37 @@ const DatePicker = () => {
           </div>
           <div className="grid grid-cols-7 gap-1 p-2 font-medium">
             {calendarDays.map((day, index) => {
-              const isToday =
-                day &&
-                new Date(
-                  currentDate.getFullYear(),
-                  currentDate.getMonth(),
-                  day
-                ).toDateString() === today.toDateString();
+              if (!day) {
+                return <div key={index} className="p-2 h-10 w-10"></div>;
+              }
+
+              const date = new Date(
+                currentDate.getFullYear(),
+                currentDate.getMonth(),
+                day
+              );
+              const diffDays = (date - today) / (1000 * 60 * 60 * 24);
+              const isSelectable = diffDays >= 0 && diffDays <= 7;
               const isSelected =
-                day &&
-                selectedDate &&
-                new Date(
-                  currentDate.getFullYear(),
-                  currentDate.getMonth(),
-                  day
-                ).toDateString() === selectedDate.toDateString();
-              const isInCurrentMonth =
-                day &&
-                new Date(
-                  currentDate.getFullYear(),
-                  currentDate.getMonth(),
-                  day
-                ).getMonth() === currentDate.getMonth();
+                timestemp &&
+                date.toDateString() === new Date(timestemp).toDateString();
+              const isToday = date.toDateString() === today.toDateString();
+
               return (
                 <div
                   key={index}
-                  onClick={() => day && handleDateClick(day)}
+                  onClick={() => isSelectable && handleDateClick(day)}
                   className={`p-2 rounded-full h-10 w-10 text-center cursor-pointer ${
-                    isInCurrentMonth
+                    isSelectable
                       ? isSelected
                         ? "bg-secondary text-white"
                         : isToday
                         ? "bg-primary text-white"
                         : "hover:bg-secondary hover:text-white"
-                      : "text-gray-400 hover:bg-transparent"
+                      : "text-gray-400 cursor-not-allowed"
                   }`}
                 >
-                  {day || ""}
+                  {day}
                 </div>
               );
             })}
