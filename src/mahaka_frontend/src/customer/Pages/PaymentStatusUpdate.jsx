@@ -8,16 +8,17 @@ const PaymentStatusUpdate = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { identity } = useIdentityKit();
-
+  const [ticketType, setTicketType] = useState(null);
   const [loading, setLoading] = useState(true);
   const [paymentStatus, setPaymentStatus] = useState(null);
-  const [responseMessage, setResponseMessage] = useState("");
-  const [invoiceDetail, setInvoiceDetail] = useState(null);
+  const [responseMessage, setResponseMessage] = useState(
+    "Processing payment..."
+  );
 
   const canisterIDFiat = process.env.CANISTER_ID_FIATPAYMENT;
   const { backend } = useAuth();
   const fullPath = location.pathname + location.hash;
-  const match = fullPath.match(/\/([^/]+)\/([^/]+)\/([^/]+)/);
+  const match = fullPath.match(/\/([^/]+)\/([^/]+)\/([^/]+)/) || [];
 
   const mockData = {
     paymentMethod: "stripe",
@@ -25,14 +26,28 @@ const PaymentStatusUpdate = () => {
     isSuccess: match[2] === "success",
   };
 
-  useEffect(() => {
-    const backendActor = createActor(canisterIDFiat, {
-      agentOptions: { identity, verifyQuerySignatures: true },
-    });
+  const [backendActor, setBackendActor] = useState(null);
 
+  useEffect(() => {
+    if (identity) {
+      const actor = createActor(canisterIDFiat, {
+        agentOptions: { identity, verifyQuerySignatures: true },
+      });
+      setBackendActor(actor);
+    }
+  }, [identity, canisterIDFiat]);
+
+  useEffect(() => {
     const handlePaymentStatusUpdate = async () => {
+      if (!identity || !backendActor) {
+        setResponseMessage("Identity or backend is not available.");
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
+        setResponseMessage("Processing payment...");
 
         const updateResponse = await backendActor.change_invoice_status({
           paymentMethod: mockData.paymentMethod,
@@ -40,53 +55,47 @@ const PaymentStatusUpdate = () => {
           isSuccess: mockData.isSuccess,
         });
 
-        if (!updateResponse.status || "err" in updateResponse.body) {
+        if (!("ok" in updateResponse)) {
           setPaymentStatus("failure");
-          setResponseMessage("Failed to update invoice status.");
-          return;
+          setResponseMessage(
+            updateResponse?.message || "Payment update failed."
+          );
         }
+
+        setPaymentStatus("success");
+        setResponseMessage("Payment updated successfully.");
 
         const invoiceResponse = await backendActor.get_invoice(
           mockData.invoiceNo
         );
 
-        if (!invoiceResponse.status || "err" in invoiceResponse.body) {
-          setPaymentStatus("failure");
-          setResponseMessage("Invoice not found or invalid.");
-          return;
-        }
+        const itemName = invoiceResponse?.body?.success?.items[0]?.name || "";
+        const type = itemName.includes("Venue")
+          ? "Venue"
+          : itemName.includes("Event")
+          ? "Event"
+          : itemName.includes("Wahana")
+          ? "Wahana"
+          : null;
 
-        const invoice = invoiceResponse.body.success;
-        setInvoiceDetail(invoice);
-        console.log("invoice", invoiceResponse);
-        const ticketMapping = {
-          "Event Ticket": { Event: null },
-          "Wahhana Ticket": { Wahana: null },
-          "Venue Ticket": { Venue: null },
-        };
+        setTicketType(type);
 
-        const matchedItem = invoice.items.find((item) =>
-          Object.keys(ticketMapping).includes(item.name)
-        );
-
-        if (matchedItem) {
+        if (type) {
+          const ticketPayload = { [type]: null };
           const processResponse = await backend.processPendingPayment(
             mockData.invoiceNo,
-            ticketMapping[matchedItem.name]
+            ticketPayload
           );
 
           if ("ok" in processResponse) {
             setPaymentStatus("success");
-            setResponseMessage(`${matchedItem.name} processed successfully.`);
+            setResponseMessage("Ticket booked successfully.");
           } else {
             setPaymentStatus("failure");
             setResponseMessage(
-              processResponse.err || `Failed to process ${matchedItem.name}.`
+              processResponse?.err || "Payment processing failed."
             );
           }
-        } else {
-          setPaymentStatus("failure");
-          setResponseMessage("Unsupported item in the invoice.");
         }
       } catch (error) {
         console.error("Error during payment update:", error);
@@ -97,18 +106,18 @@ const PaymentStatusUpdate = () => {
       }
     };
 
-    handlePaymentStatusUpdate();
-  }, [canisterIDFiat, identity, mockData]);
+    if (backendActor && identity) {
+      handlePaymentStatusUpdate();
+    }
+  }, [backendActor, identity, mockData.invoiceNo, mockData.isSuccess]);
 
-  const handleNavigateHome = () => {
-    navigate("/");
-  };
+  const handleNavigateHome = () => navigate("/");
 
   return (
     <div className="flex flex-col items-center justify-center h-screen px-4 bg-gray-50">
       {loading ? (
         <div className="text-lg font-semibold text-gray-700">
-          Processing Payment...
+          {responseMessage}
         </div>
       ) : paymentStatus === "success" ? (
         <div className="text-center">

@@ -12,6 +12,7 @@ import VisitorPicker from "../Components/single-event/VisitorPicker";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../connect/useClient";
 import { HttpAgent } from "@dfinity/agent";
+import notificationManager from "../../common/utils/notificationManager";
 
 const PaymentTest = () => {
   const authenticatedAgent = useAgent();
@@ -33,6 +34,7 @@ const PaymentTest = () => {
     window.location.hash
   }`;
   const { backend, principal } = useAuth();
+  const [timestemp, setTimeStemp] = useState(0);
   // const { backend } = useSelector((state) => state.authentication);
   const { identity } = useIdentityKit();
   const ICP_API_HOST = "https://icp-api.io/";
@@ -58,9 +60,10 @@ const PaymentTest = () => {
       setLoadingData(true);
       try {
         const data1 = await backend.getDIPdetails(eventprincipal);
-
+        const ticket = await backend.getAllCallerTickets(10, 0);
         setVanueDetail(data1);
         console.log("vandaataaa", data1);
+        console.log("ticket", ticket);
       } catch (error) {
         console.error("Error fetching:", error);
       } finally {
@@ -195,9 +198,11 @@ const PaymentTest = () => {
   //     console.error("Error in buying event tickets:", err);
   //   }
   // };
+
+  console.log("timestem", timestemp);
   const handlePayment = async (e) => {
     if (principal == undefined) {
-      alert("jgh");
+      notificationManager.error("Please login first");
       return;
     }
     e.preventDefault();
@@ -246,14 +251,19 @@ const PaymentTest = () => {
     }
   };
   const handlePayment2 = async (e) => {
-    if (principal == undefined) {
-      alert("jgh");
+    if (!principal) {
+      notificationManager.error("Please login first");
       return;
     }
+    if (timestemp == 0 || ticketprice == 0) {
+      notificationManager.error("Please fill all the Details");
+      return;
+    }
+
     setLoading(true);
     setIsPaymentProcessing(true);
-    const _venueId = eventIds;
 
+    const _venueId = eventIds;
     const _ticket_type = { GroupPass: null };
     const _metadata = [
       {
@@ -267,37 +277,44 @@ const PaymentTest = () => {
     ];
     const receiver = principal;
     const numOfVisitors = BigInt(numberOFVisitor);
-
     const paymentType = { Card: null };
 
-    console.log("backend", backend);
     try {
+      const ticketDetails = {
+        ticket_type: _ticket_type,
+        priceFiat: Number(vanuedetail?.gTicket_price) || 0,
+        price: BigInt(100_000),
+      };
+
+      console.log("Backend canister:", backend);
+
       const response = await backend.buyVenueTicket(
         _venueId,
-        {
-          ticket_type: _ticket_type,
-          priceFiat: Number(vanuedetail?.gTicket_price),
-          price: BigInt(100_000),
-        },
+        ticketDetails,
         _metadata,
         receiver,
         paymentType,
+        BigInt(timestemp),
         numOfVisitors
       );
-      console.log("res", response);
+
+      console.log("Response:", response);
+
       if ("ok" in response) {
-        console.log("Purchase response:", response);
+        console.log("Purchase successful:", response);
         navigate(`/venues/${canisterId}/primium/payment2/checkout`);
       } else {
         throw new Error(response.err || "Purchase failed");
       }
     } catch (error) {
       console.error("Payment error:", error);
+      alert(`Payment failed: ${error.message}`);
     } finally {
       setLoading(false);
       setIsPaymentProcessing(false);
     }
   };
+
   return (
     <div className="w-full bg-white m-auto">
       <div className="max-w-7xl w-full  mx-auto   rounded-lg shadow-md grid grid-cols-1 md:grid-cols-2 md:gap-6">
@@ -328,7 +345,7 @@ const PaymentTest = () => {
             )}
           </div>
           <div className="py-4 space-y-12 ">
-            <DatePicker />
+            <DatePicker timestemp={timestemp} setTimeStemp={setTimeStemp} />
             <VisitorPicker
               numberOFVisitor={numberOFVisitor}
               setNumberOFVisitor={setNumberOFVisitor}
@@ -417,22 +434,6 @@ const PaymentTest = () => {
                   onChange={() => setPaymentType("Card")}
                 />
                 Card
-              </label>
-
-              <label
-                htmlFor="icp"
-                className="flex items-center text-lg font-normal cursor-pointer"
-              >
-                <input
-                  type="radio"
-                  id="icp"
-                  name="payment"
-                  className="mr-2"
-                  value="ICP"
-                  checked={paymenttype === "ICP"}
-                  onChange={() => setPaymentType("ICP")}
-                />
-                ICP Wallet
               </label>
             </div>
           </div>

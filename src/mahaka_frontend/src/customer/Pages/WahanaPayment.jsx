@@ -12,6 +12,7 @@ import VisitorPicker from "../Components/single-event/VisitorPicker";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../connect/useClient";
 import { HttpAgent } from "@dfinity/agent";
+import notificationManager from "../../common/utils/notificationManager";
 
 const WahanaPayment = () => {
   const authenticatedAgent = useAgent();
@@ -27,6 +28,8 @@ const WahanaPayment = () => {
     window.location.hash
   }`;
   const ticketType = "SINGLE";
+  const [timestemp, setTimeStemp] = useState(0);
+
   const [numberOFVisitor, setNumberOFVisitor] = useState(1);
   const [paymenttype, setPaymentType] = useState("Card");
   const [loading, setLoading] = useState(false);
@@ -72,7 +75,7 @@ const WahanaPayment = () => {
 
   const handlePayment = async (e) => {
     if (principal == undefined) {
-      alert("jgh");
+      notificationManager.error("Please connect your wallet");
       return;
     }
     e.preventDefault();
@@ -122,7 +125,7 @@ const WahanaPayment = () => {
   };
   const handlePayment2 = async (e) => {
     if (principal == undefined) {
-      alert("connect wallet");
+      notificationManager.error("Please connect your wallet");
       return;
     }
     setLoading(true);
@@ -151,6 +154,7 @@ const WahanaPayment = () => {
         _venueId,
         wahanaid,
         receiver,
+        BigInt(timestemp),
         numOfVisitors,
         paymentType
       );
@@ -195,7 +199,7 @@ const WahanaPayment = () => {
             )}
           </div>
           <div className="py-4 space-y-12 ">
-            <DatePicker />
+            <DatePicker timestemp={timestemp} setTimeStemp={setTimeStemp} />
             <VisitorPicker
               numberOFVisitor={numberOFVisitor}
               setNumberOFVisitor={setNumberOFVisitor}
@@ -286,22 +290,6 @@ const WahanaPayment = () => {
                   onChange={() => setPaymentType("Card")}
                 />
                 Card
-              </label>
-
-              <label
-                htmlFor="icp"
-                className="flex items-center text-lg font-normal cursor-pointer"
-              >
-                <input
-                  type="radio"
-                  id="icp"
-                  name="payment"
-                  className="mr-2"
-                  value="ICP"
-                  checked={paymenttype === "ICP"}
-                  onChange={() => setPaymentType("ICP")}
-                />
-                ICP Wallet
               </label>
             </div>
           </div>

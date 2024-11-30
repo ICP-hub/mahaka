@@ -26,9 +26,13 @@ import ICRCactor "../ICRC/ICRC";
 import icrcTypes "../ICRC/Types";
 import Http "../FiatPayment/http";
 import FiatTypes "../FiatPayment/types";
-// import FiatPay "canister:Fiatpayment";
+import Interface "../ic-management-interface";
+
 
 actor mahaka {
+
+     let IC = "aaaaa-aa";
+     let ic = actor(IC) : Interface.Self;
 
 
      var _venueMap = TrieMap.TrieMap<Text, Types.Index>(Text.equal,Text.hash);
@@ -548,6 +552,7 @@ actor mahaka {
           let availablecycles : Nat = await availableCycles(); 
           if(availablecycles < 800_500_000_000 ){
                throw Error.reject("Canister doesnt have enough cycles");
+               return #err(#CyclesError);
           };
           Cycles.add<system>(800_500_000_000);
           let venueCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), collection_details.collection_args);
@@ -786,14 +791,40 @@ actor mahaka {
                     throw Error.reject("Venue not found");
                };
                case (?v){
-                    
                     let venue_blob = await stable_get(v, Venue_state);
                     let venue : ?Types.Venue = from_candid(venue_blob);
-                    _venueMap.delete(Venue_id);
-                    return #ok(true,venue);
+                    switch(venue){
+                         case null {
+                              throw Error.reject("No memory found for this index");
+                         };
+                         case(?v){
+                              let eventIds : [Text] = v.Events;
+                              let wahanaIds : [Text] = v.Wahanas;
+                              _venueMap.delete(Venue_id);
+                              let allEventsAndWahanas : [Text] = Array.append(eventIds, wahanaIds);
+                              await deleteCanistersByIds(allEventsAndWahanas);
+                              _EventsMap.delete(Venue_id);
+                              _WahanaMap.delete(Venue_id);
+                              let venueCanisterId = await Utils.extractCanisterId(Venue_id);
+                              await ic.stop_canister({ canister_id = Principal.fromText(venueCanisterId) });
+                              await ic.delete_canister({ canister_id = Principal.fromText(venueCanisterId) });
+                              return #ok(true,venue);
+                         }
+                    }
                };
           };
      };
+
+     public shared func deleteCanistersByIds(ids: [Text]) : async () {
+          for (id in ids.vals()) {
+               let canisterId = await Utils.extractCanisterId(id);
+               await ic.stop_canister({ canister_id = Principal.fromText(canisterId) });
+               await ic.delete_canister({ canister_id = Principal.fromText(canisterId) });
+          };
+
+     };
+
+
 
      public shared func getAllVenues(chunkSize : Nat , pageNo : Nat) : async {data : [Types.Venue] ; current_page : Nat ; Total_pages : Nat} {
            // if (Principal.isAnonymous(user)) {
@@ -1346,6 +1377,9 @@ actor mahaka {
                               let event_index = await update_stable(Event_index, event_blob, Events_state);
                               let updatedVenue = await updateVenuewithEvents(venue_id,List.toArray(updated_event_data.EventIds));
                               _EventsMap.put(venue_id, Event_index);
+                              let eventCanisterId = await Utils.extractCanisterId(eventId);
+                              await ic.stop_canister({ canister_id = Principal.fromText(eventCanisterId) });
+                              await ic.delete_canister({ canister_id = Principal.fromText(eventCanisterId) });
                               return #ok(true, event_index);
                          };
                     };
@@ -3704,6 +3738,9 @@ actor mahaka {
                               let wahana_index = await update_stable(Wahana_index, wahana_blob, Wahana_state);
                               let updatedVenue = await updateVenuewithWahanas(venue_id,List.toArray(updated_wahana_data.WahanaIds));
                               _WahanaMap.put(venue_id, wahana_index);
+                              let wahanaCanisterId = await Utils.extractCanisterId(wahanaId);
+                              await ic.stop_canister({ canister_id = Principal.fromText(wahanaCanisterId) });
+                              await ic.delete_canister({ canister_id = Principal.fromText(wahanaCanisterId) });
                               return #ok((true, wahana_index));
                          };
                     };

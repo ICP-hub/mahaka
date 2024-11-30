@@ -11,6 +11,7 @@ import VisitorPicker from "../Components/single-event/VisitorPicker";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../connect/useClient";
 import { HttpAgent } from "@dfinity/agent";
+import notificationManager from "../../common/utils/notificationManager";
 
 const EventPayment = () => {
   const authenticatedAgent = useAgent();
@@ -40,6 +41,8 @@ const EventPayment = () => {
   const vanueids = `${decodeURIComponent(vanueid).replace(/_/g, "#")}${
     window.location.hash
   }`;
+  const [timestemp, setTimeStemp] = useState(0);
+
   const { backend, principal } = useAuth();
   // const { backend } = useSelector((state) => state.authentication);
   const { identity } = useIdentityKit();
@@ -256,7 +259,7 @@ const EventPayment = () => {
 
   const handlePayment2 = async (e) => {
     if (!principal) {
-      alert("Please connect your wallet");
+      notificationManager.error("Please connect your wallet");
       return;
     }
 
@@ -269,12 +272,11 @@ const EventPayment = () => {
         ? { GroupPass: null }
         : ticketType === "VIP"
         ? { VipPass: null }
-        : { SinglePass: null }; // Dynamically set ticket type based on user selection
+        : { SinglePass: null };
 
-    // Metadata example; replace with actual data as needed
     const _metadata = [
       {
-        data: new Uint8Array([0x12, 0x34]), // Replace with actual image data if available
+        data: new Uint8Array([0x12, 0x34]),
         description: "Event ticket details",
         key_val_data: [
           {
@@ -292,7 +294,7 @@ const EventPayment = () => {
     ];
 
     const receiver = principal;
-    const numOfVisitors = BigInt(numberOFVisitor); // Ensure this is correct
+    const numOfVisitors = BigInt(numberOFVisitor);
     const paymentType = { Card: null };
 
     try {
@@ -301,20 +303,21 @@ const EventPayment = () => {
         _eventIds,
         {
           ticket_type: _ticket_type,
-          priceFiat: parseFloat(eventdetail?.gTicket_price || 0), // Ensure price is float
-          price: BigInt(eventdetail?.price || 100_000), // Replace with actual price value
+          priceFiat: parseFloat(eventdetail?.gTicket_price || 0),
+          price: BigInt(eventdetail?.price || 100_000),
         },
-        _metadata, // Metadata array for the event
-        receiver, // Wallet address of the receiver
-        numOfVisitors, // Number of tickets/visitors
-        paymentType // Payment type (Card/ICP/Cash)
+        _metadata,
+        receiver,
+        timestemp,
+        numOfVisitors,
+        paymentType
       );
 
       console.log("Response:", response);
 
       if ("ok" in response) {
         console.log("Purchase successful:", response.ok);
-        navigate(`/venues/${vanueid}/primium/payment2/checkout`); // Ensure `vanueid` is defined
+        navigate(`/venues/${vanueid}/primium/payment2/checkout`);
       } else {
         throw new Error(response.err || "Purchase failed");
       }
@@ -357,7 +360,7 @@ const EventPayment = () => {
             )}
           </div>
           <div className="py-4 space-y-12 ">
-            <DatePicker />
+            <DatePicker timestemp={timestemp} setTimeStemp={setTimeStemp} />
             <VisitorPicker
               numberOFVisitor={numberOFVisitor}
               setNumberOFVisitor={setNumberOFVisitor}
@@ -446,22 +449,6 @@ const EventPayment = () => {
                   onChange={() => setPaymentType("Card")}
                 />
                 Card
-              </label>
-
-              <label
-                htmlFor="icp"
-                className="flex items-center text-lg font-normal cursor-pointer"
-              >
-                <input
-                  type="radio"
-                  id="icp"
-                  name="payment"
-                  className="mr-2"
-                  value="ICP"
-                  checked={paymenttype === "ICP"}
-                  onChange={() => setPaymentType("ICP")}
-                />
-                ICP Wallet
               </label>
             </div>
           </div>
