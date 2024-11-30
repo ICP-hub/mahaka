@@ -62,7 +62,7 @@ export default function Home() {
   const { attractionbanners, banners, bannerLoading } = useSelector(
     (state) => state.banner
   );
-  const { testimonials } = useSelector((state) => state.testimonial);
+  const { testimonials,testimonialLoading } = useSelector((state) => state.testimonial);
   //  const { banners } = useSelector((state) => state.banner);
   console.log("testimonials in home", testimonials);
 
@@ -180,7 +180,7 @@ export default function Home() {
     );
   };
 
-  const SkeletonLoaderThirdParty = () => {
+  const SkeletonLoaderTestimonial = () => {
     return (
       <>
         <div>
@@ -423,12 +423,12 @@ export default function Home() {
 
         {/* 2 Grid card  end*/}
         {/* OnGoing Event slider Start  */}
-        {eventsLoading?
+        {/* {eventsLoading?
         <SkeletonLoaderEvents/>
-        :
+        : */}
 
         <OngoingSlider />
-          }
+          
         {/* OnGoing Event slider end  */}
         {/* Events and ctivity Section Start  */}
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 ">
