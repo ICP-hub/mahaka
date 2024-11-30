@@ -8,16 +8,25 @@ import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
 import { useIdentityKit } from "@nfid/identitykit/react";
 import { getAllEventsByVenue } from "../../redux/reducers/apiReducers/eventApiReducer";
 import { fetchTicketDetails } from "../../redux/reducers/apiReducers/ticketApiReducer";
+import { getVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
 import EventTickets from "../components/EventTickets";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/pagination";
+
+// import required modules
+import { Autoplay, Pagination } from "swiper/modules";
 
 const MgtTicket = () => {
   const [selectedVenue, setSelectedVenue] = useState(null);
   const [ticketDetails, setTicketDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const { venues, loading: venuesLoading } = useSelector(
+  const { currentVenue, loading: venuesLoading } = useSelector(
     (state) => state.venues
   );
+
+  const { currentUserByCaller } = useSelector((state) => state.users);
 
   const { events, eventLoading } = useSelector((state) => state.events);
   const { backend } = useSelector((state) => state.authentication);
@@ -27,13 +36,29 @@ const MgtTicket = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    dispatch(
+      getVenue({ backend, venueId: currentUserByCaller?.assignedVenue?.id })
+    );
+
     // Automatically select the first venue and fetch its ticket details
-    if (!venuesLoading && venues.length > 0) {
-      const defaultVenue = venues[0];
-      setSelectedVenue(defaultVenue);
+  }, [backend]);
+  useEffect(() => {
+    dispatch(
+      getAllEventsByVenue({
+        backend,
+        chunkSize: 100,
+        pageNo: 0,
+        venueId: currentVenue?.id,
+      })
+    );
+    // Automatically select the first venue and fetch its ticket details
+    if (!venuesLoading && currentVenue) {
+      const defaultVenue = currentVenue;
+      console.log(currentVenue);
+
       fetchTicketDetails(defaultVenue);
     }
-  }, [venuesLoading, venues]);
+  }, [backend, currentVenue]);
 
   useEffect(() => {
     // Automatically select the first venue and fetch its ticket details
@@ -48,7 +73,7 @@ const MgtTicket = () => {
           const details = await backend.getDIPdetails(
             defaultVenue?.event_collectionid
           );
-          console.log(details);
+
           setEventDetails(details);
           setLoading(false);
         } catch (error) {
@@ -58,9 +83,10 @@ const MgtTicket = () => {
 
       eventData();
     }
-  }, [eventLoading, events, venues]);
+  }, [eventLoading, events]);
 
   const fetchTicketDetails = async (venue) => {
+    console.log("hello");
     if (!venue?.Collection_id) {
       console.error("Venue does not have a collection_id:", venue);
       return;
@@ -68,18 +94,10 @@ const MgtTicket = () => {
 
     setLoadingDetails(true);
     try {
-      dispatch(
-        getAllEventsByVenue({
-          backend,
-          chunkSize: 100,
-          pageNo: 0,
-          venueId: venue.id,
-        })
-      );
-
-      console.log(backend);
       // Fetch ticket details from the actor
+      console.log("hello after events");
       const details = await backend.getDIPdetails(venue?.Collection_id);
+      console.log(details);
       setTicketDetails(details);
     } catch (error) {
       console.error("Error fetching ticket details:", error);
@@ -89,13 +107,8 @@ const MgtTicket = () => {
     }
   };
 
-  const handleVenueChange = (event) => {
-    const venue = venues.find((v) => v.id === event.target.value);
-    if (venue) {
-      setSelectedVenue(venue);
-      fetchTicketDetails(venue);
-    }
-  };
+  console.log(ticketDetails);
+
   const handleEventChange = async (event) => {
     setLoading(true);
     const selectedEventId = event.target.value;
@@ -111,7 +124,6 @@ const MgtTicket = () => {
         const details = await backend.getDIPdetails(
           selectedEvent?.event_collectionid
         );
-        console.log(details);
 
         setEventDetails(details);
         setLoading(false); // Update state with new event details
@@ -122,49 +134,78 @@ const MgtTicket = () => {
     }
   };
 
-  const ticketData = {
-    type: "VIP", // Example ticket type
-    gradientClass: "bg-gradient-to-r from-cyan-200 to-cyan-300",
-    name: "Concert Ticket",
-    description: "Access to the exclusive concert event",
-    price: "$120",
-    availability: "20 tickets left",
-    highlightClass: "bg-cyan-500",
-  };
+  const ticketData = [
+    {
+      type: "PREMIUM",
+      gradientClass: "bg-gradient-to-r from-orange-200 to-orange-300",
+      name: "Ticket Name",
+      description:
+        "Lorem ipsum dolor sit amet consectetur. Bibendum est vitae urna pharetra",
+      price: "Rp. 1,500",
+      availability: "AVAILABLE",
+      highlightClass: "bg-orange-500",
+    },
+    {
+      type: "VVIP",
+      gradientClass: "bg-gradient-to-r from-cyan-200 to-cyan-300",
+      name: "Ticket Name",
+      description:
+        "Lorem ipsum dolor sit amet consectetur. Bibendum est vitae urna pharetra",
+      price: "Rp. 1,500",
+      availability: "SOLD OUT",
+      highlightClass: "bg-cyan-500",
+    },
+    {
+      type: "GROUP",
+      gradientClass: "bg-gradient-to-r from-blue-200 to-blue-300",
+      name: "Ticket Name",
+      description:
+        "Lorem ipsum dolor sit amet consectetur. Bibendum est vitae urna pharetra",
+      price: "Rp. 1,500",
+      availability: "3 TICKETS LEFT",
+      highlightClass: "bg-blue-500",
+    },
+  ];
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Manage Tickets</h1>
 
       {/* Venue Selection */}
-      <label className="block mb-2 text-lg font-medium" htmlFor="venue">
-        Select Venue:
-      </label>
-      <select
-        id="venue"
-        className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-6"
-        value={selectedVenue?.id || ""}
-        onChange={handleVenueChange}
-      >
-        <option value="" disabled>
-          Choose a venue
-        </option>
-        {venues.map((venue) => (
-          <option key={venue.id} value={venue.id}>
-            {venue.Title}
-          </option>
-        ))}
-      </select>
+
+      {venuesLoading ? (
+        <div>loading...</div>
+      ) : (
+        <p className="text-2xl">{currentVenue?.Title}</p>
+      )}
 
       {/* Show Loader or Ticket Details */}
       {loadingDetails ? (
         <p>Loading ticket details...</p>
       ) : ticketDetails ? (
         <div>
-          <Ticket
-            {...ticketData}
-            tickets={ticketDetails}
-            selectedVenue={selectedVenue}
-          />
+          <div className="flex justify-between  ">
+            <Ticket
+              type={"GROUP"}
+              gradientClass={ticketData[0].gradientClass}
+              name={"Group Tickets"}
+              description={ticketDetails?.description || "description"}
+              price={parseInt(ticketDetails?.gTicket_price) || 1}
+              availability={parseInt(ticketDetails?.gTicket_limit) || 4}
+              highlightClass={ticketData[0].highlightClass}
+              selectedVenue={currentVenue?.id}
+            />
+
+            <Ticket
+              type={"SINGLE"}
+              gradientClass={ticketData[1].gradientClass}
+              name={"Single Tickets"}
+              description={ticketDetails?.description || "description"}
+              price={parseInt(ticketDetails?.sTicket_price) || 1}
+              availability={parseInt(ticketDetails?.sTicket_limit) || 4}
+              highlightClass={ticketData[1].highlightClass}
+              selectedVenue={currentVenue?.id}
+            />
+          </div>
         </div>
       ) : (
         <p>No ticket details available for the selected venue.</p>
@@ -192,12 +233,42 @@ const MgtTicket = () => {
             <p>Loading ticket details...</p>
           ) : eventDetails ? (
             <div>
-              <EventTickets
-                {...ticketData}
-                tickets={eventDetails}
-                selectedVenue={selectedEvent}
-                id={selectedVenue?.id}
-              />
+              <Swiper
+                spaceBetween={40}
+                slidesPerView={1}
+                breakpoints={{
+                  640: {
+                    slidesPerView: 1,
+                  },
+                  768: {
+                    slidesPerView: 1,
+                  },
+                  1024: {
+                    slidesPerView: 2,
+                  },
+                }}
+                autoplay={{
+                  delay: 3000,
+                  disableOnInteraction: false,
+                }}
+                pagination={{
+                  clickable: true,
+                }}
+                modules={[Autoplay, Pagination]}
+                className="mySwiper px-4 sm:px-6 lg:px-8 mx-auto"
+              >
+                <SwiperSlide>
+                  <EventTickets
+                    type={"SINGLE"}
+                    gradientClass={ticketData.gradientClass}
+                    tickets={eventDetails}
+                    selectedVenue={selectedEvent}
+                    id={selectedVenue?.id}
+                    availability={parseInt(ticketDetails?.sTicket_limit) || 4}
+                    highlightClass={ticketData.highlightClass}
+                  />
+                </SwiperSlide>
+              </Swiper>
             </div>
           ) : (
             <p>No ticket details available for the selected venue.</p>

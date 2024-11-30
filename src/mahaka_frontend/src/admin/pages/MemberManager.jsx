@@ -55,9 +55,7 @@ const MemberManager = () => {
               </div>
               <div className="text-secondary ml-0.5 font-medium">
                 {userLoading ? (
-                  <div className="animate-pulse bg-gray-500 rounded-md text-gray-500 max-w-fit">
-                    0 members
-                  </div>
+                  <div className="animate-pulse bg-gray-500 rounded-md h-6 w-16"></div>
                 ) : (
                   <div>{users.length} members</div>
                 )}
@@ -91,7 +89,23 @@ const MemberManager = () => {
             </div>
           </div>
           {userLoading ? (
-            <div>Loading...</div>
+            <div className="p-6 space-y-4">
+              {/* Skeleton for each member */}
+              {Array(3)
+                .fill(0)
+                .map((_, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center space-x-4 animate-pulse"
+                  >
+                    <div className="h-10 w-10 bg-gray-300 rounded-full"></div>
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 w-1/3 bg-gray-300 rounded"></div>
+                      <div className="h-4 w-1/4 bg-gray-300 rounded"></div>
+                    </div>
+                  </div>
+                ))}
+            </div>
           ) : users.length > 0 ? (
             <MemberList
               members={users}
@@ -99,7 +113,7 @@ const MemberManager = () => {
               isRtNavOpen={isRtNavOpen}
             />
           ) : (
-            <div>No users found</div>
+            <div className="text-center text-gray-500 md:text-5xl text-3xl font-bold mt-10">No users found</div>
           )}
         </div>
         <NavigationRight isOpen={isRtNavOpen}>
@@ -368,15 +382,15 @@ const EditDetails = ({
             <div className="ml-4 flex items-center space-x-4">
               {permissions.length > 0
                 ? permissions.map((permission) => (
-                    <div
-                      key={permission}
-                      className="flex items-center justify-center rounded-full bg-gray-100 px-3 py-0.5 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300"
-                    >
-                      <span className="whitespace-nowrap text-sm font-medium">
-                        {permission}
-                      </span>
-                    </div>
-                  ))
+                  <div
+                    key={permission}
+                    className="flex items-center justify-center rounded-full bg-gray-100 px-3 py-0.5 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300"
+                  >
+                    <span className="whitespace-nowrap text-sm font-medium">
+                      {permission}
+                    </span>
+                  </div>
+                ))
                 : null}
             </div>
           )}

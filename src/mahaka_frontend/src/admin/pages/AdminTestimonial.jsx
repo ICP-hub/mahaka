@@ -70,7 +70,7 @@ const AdminTestimonial = ()=>{
         </div>
 
 
-        <div className="flex w-full sm:flex-row bg-white p-7 justify-end items-center">
+        <div className="flex w-full sm:flex-row bg-card p-7 justify-end items-center">
 
   <button
     className="mt-8 sm:mt-0"

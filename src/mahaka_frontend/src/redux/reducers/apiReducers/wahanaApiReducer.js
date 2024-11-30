@@ -36,13 +36,14 @@ export const createWahana = createAsyncThunk(
         wahanaData.details,
         wahanaData.isFeatured,
         wahanaData.banner,
-        wahanaData.priceIDR,
-        wahanaData.priceICP
+        wahanaData.priceIDR
+        // wahanaData.priceICP
       );
       // console.log("wahana created successfully", response);
       setIsModalOpen(false);
       return response;
     } catch (error) {
+      notificationManager.error("Failed to create wahana");
       console.error("Error creating wahana:", error);
       throw error;
     }

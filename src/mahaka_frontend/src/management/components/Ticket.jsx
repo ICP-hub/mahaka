@@ -40,7 +40,7 @@ export default function Ticket({
       console.log(selectedVenue);
 
       const response = await backend.buyOfflineVenueTicket(
-        selectedVenue.id,
+        selectedVenue,
         { ticket_type: ticketTypeVariant, price: 1, priceFiat: 1 },
         record,
 
@@ -61,7 +61,7 @@ export default function Ticket({
   };
 
   return (
-    <div className="flex justify-center py-5">
+    <div className="flex justify-center w-1/2 p-2 py-5">
       {/* Ticket Card */}
       <div
         onClick={toggleModal}
@@ -79,13 +79,11 @@ export default function Ticket({
           </div>
           <div className="w-3/4 p-4">
             <h3 className="text-2xl font-black">{name}</h3>
-            <p className="text-base font-normal">{tickets.description}</p>
+            <p className="text-base font-normal">{description}</p>
             <div className="flex justify-between mt-[5rem]">
-              <span className="text-lg font-black">
-                ${parseInt(tickets.sTicket_price)}
-              </span>
+              <span className="text-lg font-black">Rp.{price}</span>
               <span className="text-lg font-normal">
-                {parseInt(tickets.sTicket_limit)} tickets left
+                {availability} TICKETS LEFT
               </span>
             </div>
           </div>
@@ -102,14 +100,12 @@ export default function Ticket({
             </p> */}
             <div className="flex justify-between mb-4">
               <span className="text-lg text-secondary  ">Price:</span>
-              <span className="text-lg font-semibold">
-                ${parseInt(tickets.sTicket_price)}
-              </span>
+              <span className="text-lg font-semibold">${parseInt(price)}</span>
             </div>
             <div className="flex justify-between mb-4">
               <span className="text-lg  text-secondary ">Tickets Left:</span>
               <span className="text-lg font-semibold">
-                {parseInt(tickets.sTicket_limit)}
+                {parseInt(availability)}
               </span>
             </div>
             <div className="flex justify-between mb-4">

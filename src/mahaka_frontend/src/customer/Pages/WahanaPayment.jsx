@@ -27,6 +27,8 @@ const WahanaPayment = () => {
     window.location.hash
   }`;
   const ticketType = "SINGLE";
+  const [timestemp, setTimeStemp] = useState(0);
+
   const [numberOFVisitor, setNumberOFVisitor] = useState(1);
   const [paymenttype, setPaymentType] = useState("Card");
   const [loading, setLoading] = useState(false);
@@ -151,6 +153,7 @@ const WahanaPayment = () => {
         _venueId,
         wahanaid,
         receiver,
+        BigInt(timestemp),
         numOfVisitors,
         paymentType
       );
@@ -195,7 +198,7 @@ const WahanaPayment = () => {
             )}
           </div>
           <div className="py-4 space-y-12 ">
-            <DatePicker />
+            <DatePicker timestemp={timestemp} setTimeStemp={setTimeStemp} />
             <VisitorPicker
               numberOFVisitor={numberOFVisitor}
               setNumberOFVisitor={setNumberOFVisitor}

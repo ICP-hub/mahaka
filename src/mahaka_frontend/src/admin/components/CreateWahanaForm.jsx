@@ -53,7 +53,7 @@ const CreateWahanaForm = ({ setIsModalOpen, venueIdentity }) => {
     title: "",
     description: "",
     location: "",
-    priceICP: "",
+    // priceICP: "",
     priceIDR: "",
     banner: null,
     startDate: "",
@@ -112,7 +112,7 @@ const CreateWahanaForm = ({ setIsModalOpen, venueIdentity }) => {
       decimal: 8,
       totalSupply: parseInt(formValues.totalSupply),
       description: formValues.description,
-      priceICP: parseInt(formValues.priceICP),
+      // priceICP: parseInt(formValues.priceICP),
       priceIDR: parseInt(formValues.priceIDR),
       isFeatured: formValues.isFeatured,
       banner: {
@@ -195,20 +195,20 @@ const CreateWahanaForm = ({ setIsModalOpen, venueIdentity }) => {
         onChange={(value) => handleInputChange("totalSupply", value)}
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <FormFieldInput
           type="number"
           label="Ticket Price(ICP)"
           value={formValues.priceICP}
           onChange={(value) => handleInputChange("priceICP", value)}
-        />
-        <FormFieldInput
-          type="number"
-          label="Ticket Price(IDR)"
-          value={formValues.priceIDR}
-          onChange={(value) => handleInputChange("priceIDR", value)}
-        />
-      </div>
+        /> */}
+      <FormFieldInput
+        type="number"
+        label="Ticket Price(IDR)"
+        value={formValues.priceIDR}
+        onChange={(value) => handleInputChange("priceIDR", value)}
+      />
+      {/* </div> */}
       <FormFieldImageUpload
         label="Banner"
         image={formValues.banner}
