@@ -71,11 +71,11 @@ const WahanaManager = () => {
 
   // console.log("filtered", filteredWahanas);
 
-  const containerVariants = createStaggerContainer(0.4);
-  const cardVariants = createStaggerVariant(0.3);
+  // const containerVariants = createStaggerContainer(0.4);
+  // const cardVariants = createStaggerVariant(0.3);
 
-  const containerVariants = createStaggerContainer(0.4);
-  const cardVariants = createStaggerVariant(0.3);
+  // const containerVariants = createStaggerContainer(0.4);
+  // const cardVariants = createStaggerVariant(0.3);
   return (
     <div className="flex flex-auto flex-col relative min-h-screen">
       <div className="flex min-w-0 flex-col">

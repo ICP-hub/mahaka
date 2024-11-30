@@ -175,7 +175,7 @@ const CreateBannerForm = ({onClose, onSuccess})=>{
    const handleCreateBanner = async (e) => {
     console.log("submit is triggered", bannerData)
     e.preventDefault();
-     setIsSubmitting(true);
+    
     if (!validateForm()) {
       return;
     }
