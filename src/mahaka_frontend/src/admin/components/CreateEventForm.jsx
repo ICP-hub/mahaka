@@ -30,8 +30,9 @@ export function imageToFileBlob(imageFile) {
 // Convert to timestamp date and time
 export const convertToTimestamp = (date, time) => {
   const dateTime = new Date(`${date}T${time}`);
-  return Math.floor(dateTime.getTime() / 1000);
+  return dateTime.getTime() * 1_000_000; // Convert to nanoseconds
 };
+
 /* ----------------------------------------------------------------------------------------------------- */
 /*  @ Main component
 /* ----------------------------------------------------------------------------------------------------- */
@@ -78,10 +79,7 @@ const CreateEventForm = ({ setIsModalOpen, venueIdentity }) => {
 
   const handleEventSubmit = () => {
     // no principal return
-    if (!principal) {
-      notificationManager.error("Please login first");
-      return;
-    }
+
     const isFormValid = Object.values(formValues).every(
       (value) => value !== "" && value !== null
     );
@@ -110,7 +108,7 @@ const CreateEventForm = ({ setIsModalOpen, venueIdentity }) => {
           id: "",
           venueId: formValues.venueId,
           title: formValues.title,
-          creator: Principal.fromText(principal),
+          creator: Principal.fromText("2vxsx-fae"),
           sTicket_limit: parseInt(formValues.studentTicketLimit),
           description: formValues.description,
           logo: {

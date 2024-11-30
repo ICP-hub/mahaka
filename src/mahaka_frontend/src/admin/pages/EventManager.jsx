@@ -26,9 +26,26 @@ import { IoTrashBinSharp } from "react-icons/io5";
 
 // Timstamp convert
 export function formatDateAndTime(timestamp) {
-  const dateObject = new Date(timestamp * 1000);
+  let adjustedTimestamp = timestamp;
+
+  // Determine timestamp precision and adjust to milliseconds
+  if (String(timestamp).length === 13) {
+    // Milliseconds
+    adjustedTimestamp = timestamp;
+  } else if (String(timestamp).length === 10) {
+    // Seconds
+    adjustedTimestamp = timestamp * 1000;
+  } else if (String(timestamp).length === 19) {
+    // Nanoseconds
+    adjustedTimestamp = Math.floor(timestamp / 1_000_000);
+  }
+
+  const dateObject = new Date(adjustedTimestamp);
+
+  // Format the date and time
   const date = dateObject.toDateString();
   const time = dateObject.toLocaleTimeString("en-GB", { hour12: false });
+
   return {
     date: date,
     time: time,
@@ -211,7 +228,9 @@ const EventManager = () => {
                 ))}
               </motion.div>
             ) : (
-              <div className="text-center text-gray-500 md:text-5xl text-3xl font-bold mt-10">No Events Found</div>
+              <div className="text-center text-gray-500 md:text-5xl text-3xl font-bold mt-10">
+                No Events Found
+              </div>
             )}
           </div>
         </div>
