@@ -82,10 +82,7 @@ const CreateWahanaForm = ({ setIsModalOpen, venueIdentity }) => {
 
   const handleWahanSubmit = () => {
     // no principal return
-    if (!principal) {
-      notificationManager.error("Please login first");
-      return;
-    }
+
     const isFormValid = Object.values(formValues).every(
       (value) => value !== "" && value !== null
     );

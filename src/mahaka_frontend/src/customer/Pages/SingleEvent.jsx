@@ -106,7 +106,7 @@ export default function SingleEvent() {
     loading: venueLoading,
     error,
   } = useSelector((state) => state.venues);
-  const { wahanas, loading: wahanaLoading } = useSelector(
+  const { wahanasByVenue, loading: wahanaLoading } = useSelector(
     (state) => state.wahana
   );
 
@@ -131,7 +131,6 @@ export default function SingleEvent() {
     fetchTicketDetails(currentVenue);
   }, [currentVenue]);
 
-  console.log(wahanas, "wahanas");
   console.log(currentVenue);
   const {
     events,
@@ -548,7 +547,7 @@ export default function SingleEvent() {
                   ></div>
                 ))}
               </div>
-            ) : wahanas?.length === 0 ? (
+            ) : wahanasByVenue?.length === 0 ? (
               <div className="p-6">
                 <div className="text-center p-8 bg-card rounded-lg border border-gray-200">
                   <p className="text-lg ">
@@ -581,7 +580,7 @@ export default function SingleEvent() {
                 modules={[Autoplay, Pagination]}
                 className="mySwiper px-4 sm:px-6 lg:px-8 mx-auto"
               >
-                {wahanas.map((event, index) => (
+                {wahanasByVenue.map((event, index) => (
                   <SwiperSlide key={index}>
                     <MoreWahanaCard
                       event={event}
