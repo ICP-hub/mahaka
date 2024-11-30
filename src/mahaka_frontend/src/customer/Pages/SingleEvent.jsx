@@ -431,7 +431,7 @@ export default function SingleEvent() {
                           </li>
                         </ul>
 
-                        <div className="space-y-4">{venue.Description}</div>
+                        <div className="space-y-4">{venue?.Description}</div>
                       </div>
                     </motion.div>
                   )}
