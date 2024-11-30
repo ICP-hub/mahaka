@@ -7,6 +7,7 @@ const DatePicker = ({ timestemp, setTimeStemp }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
   const toggleCalendar = () => setIsOpen(!isOpen);
 
@@ -16,6 +17,8 @@ const DatePicker = ({ timestemp, setTimeStemp }) => {
       currentDate.getMonth(),
       day
     );
+    selectedDate.setHours(0, 0, 0, 0);
+
     const diffDays = (selectedDate - today) / (1000 * 60 * 60 * 24);
 
     if (diffDays >= 0 && diffDays <= 7) {
@@ -62,7 +65,17 @@ const DatePicker = ({ timestemp, setTimeStemp }) => {
       {isOpen && (
         <div className="mt-2 w-full bg-white border border-gray-300 shadow-lg rounded-lg z-10">
           <div className="flex items-center justify-between p-2 bg-gray-100 border-b border-gray-300">
-            <button onClick={() => setCurrentDate(new Date())}>
+            <button
+              onClick={() =>
+                setCurrentDate(
+                  new Date(
+                    currentDate.getFullYear(),
+                    currentDate.getMonth() - 1,
+                    1
+                  )
+                )
+              }
+            >
               <HiArrowLeftCircle size={32} color="#f08e1e" />
             </button>
             <span className="font-semibold">
@@ -71,7 +84,17 @@ const DatePicker = ({ timestemp, setTimeStemp }) => {
                 year: "numeric",
               })}
             </span>
-            <button onClick={() => setCurrentDate(new Date())}>
+            <button
+              onClick={() =>
+                setCurrentDate(
+                  new Date(
+                    currentDate.getFullYear(),
+                    currentDate.getMonth() + 1,
+                    1
+                  )
+                )
+              }
+            >
               <HiArrowRightCircle size={32} color="#f08e1e" />
             </button>
           </div>
@@ -95,7 +118,9 @@ const DatePicker = ({ timestemp, setTimeStemp }) => {
                 currentDate.getMonth(),
                 day
               );
+              date.setHours(0, 0, 0, 0);
               const diffDays = (date - today) / (1000 * 60 * 60 * 24);
+
               const isSelectable = diffDays >= 0 && diffDays <= 7;
               const isSelected =
                 timestemp &&

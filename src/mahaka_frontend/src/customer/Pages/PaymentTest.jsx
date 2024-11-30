@@ -12,6 +12,7 @@ import VisitorPicker from "../Components/single-event/VisitorPicker";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../connect/useClient";
 import { HttpAgent } from "@dfinity/agent";
+import notificationManager from "../../common/utils/notificationManager";
 
 const PaymentTest = () => {
   const authenticatedAgent = useAgent();
@@ -197,9 +198,11 @@ const PaymentTest = () => {
   //     console.error("Error in buying event tickets:", err);
   //   }
   // };
+
+  console.log("timestem", timestemp);
   const handlePayment = async (e) => {
     if (principal == undefined) {
-      alert("jgh");
+      notificationManager.error("Please login first");
       return;
     }
     e.preventDefault();
@@ -249,7 +252,11 @@ const PaymentTest = () => {
   };
   const handlePayment2 = async (e) => {
     if (!principal) {
-      alert("Please connect your wallet.");
+      notificationManager.error("Please login first");
+      return;
+    }
+    if (timestemp == 0 || ticketprice == 0) {
+      notificationManager.error("Please fill all the Details");
       return;
     }
 
@@ -427,22 +434,6 @@ const PaymentTest = () => {
                   onChange={() => setPaymentType("Card")}
                 />
                 Card
-              </label>
-
-              <label
-                htmlFor="icp"
-                className="flex items-center text-lg font-normal cursor-pointer"
-              >
-                <input
-                  type="radio"
-                  id="icp"
-                  name="payment"
-                  className="mr-2"
-                  value="ICP"
-                  checked={paymenttype === "ICP"}
-                  onChange={() => setPaymentType("ICP")}
-                />
-                ICP Wallet
               </label>
             </div>
           </div>

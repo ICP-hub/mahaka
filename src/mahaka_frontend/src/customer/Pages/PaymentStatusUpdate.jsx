@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { useIdentityKit } from "@nfid/identitykit/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { createActor } from "../../../../declarations/Fiatpayment/index";
@@ -11,61 +11,70 @@ const PaymentStatusUpdate = () => {
   const [ticketType, setTicketType] = useState(null);
   const [loading, setLoading] = useState(true);
   const [paymentStatus, setPaymentStatus] = useState(null);
-  const [responseMessage, setResponseMessage] = useState("");
+  const [responseMessage, setResponseMessage] = useState(
+    "Processing payment..."
+  );
 
   const canisterIDFiat = process.env.CANISTER_ID_FIATPAYMENT;
   const { backend } = useAuth();
   const fullPath = location.pathname + location.hash;
   const match = fullPath.match(/\/([^/]+)\/([^/]+)\/([^/]+)/) || [];
 
-  const mockData = useMemo(
-    () => ({
-      paymentMethod: "stripe",
-      invoiceNo: Number(match[3]),
-      isSuccess: match[2] === "success",
-    }),
-    [match]
-  );
+  const mockData = {
+    paymentMethod: "stripe",
+    invoiceNo: Number(match[3]),
+    isSuccess: match[2] === "success",
+  };
 
-  const backendActor = useMemo(() => {
-    if (!identity) return null;
-    return createActor(canisterIDFiat, {
-      agentOptions: { identity, verifyQuerySignatures: true },
-    });
-  }, [canisterIDFiat, identity]);
+  const [backendActor, setBackendActor] = useState(null);
 
   useEffect(() => {
-    if (!identity || !backendActor) return;
+    if (identity) {
+      const actor = createActor(canisterIDFiat, {
+        agentOptions: { identity, verifyQuerySignatures: true },
+      });
+      setBackendActor(actor);
+    }
+  }, [identity, canisterIDFiat]);
 
+  useEffect(() => {
     const handlePaymentStatusUpdate = async () => {
+      if (!identity || !backendActor) {
+        setResponseMessage("Identity or backend is not available.");
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
+        setResponseMessage("Processing payment...");
 
         const updateResponse = await backendActor.change_invoice_status({
           paymentMethod: mockData.paymentMethod,
           invoiceNo: mockData.invoiceNo,
           isSuccess: mockData.isSuccess,
         });
-        setPaymentStatus("ok" in updateResponse ? "success" : "failure");
-        setResponseMessage(
-          "ok" in updateResponse
-            ? "Payment processed successfully."
-            : updateResponse?.message || "Unknown error."
-        );
 
-        // Fetch invoice details
+        if (!("ok" in updateResponse)) {
+          setPaymentStatus("failure");
+          setResponseMessage(
+            updateResponse?.message || "Payment update failed."
+          );
+        }
+
+        setPaymentStatus("success");
+        setResponseMessage("Payment updated successfully.");
+
         const invoiceResponse = await backendActor.get_invoice(
           mockData.invoiceNo
         );
 
-        const itemName = invoiceResponse?.body?.success?.items[0]?.name;
-
-        // Determine ticket type based on item name
-        const type = itemName?.includes("Venue")
+        const itemName = invoiceResponse?.body?.success?.items[0]?.name || "";
+        const type = itemName.includes("Venue")
           ? "Venue"
-          : itemName?.includes("Event")
+          : itemName.includes("Event")
           ? "Event"
-          : itemName?.includes("Wahana")
+          : itemName.includes("Wahana")
           ? "Wahana"
           : null;
 
@@ -73,16 +82,19 @@ const PaymentStatusUpdate = () => {
 
         if (type) {
           const ticketPayload = { [type]: null };
-
-          // Process payment based on ticket type
           const processResponse = await backend.processPendingPayment(
             mockData.invoiceNo,
             ticketPayload
           );
 
-          if (!("ok" in processResponse)) {
+          if ("ok" in processResponse) {
+            setPaymentStatus("success");
+            setResponseMessage("Ticket booked successfully.");
+          } else {
             setPaymentStatus("failure");
-            setResponseMessage(processResponse?.err || "Processing failed.");
+            setResponseMessage(
+              processResponse?.err || "Payment processing failed."
+            );
           }
         }
       } catch (error) {
@@ -94,8 +106,10 @@ const PaymentStatusUpdate = () => {
       }
     };
 
-    handlePaymentStatusUpdate();
-  }, [identity, backendActor, mockData, backend]);
+    if (backendActor && identity) {
+      handlePaymentStatusUpdate();
+    }
+  }, [backendActor, identity, mockData.invoiceNo, mockData.isSuccess]);
 
   const handleNavigateHome = () => navigate("/");
 
@@ -103,7 +117,7 @@ const PaymentStatusUpdate = () => {
     <div className="flex flex-col items-center justify-center h-screen px-4 bg-gray-50">
       {loading ? (
         <div className="text-lg font-semibold text-gray-700">
-          Processing Payment...
+          {responseMessage}
         </div>
       ) : paymentStatus === "success" ? (
         <div className="text-center">

@@ -32,7 +32,7 @@ dfx start --clean
 
 ```bash
 dfx generate
-cp src/declarations/mahaka_backend/* .dfx/local/canisters/mahaka_backend/
+  cp src/declarations/mahaka_backend/* .dfx/local/canisters/mahaka_backend/
 dfx deploy
 ```
 

@@ -11,6 +11,7 @@ import VisitorPicker from "../Components/single-event/VisitorPicker";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../connect/useClient";
 import { HttpAgent } from "@dfinity/agent";
+import notificationManager from "../../common/utils/notificationManager";
 
 const EventPayment = () => {
   const authenticatedAgent = useAgent();
@@ -258,7 +259,7 @@ const EventPayment = () => {
 
   const handlePayment2 = async (e) => {
     if (!principal) {
-      alert("Please connect your wallet");
+      notificationManager.error("Please connect your wallet");
       return;
     }
 
@@ -271,12 +272,11 @@ const EventPayment = () => {
         ? { GroupPass: null }
         : ticketType === "VIP"
         ? { VipPass: null }
-        : { SinglePass: null }; // Dynamically set ticket type based on user selection
+        : { SinglePass: null };
 
-    // Metadata example; replace with actual data as needed
     const _metadata = [
       {
-        data: new Uint8Array([0x12, 0x34]), // Replace with actual image data if available
+        data: new Uint8Array([0x12, 0x34]),
         description: "Event ticket details",
         key_val_data: [
           {
@@ -317,7 +317,7 @@ const EventPayment = () => {
 
       if ("ok" in response) {
         console.log("Purchase successful:", response.ok);
-        navigate(`/venues/${vanueid}/primium/payment2/checkout`); // Ensure `vanueid` is defined
+        navigate(`/venues/${vanueid}/primium/payment2/checkout`);
       } else {
         throw new Error(response.err || "Purchase failed");
       }
@@ -449,22 +449,6 @@ const EventPayment = () => {
                   onChange={() => setPaymentType("Card")}
                 />
                 Card
-              </label>
-
-              <label
-                htmlFor="icp"
-                className="flex items-center text-lg font-normal cursor-pointer"
-              >
-                <input
-                  type="radio"
-                  id="icp"
-                  name="payment"
-                  className="mr-2"
-                  value="ICP"
-                  checked={paymenttype === "ICP"}
-                  onChange={() => setPaymentType("ICP")}
-                />
-                ICP Wallet
               </label>
             </div>
           </div>
