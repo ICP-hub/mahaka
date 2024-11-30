@@ -205,6 +205,8 @@ module {
         #EmptyFirstName;
         #EmptyLastName;
         #EmptyAssignedVenue;
+        #NoMemoryFound;
+        #CyclesError
     };
 
     public type GetUserError = {

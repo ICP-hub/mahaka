@@ -71,8 +71,8 @@ const WahanaManager = () => {
 
   // console.log("filtered", filteredWahanas);
 
-  // const containerVariants = createStaggerContainer(0.4);
-  // const cardVariants = createStaggerVariant(0.3);
+  const containerVariants = createStaggerContainer(0.4);
+ const cardVariants = createStaggerVariant(0.3);
 
   // const containerVariants = createStaggerContainer(0.4);
   // const cardVariants = createStaggerVariant(0.3);

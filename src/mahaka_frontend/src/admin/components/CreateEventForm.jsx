@@ -30,7 +30,7 @@ export function imageToFileBlob(imageFile) {
 // Convert to timestamp date and time
 export const convertToTimestamp = (date, time) => {
   const dateTime = new Date(`${date}T${time}`);
-  return Math.floor(dateTime.getTime() / 1000);
+  return dateTime.getTime() * 1_000_000; 
 };
 /* ----------------------------------------------------------------------------------------------------- */
 /*  @ Main component

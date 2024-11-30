@@ -19,6 +19,7 @@ import CardCheckout from "../customer/Pages/CardCheckout";
 import PaymentStatusUpdate from "../customer/Pages/PaymentStatusUpdate.jsx";
 import EventPayment from "../customer/Pages/EventPayment.jsx";
 import WahanaPayment from "../customer/Pages/WahanaPayment.jsx";
+import ProtectedRoute from "../customer/Pages/ProtectedRoute.jsx";
 
 export const customerRoutes = [
   {
@@ -27,7 +28,14 @@ export const customerRoutes = [
     children: [
       { index: true, element: <Home /> },
       { path: "venues/:id", element: <SingleEvent /> },
-      { path: "venues/:id/:id/payment2", element: <PaymentTest /> },
+      {
+        path: "venues/:id/:id/payment2",
+        element: (
+          <ProtectedRoute>
+            <PaymentTest />
+          </ProtectedRoute>
+        ),
+      },
       { path: "venues/:id/:id/payment2/checkout", element: <CardCheckout /> },
       { path: "payment/checkout", element: <CardCheckout /> },
       { path: "/stripe/:id/:id", element: <PaymentStatusUpdate /> },
