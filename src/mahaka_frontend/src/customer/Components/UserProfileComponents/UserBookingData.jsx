@@ -86,7 +86,7 @@ const UserBookingData = () => {
                 </p>
                 <p className="text-sm text-gray-600">
                   <strong className="text-secondary">Price:</strong> ₹
-                  {ticket.price.Float.toFixed(2)}
+                  {ticket.price.toFixed(2)}
                 </p>
               </div>
             </div>
