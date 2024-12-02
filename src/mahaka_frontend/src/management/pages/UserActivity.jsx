@@ -27,9 +27,7 @@ const MgtUserActivity = () => {
 
   return (
     <div className="relative flex flex-col min-w-0 flex-auto p-6 bg-card min-h-screen">
-      <h1 className="text-2xl font-bold mb-6 ">
-        Ticket Purchase History
-      </h1>
+      <h1 className="text-2xl font-bold mb-6 ">Ticket Purchase History</h1>
       {error && (
         <div className="text-red-600 bg-red-100 p-4 rounded mb-6">{error}</div>
       )}
@@ -41,7 +39,7 @@ const MgtUserActivity = () => {
             <thead className="text-xs text-gray-700 uppercase bg-gray-200">
               <tr>
                 <th className="px-6 py-3 text-secondary">Ticket ID</th>
-                <th className="px-6 py-3 text-secondary">Category</th>
+                <th className="px-6 py-3 text-secondary">Id</th>
                 <th className="px-6 py-3 text-secondary">Price</th>
                 <th className="px-6 py-3 text-secondary">Num of Visitors</th>
                 <th className="px-6 py-3 text-secondary">Sale Date</th>
@@ -61,9 +59,7 @@ const MgtUserActivity = () => {
                   <td className="px-6 py-4 text-gray-800 truncate w-32">
                     {ticket.categoryId}
                   </td>
-                  <td className="px-6 py-4 text-gray-800">
-                    {ticket.price.Float}
-                  </td>
+                  <td className="px-6 py-4 text-gray-800">{ticket.price}</td>
                   <td className="px-6 py-4 text-gray-800">
                     {parseInt(ticket.numOfVisitors)}
                   </td>

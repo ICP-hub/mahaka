@@ -1,14 +1,10 @@
-import Frame13 from "../../assets/images/Frame13.png";
-import Frame15 from "../../assets/images/Frame15.png";
-import fram2 from "../../assets/images/fram2.png";
 import Ticket from "../../customer/Components/Ticket";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getDIPdetails } from "../../redux/reducers/apiReducers/dipapireducer";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { getVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
 import { getEvent } from "../../redux/reducers/apiReducers/eventApiReducer";
+import { formatDateAndTime } from "../../admin/pages/EventManager";
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/pagination";
@@ -72,46 +68,30 @@ const EventPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { ModalOne } = ModalPopup();
   const [ticketDetails, setTicketDetails] = useState(null);
-  const { backend } = useSelector((state) => state.authentication);
-
   const handleModalOpen = () => setIsModalOpen(true);
   const handleModalClose = () => setIsModalOpen(false);
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   };
-  const { ids, eventId } = useParams();
 
+  const { backend } = useSelector((state) => state.authentication);
+  const dispatch = useDispatch();
+  const { currentVenue, error, } = useSelector((state) => state.venues);
+  const { currentEvent, eventsLoading: venueLoading, error: eventError, } = useSelector((state) => state.events);
+  const [localError, setLocalError] = useState(null);
+  const venue = currentEvent ? currentEvent : null;
+
+  const { ids, eventId } = useParams();
   // Replace _ with # and append the hash from window.location.hash
-  const eventIds = `${decodeURIComponent(eventId).replace(/_/g, "#")}${
-    window.location.hash
-  }`;
-  const venueId = `${decodeURIComponent(ids).replace(/_/g, "#")}${
-    window.location.hash
-  }`;
+  const eventIds = `${decodeURIComponent(eventId).replace(/_/g, "#")}${window.location.hash}`;
+  const venueId = `${decodeURIComponent(ids).replace(/_/g, "#")}${window.location.hash}`;
   const navigate = useNavigate();
   console.log(venueId, eventIds);
   const nextpage = (ticket) => {
     navigate(`/${ids}/events/${eventId}/${ticket}/payment`);
     // :ids/events/:eventId/payment
   };
-
-  const dispatch = useDispatch();
-  const {
-    currentVenue,
-
-    error,
-  } = useSelector((state) => state.venues);
-
-  const {
-    currentEvent,
-
-    eventsLoading: venueLoading,
-    error: eventError,
-  } = useSelector((state) => state.events);
-
-  const [localError, setLocalError] = useState(null);
-  const venue = currentEvent ? currentEvent : null;
 
   useEffect(() => {
     const fetchTicketDetails = async (venue) => {
@@ -164,52 +144,18 @@ const EventPage = () => {
     }
   }, [dispatch, venueId, backend]);
 
-  // Assuming the first event is the main event for this venue
+  const duration = currentEvent?.details?.StartDate && currentEvent?.details?.EndDate
+    ? calculateDuration(currentEvent.details.StartDate, currentEvent.details.EndDate)
+    : "1 Day";
 
-  const duration =
-    venue?.details.StartDate && venue?.details.EndDate
-      ? calculateDuration(venue.details.StartDate, venue.details.EndDate)
-      : "";
+  // Safely format dates
+  const startInterVal = currentEvent?.details?.StartDate
+    ? formatDateAndTime(parseInt(currentEvent.details.StartDate))
+    : { date: '', time: '' };
 
-  function formatDate(timestamp) {
-    if (typeof timestamp === "bigint") {
-      timestamp = Number(timestamp) * 1000; // Convert BigInt to milliseconds
-    } else if (typeof timestamp === "number") {
-      timestamp = timestamp * 1000; // Convert seconds to milliseconds
-    }
-
-    if (!timestamp || isNaN(timestamp)) {
-      return "Invalid timestamp";
-    }
-
-    const date = new Date(timestamp);
-
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
-    const day = String(date.getDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-  }
-
-  function FormatTime(timestamp) {
-    if (typeof timestamp === "bigint") {
-      timestamp = Number(timestamp) * 1000; // Convert BigInt to milliseconds
-    } else if (typeof timestamp === "number") {
-      timestamp = timestamp * 1000; // Convert seconds to milliseconds
-    }
-
-    if (!timestamp || isNaN(timestamp)) {
-      return "Invalid timestamp";
-    }
-
-    const date = new Date(timestamp);
-
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    const seconds = String(date.getSeconds()).padStart(2, "0");
-
-    return `${hours}:${minutes}`;
-  }
+  const endInterVal = currentEvent?.details?.EndDate
+    ? formatDateAndTime(parseInt(currentEvent.details.EndDate))
+    : { date: '', time: '' };
 
   return (
     <>
@@ -241,7 +187,7 @@ const EventPage = () => {
           {venueLoading ? (
             <h1 className=" animate-pulse bg-gray-300 rounded-2xl w-32 h-12 font-black mb-10"></h1>
           ) : (
-            <h1 className="text-4xl font-black pb-10">{venue?.title || ""}</h1>
+            <h1 className="text-4xl font-black pb-10">{venue?.title}</h1>
           )}
           <div className="flex flex-col lg:flex-row gap-8">
             {/* left side section  */}
@@ -253,11 +199,10 @@ const EventPage = () => {
                   </div>
                 ) : (
                   <img
-                    src={venue?.banner?.data || Frame13}
-                    alt={venue?.title || "Event"}
-                    className={`h-90 w-full rounded-2xl ${
-                      venueLoading ? "hidden" : "block"
-                    }`}
+                    src={venue?.banner?.data}
+                    alt={venue?.title}
+                    className={`h-90 w-full rounded-2xl ${venueLoading ? "hidden" : "block"
+                      }`}
                     onLoad={() => setIsLoading(false)}
                   />
                 )}
@@ -271,11 +216,10 @@ const EventPage = () => {
                   >
                     <li className="me-2" role="presentation">
                       <button
-                        className={`inline-block text-2xl font-black p-4 border-b-2 rounded-t-lg ${
-                          activeTab === "profile"
-                            ? "border-blue-500"
-                            : "border-transparent"
-                        }`}
+                        className={`inline-block text-2xl font-black p-4 border-b-2 rounded-t-lg ${activeTab === "profile"
+                          ? "border-blue-500"
+                          : "border-transparent"
+                          }`}
                         onClick={() => handleTabClick("profile")}
                         type="button"
                         role="tab"
@@ -287,11 +231,10 @@ const EventPage = () => {
                     </li>
                     <li className="me-2" role="presentation">
                       <button
-                        className={`inline-block text-2xl font-normal p-4 border-b-2 rounded-t-lg ${
-                          activeTab === "dashboard"
-                            ? "border-blue-500"
-                            : "border-transparent"
-                        } `}
+                        className={`inline-block text-2xl font-normal p-4 border-b-2 rounded-t-lg ${activeTab === "dashboard"
+                          ? "border-blue-500"
+                          : "border-transparent"
+                          } `}
                         onClick={() => handleTabClick("dashboard")}
                         type="button"
                         role="tab"
@@ -316,28 +259,28 @@ const EventPage = () => {
                       role="tabpanel"
                       aria-labelledby="profile-tab"
                     >
-                      <div>
-                        {ticketData.map((ticket, index) => (
+                      {venueLoading ? (
+                        <div className="animate-pulse space-y-4">
+                          <div className="bg-gray-300 h-50 rounded-2xl w-full"></div>
+                        </div>
+                      ) : (
+                        <div>
                           <div
-                            key={index}
                             className="cursor-pointer"
-                            onClick={() => {
-                              nextpage("SINGLE");
-                            }}
+                            onClick={() => nextpage("SINGLE")}
                           >
                             <Ticket
-                              key={index}
-                              type={ticket.type}
-                              gradientClass={ticket.gradientClass}
-                              name={ticket.name}
-                              description={ticket.description}
-                              price={ticket.price}
-                              availability={ticket.availability}
-                              highlightClass={ticket.highlightClass}
+                              type={"STUDENT"}
+                              gradientClass={ticketData[1].gradientClass}
+                              name={"Student Tickets"}
+                              description={ticketDetails?.description}
+                              price={parseInt(ticketDetails?.sTicket_price)}
+                              availability={parseInt(ticketDetails?.sTicket_limit)}
+                              highlightClass={ticketData[1].highlightClass}
                             />
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      )}
                     </motion.div>
                   )}
                   {activeTab === "dashboard" && (
@@ -357,14 +300,13 @@ const EventPage = () => {
                             {duration || "1 Day"} (approx.)
                           </li>
                           <li>
-                            <strong>Location:</strong>{" "}
-                            {venue?.details.Location || "Indonesia"}
+                            <strong>Location:</strong>
+                            {venue?.details.Location}
                           </li>
                           <li>
-                            <strong>Last Entry:</strong>{" "}
+                            <strong>Last Entry:</strong>
                             {(venue?.details.EndTime &&
-                              FormatTime(venue.details.EndTime)) ||
-                              "4:00 PM"}
+                              endInterVal.time)}
                           </li>
                         </ul>
 
@@ -398,32 +340,29 @@ const EventPage = () => {
                 <div className="p-8">
                   <h1 className="text-2xl font-black">Event Details</h1>
                   <h3 className="text-lg font-normal">
-                    {" "}
+
                     {venue?.details.StartDate &&
-                      formatDate(venue.details.StartDate)}{" "}
+                      startInterVal.date}
                     -
                     {(venue?.details.EndDate &&
-                      formatDate(venue.details.EndDate)) ||
-                      "13 Jul- 17 Jul 2024"}
+                      endInterVal.date)}
                   </h3>
                   <h3 className="text-lg font-normal">
                     {venue?.details.StartTime &&
-                      FormatTime(venue.details.StartTime)}{" "}
+                      startInterVal.time}
                     -
                     {(venue?.details.EndTime &&
-                      FormatTime(venue.details.EndTime)) ||
-                      "12:00AM - 3:00PM"}
+                      endInterVal.time)}
                   </h3>
                   <h3 className="text-lg font-normal">
                     Location of the Venue - {venue?.details.Location}
                   </h3>
                 </div>
                 <h2 className="text-2xl font-normal pl-8">
-                  Venue ends on :{" "}
+                  Venue ends on :
                   <span className="text-red-600">
                     {(venue?.details.EndDate &&
-                      formatDate(venue.details.EndDate)) ||
-                      "17 July, 2024"}
+                      endInterVal.date)}
                   </span>
                 </h2>
               </div>

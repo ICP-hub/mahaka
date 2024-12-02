@@ -1,6 +1,3 @@
-import Frame13 from "../../assets/images/Frame13.png";
-import Frame15 from "../../assets/images/Frame15.png";
-import fram2 from "../../assets/images/fram2.png";
 import Ticket from "../../customer/Components/Ticket";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -101,14 +98,10 @@ export default function SingleEvent() {
   };
 
   const dispatch = useDispatch();
-  const {
-    currentVenue,
-    loading: venueLoading,
-    error,
-  } = useSelector((state) => state.venues);
-  const { wahanasByVenue, loading: wahanaLoading } = useSelector(
-    (state) => state.wahana
-  );
+  const { currentVenue, loading: venueLoading, error, } = useSelector((state) => state.venues);
+  const { wahanasByVenue, singleWahanaLoading } = useSelector((state) => state.wahana);
+  const { eventByVenue, singleEventLoading, error: eventError, } = useSelector((state) => state.events);
+  const { backend } = useSelector((state) => state.authentication);
 
   useEffect(() => {
     const fetchTicketDetails = async (venue) => {
@@ -116,7 +109,6 @@ export default function SingleEvent() {
         console.error("Venue does not have a collection_id:", venue);
         return;
       }
-
       try {
         // Fetch ticket details from the actor
         const details = await backend.getDIPdetails(venue?.Collection_id);
@@ -131,15 +123,8 @@ export default function SingleEvent() {
     fetchTicketDetails(currentVenue);
   }, [currentVenue]);
 
+  console.log(wahanasByVenue, "wahanas");
   console.log(currentVenue);
-  const {
-    events,
-
-    eventsLoading: eventLoading,
-    error: eventError,
-  } = useSelector((state) => state.events);
-  const { backend } = useSelector((state) => state.authentication);
-
   const [localError, setLocalError] = useState(null);
   const venue = currentVenue ? currentVenue : null;
 
@@ -187,37 +172,16 @@ export default function SingleEvent() {
     }
   }, [dispatch, venueId, backend]);
 
-  console.log(eventLoading, "eventLoading");
-  console.log(venueLoading, "venueLoading");
-  console.log(wahanaLoading, "wahanaLoading");
+  // console.log(singleEventLoading, "eventLoading");
+  // console.log(venueLoading, "venueLoading");
+  // console.log(singleWahanaLoading, "wahanaLoading");
 
   // Assuming the first event is the main event for this venue
-  const event = events && Array.isArray(events) ? events : null;
-
+  const event = eventByVenue ? eventByVenue : null;
   const duration =
     venue?.Details.StartDate && venue?.Details.EndDate
       ? calculateDuration(venue.Details.StartDate, venue.Details.EndDate)
       : "";
-
-  function formatDate(timestamp) {
-    if (typeof timestamp === "bigint") {
-      timestamp = Number(timestamp) * 1000; // Convert BigInt to milliseconds
-    } else if (typeof timestamp === "number") {
-      timestamp = timestamp * 1000; // Convert seconds to milliseconds
-    }
-
-    if (!timestamp || isNaN(timestamp)) {
-      return "Invalid timestamp";
-    }
-
-    const date = new Date(timestamp);
-
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
-    const day = String(date.getDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-  }
 
   function FormatTime(timestamp) {
     if (typeof timestamp === "bigint") {
@@ -225,17 +189,14 @@ export default function SingleEvent() {
     } else if (typeof timestamp === "number") {
       timestamp = timestamp * 1000; // Convert seconds to milliseconds
     }
-
     if (!timestamp || isNaN(timestamp)) {
       return "Invalid timestamp";
     }
 
     const date = new Date(timestamp);
-
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
     const seconds = String(date.getSeconds()).padStart(2, "0");
-
     return `${hours}:${minutes}`;
   }
 
@@ -281,11 +242,10 @@ export default function SingleEvent() {
                   </div>
                 ) : (
                   <img
-                    src={venue?.banner?.data || Frame13}
-                    alt={venue?.title || "Event"}
-                    className={`h-90 w-full rounded-2xl ${
-                      venueLoading ? "hidden" : "block"
-                    }`}
+                    src={venue?.banner?.data}
+                    alt={venue?.title}
+                    className={`h-90 w-full rounded-2xl ${venueLoading ? "hidden" : "block"
+                      }`}
                     onLoad={() => setIsLoading(false)}
                   />
                 )}
@@ -299,11 +259,10 @@ export default function SingleEvent() {
                   >
                     <li className="me-2" role="presentation">
                       <button
-                        className={`inline-block text-2xl font-black p-4 border-b-2 rounded-t-lg ${
-                          activeTab === "profile"
-                            ? "border-blue-500"
-                            : "border-transparent"
-                        }`}
+                        className={`inline-block text-2xl font-black p-4 border-b-2 rounded-t-lg ${activeTab === "profile"
+                          ? "border-blue-500"
+                          : "border-transparent"
+                          }`}
                         onClick={() => handleTabClick("profile")}
                         type="button"
                         role="tab"
@@ -315,11 +274,10 @@ export default function SingleEvent() {
                     </li>
                     <li className="me-2" role="presentation">
                       <button
-                        className={`inline-block text-2xl font-normal p-4 border-b-2 rounded-t-lg ${
-                          activeTab === "dashboard"
-                            ? "border-blue-500"
-                            : "border-transparent"
-                        } `}
+                        className={`inline-block text-2xl font-normal p-4 border-b-2 rounded-t-lg ${activeTab === "dashboard"
+                          ? "border-blue-500"
+                          : "border-transparent"
+                          } `}
                         onClick={() => handleTabClick("dashboard")}
                         type="button"
                         role="tab"
@@ -344,62 +302,66 @@ export default function SingleEvent() {
                       role="tabpanel"
                       aria-labelledby="profile-tab"
                     >
-                      {/* <p className="text-lg font-normal">
-                        Lorem ipsum dolor sit amet consectetur. Nisl sapien id
-                        erat senectus ornare egestas diam vitae tincidunt.
-                        Curabitur commodo purus sed accumsan tristique velit
-                        volutpat amet.
-                      </p> */}
-                      <div>
-                        <div
-                          className="cursor-pointer"
-                          onClick={() => nextpage("GROUP")}
-                        >
-                          <Ticket
-                            type={"GROUP"}
-                            gradientClass={ticketData[0].gradientClass}
-                            name={"Group Tickets"}
-                            description={ticketDetails?.description}
-                            price={parseInt(ticketDetails?.gTicket_price) || 1}
-                            availability={
-                              parseInt(ticketDetails?.gTicket_limit) || 4
-                            }
-                            highlightClass={ticketData[0].highlightClass}
-                          />
+                      {venueLoading ? (
+                        <>
+                          <div className="animate-pulse space-y-4">
+                            <div className="bg-gray-300 h-50 rounded-2xl w-full"></div>
+                            <div className="bg-gray-300 h-50 rounded-2xl w-full"></div>
+                            <div className="bg-gray-300 h-50 rounded-2xl w-full"></div>
+                          </div>
+
+                        </>
+                      ) : (
+                        <div>
+                          <div
+                            className="cursor-pointer"
+                            onClick={() => nextpage("GROUP")}
+                          >
+                            <Ticket
+                              type={"GROUP"}
+                              gradientClass={ticketData[0].gradientClass}
+                              name={"Group Tickets"}
+                              description={ticketDetails?.description}
+                              price={parseInt(ticketDetails?.gTicket_price)}
+                              availability={
+                                parseInt(ticketDetails?.gTicket_limit)}
+                              highlightClass={ticketData[0].highlightClass}
+                            />
+                          </div>
+                          <div
+                            className="cursor-pointer"
+                            onClick={() => nextpage("SINGLE")}
+                          >
+                            <Ticket
+                              type={"SINGLE"}
+                              gradientClass={ticketData[1].gradientClass}
+                              name={"Single Tickets"}
+                              description={ticketDetails?.description}
+                              price={parseInt(ticketDetails?.sTicket_price)}
+                              availability={
+                                parseInt(ticketDetails?.sTicket_limit)
+                              }
+                              highlightClass={ticketData[1].highlightClass}
+                            />
+                          </div>
+                          <div
+                            className="cursor-pointer"
+                            onClick={() => nextpage("VIP")}
+                          >
+                            <Ticket
+                              type={"VIP"}
+                              gradientClass={ticketData[2].gradientClass}
+                              name={"VIP Tickets"}
+                              description={ticketDetails?.description}
+                              price={parseInt(ticketDetails?.vTicket_price)}
+                              availability={
+                                parseInt(ticketDetails?.vTicket_limit)
+                              }
+                              highlightClass={ticketData[2].highlightClass}
+                            />
+                          </div>
                         </div>
-                        <div
-                          className="cursor-pointer"
-                          onClick={() => nextpage("SINGLE")}
-                        >
-                          <Ticket
-                            type={"SINGLE"}
-                            gradientClass={ticketData[1].gradientClass}
-                            name={"Single Tickets"}
-                            description={ticketDetails?.description}
-                            price={parseInt(ticketDetails?.sTicket_price) || 1}
-                            availability={
-                              parseInt(ticketDetails?.sTicket_limit) || 4
-                            }
-                            highlightClass={ticketData[1].highlightClass}
-                          />
-                        </div>
-                        <div
-                          className="cursor-pointer"
-                          onClick={() => nextpage("VIP")}
-                        >
-                          <Ticket
-                            type={"VIP"}
-                            gradientClass={ticketData[2].gradientClass}
-                            name={"VIP Tickets"}
-                            description={ticketDetails?.description}
-                            price={parseInt(ticketDetails?.vTicket_price) || 1}
-                            availability={
-                              parseInt(ticketDetails?.vTicket_limit) || 4
-                            }
-                            highlightClass={ticketData[2].highlightClass}
-                          />
-                        </div>
-                      </div>
+                      )}
                     </motion.div>
                   )}
                   {activeTab === "dashboard" && (
@@ -476,7 +438,7 @@ export default function SingleEvent() {
           </section>
 
           <div className="max-w-7xl mx-auto">
-            {eventLoading ? (
+            {singleEventLoading ? (
               <div className="flex my-18 space-x-4 px-4 sm:px-6 lg:px-8 mx-auto">
                 {/* Skeleton Loader for each card */}
                 {[...Array(2)].map((_, index) => (
@@ -535,9 +497,8 @@ export default function SingleEvent() {
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h1 className="text-4xl font-black">Wahana</h1>
           </section>
-
           <div className="max-w-7xl mx-auto">
-            {wahanaLoading ? (
+            {wahanasByVenue && singleWahanaLoading ? (
               <div className="flex my-18 space-x-4 px-4 sm:px-6 lg:px-8 mx-auto">
                 {/* Skeleton Loader for each card */}
                 {[...Array(2)].map((_, index) => (
@@ -580,7 +541,7 @@ export default function SingleEvent() {
                 modules={[Autoplay, Pagination]}
                 className="mySwiper px-4 sm:px-6 lg:px-8 mx-auto"
               >
-                {wahanasByVenue.map((event, index) => (
+                {wahanasByVenue?.map((event, index) => (
                   <SwiperSlide key={index}>
                     <MoreWahanaCard
                       event={event}

@@ -57,10 +57,10 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
   };
 
   const handleEventSubmit = () => {
-    // if (!principal) {
-    //   notificationManager.error("Please login first");
-    //   return;
-    // }
+    if (!principal) {
+      notificationManager.error("Please login first");
+      return;
+    }
     // const isFormValid = Object.values(formValues).every(
     //   (value) => value !== "" && value !== null
     // );
@@ -106,7 +106,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
             symbol: "VENUE",
             vTicket_limit: parseInt(formValues.vipTicketLimit),
           },
-          custodian: Principal.fromText("2vxsx-fae"),
+          custodian: Principal.fromText(principal),
         },
         title: formValues.title,
         capacity: parseInt(formValues.capacity),
@@ -141,7 +141,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         label="Location"
         value={formValues.location}
         onChange={(value) => handleInputChange("location", value)}
-      />    
+      />
 
       <div className="grid grid-cols-2 gap-4">
         <FormFieldInput
