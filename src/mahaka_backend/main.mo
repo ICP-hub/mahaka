@@ -137,7 +137,7 @@ actor mahaka {
 
      public query func availableCycles() : async Nat {
         return Cycles.balance();
-    };
+     };
 
 
      let LedgerCanister = actor "ryjl3-tyaaa-aaaaa-aaaba-cai" : actor {
@@ -145,7 +145,7 @@ actor mahaka {
         icrc2_transfer_from : shared Types.TransferFromArgs -> async Types.Result_3;
     };
 
-     let FiatPayCanister = actor "bd3sg-teaaa-aaaaa-qaaba-cai" : actor {
+     let FiatPayCanister = actor "bkyz2-fmaaa-aaaaa-qaaaq-cai" : actor {
         create_invoice : shared (Principal,FiatTypes.Request.CreateInvoiceBody) -> async Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>>;
         get_invoice : (Nat)->async Http.Response<Http.ResponseStatus<FiatTypes.Invoice, {}>>;
         get_all_invoices_to_admin : () -> async Http.Response<Http.ResponseStatus<[FiatTypes.Invoice], {}>>
@@ -550,7 +550,7 @@ actor mahaka {
           //      };
           // };
           let availablecycles : Nat = await availableCycles(); 
-          if(availablecycles < 800_500_000_000 ){
+          if(availablecycles < 800_510_000_000 ){
                throw Error.reject("Canister doesnt have enough cycles");
                return #err(#CyclesError);
           };
@@ -927,6 +927,11 @@ actor mahaka {
           //           };
           //      };
           // };
+          let availablecycles : Nat = await availableCycles(); 
+          if(availablecycles < 800_510_000_000 ){
+               throw Error.reject("Canister doesnt have enough cycles");
+               return #err(#CyclesError);
+          };
           Cycles.add<system>(800_500_000_000);
           let eventCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), eCollection.collection_args);
           let new_custodian = await eventCollection.addcustodians(user);
@@ -3254,7 +3259,12 @@ actor mahaka {
           //           };
           //      };
           // };
-          Cycles.add<system>(800_000_000_000);
+          let availablecycles : Nat = await availableCycles(); 
+          if(availablecycles < 800_510_000_000 ){
+               throw Error.reject("Canister doesnt have enough cycles");
+               return #err(#CyclesError);
+          };
+          Cycles.add<system>(800_500_000_000);
           let initial_mints = [{
                account = { owner = Principal.fromActor(mahaka); subaccount = null };
                amount = _totalSupply;
