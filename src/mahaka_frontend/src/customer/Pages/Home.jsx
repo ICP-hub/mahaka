@@ -212,8 +212,8 @@ export default function Home() {
   return (
     <>
       {attractionbanners && attractionbanners.length ===0 ?
-       <div className = "bg-card rounded-lg p-5 text-center mx-10 shadow-lg mt-10"> 
-       <h1 className = "text-4xl text-gray-800 font-bold">No Attraction banners Found.</h1>
+       <div className = "bg-card rounded-lg p-5 text-center mx-10 shadow-lg mt-10 h-100"> 
+       <h1 className = "text-3xl md:text-7xl text-gray-800 font-bold md:mt-30">No Attraction banners Found.</h1>
      
        </div>
       
@@ -417,8 +417,8 @@ export default function Home() {
           </div>
         ) : banners && banners.length === 0 ? 
         
-        <div className = " bg-card rounded-lg p-5 text-center mt-10 shadow-lg"> 
-        <h1 className = "text-4xl text-gray-800 font-bold">No  ThirdParty Banners.</h1>
+        <div className = " bg-card rounded-lg p-5 text-center mt-10 shadow-lg md:h-50"> 
+        <h1 className = "text-4xl text-gray-800 font-bold  md:mt-15">No  ThirdParty Banners Found.</h1>
 
         </div>
         :
@@ -550,10 +550,10 @@ ongoingEventsLoading? <SkeletonLoaderEvents/>:<OngoingSlider />
   )
   
   : testimonials && testimonials.length === 0? 
-  
-  <div className = "bg-card rounded-lg p-5 text-center mx-10 shadow-lg"> 
-  <h1 className = "text-4xl text-gray-800 font-bold">No Testimonials Found.</h1>
-
+  <div className = "flex flex-row justify-center">
+  <div className = "bg-card rounded-lg p-5 text-center mx-10 shadow-lg md:h-50 md:w-[35%]"> 
+  <h1 className = "text-3xl text-gray-800 font-bold md:mt-13">No Testimonials Found.</h1>
+  </div>
   </div>
   :
 
