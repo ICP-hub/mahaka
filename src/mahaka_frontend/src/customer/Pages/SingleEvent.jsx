@@ -79,6 +79,7 @@ export default function SingleEvent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { ModalOne } = ModalPopup();
   const [ticketDetails, setTicketDetails] = useState(null);
+  const [ticketLoading, setTicketLoading] = useState(true);
   const handleModalOpen = () => setIsModalOpen(true);
   const handleModalClose = () => setIsModalOpen(false);
 
@@ -128,6 +129,7 @@ export default function SingleEvent() {
         console.error("Error fetching ticket details:", error);
         setTicketDetails(null);
       } finally {
+        setTicketLoading(false);
       }
     };
     fetchTicketDetails(currentVenue);
@@ -315,7 +317,7 @@ export default function SingleEvent() {
                       role="tabpanel"
                       aria-labelledby="profile-tab"
                     >
-                      {venueLoading ? (
+                      {ticketLoading ? (
                         <>
                           <div className="animate-pulse space-y-4">
                             <div className="bg-gray-300 h-50 rounded-2xl w-full"></div>

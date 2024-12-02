@@ -214,7 +214,19 @@ export default function Home() {
 
   return (
     <>
-      {attractionbanners && attractionbanners.length === 0 ? (
+      {bannerLoading ? (
+        <SkeletonLoaderAttraction />
+      ) : attractionbanners && attractionbanners.length === 0 ? (
+        <div className="bg-card rounded-lg p-5 text-center mx-10 shadow-lg mt-10 h-100">
+          <h1 className="text-3xl md:text-7xl text-gray-800 font-bold md:mt-30">
+            No banners Found.
+          </h1>
+        </div>
+      ) : (
+        <HeroSider />
+      )}
+
+      {/* {attractionbanners && attractionbanners.length == 0 ? (
         <div className="bg-card rounded-lg p-5 text-center mx-10 shadow-lg mt-10 h-100">
           <h1 className="text-3xl md:text-7xl text-gray-800 font-bold md:mt-30">
             No banners Found.
@@ -224,7 +236,7 @@ export default function Home() {
         <SkeletonLoaderAttraction />
       ) : (
         <HeroSider />
-      )}
+      )} */}
       <section className="py-12">
         {/* -------------------------------------venues section start------------------------------ */}
 
