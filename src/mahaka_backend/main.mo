@@ -1834,7 +1834,7 @@ actor mahaka {
           paymentType: Types.PaymentType,
           saleDate : Time.Time,
           numOfVisitors: Nat
-     ) : async Result.Result<[nftTypes.MintReceiptPart] or Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>>, Types.MintError or Text> {
+     ) : async Result.Result<Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>>, Text> {
           
           let venueResult = await getVenue(venueId);
           switch(venueResult){
@@ -1891,7 +1891,7 @@ actor mahaka {
                                              caller = caller;
                                         };
                                         pendingPayments := Array.append<(Nat,Types.ArgsStore)>([(invoice_id,args)],pendingPayments);
-                                        return #ok(create_invoice_response.body);
+                                        return #ok(create_invoice_response);
                                    };
                                    case (#err(error)) {
                                         return #err(debug_show(error));
@@ -1900,7 +1900,7 @@ actor mahaka {
                          };
                     };
                };
-               case (#err(e)) { return #err(#EventError); };
+               case (#err(e)) { return #err("Venue not found"#debug_show(e)); };
           };
           
      };
@@ -1915,7 +1915,7 @@ actor mahaka {
           saleDate : Time.Time,
           numOfVisitors: Nat,
           paymentType: Types.PaymentType
-     ) : async Result.Result<[nftTypes.MintReceiptPart] or Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>>, Types.MintError or Text> {
+     ) : async Result.Result<Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>>, Text> {
           let eventResult = await getEvent(_eventId, _venueId);
           switch (eventResult) {
                case (#ok(event)) {
@@ -1970,7 +1970,7 @@ actor mahaka {
                                              caller = caller;
                                         };
                                         pendingPayments := Array.append<(Nat,Types.ArgsStore)>([(invoice_id,args)],pendingPayments);
-                                        return #ok(create_invoice_response.body);
+                                        return #ok(create_invoice_response);
                                    };
                                    case (#err(error)) {
                                         return #err(debug_show(error));
@@ -1979,7 +1979,7 @@ actor mahaka {
                          };
                     };
                };
-               case (#err(e)) { return #err(#EventError); };
+               case (#err(e)) { return #err("Event not found"#debug_show(e)); };
           };
      };
 
@@ -1990,7 +1990,7 @@ actor mahaka {
           saleDate : Time.Time,
           numOfVisitors: Nat,
           paymentType: Types.PaymentType
-     ) : async Result.Result<[icrcTypes.TxIndex] or Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>>, icrcTypes.TransferError or Types.MintError or Text> {
+     ) : async Result.Result<Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>>, Text> {
           let wahanaResult = await getWahana(wahanaId, venueId);
           Debug.print(debug_show(wahanaResult));
           switch (wahanaResult) {
@@ -2049,7 +2049,7 @@ actor mahaka {
                                              caller = caller;
                                         };
                                         pendingPaymentsWahana := Array.append<(Nat,Types.ArgsStoreWahana)>([(invoice_id,args)],pendingPaymentsWahana);
-                                        return #ok(create_invoice_response.body);
+                                        return #ok(create_invoice_response);
                                    };
                                    case (#err(error)) {
                                         return #err(debug_show(error));
@@ -2060,7 +2060,7 @@ actor mahaka {
                     // await processTransfer(collectionActor, receivers, numOfVisitors, wahanaId, paymentType, wahana.price,caller);
                };
                case (#err(e)) { 
-                    return #err(#WahanaError); 
+                    return #err("Wahana not found"#debug_show(e)); 
                };
           };
      };
@@ -2161,7 +2161,7 @@ actor mahaka {
           numOfVisitors: Nat,
           saleDate : Time.Time,
           paymentType: Types.PaymentType
-     ) : async Result.Result<[icrcTypes.TxIndex], icrcTypes.TransferError or Types.MintError or Text> {
+     ) : async Result.Result<[icrcTypes.TxIndex], icrcTypes.TransferError or Text> {
           // let roleResult = await getRoleByPrincipal(user);
           // switch (roleResult) {
           //      case (#err(error)) {
