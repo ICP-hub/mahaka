@@ -173,7 +173,7 @@ const bannerSlice = createSlice({
           // Update only thirdPartyBanners
           state.banners = [];
         }
-        console.log("Banners are cleared successfully")
+        //console.log("Banners are cleared successfully")
       })
       .addCase(clearAllBanners.rejected, (state, action) => {
         
@@ -205,11 +205,11 @@ const bannerSlice = createSlice({
             }
           });
 
-          console.log(
-            "banners fetched successfully",
-            state.banners,
-            state.attractionbanners
-          );
+          // console.log(
+          //   "banners fetched successfully",
+          //   state.banners,
+          //   state.attractionbanners
+          // );
         } else {
           state.banners = [];
           state.attractionbanners = [];
@@ -220,6 +220,8 @@ const bannerSlice = createSlice({
 
       .addCase(getAllBanners.rejected, (state, action) => {
         state.bannerLoading = false;
+        state.banners = [];
+        state.attractionbanners = [];
         state.error = action.error.message;
       });
   },

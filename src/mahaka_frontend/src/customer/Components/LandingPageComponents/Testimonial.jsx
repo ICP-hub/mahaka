@@ -2,15 +2,14 @@ import React, { useEffect, useState } from "react";
 // import { useSwipeable } from 'react-swipeable';
 import Frame from "../../../assets/images/Frame.png";
 import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
-import { getAllTestimonials } from "../../../redux/reducers/apiReducers/testimonialApiReducer";
+
 import { useSelector, useDispatch } from "react-redux";
 
 
 
 const TestimonialCarousel = () => {
   const {testimonials,  testimonialLoading  } = useSelector((state)=>state.testimonial)
-  const dispatch = useDispatch();
-  console.log("testimonials logging",testimonials)
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const controls = useAnimationControls();
 
@@ -65,19 +64,6 @@ const TestimonialCarousel = () => {
   };
 
  
-
-  // const SkeletonLoaderTestimonial = ()=>{
-
-  //   return (
-  //     <>
-  //     <div>
-  //       <div className = "bg-gray-400 h-50 w-auto rounded-lg animate-pulse shadow-lg">
-  //       </div>
-  //     </div>
-  //     </>
-  //   )
-  // }
-
   return (
     <>
     <div className="relative mx-auto flex flex-col items-center w-full max-w-7xl p-4 overflow-hidden">

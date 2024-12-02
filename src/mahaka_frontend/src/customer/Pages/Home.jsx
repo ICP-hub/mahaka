@@ -57,18 +57,20 @@ const VenueCard = ({ venue, layout }) => (
 export default function Home() {
   const { venues, loading } = useSelector((state) => state.venues);
   const { wahanas } = useSelector((state) => state.wahana);
-  console.log("venues in home", venues);
+ // console.log("venues in home", venues);
   const { backend } = useSelector((state) => state.authentication);
   const { attractionbanners, banners, bannerLoading } = useSelector(
     (state) => state.banner
   );
   const { testimonials,testimonialLoading } = useSelector((state) => state.testimonial);
-  //  const { banners } = useSelector((state) => state.banner);
-  console.log("testimonials in home", testimonials);
-
-  console.log("Attraction Banners home:", attractionbanners);
-  console.log("Third Party Banners home:", banners);
+  const { ongoingEventsLoading,ongoingEvents} = useSelector((state)=> state.ongoingevents)
   const dispatch = useDispatch();
+  //  const { banners } = useSelector((state) => state.banner);
+ // console.log("testimonials in home", testimonials);
+
+ // console.log("Attraction Banners home:", attractionbanners);
+ // console.log("Third Party Banners home:", banners);
+ 
  // console.log(wahanas, "wahanas");
 
   // const SkeletonLoader = ()=>{
@@ -190,9 +192,32 @@ export default function Home() {
     );
   };
 
+  const SkeletonLoaderEvents = () => {
+    return (
+      <>
+        <div className="mx-10 mt-15">
+          <div className="bg-gray-400 h-40 md:h-80 rounded-lg min-w-full animate-pulse p-4">
+            <div className="flex flex-col items-center justify-center md:mt-40 mt-13">
+              <div className="bg-gray-300 h-4 md:h-5 w-[25%] my-2 rounded-md"></div>
+              <div className="bg-gray-300 h-3 md:h-6 w-[70%]   my-2 rounded-md"></div>
+              <div className="bg-gray-300 h-4 md:h-7 w-[10%] my-2 rounded-md"></div>
+              
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  };
+
   return (
     <>
-      {bannerLoading ? <SkeletonLoaderAttraction /> : <HeroSider />}
+      {attractionbanners && attractionbanners.length ===0 ?
+       <div className = "bg-card rounded-lg p-5 text-center mx-10 shadow-lg mt-10"> 
+       <h1 className = "text-4xl text-gray-800 font-bold">No Attraction banners Found.</h1>
+     
+       </div>
+      
+      :bannerLoading ? <SkeletonLoaderAttraction /> : <HeroSider />}
       <section className="py-12">
         {/* -------------------------------------venues section start------------------------------ */}
 
@@ -205,7 +230,17 @@ export default function Home() {
 
               <div className="w-full lg:w-1/2 h-120 m-2 bg-gray-400 animate-pulse rounded-lg"></div>
             </div>
-          ) : (
+          ) : venues && venues.length ===0? 
+          <div className = "bg-card rounded-lg p-5 text-center shadow-lg"> 
+          <h1 className = "text-4xl text-gray-800 font-bold">No venues Found.</h1>
+
+          </div>
+          :
+          
+          
+          
+          
+          (
             <div>
               {/* if length equals 1 */}
               {venues?.length === 1 && (
@@ -375,12 +410,20 @@ export default function Home() {
         {/* --------------------------------venues section end-------------------------------- */}
 
         {/* third party BANNER section start*/}
-
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {bannerLoading ? (
           <div className="my-10 mx-10">
             <div className="bg-gray-400 h-50 w-full px-4 rounded-lg animate-pulse shadow-lg"></div>
           </div>
-        ) : (
+        ) : banners && banners.length === 0 ? 
+        
+        <div className = " bg-card rounded-lg p-5 text-center mt-10 shadow-lg"> 
+        <h1 className = "text-4xl text-gray-800 font-bold">No  ThirdParty Banners.</h1>
+
+        </div>
+        :
+        
+        (
           <div className="max-w-7xl mx-auto py-8 sm:px-6">
             {/* Group banners into chunks of 1, 2, 3 (or more if needed) */}
             {chunkArray(banners, [1, 2, 3]).map((group, index) => (
@@ -420,14 +463,29 @@ export default function Home() {
             ))}
           </div>
         )}
+        </div>
 
         {/* 2 Grid card  end*/}
         {/* OnGoing Event slider Start  */}
-        {/* {eventsLoading?
+        {/* { ongoingEventsLoading?
         <SkeletonLoaderEvents/>
-        : */}
+        : ongoingEvents && ongoingEvents.length ===0? "LOading":
 
         <OngoingSlider />
+} */}
+
+{ongoingEvents && ongoingEvents.length ===0?
+
+<div className = " bg-card rounded-lg p-5 text-center mt-10 mx-10 shadow-lg"> 
+<h1 className = "text-4xl text-gray-800 font-bold">No  Ongoing Events Found.</h1>
+
+</div>
+:
+ongoingEventsLoading? <SkeletonLoaderEvents/>:<OngoingSlider />
+
+
+
+}
           
         {/* OnGoing Event slider end  */}
         {/* Events and ctivity Section Start  */}
@@ -480,7 +538,9 @@ export default function Home() {
         {/* Events and ctivity Section end  */}
         {/* Testimonial start  */}
 
-  {testimonialLoading ?
+  
+        <div className="mt-15">
+        {testimonialLoading ?
   (
   <div className = "grid grid-cols-1 md:grid-cols-3 gap-6 my-5 mx-10">
   <SkeletonLoaderTestimonial/>
@@ -489,13 +549,19 @@ export default function Home() {
   </div>
   )
   
+  : testimonials && testimonials.length === 0? 
+  
+  <div className = "bg-card rounded-lg p-5 text-center mx-10 shadow-lg"> 
+  <h1 className = "text-4xl text-gray-800 font-bold">No Testimonials Found.</h1>
+
+  </div>
   :
 
-        <div className="mt-15">
-          {" "}
+        
           <TestimonialCarousel />
-        </div>
 }
+        </div>
+
         {/* Testimonial End  */}
       </section>
     </>

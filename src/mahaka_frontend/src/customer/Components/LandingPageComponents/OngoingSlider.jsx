@@ -11,8 +11,11 @@ import { Autoplay, Pagination } from 'swiper/modules';
 
 import OngoingCard from '../OngoingCard';
 export default function () {
-  const { events, eventByVenue, eventsLoading, singleEventLoading } =
-  useSelector((state) => state.events);
+  // const { events, eventByVenue, eventsLoading, singleEventLoading } =
+  // useSelector((state) => state.events);
+
+  const {ongoingEvents, ongoingEventsLoading} = useSelector((state)=> state.ongoingevents)
+ // console.log("ongoing events in slider",ongoingEvents)
   return (
     <>
      <Swiper
@@ -27,10 +30,10 @@ export default function () {
         modules={[Autoplay,Pagination]}
         className="mySwiper"
       >
-        {events?.map((event, index) => (
+        {ongoingEvents?.map((ongoingEvent, index) => (
           <SwiperSlide key={index}>
-            <OngoingCard eventData={event}
-            eventsLoading ={ eventsLoading}
+            <OngoingCard ongoingEventData={ongoingEvent}
+            ongoingEventsLoading ={ ongoingEventsLoading}
             />
           </SwiperSlide>
         ))}

@@ -226,24 +226,24 @@ const wahanaSlice = createSlice({
       })
 
       //Handle edit wahana
-      .addCase(edit_wahana.pending, (state) => {
-        state.editWahanaLoader = true;
-      })
+      // .addCase(edit_wahana.pending, (state) => {
+      //   state.editWahanaLoader = true;
+      // })
 
-      .addCase(edit_wahana.fulfilled, (state, action) => {
-        state.editWahanaLoader = false;
-        console.log(action.payload, "Edited wahana");
+      // .addCase(edit_wahana.fulfilled, (state, action) => {
+      //   state.editWahanaLoader = false;
+      //   console.log(action.payload, "Edited wahana");
 
-        state.wahanas.push(action.payload.ok);
-        state.error = null;
-        notificationManager.success("Wahana Edited successfully");
-      })
+      //   state.wahanas.push(action.payload.ok);
+      //   state.error = null;
+      //   notificationManager.success("Wahana Edited successfully");
+      // })
 
-      .addCase(edit_wahana.rejected, (state, action) => {
-        state.createWahanaLoader = false;
-        state.error = action.error.message;
-        //notificationManager.error("Failed to Edit wahana");
-      })
+      // .addCase(edit_wahana.rejected, (state, action) => {
+      //   state.createWahanaLoader = false;
+      //   state.error = action.error.message;
+      
+      // })
 
       //Getting all wahanas
       .addCase(getAllWahanas.pending, (state) => {

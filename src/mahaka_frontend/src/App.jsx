@@ -14,6 +14,7 @@ import { getUserDetailsByCaller } from "./redux/reducers/apiReducers/userApiRedu
 import { getAllEventsPaginated } from "./redux/reducers/apiReducers/eventApiReducer";
 import { getAllTestimonials} from "./redux/reducers/apiReducers/testimonialApiReducer";
 import { createTestimonial } from "./redux/reducers/apiReducers/testimonialApiReducer";
+import { getOngoingEvents} from "./redux/reducers/apiReducers/ongoingEventsApiReducer";
 // import { createVenue , updateVenue } from "./redux/reducers/apiReducers/venueApiReducer";
 
 function App() {
@@ -90,6 +91,10 @@ function App() {
 
   useEffect(()=>{
     dispatch(getAllTestimonials({backend:backend}))
+  },[]);
+
+  useEffect(()=>{
+    dispatch(getOngoingEvents({backend:backend}))
   },[])
 
 
