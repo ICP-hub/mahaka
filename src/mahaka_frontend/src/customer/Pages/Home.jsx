@@ -211,13 +211,16 @@ export default function Home() {
 
   return (
     <>
-      {attractionbanners && attractionbanners.length ===0 ?
-       <div className = "bg-card rounded-lg p-5 text-center mx-10 shadow-lg mt-10 h-100"> 
+      
+      
+      {bannerLoading ? <SkeletonLoaderAttraction /> : 
+      attractionbanners && attractionbanners.length ===0 ?
+      <div className = "bg-card rounded-lg p-5 text-center mx-10 shadow-lg mt-10 h-100"> 
        <h1 className = "text-3xl md:text-7xl text-gray-800 font-bold md:mt-30">No Attraction banners Found.</h1>
      
-       </div>
+       </div>:
       
-      :bannerLoading ? <SkeletonLoaderAttraction /> : <HeroSider />}
+      <HeroSider />}
       <section className="py-12">
         {/* -------------------------------------venues section start------------------------------ */}
 
@@ -474,14 +477,24 @@ export default function Home() {
         <OngoingSlider />
 } */}
 
-{ongoingEvents && ongoingEvents.length ===0?
+
+
+{/* <div className = " bg-card rounded-lg p-5 text-center mt-10 mx-10 shadow-lg"> 
+<h1 className = "text-4xl text-gray-800 font-bold">No  Ongoing Events Found.</h1>
+
+</div> */}
+
+{ongoingEventsLoading? <SkeletonLoaderEvents/>:
+ongoingEvents && ongoingEvents.length === 0?
 
 <div className = " bg-card rounded-lg p-5 text-center mt-10 mx-10 shadow-lg"> 
 <h1 className = "text-4xl text-gray-800 font-bold">No  Ongoing Events Found.</h1>
 
-</div>
+</div> 
 :
-ongoingEventsLoading? <SkeletonLoaderEvents/>:<OngoingSlider />
+
+
+<OngoingSlider />
 
 
 
