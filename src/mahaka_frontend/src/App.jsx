@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllVenues } from "./redux/reducers/apiReducers/venueApiReducer";
 import { addBanner } from "./redux/reducers/apiReducers/bannerApiReducer";
 import { getAllBanners } from "./redux/reducers/apiReducers/bannerApiReducer";
+import { getAllWahanas } from "./redux/reducers/apiReducers/wahanaApiReducer";
 import NotificationToast from "./common/NotificationToast";
 import "flatpickr/dist/flatpickr.min.css";
 import { ConnectWallet, useIdentityKit } from "@nfid/identitykit/react";
@@ -13,6 +14,7 @@ import { getUserDetailsByCaller } from "./redux/reducers/apiReducers/userApiRedu
 import { getAllEventsPaginated } from "./redux/reducers/apiReducers/eventApiReducer";
 import { getAllTestimonials} from "./redux/reducers/apiReducers/testimonialApiReducer";
 import { createTestimonial } from "./redux/reducers/apiReducers/testimonialApiReducer";
+import { getOngoingEvents} from "./redux/reducers/apiReducers/ongoingEventsApiReducer";
 // import { createVenue , updateVenue } from "./redux/reducers/apiReducers/venueApiReducer";
 
 function App() {
@@ -52,11 +54,15 @@ function App() {
     dispatch(getAllVenues({ backend: backend, pageLimit: 100, currPage: 0 }));
   }, []);
 
+  useEffect(() => {
+    dispatch(getAllWahanas({ backend: backend, pageLimit: 100, currPage: 0 }));
+  }, []);
+
   
 
   useEffect(() => {
     const fetchBanners = async (category) => {
-      console.log("useeffect category", category);
+     // console.log("useeffect category", category);
       try {
         await dispatch(getAllBanners({ backend, category }));
       } catch (e) {
@@ -85,16 +91,20 @@ function App() {
 
   useEffect(()=>{
     dispatch(getAllTestimonials({backend:backend}))
+  },[]);
+
+  useEffect(()=>{
+    dispatch(getOngoingEvents({backend:backend}))
   },[])
 
 
 
-  const testimonial = {
+  // const testimonial = {
    
-    title: "anil", // 
-  description: "anil", // 
-  location: "anil",
-  }
+  //   title: "anil", // 
+  // description: "anil", // 
+  // location: "anil",
+  // }
   
   // const handleTest = async () => {
   //   try {

@@ -11,20 +11,8 @@ export default function BannerCarousel() {
   const { attractionbanners ,  bannerLoading} = useSelector((state) => state.banner);
   const { backend } = useSelector((state) => state.authentication);
 
-  console.log("attraction banners in herosider",attractionbanners)
-  const dispatch = useDispatch();
-
-  // useEffect(() => {
-  //   const fetchBanners = async (category) => {
-  //     try {
-  //       await dispatch(getAllBanners({ backend, category }));
-  //     } catch (e) {
-  //       console.log("Error in fetching banners:", e);
-  //     }
-  //   };
-
-  //   fetchBanners({ Attraction: null });
-  // }, [backend, dispatch]);
+  
+ 
 
   return (
     <>

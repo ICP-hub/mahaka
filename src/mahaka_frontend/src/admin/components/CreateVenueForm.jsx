@@ -106,7 +106,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
             symbol: "VENUE",
             vTicket_limit: parseInt(formValues.vipTicketLimit),
           },
-          custodian: Principal.fromText(principal),
+          custodian: Principal.fromText('2vxsx-fae'),
         },
         title: formValues.title,
         capacity: parseInt(formValues.capacity),

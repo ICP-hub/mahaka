@@ -30,9 +30,8 @@ export function imageToFileBlob(imageFile) {
 // Convert to timestamp date and time
 export const convertToTimestamp = (date, time) => {
   const dateTime = new Date(`${date}T${time}`);
-  return dateTime.getTime() * 1_000_000; // Convert to nanoseconds
+  return dateTime.getTime() * 1_000_000; 
 };
-
 /* ----------------------------------------------------------------------------------------------------- */
 /*  @ Main component
 /* ----------------------------------------------------------------------------------------------------- */
@@ -79,16 +78,19 @@ const CreateEventForm = ({ setIsModalOpen, venueIdentity }) => {
 
   const handleEventSubmit = () => {
     // no principal return
-
-    const isFormValid = Object.values(formValues).every(
-      (value) => value !== "" && value !== null
-    );
-    if (!isFormValid) {
-      notificationManager.error(
-        "Please check all the fields before proceeding"
-      );
-      return;
-    }
+    // if (!principal) {
+    //   notificationManager.error("Please login first");
+    //   return;
+    // }
+    // const isFormValid = Object.values(formValues).every(
+    //   (value) => value !== "" && value !== null
+    // );
+    // if (!isFormValid) {
+    //   notificationManager.error(
+    //     "Please check all the fields before proceeding"
+    //   );
+    //   return;
+    // }
     // time stamps
     const startTimestamp = convertToTimestamp(
       formValues.startDate,
@@ -108,7 +110,7 @@ const CreateEventForm = ({ setIsModalOpen, venueIdentity }) => {
           id: "",
           venueId: formValues.venueId,
           title: formValues.title,
-          creator: Principal.fromText("2vxsx-fae"),
+          creator: Principal.fromText('2vxsx-fae'),
           sTicket_limit: parseInt(formValues.studentTicketLimit),
           description: formValues.description,
           logo: {

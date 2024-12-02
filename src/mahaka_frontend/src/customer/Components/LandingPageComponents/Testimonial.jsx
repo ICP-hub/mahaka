@@ -2,61 +2,14 @@ import React, { useEffect, useState } from "react";
 // import { useSwipeable } from 'react-swipeable';
 import Frame from "../../../assets/images/Frame.png";
 import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
-import { getAllTestimonials } from "../../../redux/reducers/apiReducers/testimonialApiReducer";
+
 import { useSelector, useDispatch } from "react-redux";
 
-const testimonials = [
-  {
-    text: "This app has been a game changer for my daily routine. I feel more focused and relaxed.",
-    author: "Sarah, USA",
-    description: "on the positive impact on her daily productivity",
-  },
-  {
-    text: "I’ve never experienced such a deep sense of calm before. Truly transformative!",
-    author: "Liam, Canada",
-    description: "on achieving a new level of calm",
-  },
-  {
-    text: "The guided sessions are incredibly helpful. I’ve learned so much about mindfulness.",
-    author: "Amina, Australia",
-    description: "on the educational aspect of the app",
-  },
-  {
-    text: "My stress levels have drastically decreased since using this app. Highly recommend!",
-    author: "Raj, India",
-    description: "on reducing stress and anxiety",
-  },
-  {
-    text: "I love how easy it is to integrate mindfulness into my busy schedule. It’s a lifesaver!",
-    author: "Emily, UK",
-    description: "on integrating mindfulness into a busy lifestyle",
-  },
-  {
-    text: "The app’s calming voice and soothing music make each session a pleasure. Five stars!",
-    author: "Carlos, Spain",
-    description: "on the app's audio features",
-  },
-  {
-    text: "I didn’t realize how much I needed this until I started using it. It’s a must-have!",
-    author: "Lena, Germany",
-    description: "on discovering the app’s value",
-  },
-  {
-    text: "The app has helped me manage my anxiety and improve my overall well-being. Fantastic!",
-    author: "Sophie, France",
-    description: "on managing anxiety and improving well-being",
-  },
-  {
-    text: "I appreciate the variety of meditation techniques offered. There’s something for everyone.",
-    author: "Jake, Netherlands",
-    description: "on the variety of meditation techniques",
-  },
-];
+
 
 const TestimonialCarousel = () => {
-  const {testimonials, testimonialLoading  } = useSelector((state)=>state.testimonial)
-  const dispatch = useDispatch();
-  console.log("testimonials logging",testimonials)
+  const {testimonials,  testimonialLoading  } = useSelector((state)=>state.testimonial)
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const controls = useAnimationControls();
 
@@ -111,10 +64,11 @@ const TestimonialCarousel = () => {
   };
 
  
-
   return (
+    <>
     <div className="relative mx-auto flex flex-col items-center w-full max-w-7xl p-4 overflow-hidden">
       <h1 className="text-7xl font-black text-center pb-15">Testimonials</h1>
+
       <div className="relative w-full">
         <motion.div
           className="flex"
@@ -130,7 +84,7 @@ const TestimonialCarousel = () => {
                 index
               )}`}
             >
-              <TestimonialCard testimonial={testimonial} />
+              <TestimonialCard testimonial={testimonial} testimonialLoading = {testimonialLoading}/>
             </motion.div>
           ))}
         </motion.div>
@@ -167,6 +121,7 @@ const TestimonialCarousel = () => {
         </div>
       </div>
     </div>
+    </>
   );
 
   function getCardWidth() {
@@ -174,8 +129,11 @@ const TestimonialCarousel = () => {
   }
 };
 
-const TestimonialCard = ({ testimonial }) => {
+
+
+const TestimonialCard = ({ testimonial, testimonialLoading}) => {
   return (
+    <>
     <div className="flex flex-col min-w-[300px] p-8 shadow-lg rounded-lg bg-[#F9F9F9]">
       <img src={Frame} alt="frame" className="h-12 w-16 mb-4" />
       <p className="mb-4 text-2xl font-medium text-gray-700 text-justify">
@@ -186,6 +144,9 @@ const TestimonialCard = ({ testimonial }) => {
       </p>
       <p className="text-sm text-gray-600">{testimonial.description}</p>
     </div>
+      
+    
+      </>
   );
 };
 

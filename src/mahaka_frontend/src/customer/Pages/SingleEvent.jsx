@@ -105,13 +105,13 @@ export default function SingleEvent() {
 
   useEffect(() => {
     const fetchTicketDetails = async (venue) => {
-      if (!venue?.Collection_id) {
+      if (!venue[1]?.Collection_id) {
         console.error("Venue does not have a collection_id:", venue);
         return;
       }
       try {
         // Fetch ticket details from the actor
-        const details = await backend.getDIPdetails(venue?.Collection_id);
+        const details = await backend.getDIPdetails(venue[1]?.Collection_id);
         console.log(details, "ticketDetails");
         setTicketDetails(details);
       } catch (error) {
@@ -126,7 +126,8 @@ export default function SingleEvent() {
   console.log(wahanasByVenue, "wahanas");
   console.log(currentVenue);
   const [localError, setLocalError] = useState(null);
-  const venue = currentVenue ? currentVenue : null;
+  const venue =
+    currentVenue && Array.isArray(currentVenue) ? currentVenue[1] : null;
 
   useEffect(() => {
     if (!venueId) {
@@ -391,7 +392,7 @@ export default function SingleEvent() {
                           </li>
                         </ul>
 
-                        <div className="space-y-4">{venue.Description}</div>
+                        <div className="space-y-4">{venue?.Description}</div>
                       </div>
                     </motion.div>
                   )}
@@ -421,11 +422,13 @@ export default function SingleEvent() {
                 <div className="p-8">
                   <h1 className="text-2xl font-black">Venue Details</h1>
                   <h3 className="text-lg font-normal"> </h3>
-
+                   
+                  
                   <h3 className="text-lg font-normal">
                     Location of the Venue - {venue?.Details.Location}
                   </h3>
                 </div>
+                 
               </div>
             )}
           </div>

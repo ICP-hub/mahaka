@@ -26,7 +26,7 @@ const initialState = {
           
         );
         // action(false);
-        console.log("testimonial created successfully")
+       // console.log("testimonial created successfully")
         return response;
       } catch (error) {
         throw error;
@@ -47,7 +47,7 @@ const initialState = {
           
         );
         // action(false);
-        console.log("testimonials fetshed successfully")
+       // console.log("testimonials fetshed successfully")
         return response;
       } catch (error) {
         throw error;
@@ -69,7 +69,7 @@ const initialState = {
       })
       .addCase(createTestimonial.fulfilled, (state, action) => {
         state.testimonialLoading = false;
-       console.log("testimonial in reducer", action)
+       //console.log("testimonial in reducer", action)
        
         state. testimonials.push(action.payload.ok);
         state.error = null;

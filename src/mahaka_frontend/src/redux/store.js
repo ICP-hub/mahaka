@@ -6,6 +6,7 @@ import eventApiReducer from "./reducers/apiReducers/eventApiReducer";
 import bannerApiReducer from "./reducers/apiReducers/bannerApiReducer";
 import wahanaApiReducer from "./reducers/apiReducers/wahanaApiReducer";
 import testimonialApiReducer from "./reducers/apiReducers/testimonialApiReducer";
+import ongoingEventsApiReducer from "./reducers/apiReducers/ongoingEventsApiReducer";
 
 import authenticationReducer from "./reducers/auth/authenticationReducer";
  
@@ -18,7 +19,8 @@ const store = configureStore({
     events: eventApiReducer,
     wahana: wahanaApiReducer,
     banner: bannerApiReducer,
-    testimonial:testimonialApiReducer
+    testimonial:testimonialApiReducer,
+    ongoingevents:ongoingEventsApiReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
