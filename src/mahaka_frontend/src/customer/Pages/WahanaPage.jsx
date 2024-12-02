@@ -8,7 +8,7 @@ import { getWahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/pagination";
-
+import { formatDateAndTime } from "../../admin/pages/EventManager";
 // import required modules
 import { Autoplay, Pagination } from "swiper/modules";
 import { GoArrowUpRight } from "react-icons/go";
@@ -54,21 +54,15 @@ const WahanaPage = () => {
   const { ids, eventId } = useParams();
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
-  const { currentWahana: wahanas, loading } = useSelector(
-    (state) => state.wahana
-  );
+  const { currentWahana, loading } = useSelector( (state) => state.wahana);
   const [localError, setLocalError] = useState(null);
 
   useEffect(() => {
-    console.log("Fetched Wahana Data:", wahanas);
-  }, [wahanas]);
+    console.log("Fetched Wahana Data:", currentWahana);
+  }, [currentWahana]);
 
-  const eventIds = `${decodeURIComponent(eventId).replace(/_/g, "#")}${
-    window.location.hash
-  }`;
-  const venueId = `${decodeURIComponent(ids).replace(/_/g, "#")}${
-    window.location.hash
-  }`;
+  const eventIds = `${decodeURIComponent(eventId).replace(/_/g, "#")}${window.location.hash}`;
+  const venueId = `${decodeURIComponent(ids).replace(/_/g, "#")}${window.location.hash}`;
 
   const navigate = useNavigate();
   const nextpage = (ticket) => {
@@ -97,30 +91,19 @@ const WahanaPage = () => {
       });
   }, [dispatch, eventIds, venueId, backend]);
 
-  // Assuming the first event is the main event for this venue
 
-  //   const duration =
-  //     venue?.details.StartDate && venue?.details.EndDate
-  //       ? calculateDuration(venue.details.StartDate, venue.details.EndDate)
-  //       : "";
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  };
+  // const duration = currentWahana?.details?.StartDate && currentWahana?.details?.EndDate
+  // ? calculateDuration(currentWahana.details.StartDate, currentWahana.details.EndDate)
+  // : "1 Day";
 
-  const formatTime = (timeString) => {
-    const time = parseInt(timeString, 10);
-    const hours = Math.floor(time / 100);
-    const minutes = time % 100;
-    const period = hours >= 12 ? "PM" : "AM";
-    const formattedHours = hours % 12 || 12;
-    return `${formattedHours}:${minutes.toString().padStart(2, "0")} ${period}`;
-  };
+  const startInterVal = currentWahana?.details?.StartDate
+    ? formatDateAndTime(parseInt(currentWahana.details.StartDate))
+    : { date: '', time: '' };
+
+  const endInterVal = currentWahana?.details?.EndDate
+    ? formatDateAndTime(parseInt(currentWahana.details.EndDate))
+    : { date: '', time: '' };
 
   return (
     <>
@@ -153,7 +136,7 @@ const WahanaPage = () => {
             <h1 className=" animate-pulse bg-gray-300 rounded-2xl w-32 h-12 font-black mb-10"></h1>
           ) : (
             <h1 className="text-4xl font-black pb-10">
-              {wahanas?.ride_title || ""}
+              {currentWahana?.ride_title || ""}
             </h1>
           )}
           <div className="flex flex-col lg:flex-row gap-8">
@@ -166,11 +149,10 @@ const WahanaPage = () => {
                   </div>
                 ) : (
                   <img
-                    src={wahanas?.banner?.data || Frame13}
-                    alt={wahanas?.title || "Event"}
-                    className={`h-90 w-full rounded-2xl ${
-                      loading ? "hidden" : "block"
-                    }`}
+                    src={currentWahana?.banner?.data || Frame13}
+                    alt={currentWahana?.title || "Event"}
+                    className={`h-90 w-full rounded-2xl ${loading ? "hidden" : "block"
+                      }`}
                     onLoad={() => setIsLoading(false)}
                   />
                 )}
@@ -184,11 +166,10 @@ const WahanaPage = () => {
                   >
                     <li className="me-2" role="presentation">
                       <button
-                        className={`inline-block text-2xl font-black p-4 border-b-2 rounded-t-lg ${
-                          activeTab === "profile"
+                        className={`inline-block text-2xl font-black p-4 border-b-2 rounded-t-lg ${activeTab === "profile"
                             ? "border-blue-500"
                             : "border-transparent"
-                        }`}
+                          }`}
                         onClick={() => handleTabClick("profile")}
                         type="button"
                         role="tab"
@@ -200,11 +181,10 @@ const WahanaPage = () => {
                     </li>
                     <li className="me-2" role="presentation">
                       <button
-                        className={`inline-block text-2xl font-normal p-4 border-b-2 rounded-t-lg ${
-                          activeTab === "dashboard"
+                        className={`inline-block text-2xl font-normal p-4 border-b-2 rounded-t-lg ${activeTab === "dashboard"
                             ? "border-blue-500"
                             : "border-transparent"
-                        } `}
+                          } `}
                         onClick={() => handleTabClick("dashboard")}
                         type="button"
                         role="tab"
@@ -267,16 +247,16 @@ const WahanaPage = () => {
                         <ul className="list-disc list-inside mb-4">
                           <li>
                             <strong>Location:</strong>{" "}
-                            {wahanas.ride_title || "Indonesia"}
+                            {currentWahana.ride_title || "Indonesia"}
                           </li>
                           <li>
                             <strong>Price:</strong> IDR{" "}
-                            {parseInt(wahanas.priceICP)}
+                            {parseInt(currentWahana.price)}
                           </li>
                         </ul>
 
                         <div className="space-y-4">
-                          <div>{wahanas.description || " "}</div>
+                          <div>{currentWahana.description || " "}</div>
                         </div>
                       </div>
                     </motion.div>
@@ -308,7 +288,25 @@ const WahanaPage = () => {
                   <h1 className="text-2xl font-black">Wahana Details</h1>
                   <h3 className="text-lg font-normal">
                     {" "}
-                    IDR {parseInt(wahanas?.priceICP)}
+                    {currentWahana?.details.StartDate &&
+                      startInterVal.date}{" "}
+                    -
+                    {(currentWahana?.details.EndDate &&
+                      endInterVal.date)}
+                  </h3>
+                  <h3 className="text-lg font-normal">
+                    {currentWahana?.details.StartTime &&
+                      startInterVal.time}{" "}
+                    -
+                    {(currentWahana?.details.EndTime &&
+                      endInterVal.time)}
+                  </h3>
+                  <h3 className="text-lg font-normal">
+                    Location of the Wahana - {currentWahana?.details.Location}
+                  </h3>
+                  <h3 className="text-lg font-normal">
+                    {" "}
+                    IDR {parseInt(currentWahana?.price)}
                   </h3>
                 </div>
               </div>
