@@ -32,6 +32,7 @@ import { useAuth } from "../../connect/useClient";
 import { searchVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
 import { searchEvents } from "../../redux/reducers/apiReducers/eventApiReducer";
 import { searchWahanas } from "../../redux/reducers/apiReducers/wahanaApiReducer";
+import { CiWallet } from "react-icons/ci";
 
 const NavLinks = [
   { title: "HOME", url: "/" },
@@ -47,6 +48,11 @@ export default function Header() {
   const navigate = useNavigate();
   const { user } = useIdentityKit();
   const { isConnected, login, logout } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleCloseMenu = () => {
+    setIsMenuOpen(false);
+  };
   // useEffect(() => {
   //   if (isConnected) {
   //     navigate("/user-profile");
@@ -75,8 +81,33 @@ export default function Header() {
               </button>
             </div>
             {/* {isConnected && <ConnectBtn />} */}
+            {/* If connected show icon */}
+            {isConnected && (
+              <div className="relative h-20 flex items-center justify-center">
+                <div
+                  className="h-12 w-12 p-0.5 border border-[#F08E1E] rounded-full flex items-center justify-center cursor-pointer"
+                  onClick={() => setIsMenuOpen((pv) => !pv)}
+                >
+                  <Avvvatars
+                    value={user?.principal?.toText()}
+                    size={40}
+                    shadow={true}
+                  />
+                </div>
+                {isMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ stiffness: 300 }}
+                    className="absolute top-20 bg-gray-900 min-w-80 right-0 rounded-xl"
+                  >
+                    <ProfileMenu onClose={handleCloseMenu} />
+                  </motion.div>
+                )}
+              </div>
+            )}
           </div>
-          <div>
+          <div className="hidden sm:block">
             <ConnectBtn />
           </div>
         </div>
@@ -336,6 +367,9 @@ const NavVertical = ({ isNavOpen, onNavOpen }) => {
             </div>
           </Link>
         ))}
+        <div className="block sm:hidden">
+          <ConnectBtn />
+        </div>
       </div>
     </motion.nav>
   );
@@ -345,11 +379,6 @@ const ConnectBtn = () => {
   const { user, connect } = useIdentityKit();
   const { isConnected, login, logout, balance } = useAuth();
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const handleCloseMenu = () => {
-    setIsMenuOpen(false);
-  };
   const ConnectBtn1 = ({ onClick }) => (
     <button
       onClick={onClick}
@@ -358,6 +387,7 @@ const ConnectBtn = () => {
       Connect wallet
     </button>
   );
+
   if (!isConnected) {
     return (
       <ConnectWallet
@@ -366,27 +396,6 @@ const ConnectBtn = () => {
       />
     );
   }
-
-  return (
-    <div className="relative h-20 flex items-center justify-center">
-      <div
-        className="h-12 w-12 p-0.5 border border-[#F08E1E] rounded-full flex items-center justify-center cursor-pointer"
-        onClick={() => setIsMenuOpen((pv) => !pv)}
-      >
-        <Avvvatars value={user?.principal?.toText()} size={40} shadow={true} />
-      </div>
-      {isMenuOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ stiffness: 300 }}
-          className="absolute top-20 bg-gray-900 min-w-80 right-0 rounded-xl"
-        >
-          <ProfileMenu onClose={handleCloseMenu} />
-        </motion.div>
-      )}
-    </div>
-  );
 };
 
 // Profile menu : export if required
