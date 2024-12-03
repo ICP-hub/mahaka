@@ -113,7 +113,9 @@ const MemberManager = () => {
               isRtNavOpen={isRtNavOpen}
             />
           ) : (
-            <div className="text-center text-gray-500 md:text-5xl text-3xl font-bold mt-10">No users found</div>
+            <div className="text-center text-gray-500 md:text-5xl text-3xl font-bold mt-10">
+              No users found
+            </div>
           )}
         </div>
         <NavigationRight isOpen={isRtNavOpen}>
@@ -201,13 +203,19 @@ const UpdateMember = ({ member, onToggle, isEditing, setIsEditing }) => {
     }
 
     // pass validation
+
+    console.log(selectedVenue);
+
     const userDataForUpdate = {
       firstName: firstName,
       lastName: lastName,
       role: { [role]: null },
       email: email,
       principal: principalId,
-      venue: { id: selectedVenue.id, title: selectedVenue.Title },
+      venue: {
+        id: selectedVenue.id,
+        title: selectedVenue.Title || selectedVenue.title,
+      },
     };
 
     dispatch(
@@ -382,15 +390,15 @@ const EditDetails = ({
             <div className="ml-4 flex items-center space-x-4">
               {permissions.length > 0
                 ? permissions.map((permission) => (
-                  <div
-                    key={permission}
-                    className="flex items-center justify-center rounded-full bg-gray-100 px-3 py-0.5 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300"
-                  >
-                    <span className="whitespace-nowrap text-sm font-medium">
-                      {permission}
-                    </span>
-                  </div>
-                ))
+                    <div
+                      key={permission}
+                      className="flex items-center justify-center rounded-full bg-gray-100 px-3 py-0.5 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300"
+                    >
+                      <span className="whitespace-nowrap text-sm font-medium">
+                        {permission}
+                      </span>
+                    </div>
+                  ))
                 : null}
             </div>
           )}

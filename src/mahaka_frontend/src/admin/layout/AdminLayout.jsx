@@ -15,28 +15,33 @@ const AdminProtected = ({ children }) => {
   const { userLoading, currentUserByCaller } = useSelector(
     (state) => state.users
   );
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [layoutLoader, setLayoutLoader] = useState(true);
   const navigate = useNavigate();
 
+  // layoutloader : false after userLoading false: after 2 sec. for get the Object Keys
   useEffect(() => {
-    if (!userLoading && currentUserByCaller) {
-      if (!Object.keys(currentUserByCaller.role).includes("admin")) {
-        notificationManager.error("User is not an admin!");
-        navigate("/");
-      }
-    } else if (!userLoading && !currentUserByCaller) {
-      notificationManager.error("User is not an admin!");
-      navigate("/");
+    if (!userLoading) {
+      setTimeout(() => {
+        setLayoutLoader(false);
+      }, [3000]);
+    }
+  }, [userLoading]);
+
+  useEffect(() => {
+    if (currentUserByCaller) {
+      const isAdmin = Object.keys(currentUserByCaller.role).includes("admin");
+      setIsAdmin(isAdmin);
     }
   }, [currentUserByCaller]);
 
-  if (userLoading) {
-    return <div>Loading...</div>;
+  if (layoutLoader) return <div>Loading...</div>;
+  if (isAdmin) {
+    return children;
+  } else {
+    notificationManager.error("User is not an admin!");
+    navigate("/");
   }
-
-  return currentUserByCaller &&
-    Object.keys(currentUserByCaller.role).includes("admin")
-    ? children
-    : null;
 };
 
 /* Main Layout */
