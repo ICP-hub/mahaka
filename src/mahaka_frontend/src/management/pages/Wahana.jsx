@@ -31,6 +31,7 @@ const MgtWahana = () => {
   const containerVariants = createStaggerContainer(0.4);
   const cardVariants = createStaggerVariant(0.3);
   const [searchInput, setSearchInput] = useState("")
+  const [searchBtnClick, setSearchBtnClick] = useState(false)
   const dispatch = useDispatch()
 
 // console.log("wahana by venues are", wahanasByVenue)
@@ -38,18 +39,25 @@ const MgtWahana = () => {
 // // console.log("searched wahanas by venues are", wahanas)
 
 const filteredWahanas = useMemo(() => {
-  if (!searchInput) {
-    return wahanasByVenue;
-  } else {
+  if (searchInput && searchBtnClick) {
     return searchedWahana;
+  } else {
+    return wahanasByVenue;
   }
 }, [ wahanasByVenue,searchedWahana,searchInput]);
 
 
+useEffect(() => {
+  setSearchBtnClick(false); 
+}, [searchInput]);
+
 
   const handleSearch = ()=>{
+     if (searchInput.trim()) {
+      setSearchBtnClick(true); 
    // console.log("search value is",searchInput)
     dispatch(searchWahanas({backend:backend,searchText:searchInput,chunkSize:10,pageNo:0}))
+     }
   }
 
   return (
