@@ -19,13 +19,13 @@ import DatePicker from "../../common/DatePicker";
 import VisitorPicker from "../Components/single-event/VisitorPicker";
 const ticketData = [
   {
-    type: "PREMIUM",
+    type: "SINGLE",
     gradientClass: "bg-gradient-to-r from-orange-200 to-orange-300",
     name: "Ticket Name",
     description:
       "Lorem ipsum dolor sit amet consectetur. Bibendum est vitae urna pharetra",
     price: "Rp. 1,500",
-    availability: "AVAILABLE",
+    availability: " ",
     highlightClass: "bg-orange-500",
   },
 ];
@@ -54,15 +54,19 @@ const WahanaPage = () => {
   const { ids, eventId } = useParams();
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
-  const { currentWahana, loading } = useSelector( (state) => state.wahana);
+  const { currentWahana, loading } = useSelector((state) => state.wahana);
   const [localError, setLocalError] = useState(null);
 
   useEffect(() => {
     console.log("Fetched Wahana Data:", currentWahana);
   }, [currentWahana]);
 
-  const eventIds = `${decodeURIComponent(eventId).replace(/_/g, "#")}${window.location.hash}`;
-  const venueId = `${decodeURIComponent(ids).replace(/_/g, "#")}${window.location.hash}`;
+  const eventIds = `${decodeURIComponent(eventId).replace(/_/g, "#")}${
+    window.location.hash
+  }`;
+  const venueId = `${decodeURIComponent(ids).replace(/_/g, "#")}${
+    window.location.hash
+  }`;
 
   const navigate = useNavigate();
   const nextpage = (ticket) => {
@@ -89,9 +93,7 @@ const WahanaPage = () => {
       .catch((err) => {
         setLocalError(err.message || "Failed to fetch wahana details");
       });
-  }, [dispatch, eventIds, venueId, backend]);
-
-
+  }, [backend]);
 
   // const duration = currentWahana?.details?.StartDate && currentWahana?.details?.EndDate
   // ? calculateDuration(currentWahana.details.StartDate, currentWahana.details.EndDate)
@@ -99,11 +101,11 @@ const WahanaPage = () => {
 
   const startInterVal = currentWahana?.details?.StartDate
     ? formatDateAndTime(parseInt(currentWahana.details.StartDate))
-    : { date: '', time: '' };
+    : { date: "", time: "" };
 
   const endInterVal = currentWahana?.details?.EndDate
     ? formatDateAndTime(parseInt(currentWahana.details.EndDate))
-    : { date: '', time: '' };
+    : { date: "", time: "" };
 
   return (
     <>
@@ -136,7 +138,7 @@ const WahanaPage = () => {
             <h1 className=" animate-pulse bg-gray-300 rounded-2xl w-32 h-12 font-black mb-10"></h1>
           ) : (
             <h1 className="text-4xl font-black pb-10">
-              {currentWahana?.ride_title || ""}
+              {currentWahana?.ride_title}
             </h1>
           )}
           <div className="flex flex-col lg:flex-row gap-8">
@@ -151,8 +153,9 @@ const WahanaPage = () => {
                   <img
                     src={currentWahana?.banner?.data || Frame13}
                     alt={currentWahana?.title || "Event"}
-                    className={`h-90 w-full rounded-2xl ${loading ? "hidden" : "block"
-                      }`}
+                    className={`h-90 w-full rounded-2xl ${
+                      loading ? "hidden" : "block"
+                    }`}
                     onLoad={() => setIsLoading(false)}
                   />
                 )}
@@ -166,10 +169,11 @@ const WahanaPage = () => {
                   >
                     <li className="me-2" role="presentation">
                       <button
-                        className={`inline-block text-2xl font-black p-4 border-b-2 rounded-t-lg ${activeTab === "profile"
+                        className={`inline-block text-2xl font-black p-4 border-b-2 rounded-t-lg ${
+                          activeTab === "profile"
                             ? "border-blue-500"
                             : "border-transparent"
-                          }`}
+                        }`}
                         onClick={() => handleTabClick("profile")}
                         type="button"
                         role="tab"
@@ -181,10 +185,11 @@ const WahanaPage = () => {
                     </li>
                     <li className="me-2" role="presentation">
                       <button
-                        className={`inline-block text-2xl font-normal p-4 border-b-2 rounded-t-lg ${activeTab === "dashboard"
+                        className={`inline-block text-2xl font-normal p-4 border-b-2 rounded-t-lg ${
+                          activeTab === "dashboard"
                             ? "border-blue-500"
                             : "border-transparent"
-                          } `}
+                        } `}
                         onClick={() => handleTabClick("dashboard")}
                         type="button"
                         role="tab"
@@ -209,28 +214,32 @@ const WahanaPage = () => {
                       role="tabpanel"
                       aria-labelledby="profile-tab"
                     >
-                      <div>
-                        {ticketData.map((ticket, index) => (
+                      {loading ? (
+                        <>
+                          <div className="animate-pulse space-y-4">
+                            <div className="bg-gray-300 h-50 rounded-2xl w-full"></div>
+                          </div>
+                        </>
+                      ) : (
+                        <div>
                           <div
-                            key={index}
                             className="cursor-pointer"
                             onClick={() => {
                               nextpage("SINGLE");
                             }}
                           >
                             <Ticket
-                              key={index}
-                              type={ticket.type}
-                              gradientClass={ticket.gradientClass}
-                              name={ticket.name}
-                              description={ticket.description}
-                              price={ticket.price}
-                              availability={ticket.availability}
-                              highlightClass={ticket.highlightClass}
+                              type={ticketData[0].type}
+                              gradientClass={ticketData[0].gradientClass}
+                              name={ticketData[0].name}
+                              description={ticketData[0].description}
+                              price={parseInt(currentWahana?.price)}
+                              availability={ticketData[0].availability}
+                              highlightClass={ticketData[0].highlightClass}
                             />
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      )}
                     </motion.div>
                   )}
                   {activeTab === "dashboard" && (
@@ -286,21 +295,7 @@ const WahanaPage = () => {
               <div className="lg:w-1/3 h-[340px] w-full shadow-lg rounded-lg sticky top-0">
                 <div className="p-8">
                   <h1 className="text-2xl font-black">Wahana Details</h1>
-                  <h3 className="text-lg font-normal">
-                    {" "}
-                    {currentWahana?.details.StartDate &&
-                      startInterVal.date}{" "}
-                    -
-                    {(currentWahana?.details.EndDate &&
-                      endInterVal.date)}
-                  </h3>
-                  <h3 className="text-lg font-normal">
-                    {currentWahana?.details.StartTime &&
-                      startInterVal.time}{" "}
-                    -
-                    {(currentWahana?.details.EndTime &&
-                      endInterVal.time)}
-                  </h3>
+
                   <h3 className="text-lg font-normal">
                     Location of the Wahana - {currentWahana?.details.Location}
                   </h3>

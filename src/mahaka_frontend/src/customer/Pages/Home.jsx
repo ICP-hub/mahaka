@@ -35,7 +35,9 @@ const VenueCard = ({ venue, layout }) => (
       <div className={`${layout.padding} h-full flex flex-col justify-between`}>
         <div>
           <h3 className="text-3xl font-black mb-2">{venue.Title}</h3>
-          <p className="mb-4 text-[14px] font-normal">{venue.Description}</p>
+          <p className="mb-4 text-[14px] font-normal line-clamp-3">
+            {venue.Description}
+          </p>
         </div>
         <div className={`${layout.iconPadding}`}>
           <GoArrowUpRight className="bg-white w-[30px] h-[30px] text-[#E2AF4E] rounded-full p-1" />
@@ -59,9 +61,8 @@ export default function Home() {
   const { wahanas } = useSelector((state) => state.wahana);
   // console.log("venues in home", venues);
   const { backend } = useSelector((state) => state.authentication);
-  const { attractionbanners, banners, bannerLoading } = useSelector(
-    (state) => state.banner
-  );
+  const { attractionbanners, banners, attractionBannerLoading, bannerLoading } =
+    useSelector((state) => state.banner);
   const { testimonials, testimonialLoading } = useSelector(
     (state) => state.testimonial
   );
@@ -214,7 +215,7 @@ export default function Home() {
 
   return (
     <>
-      {bannerLoading ? (
+      {attractionBannerLoading ? (
         <SkeletonLoaderAttraction />
       ) : attractionbanners && attractionbanners.length === 0 ? (
         <div className="bg-card rounded-lg p-5 text-center mx-10 shadow-lg mt-10 h-100">
@@ -534,7 +535,7 @@ export default function Home() {
                       <h1 className="text-3xl font-black">
                         {wahana.ride_title}
                       </h1>
-                      <p className="text-base font-normal mt-2">
+                      <p className="text-base font-normal mt-2 line-clamp-3">
                         {wahana.description}
                       </p>
                     </div>

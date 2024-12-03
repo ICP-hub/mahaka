@@ -24,7 +24,9 @@ export default function MoreEventCard({ image, event, index }) {
         >
           <div className="pt-10 pl-7">
             <h3 className="text-3xl font-black mb-2">{event.title}</h3>
-            <p className="mb-4 text-[14px] font-normal">{event.description}</p>
+            <p className="mb-4 text-[14px] font-normal line-clamp-3">
+              {event.description}
+            </p>
             <div className="py-12">
               <GoArrowUpRight
                 className="bg-white w-[30px] h-[30px] rounded-full"

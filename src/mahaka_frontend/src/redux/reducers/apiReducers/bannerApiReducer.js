@@ -9,6 +9,7 @@ const initialState = {
   currentPage: 1,
   totalPages: 1,
   attractionbanners: [],
+  attractionBannerLoading: false,
 };
 
 //   add banner
@@ -39,11 +40,24 @@ export const addBanner = createAsyncThunk(
 // get all banners
 export const getAllBanners = createAsyncThunk(
   "banner/getAllBanners",
+  async ({ backend }) => {
+    try {
+      //console.log("category in reducer", category);
+      const response = await backend.getAllBanners({ ThirdParty: null });
+
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  }
+);
+export const getAllAttractionBanners = createAsyncThunk(
+  "banner/getAllAttractionBanners",
   async ({ backend, category }) => {
     try {
       //console.log("category in reducer", category);
-      const response = await backend.getAllBanners(category);
-      console.log("banners fetched response is", response);
+      const response = await backend.getAllBanners({ Attraction: null });
+
       return response;
     } catch (error) {
       throw error;
@@ -55,10 +69,7 @@ export const getAllBanners = createAsyncThunk(
 export const deleteBannerByImage = createAsyncThunk(
   "banner/deleteBannerByImage",
 
-
-
   async ({ backend, image }) => {
-    
     await backend.deleteBannerByImage(image);
     return image;
   }
@@ -74,27 +85,38 @@ export const deleteBannerByImage = createAsyncThunk(
   // }
 );
 
-
-
 // Async thunk to clear banners
 export const clearAllBanners = createAsyncThunk(
-  'banner/clearAllBanners',
-  async ({category, backend}) => {
+  "banner/clearAllBanners",
+  async ({ backend }) => {
     try {
-      console.log("category in clear all in reducer is", category);
-      // Replace this with your actual backend API call
-      const response = await backend.clearAllBanners(category); // Assume `backend` is your API handler
+      const response = await backend.clearAllBanners({ ThirdParty: null });
       if (response.ok) {
         return response.ok; // Success message
       } else {
         throw new Error(response.err); // Handle error
       }
     } catch (error) {
-      console.log("Error in clear banners",e)
+      console.log("Error in clear banners", e);
     }
   }
 );
-
+export const clearAllAttractionBanners = createAsyncThunk(
+  "banner/clearAllAttractionBanners",
+  async ({ backend }) => {
+    try {
+      // Replace this with your actual backend API call
+      const response = await backend.clearAllBanners({ Attraction: null }); // Assume `backend` is your API handler
+      if (response.ok) {
+        return response.ok; // Success message
+      } else {
+        throw new Error(response.err); // Handle error
+      }
+    } catch (error) {
+      console.log("Error in clear banners", e);
+    }
+  }
+);
 
 //   create slice
 const bannerSlice = createSlice({
@@ -104,19 +126,18 @@ const bannerSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // Handle addbanner
-      .addCase(addBanner.pending, (state) => {
-        state.bannerLoading = true;
-      })
+      .addCase(addBanner.pending, (state) => {})
       .addCase(addBanner.fulfilled, (state, action) => {
         state.bannerLoading = false;
+        console.log(action);
         if (action.meta.arg.category.Attraction !== undefined) {
           // Update only attractionBanners
-          state.attractionbanners.push(action.payload);
+          state.attractionbanners.push(action.meta.arg);
         } else if (action.meta.arg.category.ThirdParty !== undefined) {
           // Update only thirdPartyBanners
-          state.banners.push(action.payload);
+          state.banners.push(action.meta.arg);
         }
-       
+
         // state.banners = [...state.banners, action.payload];
         state.error = null;
         notificationManager.success("banner created successfully");
@@ -134,19 +155,17 @@ const bannerSlice = createSlice({
       })
       .addCase(deleteBannerByImage.fulfilled, (state, action) => {
         state.bannerLoading = false;
-        console.log("single banner delete",action)
-       
-          state.attractionbanners = state.attractionbanners.filter(
-              (banner) => banner.image !== action.payload
-             );
-         
-         
-          state.banners = state.banners.filter(
-            (banner) => banner.image !== action.payload
-           );
+        console.log("single banner delete", action);
 
-           console.log("single banner delete successfully")
-         
+        state.attractionbanners = state.attractionbanners.filter(
+          (banner) => banner.image !== action.payload
+        );
+
+        state.banners = state.banners.filter(
+          (banner) => banner.image !== action.payload
+        );
+
+        console.log("single banner delete successfully");
       })
       .addCase(deleteBannerByImage.rejected, (state, action) => {
         console.log("Deleted banner rejected:", action.payload);
@@ -154,31 +173,39 @@ const bannerSlice = createSlice({
         state.error = action.error.message;
       })
 
-
       // clear all banners
 
       .addCase(clearAllBanners.pending, (state) => {
-        state.bannerLoading = true
-       
+        state.bannerLoading = true;
+
         state.error = null;
       })
       .addCase(clearAllBanners.fulfilled, (state, action) => {
-        state.bannerLoading = false
-       
-       
-        if (action.meta.arg.category.Attraction !== undefined) {
-          // Update only attractionBanners
-          state.attractionbanners = [];
-        } else if (action.meta.arg.category.ThirdParty !== undefined) {
-          // Update only thirdPartyBanners
-          state.banners = [];
-        }
+        state.bannerLoading = false;
+
+        state.banners = [];
+
         //console.log("Banners are cleared successfully")
       })
       .addCase(clearAllBanners.rejected, (state, action) => {
-        
         state.error = action.payload;
-       // console.log("Error in clear banner",state.error)
+        // console.log("Error in clear banner",state.error)
+      })
+      .addCase(clearAllAttractionBanners.pending, (state) => {
+        state.attractionBannerLoading = true;
+
+        state.error = null;
+      })
+      .addCase(clearAllAttractionBanners.fulfilled, (state, action) => {
+        state.attractionBannerLoading = false;
+
+        state.attractionbanners = [];
+
+        //console.log("Banners are cleared successfully")
+      })
+      .addCase(clearAllAttractionBanners.rejected, (state, action) => {
+        state.error = action.payload;
+        // console.log("Error in clear banner",state.error)
       })
 
       // get all banners
@@ -189,31 +216,11 @@ const bannerSlice = createSlice({
       .addCase(getAllBanners.fulfilled, (state, action) => {
         state.bannerLoading = false;
 
-        if (action.payload) {
-          // Clear the arrays to avoid duplication
+        // Clear the arrays to avoid duplication
 
-          // Iterate over each banner
-          action.payload.forEach((banner) => {
-            if (banner.category && typeof banner.category === "object") {
-              const categoryKey = Object.keys(banner.category)[0]; // Extract the first key from the category object
+        // Iterate over each banner
 
-              if (categoryKey === "ThirdParty") {
-                state.banners.push(banner);
-              } else if (categoryKey === "Attraction") {
-                state.attractionbanners.push(banner);
-              }
-            }
-          });
-
-          // console.log(
-          //   "banners fetched successfully",
-          //   state.banners,
-          //   state.attractionbanners
-          // );
-        } else {
-          state.banners = [];
-          state.attractionbanners = [];
-        }
+        state.banners = [...action.payload];
 
         state.error = null;
       })
@@ -221,7 +228,25 @@ const bannerSlice = createSlice({
       .addCase(getAllBanners.rejected, (state, action) => {
         state.bannerLoading = false;
         state.banners = [];
+
+        state.error = action.error.message;
+      })
+      .addCase(getAllAttractionBanners.pending, (state) => {
+        state.attractionBannerLoading = true;
+      })
+      .addCase(getAllAttractionBanners.fulfilled, (state, action) => {
+        state.attractionBannerLoading = false;
+        console.log(action.payload);
+
+        state.attractionbanners = [...action.payload];
+
+        state.error = null;
+      })
+
+      .addCase(getAllAttractionBanners.rejected, (state, action) => {
+        state.attractionBannerLoading = false;
         state.attractionbanners = [];
+
         state.error = action.error.message;
       });
   },
