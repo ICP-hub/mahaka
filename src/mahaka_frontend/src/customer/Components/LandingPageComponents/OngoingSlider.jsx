@@ -14,7 +14,7 @@ export default function () {
   // const { events, eventByVenue, eventsLoading, singleEventLoading } =
   // useSelector((state) => state.events);
 
-  const {ongoingEvents, ongoingEventsLoading} = useSelector((state)=> state.ongoingevents)
+  const {ongoingEvents} = useSelector((state)=> state.ongoingevents)
  // console.log("ongoing events in slider",ongoingEvents)
   return (
     <>
@@ -33,7 +33,7 @@ export default function () {
         {ongoingEvents?.map((ongoingEvent, index) => (
           <SwiperSlide key={index}>
             <OngoingCard ongoingEventData={ongoingEvent}
-            ongoingEventsLoading ={ ongoingEventsLoading}
+          
             />
           </SwiperSlide>
         ))}

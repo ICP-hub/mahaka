@@ -79,6 +79,7 @@ export default function SingleEvent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { ModalOne } = ModalPopup();
   const [ticketDetails, setTicketDetails] = useState(null);
+  const [ticketLoading, setTicketLoading] = useState(true);
   const handleModalOpen = () => setIsModalOpen(true);
   const handleModalClose = () => setIsModalOpen(false);
 
@@ -98,26 +99,37 @@ export default function SingleEvent() {
   };
 
   const dispatch = useDispatch();
-  const { currentVenue, loading: venueLoading, error, } = useSelector((state) => state.venues);
-  const { wahanasByVenue, singleWahanaLoading } = useSelector((state) => state.wahana);
-  const { eventByVenue, singleEventLoading, error: eventError, } = useSelector((state) => state.events);
+  const {
+    currentVenue,
+    loading: venueLoading,
+    error,
+  } = useSelector((state) => state.venues);
+  const { wahanasByVenue, singleWahanaLoading } = useSelector(
+    (state) => state.wahana
+  );
+  const {
+    eventByVenue,
+    singleEventLoading,
+    error: eventError,
+  } = useSelector((state) => state.events);
   const { backend } = useSelector((state) => state.authentication);
 
   useEffect(() => {
     const fetchTicketDetails = async (venue) => {
-      if (!venue[1]?.Collection_id) {
+      if (!venue?.Collection_id) {
         console.error("Venue does not have a collection_id:", venue);
         return;
       }
       try {
         // Fetch ticket details from the actor
-        const details = await backend.getDIPdetails(venue[1]?.Collection_id);
+        const details = await backend.getDIPdetails(venue?.Collection_id);
         console.log(details, "ticketDetails");
         setTicketDetails(details);
       } catch (error) {
         console.error("Error fetching ticket details:", error);
         setTicketDetails(null);
       } finally {
+        setTicketLoading(false);
       }
     };
     fetchTicketDetails(currentVenue);
@@ -126,8 +138,7 @@ export default function SingleEvent() {
   console.log(wahanasByVenue, "wahanas");
   console.log(currentVenue);
   const [localError, setLocalError] = useState(null);
-  const venue =
-    currentVenue && Array.isArray(currentVenue) ? currentVenue[1] : null;
+  const venue = currentVenue ? currentVenue : null;
 
   useEffect(() => {
     if (!venueId) {
@@ -245,8 +256,9 @@ export default function SingleEvent() {
                   <img
                     src={venue?.banner?.data}
                     alt={venue?.title}
-                    className={`h-90 w-full rounded-2xl ${venueLoading ? "hidden" : "block"
-                      }`}
+                    className={`h-90 w-full rounded-2xl ${
+                      venueLoading ? "hidden" : "block"
+                    }`}
                     onLoad={() => setIsLoading(false)}
                   />
                 )}
@@ -260,10 +272,11 @@ export default function SingleEvent() {
                   >
                     <li className="me-2" role="presentation">
                       <button
-                        className={`inline-block text-2xl font-black p-4 border-b-2 rounded-t-lg ${activeTab === "profile"
-                          ? "border-blue-500"
-                          : "border-transparent"
-                          }`}
+                        className={`inline-block text-2xl font-black p-4 border-b-2 rounded-t-lg ${
+                          activeTab === "profile"
+                            ? "border-blue-500"
+                            : "border-transparent"
+                        }`}
                         onClick={() => handleTabClick("profile")}
                         type="button"
                         role="tab"
@@ -275,10 +288,11 @@ export default function SingleEvent() {
                     </li>
                     <li className="me-2" role="presentation">
                       <button
-                        className={`inline-block text-2xl font-normal p-4 border-b-2 rounded-t-lg ${activeTab === "dashboard"
-                          ? "border-blue-500"
-                          : "border-transparent"
-                          } `}
+                        className={`inline-block text-2xl font-normal p-4 border-b-2 rounded-t-lg ${
+                          activeTab === "dashboard"
+                            ? "border-blue-500"
+                            : "border-transparent"
+                        } `}
                         onClick={() => handleTabClick("dashboard")}
                         type="button"
                         role="tab"
@@ -303,14 +317,13 @@ export default function SingleEvent() {
                       role="tabpanel"
                       aria-labelledby="profile-tab"
                     >
-                      {venueLoading ? (
+                      {ticketLoading ? (
                         <>
                           <div className="animate-pulse space-y-4">
                             <div className="bg-gray-300 h-50 rounded-2xl w-full"></div>
                             <div className="bg-gray-300 h-50 rounded-2xl w-full"></div>
                             <div className="bg-gray-300 h-50 rounded-2xl w-full"></div>
                           </div>
-
                         </>
                       ) : (
                         <div>
@@ -324,8 +337,9 @@ export default function SingleEvent() {
                               name={"Group Tickets"}
                               description={ticketDetails?.description}
                               price={parseInt(ticketDetails?.gTicket_price)}
-                              availability={
-                                parseInt(ticketDetails?.gTicket_limit)}
+                              availability={parseInt(
+                                ticketDetails?.gTicket_limit
+                              )}
                               highlightClass={ticketData[0].highlightClass}
                             />
                           </div>
@@ -339,9 +353,9 @@ export default function SingleEvent() {
                               name={"Single Tickets"}
                               description={ticketDetails?.description}
                               price={parseInt(ticketDetails?.sTicket_price)}
-                              availability={
-                                parseInt(ticketDetails?.sTicket_limit)
-                              }
+                              availability={parseInt(
+                                ticketDetails?.sTicket_limit
+                              )}
                               highlightClass={ticketData[1].highlightClass}
                             />
                           </div>
@@ -355,9 +369,9 @@ export default function SingleEvent() {
                               name={"VIP Tickets"}
                               description={ticketDetails?.description}
                               price={parseInt(ticketDetails?.vTicket_price)}
-                              availability={
-                                parseInt(ticketDetails?.vTicket_limit)
-                              }
+                              availability={parseInt(
+                                ticketDetails?.vTicket_limit
+                              )}
                               highlightClass={ticketData[2].highlightClass}
                             />
                           </div>
@@ -392,7 +406,7 @@ export default function SingleEvent() {
                           </li>
                         </ul>
 
-                        <div className="space-y-4">{venue?.Description}</div>
+                        <div className="space-y-4">{venue.Description}</div>
                       </div>
                     </motion.div>
                   )}
@@ -422,13 +436,11 @@ export default function SingleEvent() {
                 <div className="p-8">
                   <h1 className="text-2xl font-black">Venue Details</h1>
                   <h3 className="text-lg font-normal"> </h3>
-                   
-                  
+
                   <h3 className="text-lg font-normal">
                     Location of the Venue - {venue?.Details.Location}
                   </h3>
                 </div>
-                 
               </div>
             )}
           </div>

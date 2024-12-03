@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import AppBar from "./navigation/AppBar";
 import NavigationVertical from "./navigation/NavigationVertical";
 import ScreenOverlayBlur from "../../common/ScreenOverlay";
@@ -8,7 +8,38 @@ import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { listUsers } from "../../redux/reducers/apiReducers/userApiReducer";
 import { getAllWahanas } from "../../redux/reducers/apiReducers/wahanaApiReducer";
+import notificationManager from "../../common/utils/notificationManager";
 
+// Protected route for admin
+const AdminProtected = ({ children }) => {
+  const { userLoading, currentUserByCaller } = useSelector(
+    (state) => state.users
+  );
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!userLoading && currentUserByCaller) {
+      if (!Object.keys(currentUserByCaller.role).includes("admin")) {
+        notificationManager.error("User is not an admin!");
+        navigate("/");
+      }
+    } else if (!userLoading && !currentUserByCaller) {
+      notificationManager.error("User is not an admin!");
+      navigate("/");
+    }
+  }, [currentUserByCaller]);
+
+  if (userLoading) {
+    return <div>Loading...</div>;
+  }
+
+  return currentUserByCaller &&
+    Object.keys(currentUserByCaller.role).includes("admin")
+    ? children
+    : null;
+};
+
+/* Main Layout */
 const AdminLayout = () => {
   const { state, toggleNavigation } = useNavigationControl();
   const dispatch = useDispatch();
@@ -39,7 +70,7 @@ const AdminLayout = () => {
   }, []);
 
   return (
-    <>
+ <>
       {state.isOpen && (
         <ScreenOverlayBlur onOverlayClicked={handleNavigationOnSmallScreen} />
       )}

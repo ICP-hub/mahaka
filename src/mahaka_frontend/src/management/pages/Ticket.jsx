@@ -233,42 +233,15 @@ const MgtTicket = () => {
             <p>Loading ticket details...</p>
           ) : eventDetails ? (
             <div>
-              <Swiper
-                spaceBetween={40}
-                slidesPerView={1}
-                breakpoints={{
-                  640: {
-                    slidesPerView: 1,
-                  },
-                  768: {
-                    slidesPerView: 1,
-                  },
-                  1024: {
-                    slidesPerView: 2,
-                  },
-                }}
-                autoplay={{
-                  delay: 3000,
-                  disableOnInteraction: false,
-                }}
-                pagination={{
-                  clickable: true,
-                }}
-                modules={[Autoplay, Pagination]}
-                className="mySwiper px-4 sm:px-6 lg:px-8 mx-auto"
-              >
-                <SwiperSlide>
-                  <EventTickets
-                    type={"SINGLE"}
-                    gradientClass={ticketData.gradientClass}
-                    tickets={eventDetails}
-                    selectedVenue={selectedEvent}
-                    id={selectedVenue?.id}
-                    availability={parseInt(ticketDetails?.sTicket_limit) || 4}
-                    highlightClass={ticketData.highlightClass}
-                  />
-                </SwiperSlide>
-              </Swiper>
+              <EventTickets
+                type={"SINGLE"}
+                gradientClass={ticketData[0].gradientClass}
+                tickets={eventDetails}
+                selectedVenue={selectedEvent}
+                id={selectedVenue?.id}
+                availability={parseInt(ticketDetails?.sTicket_limit) || 4}
+                highlightClass={ticketData[0].highlightClass}
+              />
             </div>
           ) : (
             <p>No ticket details available for the selected venue.</p>

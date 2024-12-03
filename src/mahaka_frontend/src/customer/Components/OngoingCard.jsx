@@ -2,7 +2,7 @@ import React from 'react'
 import bgocen2 from "../../assets/images/bgocen2.png";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-export default function OngoingCard({ongoingEventData,ongoingEventsLoading}) {
+export default function OngoingCard({ongoingEventData}) {
   // const { events, eventByVenue, eventsLoading, singleEventLoading } =
   // useSelector((state) => state.events);
 
@@ -14,9 +14,7 @@ export default function OngoingCard({ongoingEventData,ongoingEventsLoading}) {
      {/* on going event section  */}
      <Link to={`/${venueId}/events/${eventId}`} className="my-18">
      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-extrabold text-center mb-6">
-          Ongoing Events
-        </h2>
+       
         <div className="relative w-full h-full ">
           <img
             src={ongoingEventData?.banner.data}

@@ -141,7 +141,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         label="Location"
         value={formValues.location}
         onChange={(value) => handleInputChange("location", value)}
-      />    
+      />
 
       <div className="grid grid-cols-2 gap-4">
         <FormFieldInput

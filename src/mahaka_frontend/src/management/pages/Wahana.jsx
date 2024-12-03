@@ -18,17 +18,39 @@ import {
 import { formatDateAndTime } from "../../admin/pages/EventManager";
 import ModalOverlay from "../../customer/Components/Modal-overlay";
 import CreateWahanaForm from "../../admin/components/CreateWahanaForm";
-import { deleteWahana } from "../../redux/reducers/apiReducers/wahanaApiReducer";
+import { deleteWahana,searchWahanas,} from "../../redux/reducers/apiReducers/wahanaApiReducer";
 
 // Main component
 const MgtWahana = () => {
-  const { wahanasByVenue, singleWahanaLoading } = useSelector(
+  const { backend } = useSelector((state) => state.authentication);
+  const { wahanasByVenue, singleWahanaLoading,  searchedWahana,wahanas, searchedWahanaLoading } = useSelector(
     (state) => state.wahana
   );
   const { currentUserByCaller } = useSelector((state) => state.users);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const containerVariants = createStaggerContainer(0.4);
   const cardVariants = createStaggerVariant(0.3);
+  const [searchInput, setSearchInput] = useState("")
+  const dispatch = useDispatch()
+
+// console.log("wahana by venues are", wahanasByVenue)
+//  console.log("searched wahanas  are", searchedWahana)
+// // console.log("searched wahanas by venues are", wahanas)
+
+const filteredWahanas = useMemo(() => {
+  if (!searchInput) {
+    return wahanasByVenue;
+  } else {
+    return searchedWahana;
+  }
+}, [ wahanasByVenue,searchedWahana,searchInput]);
+
+
+
+  const handleSearch = ()=>{
+   // console.log("search value is",searchInput)
+    dispatch(searchWahanas({backend:backend,searchText:searchInput,chunkSize:10,pageNo:0}))
+  }
 
   return (
     <div className="flex flex-auto flex-col relative min-h-screen">
@@ -72,11 +94,14 @@ const MgtWahana = () => {
                       type="text"
                       placeholder="Search wahanas..."
                       className="outline-none bg-transparent w-full"
+                     value = {searchInput}
+                      //setSearchInput = {setSearchInput}
+                      onChange = {(e)=>setSearchInput(e.target.value)}
                     />
                   </div>
-                  <div className="ml-auto">
+                  <button className="ml-auto" onClick = {handleSearch}>
                     <HiArrowRightCircle size={24} className="cursor-pointer" />
-                  </div>
+                  </button>
                 </div>
               </div>
               <div className="sm:ml-auto mt-4 sm:mt-0 flex items-center justify-center w-full sm:w-fit h-full">
@@ -88,28 +113,29 @@ const MgtWahana = () => {
                 </div>
               </div>
             </div>
-            {!currentUserByCaller || singleWahanaLoading ? (
+            {!currentUserByCaller || singleWahanaLoading ||  searchedWahanaLoading? (
               <div className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3">
                 <SkeletonLoader />
                 <SkeletonLoader />
                 <SkeletonLoader />
               </div>
-            ) : wahanasByVenue && wahanasByVenue.length > 0 ? (
+            ) : filteredWahanas && filteredWahanas.length > 0 ? (
               <motion.div
                 variants={containerVariants}
                 initial="hidden"
                 animate="show"
                 className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3"
               >
-                {wahanasByVenue.map((wahana, index) => (
+                {filteredWahanas.map((wahana, index) => (
                   <motion.div key={index} variants={cardVariants}>
                     <WahanaCard wahana={wahana} />
                   </motion.div>
                 ))}
               </motion.div>
-            ) : (
-              <div className="mt-8">No Wahana Found</div>
-            )}
+            ) : 
+            
+              <div className="mt-10 text-4xl text-gray-600 font-bold flex justify-center">No Wahana Found</div>
+            }
           </div>
         </div>
       </div>

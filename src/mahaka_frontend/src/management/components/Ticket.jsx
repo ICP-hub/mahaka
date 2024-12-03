@@ -3,6 +3,8 @@ import { useSelector } from "react-redux";
 import { Principal } from "@dfinity/principal";
 import notificationManager from "../../common/utils/notificationManager";
 
+import { FaPlus, FaMinus } from "react-icons/fa";
+
 export default function Ticket({
   type,
   gradientClass,
@@ -14,23 +16,32 @@ export default function Ticket({
   tickets,
   selectedVenue,
 }) {
-  const { backend } = useSelector((state) => state.authentication);
+  const { backend, principal } = useSelector((state) => state.authentication);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [ticketQuantity, setTicketQuantity] = useState(1);
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
 
+  const convertDateToNanoseconds = (dateString) => {
+    const date = new Date(dateString);
+    return date.getTime() * 1_000_000; // Convert milliseconds to nanoseconds
+  };
+
   const buyVenueTicketHandler = async () => {
     try {
       const ticketTypeVariant = { ["SinglePass"]: null };
+      const dateInNanoseconds = convertDateToNanoseconds(selectedDate);
+
       const record = [
         {
           data: new Uint8Array([1, 2, 3]),
           description: "Ticket metadata",
           key_val_data: [
             { key: "venueName", val: { TextContent: "Amazing Concert" } },
-            { key: "date", val: { TextContent: "2024-12-31" } },
+            { key: "date", val: { TextContent: selectedDate } },
           ],
           purpose: { Rendered: null },
         },
@@ -41,13 +52,12 @@ export default function Ticket({
 
       const response = await backend.buyOfflineVenueTicket(
         selectedVenue,
-        { ticket_type: ticketTypeVariant, price: 1, priceFiat: 1 },
+        { ticket_type: ticketTypeVariant, price: price },
         record,
-
-        Principal.fromText("2vxsx-fae"),
-
+        Principal.fromText(principal),
+        dateInNanoseconds,
         { Cash: null },
-        1
+        ticketQuantity
       );
 
       console.log("venue ticket purchased successfully:", response);
@@ -62,7 +72,6 @@ export default function Ticket({
 
   return (
     <div className="flex justify-center w-1/2 p-2 py-5">
-      {/* Ticket Card */}
       <div
         onClick={toggleModal}
         className={`relative ${gradientClass} rounded-xl w-full h-[196px] overflow-hidden cursor-pointer`}
@@ -90,37 +99,60 @@ export default function Ticket({
         </div>
       </div>
 
-      {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded-lg p-6 w-96">
-            <h2 className="text-2xl text-secondary   mb-4">{name}</h2>
-            {/* <p className="text-base text-gray-600 mb-4">
-              {tickets.description}
-            </p> */}
+            <h2 className="text-2xl text-secondary mb-4">{name}</h2>
+            <div className="mb-4">
+              <label className="block text-secondary text-lg mb-2">
+                Select Date:
+              </label>
+              <input
+                type="date"
+                className="w-full border border-gray-300 rounded-lg p-2"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+              />
+            </div>
+            <div className="flex justify-between">
+              <label className="block text-secondary text-lg mb-2">
+                Quantity:
+              </label>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() =>
+                    setTicketQuantity(Math.max(1, ticketQuantity - 1))
+                  }
+                  className="px-2 py-1 bg-gray-200 rounded-md"
+                >
+                  <FaMinus size={8} />
+                </button>
+                <span className="text-lg">{ticketQuantity}</span>
+                <button
+                  onClick={() =>
+                    setTicketQuantity(
+                      Math.min(ticketQuantity + 1, availability)
+                    )
+                  }
+                  className="px-2 py-1 bg-gray-200 rounded-md"
+                >
+                  <FaPlus size={8} />
+                </button>
+              </div>
+            </div>
             <div className="flex justify-between mb-4">
-              <span className="text-lg text-secondary  ">Price:</span>
+              <span className="text-lg text-secondary">Price:</span>
               <span className="text-lg font-semibold">${parseInt(price)}</span>
             </div>
             <div className="flex justify-between mb-4">
-              <span className="text-lg  text-secondary ">Tickets Left:</span>
+              <span className="text-lg text-secondary">Tickets Left:</span>
               <span className="text-lg font-semibold">
                 {parseInt(availability)}
               </span>
             </div>
             <div className="flex justify-between mb-4">
-              <span className="text-lg text-secondary  ">Type:</span>
+              <span className="text-lg text-secondary">Type:</span>
               <span className="text-lg font-semibold">{type}</span>
-            </div>
-            <div className="mb-4">
-              <label className="block text-secondary text-lg   mb-2">
-                Payment Mode:
-              </label>
-              <select className="w-full border border-gray-300 rounded-lg p-2">
-                <option value="credit">Cash</option>
-                <option value="debit">Card</option>
-                <option value="paypal">ICP</option>
-              </select>
             </div>
             <div className="flex justify-end space-x-4">
               <button
@@ -130,7 +162,7 @@ export default function Ticket({
                 Close
               </button>
               <button
-                className="px-4 py-2  bg-secondary text-white rounded-lg"
+                className="px-4 py-2 bg-secondary text-white rounded-lg"
                 onClick={buyVenueTicketHandler}
               >
                 Buy Ticket

@@ -211,6 +211,7 @@ const wahanaSlice = createSlice({
         state.searchedWahanaLoading = true;
       })
       .addCase(searchWahanas.fulfilled, (state, action) => {
+       // console.log("searched wahanas in redux",action.payload)
         state.loading = false;
         state.searchedWahanaLoading = false;
         state.searchedWahana = action.payload;

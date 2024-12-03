@@ -57,35 +57,21 @@ const VenueCard = ({ venue, layout }) => (
 export default function Home() {
   const { venues, loading } = useSelector((state) => state.venues);
   const { wahanas } = useSelector((state) => state.wahana);
- // console.log("venues in home", venues);
+  // console.log("venues in home", venues);
   const { backend } = useSelector((state) => state.authentication);
   const { attractionbanners, banners, bannerLoading } = useSelector(
     (state) => state.banner
   );
-  const { testimonials,testimonialLoading } = useSelector((state) => state.testimonial);
-  const { ongoingEventsLoading,ongoingEvents} = useSelector((state)=> state.ongoingevents)
+  const { testimonials, testimonialLoading } = useSelector(
+    (state) => state.testimonial
+  );
+  const { ongoingEventsLoading, ongoingEvents } = useSelector(
+    (state) => state.ongoingevents
+  );
   const dispatch = useDispatch();
-  //  const { banners } = useSelector((state) => state.banner);
- // console.log("testimonials in home", testimonials);
+  // console.log("on going events in home", ongoingEvents.length)
+  // console.log("on going events loading in home", ongoingEventsLoading)
 
- // console.log("Attraction Banners home:", attractionbanners);
- // console.log("Third Party Banners home:", banners);
- 
- // console.log(wahanas, "wahanas");
-
-  // const SkeletonLoader = ()=>{
-
-  //   return (
-  //     <>
-  //     <div className = "p-3">
-  //       <div className = "bg-gray-500 h-30 min-w-full">
-
-  //       </div>
-  //     </div>
-
-  //     </>
-  //   )
-  // }
 
   const chunkArray = (arr, sizes) => {
     let result = [];
@@ -201,7 +187,6 @@ export default function Home() {
               <div className="bg-gray-300 h-4 md:h-5 w-[25%] my-2 rounded-md"></div>
               <div className="bg-gray-300 h-3 md:h-6 w-[70%]   my-2 rounded-md"></div>
               <div className="bg-gray-300 h-4 md:h-7 w-[10%] my-2 rounded-md"></div>
-              
             </div>
           </div>
         </div>
@@ -233,17 +218,13 @@ export default function Home() {
 
               <div className="w-full lg:w-1/2 h-120 m-2 bg-gray-400 animate-pulse rounded-lg"></div>
             </div>
-          ) : venues && venues.length ===0? 
-          <div className = "bg-card rounded-lg p-5 text-center shadow-lg"> 
-          <h1 className = "text-4xl text-gray-800 font-bold">No venues Found.</h1>
-
-          </div>
-          :
-          
-          
-          
-          
-          (
+          ) : venues && venues.length === 0 ? (
+            <div className="bg-card rounded-lg p-5 text-center shadow-lg">
+              <h1 className="text-4xl text-gray-800 font-bold">
+                No venues Found.
+              </h1>
+            </div>
+          ) : (
             <div>
               {/* if length equals 1 */}
               {venues?.length === 1 && (
@@ -414,92 +395,76 @@ export default function Home() {
 
         {/* third party BANNER section start*/}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {bannerLoading ? (
-          <div className="my-10 mx-10">
-            <div className="bg-gray-400 h-50 w-full px-4 rounded-lg animate-pulse shadow-lg"></div>
-          </div>
-        ) : banners && banners.length === 0 ? 
-        
-        <div className = " bg-card rounded-lg p-5 text-center mt-10 shadow-lg md:h-50"> 
-        <h1 className = "text-4xl text-gray-800 font-bold  md:mt-15">No  ThirdParty Banners Found.</h1>
-
-        </div>
-        :
-        
-        (
-          <div className="max-w-7xl mx-auto py-8 sm:px-6">
-            {/* Group banners into chunks of 1, 2, 3 (or more if needed) */}
-            {chunkArray(banners, [1, 2, 3]).map((group, index) => (
-              <div
-                key={index}
-                className={`grid ${
-                  index === 0
-                    ? "lg:grid-cols-1 md:grid-cols-1"
-                    : index === 1
-                    ? "lg:grid-cols-2 md:grid-cols-2"
-                    : "lg:grid-cols-3 md:grid-cols-3"
-                } gap-[33px] my-5 mx-10`}
-              >
-                {group.map((banner, bannerIndex) => (
-                  <div
-                    key={bannerIndex}
-                    className="w-full h-[204px] shadow-lg rounded-2xl overflow-hidden"
-                  >
-                    <a
-                      href={
-                        banner?.redirectUrl?.startsWith("http")
-                          ? banner.redirectUrl
-                          : `https://${banner?.redirectUrl}`
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
+          {bannerLoading ? (
+            <div className="my-10 mx-10">
+              <div className="bg-gray-400 h-50 w-full px-4 rounded-lg animate-pulse shadow-lg"></div>
+            </div>
+          ) : banners && banners.length === 0 ? (
+            <div className=" bg-card rounded-lg p-5 text-center mt-10 shadow-lg md:h-50">
+              <h1 className="text-4xl text-gray-800 font-bold  md:mt-15">
+                No Banners Found.
+              </h1>
+            </div>
+          ) : (
+            <div className="max-w-7xl mx-auto py-8">
+              <h2 className="text-5xl font-bold text-center mb-8">
+                Advertisement
+              </h2>
+              {/* Group banners into chunks of 1, 2, 3 (or more if needed) */}
+              {chunkArray(banners, [1, 2, 3]).map((group, index) => (
+                <div
+                  key={index}
+                  className={`grid ${
+                    index === 0
+                      ? "lg:grid-cols-1 md:grid-cols-1"
+                      : index === 1
+                      ? "lg:grid-cols-2 md:grid-cols-2"
+                      : "lg:grid-cols-3 md:grid-cols-3"
+                  } gap-[33px] my-5`}
+                >
+                  {group.map((banner, bannerIndex) => (
+                    <div
+                      key={bannerIndex}
+                      className="w-full h-[204px] shadow-lg rounded-2xl overflow-hidden"
                     >
-                      <img
-                        src={banner?.image}
-                        alt="banner"
-                        className="w-full h-[100%] object-cover object-center"
-                      />
-                    </a>
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        )}
+                      <a
+                        href={
+                          banner?.redirectUrl?.startsWith("http")
+                            ? banner.redirectUrl
+                            : `https://${banner?.redirectUrl}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <img
+                          src={banner?.image}
+                          alt="banner"
+                          className="w-full h-[100%] object-cover object-center"
+                        />
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* 2 Grid card  end*/}
         {/* OnGoing Event slider Start  */}
-        {/* { ongoingEventsLoading?
-        <SkeletonLoaderEvents/>
-        : ongoingEvents && ongoingEvents.length ===0? "LOading":
+      
 
-        <OngoingSlider />
-} */}
-
-
-
-{/* <div className = " bg-card rounded-lg p-5 text-center mt-10 mx-10 shadow-lg"> 
-<h1 className = "text-4xl text-gray-800 font-bold">No  Ongoing Events Found.</h1>
-
-</div> */}
-
-{ongoingEventsLoading? <SkeletonLoaderEvents/>:
-ongoingEvents && ongoingEvents.length === 0?
-
-<div className = " bg-card rounded-lg p-5 text-center mt-10 mx-10 shadow-lg"> 
-<h1 className = "text-4xl text-gray-800 font-bold">No  Ongoing Events Found.</h1>
-
-</div> 
-:
+        {ongoingEventsLoading ? (
+  <SkeletonLoaderEvents />
+) : ongoingEvents && ongoingEvents.length > 0 ? (
+  <OngoingSlider />
+) : (
+  <div className="bg-card rounded-lg p-5 text-center mt-10 mx-10 shadow-lg">
+    <h1 className="text-4xl text-gray-800 font-bold">No Ongoing Events Found.</h1>
+  </div>
+)}
 
 
-<OngoingSlider />
-
-
-
-}
-          
         {/* OnGoing Event slider end  */}
         {/* Events and ctivity Section Start  */}
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 ">
@@ -508,12 +473,6 @@ ongoingEvents && ongoingEvents.length === 0?
               <h1 className="text-[48px] font-black">
                 What's On: Wahana and Activities
               </h1>
-              <p className="text-lg font-normal">
-                Explore our lush habitats, meet exotic creatures, and create
-                unforgettable memories. Whether you're planning a family
-                adventure, a school trip, or a solo exploration, we have
-                everything you need to make your visit special.
-              </p>
             </div>
           </section>
           {/* cards box start  */}
@@ -542,37 +501,33 @@ ongoingEvents && ongoingEvents.length === 0?
               ))}
           </div>
           {/* cards box end  */}
-          <section className="flex flex-col justify-center items-center pt-10">
+          {/* <section className="flex flex-col justify-center items-center pt-10">
             <button className="px-14 py-3 bg-[#F08E1E] text-white rounded-[10px] font-normal text-base">
               Explore
             </button>
-          </section>
+          </section> */}
         </div>
         {/* Events and ctivity Section end  */}
         {/* Testimonial start  */}
 
-  
         <div className="mt-15">
-        {testimonialLoading ?
-  (
-  <div className = "grid grid-cols-1 md:grid-cols-3 gap-6 my-5 mx-10">
-  <SkeletonLoaderTestimonial/>
-  <SkeletonLoaderTestimonial/>
-  <SkeletonLoaderTestimonial/>
-  </div>
-  )
-  
-  : testimonials && testimonials.length === 0? 
-  <div className = "flex flex-row justify-center">
-  <div className = "bg-card rounded-lg p-5 text-center mx-10 shadow-lg md:h-50 md:w-[35%]"> 
-  <h1 className = "text-3xl text-gray-800 font-bold md:mt-13">No Testimonials Found.</h1>
-  </div>
-  </div>
-  :
-
-        
-          <TestimonialCarousel />
-}
+          {testimonialLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-5 mx-10">
+              <SkeletonLoaderTestimonial />
+              <SkeletonLoaderTestimonial />
+              <SkeletonLoaderTestimonial />
+            </div>
+          ) : testimonials && testimonials.length === 0 ? (
+            <div className="flex flex-row justify-center">
+              <div className="bg-card rounded-lg p-5 text-center mx-10 shadow-lg md:h-50 md:w-[35%]">
+                <h1 className="text-3xl text-gray-800 font-bold md:mt-13">
+                  No Testimonials Found.
+                </h1>
+              </div>
+            </div>
+          ) : (
+            <TestimonialCarousel />
+          )}
         </div>
 
         {/* Testimonial End  */}

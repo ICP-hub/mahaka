@@ -15,7 +15,7 @@ export default function EventTickets({
   selectedVenue,
   id,
 }) {
-  const { backend } = useSelector((state) => state.authentication);
+  const { backend, principal } = useSelector((state) => state.authentication);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const toggleModal = () => {
@@ -46,9 +46,8 @@ export default function EventTickets({
         { ticket_type: ticketTypeVariant, price: 1, priceFiat: 1 },
         record,
 
-        Principal.fromText(
-          "h7yxq-n6yb2-6js2j-af5hk-h4inj-edrce-oevyj-kbs7a-76kft-vrqrw-nqe"
-        ),
+        Principal.fromText(principal),
+        12345,
 
         1,
         { Cash: null }
