@@ -3,6 +3,7 @@ import {
   HiArrowRightCircle,
   HiCheckBadge,
   HiChevronDown,
+  HiChevronRight,
   HiChevronUp,
   // HiClock,
   HiMiniMapPin,
@@ -72,10 +73,14 @@ const WahanaManager = () => {
   // console.log("filtered", filteredWahanas);
 
   const containerVariants = createStaggerContainer(0.4);
- const cardVariants = createStaggerVariant(0.3);
+  const cardVariants = createStaggerVariant(0.3);
 
   // const containerVariants = createStaggerContainer(0.4);
   // const cardVariants = createStaggerVariant(0.3);
+
+  console.log("loading is", loading);
+  console.log("single wahana loading", singleWahanaLoading);
+
   return (
     <div className="flex flex-auto flex-col relative min-h-screen">
       <div className="flex min-w-0 flex-col">
@@ -175,7 +180,7 @@ const WahanaManager = () => {
               </div>
               <div className="sm:ml-auto mt-4 sm:mt-0 flex items-center justify-center w-full sm:w-fit h-full">
                 <div
-                  className="bg-indigo-600 rounded-xl cursor-pointer w-full text-white p-4"
+                  className="bg-indigo-600 hover:bg-indigo-700 rounded-xl cursor-pointer w-full text-white p-4"
                   onClick={() => setIsModalOpen(true)}
                 >
                   Add a new wahana
@@ -224,9 +229,7 @@ const WahanaManager = () => {
 // event cards
 const WahanaCard = ({ wahana }) => {
   const dispatch = useDispatch();
-  const [isExpanded, setIsExpanded] = useState(false);
   const { backend } = useSelector((state) => state.authentication);
-  const toggleExpand = () => setIsExpanded((pv) => !pv);
   const startInterVal = formatDateAndTime(parseInt(wahana.details.StartDate));
   const endInterVal = formatDateAndTime(parseInt(wahana.details.EndDate));
   const [isDelete, setIsDelete] = useState(false);
@@ -281,9 +284,9 @@ const WahanaCard = ({ wahana }) => {
             </div>
           </div>
           <div className="mt-4 text-lg font-medium">{wahana.ride_title}</div>
-          <div className="text-secondary mt-0.5 line-clamp-2">
+          {/* <div className="text-secondary mt-0.5 line-clamp-2">
             {wahana.description}
-          </div>
+          </div> */}
           <div className="flex items-center text-md leading-5 mt-2 uppercase font-medium">
             <HiMiniMapPin size={14} />
             <div className="ml-1.5">{wahana.details.Location}</div>
@@ -299,14 +302,15 @@ const WahanaCard = ({ wahana }) => {
               <div>{startInterVal.time}</div>
             </div>
             <button
-              onClick={toggleExpand}
+              // onClick={toggleExpand}
               className="h-8 w-8 rounded-full hover:bg-hover flex items-center justify-center"
             >
-              {isExpanded ? <HiChevronUp /> : <HiChevronDown />}
+              {/* {isExpanded ? <HiChevronUp /> : <HiChevronDown />} */}
+              <HiChevronRight />
             </button>
           </div>
         </div>
-        <AnimatePresence>
+        {/* <AnimatePresence>
           {isExpanded && (
             <motion.div
               initial={{
@@ -334,7 +338,7 @@ const WahanaCard = ({ wahana }) => {
                     <div className="text-xs">{wahana.id}</div>
                   </div>
                 </div>
-                {/* <div className="flex items-center flex-auto mt-4">
+                <div className="flex items-center flex-auto mt-4">
                   <div className="font-mono text-xl">ICP</div>
                   <div className="ml-auto flex items-baseline">
                     <div className="font-bold text-4xl">
@@ -344,7 +348,7 @@ const WahanaCard = ({ wahana }) => {
                       /Person
                     </div>
                   </div>
-                </div> */}
+                </div>
                 <div className="flex items-center flex-auto mt-4">
                   <div className="font-mono text-xl">IDR</div>
                   <div className="ml-auto flex items-baseline">
@@ -357,7 +361,7 @@ const WahanaCard = ({ wahana }) => {
               </div>
             </motion.div>
           )}
-        </AnimatePresence>
+        </AnimatePresence> */}
       </div>
     </>
   );

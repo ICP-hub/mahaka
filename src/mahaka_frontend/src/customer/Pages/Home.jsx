@@ -535,7 +535,7 @@ export default function Home() {
                       <h1 className="text-3xl font-black">
                         {wahana.ride_title}
                       </h1>
-                      <p className="text-base font-normal mt-2 line-clamp-3">
+                      <p className="text-base font-normal mt-2 line-clamp-1">
                         {wahana.description}
                       </p>
                     </div>

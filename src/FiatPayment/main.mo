@@ -52,6 +52,10 @@ actor Fiat {
         return owner
     };
 
+    public query func availableCycles() : async Nat {
+        return Cycles.balance();
+    };
+
     public shared({caller}) func setOwner(newOwner : Text) : async Http.Response<Http.ResponseStatus<Bool, {}>> {
 
         let newOwnerTemp = Text.trim(newOwner, #char ' ');

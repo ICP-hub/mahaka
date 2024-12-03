@@ -7,9 +7,9 @@ import bannerApiReducer from "./reducers/apiReducers/bannerApiReducer";
 import wahanaApiReducer from "./reducers/apiReducers/wahanaApiReducer";
 import testimonialApiReducer from "./reducers/apiReducers/testimonialApiReducer";
 import ongoingEventsApiReducer from "./reducers/apiReducers/ongoingEventsApiReducer";
+import DIPApiReducer from "./reducers/apiReducers/dipapireducer";
 
 import authenticationReducer from "./reducers/auth/authenticationReducer";
- 
 
 const store = configureStore({
   reducer: {
@@ -19,8 +19,9 @@ const store = configureStore({
     events: eventApiReducer,
     wahana: wahanaApiReducer,
     banner: bannerApiReducer,
-    testimonial:testimonialApiReducer,
-    ongoingevents:ongoingEventsApiReducer,
+    testimonial: testimonialApiReducer,
+    ongoingevents: ongoingEventsApiReducer,
+    dipDetails: DIPApiReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

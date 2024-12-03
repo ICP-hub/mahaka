@@ -52,9 +52,11 @@ const initialState = {
         //state.status = "succeeded";
       })
       .addCase(getOngoingEvents.rejected, (state, action) => {
+        state.ongoingEventsLoading = false;
+      
        // state.status = "failed";
          state.ongoingEvents = [];
-        (state.ongoingEventsLoading = false), (state.error = action.error.message);
+       // (state.ongoingEventsLoading = false), (state.error = action.error.message);
         // notificationManager.error("Failed to fetch events");
       })
 

@@ -31,7 +31,7 @@ const PageIntro = ({
         )}
         <div className="mt-4 flex items-center sm:mt-0 md:mt-4">
           <div className="flex-auto">
-            <div className="px-4 border border-border rounded-full flex items-center gap-2">
+            <div className="px-4 border border-border rounded-md flex items-center gap-2">
               <HiOutlineMagnifyingGlass size={24} className="text-gray-500" />
               <input
                 type="text"
@@ -46,8 +46,8 @@ const PageIntro = ({
             initial="initial"
             whileHover="hover"
             className={`ml-4 py-3 px-4 min-w-max flex gap-1 items-center justify-center ${
-              isLoading ? "bg-gray-400" : "bg-secondary hover:bg-orange-600"
-            } h-full text-white font-medium rounded-full`}
+              isLoading ? "bg-gray-400" : "bg-indigo-600 hover:bg-indigo-800"
+            } h-full text-white font-medium rounded-md`}
             onClick={isLoading ? null : actionOnButton}
           >
             <motion.div variants={animVar}>

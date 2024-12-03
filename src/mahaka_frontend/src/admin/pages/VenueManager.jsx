@@ -1,4 +1,8 @@
-import { HiOutlinePlus } from "react-icons/hi2";
+import {
+  HiArrowRightCircle,
+  HiOutlineMagnifyingGlass,
+  HiOutlinePlus,
+} from "react-icons/hi2";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -57,14 +61,54 @@ const VenueManager = () => {
 
   return (
     <div className="flex flex-col sm:overflow-hidden">
-      <PageIntro
+      <div className="relative flex-0 overflow-hidden bg-gray-800 px-4 py-8 md:px-8">
+        <div className="relative flex flex-col text-text text-[#E2E8F0]">
+          <div className="text-4xl font-extrabold leading-tight tracking-tight sm:text-7xl">
+            Venues
+          </div>
+          <div className="mt-1 ml-3 text-xl font-semibold">
+            {loading ? (
+              <div className="bg-gray-500 animate-pulse h-6 w-24 rounded-md"></div>
+            ) : (
+              <div>
+                {venues?.length || 0} {venues?.length > 1 ? "Venues" : "Venue"}
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="flex w-full flex-col sm:items-center sm:max-w-none sm:flex-row mt-4">
+          <div className="w-full sm:w-72 md:w-128 bg-card p-4 rounded-xl border border-border">
+            <div className="relative flex items-center flex-auto">
+              <div>
+                <HiOutlineMagnifyingGlass size={24} />
+              </div>
+              <div className="w-full mx-1">
+                <input
+                  type="text"
+                  placeholder="Search venues..."
+                  className="outline-none bg-transparent w-full"
+                />
+              </div>
+              <div className="ml-auto">
+                <HiArrowRightCircle size={24} className="cursor-pointer" />
+              </div>
+            </div>
+          </div>
+          <div className="sm:ml-auto mt-4 sm:mt-0 flex items-center justify-center w-full sm:w-fit h-full">
+            <div className="bg-indigo-600 hover:bg-indigo-700 rounded-xl cursor-pointer w-full text-white p-4">
+              Add a new venue
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* <PageIntro
         title="Venue"
         count={(venues && venues.length) || 0}
         actionOnButton={() => setIsVenueModalOpen(true)}
         isLoading={loading}
         searchInput={searchInput}
         setSearchInput={setSearchInput}
-      />
+      /> */}
       <VenueTableFormat filteredVenues={venues} />
       {/* Modal for creating a new venue */}
       {isVenueModalOpen && (

@@ -57,10 +57,10 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
   };
 
   const handleEventSubmit = () => {
-    if (!principal) {
-      notificationManager.error("Please login first");
-      return;
-    }
+    // if (!principal) {
+    //   notificationManager.error("Please login first");
+    //   return;
+    // }
     // const isFormValid = Object.values(formValues).every(
     //   (value) => value !== "" && value !== null
     // );
@@ -106,10 +106,10 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
             symbol: "VENUE",
             vTicket_limit: parseInt(formValues.vipTicketLimit),
           },
-          custodian: Principal.fromText('2vxsx-fae'),
+          custodian: Principal.fromText("2vxsx-fae"),
         },
         title: formValues.title,
-        capacity: parseInt(formValues.capacity),
+        capacity: parseInt(formValues.maxTicketLimit),
         details: {
           // StartDate: startTimestamp,
           // StartTime: startTimestamp,
@@ -143,20 +143,12 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         onChange={(value) => handleInputChange("location", value)}
       />
 
-      <div className="grid grid-cols-2 gap-4">
-        <FormFieldInput
-          type="number"
-          label="Maximum number of people"
-          value={formValues.capacity}
-          onChange={(value) => handleInputChange("capacity", value)}
-        />
-        <FormFieldInput
-          type="number"
-          label="Maximum ticket limit"
-          value={formValues.maxTicketLimit}
-          onChange={(value) => handleInputChange("maxTicketLimit", value)}
-        />
-      </div>
+      <FormFieldInput
+        type="number"
+        label="Maximum ticket limit"
+        value={formValues.maxTicketLimit}
+        onChange={(value) => handleInputChange("maxTicketLimit", value)}
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-4">
         <FormFieldInput
