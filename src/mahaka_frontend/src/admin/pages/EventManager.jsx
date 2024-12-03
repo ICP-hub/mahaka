@@ -17,6 +17,7 @@ import CreateEventForm from "../components/CreateEventForm";
 import {
   deleteEvent,
   getAllEventsByVenue,
+  searchEvents
 } from "../../redux/reducers/apiReducers/eventApiReducer";
 import {
   createStaggerContainer,
@@ -55,19 +56,19 @@ export function formatDateAndTime(timestamp) {
 // Main component
 const EventManager = () => {
   const { venues } = useSelector((state) => state.venues);
-  const { events, eventByVenue, eventsLoading, singleEventLoading } =
-    useSelector((state) => state.events);
+  const { events, eventByVenue, eventsLoading, singleEventLoading, searchedEvents, searchEventLoading } = useSelector((state) => state.events);
   const { backend } = useSelector((state) => state.authentication);
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOptionMenuOpen, setIsOptionMenuOpen] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [searchPerformed, setSearchPerformed] = useState(false)
   const [selectedVenue, setSelectedVenue] = useState({
     option: "All",
     id: "",
   });
 
   const toggleOptionMenu = () => setIsOptionMenuOpen((pv) => !pv);
-
   const handleSelectOption = (option, id) => {
     setSelectedVenue((pv) => ({ ...pv, option: option, id: id }));
     setIsOptionMenuOpen(false);
@@ -75,14 +76,19 @@ const EventManager = () => {
 
   // Filtered : memoized
   const filteredEvents = useMemo(() => {
+    if (searchText && searchPerformed) return searchedEvents;
     if (selectedVenue.option === "All") {
       return events;
     } else {
       return eventByVenue;
     }
-  }, [selectedVenue, events, eventByVenue]);
+  }, [selectedVenue, events, eventByVenue, searchText, searchedEvents, searchPerformed]);
 
-  // console.log(filteredEvents, "fe");
+  useEffect(() => {
+    setSearchPerformed(false);
+  }, [searchText]);
+
+
 
   useEffect(() => {
     if (selectedVenue.option !== "All") {
@@ -98,6 +104,19 @@ const EventManager = () => {
   }, [selectedVenue]);
 
   // console.log("filtered", filteredEvents);
+  const handleSearch = () => {
+    if (searchText.trim()) {
+      setSearchPerformed(true);
+      dispatch(
+        searchEvents({
+          backend,
+          searchText,
+          chunkSize: 10,
+          pageNo: 0,
+        })
+      );
+    }
+  };
 
   const containerVariants = createStaggerContainer(0.4);
   const cardVariants = createStaggerVariant(0.3);
@@ -192,10 +211,12 @@ const EventManager = () => {
                       type="text"
                       placeholder="Search for events..."
                       className="outline-none bg-transparent w-full"
+                      value={searchText}
+                      onChange={(e) => setSearchText(e.target.value)}
                     />
                   </div>
                   <div className="ml-auto">
-                    <HiArrowRightCircle size={24} className="cursor-pointer" />
+                    <HiArrowRightCircle size={24} className="cursor-pointer" onClick={handleSearch} />
                   </div>
                 </div>
               </div>
@@ -208,7 +229,7 @@ const EventManager = () => {
                 </div>
               </div>
             </div>
-            {eventsLoading || singleEventLoading ? (
+            {eventsLoading || singleEventLoading || searchEventLoading ? (
               <div className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3">
                 <SkeletonLoader />
                 <SkeletonLoader />
@@ -227,11 +248,12 @@ const EventManager = () => {
                   </motion.div>
                 ))}
               </motion.div>
-            ) : (
+            ) : searchPerformed && !searchEventLoading ? (
               <div className="text-center text-gray-500 md:text-5xl text-3xl font-bold mt-10">
                 No Events Found
               </div>
-            )}
+            ) : null}
+
           </div>
         </div>
       </div>
@@ -460,7 +482,6 @@ export const DeleteEventModal = ({ closeModal, onEventDelete }) => {
     </div>
   );
 };
-
 export default EventManager;
 
 // const EventManager = () => {
