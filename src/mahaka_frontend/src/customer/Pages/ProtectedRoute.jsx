@@ -12,9 +12,9 @@ const ProtectedRoute = ({ children, checkInterval = 60000 }) => {
   useEffect(() => {
     const checkPrincipal = () => {
       if (!principal) {
+        login();
         setIsAuthorized(false);
         notificationManager.error("Please connect your wallet");
-        logout();
       } else {
         setIsAuthorized(true);
       }
