@@ -262,7 +262,7 @@ const eventSlice = createSlice({
         state.singleEventLoading = false;
         state.currentEvent = action.payload.ok;
         state.error = null;
-        notificationManager.success("Event fetched successfully");
+        // notificationManager.success("Event fetched successfully");
       })
       .addCase(getEvent.rejected, (state, action) => {
         state.singleEventLoading = false;

@@ -160,7 +160,7 @@ const CreateWahanaForm = ({ setIsModalOpen, venueIdentity }) => {
         onChange={(value) => handleInputChange("location", value)}
       />
 
-      <div className="grid grid-cols-2 gap-4">
+      {/* <div className="grid grid-cols-2 gap-4">
         {" "}
         <FormFieldDate
           label="Start Date"
@@ -186,7 +186,7 @@ const CreateWahanaForm = ({ setIsModalOpen, venueIdentity }) => {
           value={formValues.endTime}
           onChange={(value) => handleInputChange("endTime", value)}
         />
-      </div>
+      </div> */}
 
       <FormFieldInput
         type="number"

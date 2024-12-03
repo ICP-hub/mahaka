@@ -3,6 +3,7 @@ import {
   HiArrowRightCircle,
   HiCheckBadge,
   HiChevronDown,
+  HiChevronRight,
   HiChevronUp,
   // HiClock,
   HiMiniMapPin,
@@ -24,6 +25,7 @@ import {
   createStaggerVariant,
 } from "../../common/animationVariants";
 import { IoTrashBinSharp } from "react-icons/io5";
+import { Link } from "react-router-dom";
 
 // Timstamp convert
 export function formatDateAndTime(timestamp) {
@@ -222,7 +224,7 @@ const EventManager = () => {
               </div>
               <div className="sm:ml-auto mt-4 sm:mt-0 flex items-center justify-center w-full sm:w-fit h-full">
                 <div
-                  className="bg-indigo-600 rounded-xl cursor-pointer w-full text-white p-4"
+                  className="bg-indigo-600 hover:bg-indigo-700 rounded-xl cursor-pointer w-full text-white p-4"
                   onClick={() => setIsModalOpen(true)}
                 >
                   Add a new event
@@ -274,11 +276,9 @@ const EventManager = () => {
 // event cards
 const EventCard = ({ event }) => {
   const dispatch = useDispatch();
-  const [isExpanded, setIsExpanded] = useState(false);
-  const toggleExpand = () => setIsExpanded((pv) => !pv);
   const { backend } = useSelector((state) => state.authentication);
   const startInterVal = formatDateAndTime(parseInt(event.details.StartDate));
-  const endInterVal = formatDateAndTime(parseInt(event.details.EndDate));
+  // const endInterVal = formatDateAndTime(parseInt(event.details.EndDate));
   const [isDelete, setIsDelete] = useState(false);
 
   const handleDeleteEvent = () => {
@@ -346,9 +346,9 @@ const EventCard = ({ event }) => {
             <div>Creator</div>
             <div className="ml-1.5 truncate">{event.creator.toText()}</div>
           </div>
-          <div className="text-secondary mt-0.5 line-clamp-2">
+          {/* <div className="text-secondary mt-0.5 line-clamp-2">
             {event.description}
-          </div>
+          </div> */}
           <div className="flex items-center text-md leading-5 mt-2 uppercase font-medium">
             <HiMiniMapPin size={14} />
             <div className="ml-1.5">{event.details.Location}</div>
@@ -359,15 +359,18 @@ const EventCard = ({ event }) => {
               <div>{startInterVal.date}</div>
               <div>{startInterVal.time}</div>
             </div>
-            <button
-              onClick={toggleExpand}
+            <Link
+              to={`/admin/events/event/${encodeURIComponent(
+                event.venueId
+              )}/${encodeURIComponent(event.id)}`}
               className="h-8 w-8 rounded-full hover:bg-hover flex items-center justify-center"
             >
-              {isExpanded ? <HiChevronUp /> : <HiChevronDown />}
-            </button>
+              {/* {isExpanded ? <HiChevronUp /> : <HiChevronDown />} */}
+              <HiChevronRight />
+            </Link>
           </div>
         </div>
-        <AnimatePresence>
+        {/* <AnimatePresence>
           {isExpanded && (
             <motion.div
               initial={{
@@ -427,7 +430,7 @@ const EventCard = ({ event }) => {
               </div>
             </motion.div>
           )}
-        </AnimatePresence>
+        </AnimatePresence> */}
       </div>
     </>
   );

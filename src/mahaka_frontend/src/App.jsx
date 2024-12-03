@@ -12,9 +12,9 @@ import { ConnectWallet, useIdentityKit } from "@nfid/identitykit/react";
 import { updateAuthData } from "./redux/reducers/auth/authenticationReducer";
 import { getUserDetailsByCaller } from "./redux/reducers/apiReducers/userApiReducer";
 import { getAllEventsPaginated } from "./redux/reducers/apiReducers/eventApiReducer";
-import { getAllTestimonials} from "./redux/reducers/apiReducers/testimonialApiReducer";
+import { getAllTestimonials } from "./redux/reducers/apiReducers/testimonialApiReducer";
 import { createTestimonial } from "./redux/reducers/apiReducers/testimonialApiReducer";
-import { getOngoingEvents} from "./redux/reducers/apiReducers/ongoingEventsApiReducer";
+import { getOngoingEvents } from "./redux/reducers/apiReducers/ongoingEventsApiReducer";
 // import { createVenue , updateVenue } from "./redux/reducers/apiReducers/venueApiReducer";
 
 function App() {
@@ -51,68 +51,60 @@ function App() {
   /*  @ Effects : common dispatches.
   /* ----------------------------------------------------------------------------------------------------- */
   useEffect(() => {
-    dispatch(getAllVenues({ backend: backend, pageLimit: 100, currPage: 0 }));
+    dispatch(getAllVenues({ backend: backend, pageLimit: 10, currPage: 0 }));
   }, []);
 
   useEffect(() => {
-    dispatch(getAllWahanas({ backend: backend, pageLimit: 100, currPage: 0 }));
+    dispatch(getAllWahanas({ backend: backend, pageLimit: 10, currPage: 0 }));
   }, []);
-
-  
 
   useEffect(() => {
     const fetchBanners = async (category) => {
-     // console.log("useeffect category", category);
+      // console.log("useeffect category", category);
       try {
         await dispatch(getAllBanners({ backend, category }));
       } catch (e) {
         console.log("Error in fetching banners:", e);
       }
     };
-  
+
     // Fetch both categories concurrently
-  
+
     // Wait for both fetches to complete
     const fetchBannersSequentially = async () => {
-
       await fetchBanners({ ThirdParty: null });
-     await fetchBanners({ Attraction: null });
-    
-     
+      await fetchBanners({ Attraction: null });
     };
-  
+
     fetchBannersSequentially();
-  }, [dispatch,backend]);
-  
+  }, [dispatch, backend]);
 
   useEffect(() => {
     dispatch(getAllEventsPaginated({ backend: backend }));
   }, []);
 
-  useEffect(()=>{
-    dispatch(getAllTestimonials({backend:backend}))
-  },[]);
+  useEffect(() => {
+    dispatch(getAllTestimonials({ backend: backend }));
+  }, []);
 
-  useEffect(()=>{
-    dispatch(getOngoingEvents({backend:backend}))
-  },[])
-
-
+  useEffect(() => {
+    dispatch(getOngoingEvents({ backend: backend }));
+  }, []);
 
   // const testimonial = {
-   
-  //   title: "anil", // 
-  // description: "anil", // 
+
+  //   title: "anil", //
+  // description: "anil", //
   // location: "anil",
   // }
-  
+
   // const handleTest = async () => {
   //   try {
   //     const result = await backend.createTestimonial(
   //       testimonial.description,
   //       testimonial.title,
   //       testimonial.location
-          
+
   //       )
   //      // Unwrap to handle the result directly
   //     console.log("Successfully created testimonial", result);
@@ -120,7 +112,6 @@ function App() {
   //     console.log("Error in creating the testimonial", error);
   //   }
   // };
-
 
   // const handleTest = async () => {
   //   try {

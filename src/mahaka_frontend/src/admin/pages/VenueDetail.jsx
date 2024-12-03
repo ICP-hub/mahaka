@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
 
 import { HiArrowLeftCircle, HiOutlineMapPin } from "react-icons/hi2";
+import { getDIPdetails } from "../../redux/reducers/apiReducers/dipapireducer";
 // import { formatDateAndTime } from "./EventManager";
 
 const VenueDetailPage = () => {
@@ -11,10 +12,24 @@ const VenueDetailPage = () => {
   const { backend } = useSelector((state) => state.authentication);
   const { currentVenue, loading } = useSelector((state) => state.venues);
   const { id } = useParams();
+  const { dipDetails, dipDetailsLoading } = useSelector(
+    (state) => state.dipDetails
+  );
 
   useEffect(() => {
     dispatch(getVenue({ backend, venueId: id }));
   }, []);
+
+  useEffect(() => {
+    if (currentVenue) {
+      dispatch(
+        getDIPdetails({
+          backend: backend,
+          principal: currentVenue.Collection_id,
+        })
+      );
+    }
+  }, [currentVenue]);
 
   if (loading || !currentVenue) return <LoadingScreen />;
 
@@ -54,7 +69,7 @@ const VenueDetailPage = () => {
           </div>
           <div className="mt-2 flex flex-wrap items-center">
             <div className="mb-3 mr-3 flex items-center justify-center rounded-full bg-icon px-3 py-1 leading-normal text-white dark:bg-gray-700 dark:text-gray-300">
-              <span className="whitespace-nowrap text-sm font-medium max-w-xs md:max-w-full flex items-center">
+              <span className="whitespace-nowrap text-sm font-medium max-w-[280px] md:max-w-full flex items-center">
                 Creator :{" "}
                 <p className="ml-1.5 truncate">
                   {currentVenue.creator.toText()}
@@ -75,18 +90,15 @@ const VenueDetailPage = () => {
                 {parseInt(currentVenue.capacity)}
               </div>
             </div>
-            {/* <div className="flex sm:items-center">
-              <p>Start Date</p>
-              <div className="ml-6 leading-6">Nov 25, 2024</div>
-            </div>
-            <div className="flex sm:items-center">
-              <p>End Date</p>
-              <div className="ml-6 leading-6">Nov 28, 2024</div>
-            </div> */}
             <div className="flex sm:items-center">
               <p className="font-medium text-lg">Venue id</p>
-              <div className="ml-6 leading-6">{currentVenue.id}</div>
+              <div className="ml-6 leading-6 font-medium">
+                {currentVenue.id}
+              </div>
             </div>
+            <TicketInfo label="General ticket" />
+            <TicketInfo label="Student ticket" />
+            <TicketInfo label="Vip ticket" />
             <div className="flex">
               <div className="font-medium text-lg">Events</div>
               <div className="ml-6 min-w-0 space-y-1">
@@ -139,6 +151,54 @@ const VenueDetailPage = () => {
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  );
+};
+
+// Ticket info
+export const TicketInfo = ({ label }) => {
+  const { dipDetailsLoading, dipDetails } = useSelector(
+    (state) => state.dipDetails
+  );
+  return (
+    <div className="flex font-medium">
+      <p className="text-lg">{label}</p>
+      <div className="ml-6 leading-6 flex flex-col">
+        {dipDetailsLoading ? (
+          <DipLoader />
+        ) : (
+          <>
+            <div className="flex">
+              Ticket limit:
+              <div className="ml-1.5 font-bold text-xl">
+                {label === "Vip ticket"
+                  ? parseInt(dipDetails.vTicket_limit)
+                  : label === "Student ticket"
+                  ? parseInt(dipDetails.sTicket_limit)
+                  : label === "General ticket"
+                  ? parseInt(dipDetails.gTicket_limit)
+                  : "N/A"}
+              </div>
+            </div>
+            <div className="mt-2 flex flex-col">
+              Ticket price
+              <div>
+                Rp.
+                <span className="text-xl font-bold">
+                  {label === "Vip ticket"
+                    ? parseInt(dipDetails.vTicket_price)
+                    : label === "Student ticket"
+                    ? parseInt(dipDetails.sTicket_price)
+                    : label === "General ticket"
+                    ? parseInt(dipDetails.gTicket_price)
+                    : 0}
+                </span>
+                /person
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -232,6 +292,33 @@ export const LoadingScreen = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+export const DipLoader = () => {
+  return (
+    <>
+      <div className="flex">
+        <span className="text-gray-400 bg-gray-400 rounded-md animate-pulse">
+          Ticket limit:
+        </span>
+        <div className="ml-1.5 font-bold text-xl">
+          <span className="text-gray-400 bg-gray-400 rounded-md animate-pulse">
+            xxxxxxxxxxx
+          </span>
+        </div>
+      </div>
+      <div className="mt-2 flex flex-col">
+        <span className="text-gray-400 bg-gray-400 rounded-md animate-pulse">
+          Ticket price
+        </span>
+        <div>
+          <span className="text-gray-400 bg-gray-400 rounded-md animate-pulse">
+            xxxxxxxxxxxxxxxxxxx
+          </span>
+        </div>
+      </div>
+    </>
   );
 };
 

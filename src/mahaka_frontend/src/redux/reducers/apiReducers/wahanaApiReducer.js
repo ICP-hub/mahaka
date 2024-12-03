@@ -5,8 +5,8 @@ import { MdDetails } from "react-icons/md";
 // Initial state for Wahana
 const initialState = {
   wahanas: [],
-  wahanaByVenue : [],
-  loading: false,
+  wahanaByVenue: [],
+  loading: true,
   error: null,
   currentPage: 1,
   wahanasPerPage: 3,
@@ -18,6 +18,7 @@ const initialState = {
   wahanasByVenue: null,
   singleWahanaLoading: false,
   deleteWahanaLoading: false,
+  allWahanaLoading: true,
 };
 
 // Creating a wahana
@@ -110,9 +111,8 @@ export const getWahana = createAsyncThunk(
   "wahana/getWahana",
   async ({ backend, selectedWahana, selectedVenue }) => {
     try {
-      console.log(selectedWahana);
-      console.log(selectedVenue);
-
+      // console.log(selectedWahana);
+      // console.log(selectedVenue);
       const response = await backend.getWahana(selectedWahana, selectedVenue);
       // console.log(response, "response");
       return response;
@@ -192,7 +192,6 @@ const wahanaSlice = createSlice({
         state.createWahanaLoader = true;
       })
       .addCase(createWahana.fulfilled, (state, action) => {
-
         state.createWahanaLoader = false;
         // console.log(action.payload, "create wahana");
         state.wahanas.push(action.payload.ok);
@@ -243,22 +242,25 @@ const wahanaSlice = createSlice({
       // .addCase(edit_wahana.rejected, (state, action) => {
       //   state.createWahanaLoader = false;
       //   state.error = action.error.message;
-      
+
       // })
 
       //Getting all wahanas
       .addCase(getAllWahanas.pending, (state) => {
         // state.status = "loading";
         state.loading = true;
+        state.allWahanaLoading = true;
         state.error = null;
       })
       .addCase(getAllWahanas.fulfilled, (state, action) => {
         state.loading = false;
+        state.allWahanaLoading = false;
         state.wahanas = action.payload.ok.data;
       })
       .addCase(getAllWahanas.rejected, (state) => {
         state.loading = false;
-        state.status = "failed";
+        state.allWahanaLoading = false;
+        // state.status = "failed";
         state.wahanas = [];
         // (state.loading = false), (state.error = action.error.message);
         // notificationManager.error("Failed to fetch wahanas");

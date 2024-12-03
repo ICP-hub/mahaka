@@ -473,7 +473,7 @@ const ProfileMenu = ({ onClose }) => {
           </div>
         </div>
       </div>
-      <div className="px-4 py-2 rounded-md flex items-center flex-auto cursor-pointer">
+      {/* <div className="px-4 py-2 rounded-md flex items-center flex-auto cursor-pointer">
         <div className="flex items-center space-x-2">
           <GrCurrency size={20} />
           <div>Balance</div>
@@ -483,7 +483,7 @@ const ProfileMenu = ({ onClose }) => {
             {balance}
           </div>
         </div>
-      </div>
+      </div> */}
       <div
         className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto cursor-pointer"
         onClick={() => {

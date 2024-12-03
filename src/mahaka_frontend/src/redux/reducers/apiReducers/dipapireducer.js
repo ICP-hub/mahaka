@@ -4,7 +4,7 @@ import notificationManager from "../../../common/utils/notificationManager";
 // Initial state for DIP details
 const initialState = {
   dipDetails: null,
-  dipDetailsLoading: false,
+  dipDetailsLoading: true,
   error: null,
 };
 
@@ -38,7 +38,7 @@ const dipDetailsSlice = createSlice({
         state.dipDetailsLoading = false;
         state.dipDetails = action.payload;
         state.error = null;
-        notificationManager.success("DIP details fetched successfully");
+        // notificationManager.success("DIP details fetched successfully");
       })
       .addCase(getDIPdetails.rejected, (state, action) => {
         state.dipDetailsLoading = false;
