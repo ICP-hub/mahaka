@@ -78,9 +78,6 @@ const WahanaManager = () => {
   // const containerVariants = createStaggerContainer(0.4);
   // const cardVariants = createStaggerVariant(0.3);
 
-  console.log("loading is", loading);
-  console.log("single wahana loading", singleWahanaLoading);
-
   return (
     <div className="flex flex-auto flex-col relative min-h-screen">
       <div className="flex min-w-0 flex-col">

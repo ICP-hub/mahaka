@@ -18,7 +18,6 @@ const initialState = {
   wahanasByVenue: null,
   singleWahanaLoading: false,
   deleteWahanaLoading: false,
-  allWahanaLoading: true,
 };
 
 // Creating a wahana
@@ -210,7 +209,7 @@ const wahanaSlice = createSlice({
         state.searchedWahanaLoading = true;
       })
       .addCase(searchWahanas.fulfilled, (state, action) => {
-       // console.log("searched wahanas in redux",action.payload)
+        // console.log("searched wahanas in redux",action.payload)
         state.loading = false;
         state.searchedWahanaLoading = false;
         state.searchedWahana = action.payload;
@@ -249,17 +248,14 @@ const wahanaSlice = createSlice({
       .addCase(getAllWahanas.pending, (state) => {
         // state.status = "loading";
         state.loading = true;
-        state.allWahanaLoading = true;
         state.error = null;
       })
       .addCase(getAllWahanas.fulfilled, (state, action) => {
         state.loading = false;
-        state.allWahanaLoading = false;
         state.wahanas = action.payload.ok.data;
       })
       .addCase(getAllWahanas.rejected, (state) => {
         state.loading = false;
-        state.allWahanaLoading = false;
         // state.status = "failed";
         state.wahanas = [];
         // (state.loading = false), (state.error = action.error.message);

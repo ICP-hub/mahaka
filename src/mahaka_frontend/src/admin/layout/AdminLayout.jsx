@@ -70,9 +70,9 @@ const AdminLayout = () => {
   }, []);
 
   // Fetch wahanas
-  useEffect(() => {
-    dispatch(getAllWahanas({ backend: backend, chunkSize: 10, pageNo: 0 }));
-  }, []);
+  // useEffect(() => {
+  //   dispatch(getAllWahanas({ backend: backend, chunkSize: 10, pageNo: 0 }));
+  // }, []);
 
   return (
     <>
