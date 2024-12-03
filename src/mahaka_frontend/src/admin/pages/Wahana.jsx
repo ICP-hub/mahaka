@@ -12,7 +12,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 // import img1 from "../../assets/images/frame3.png";
 // import img2 from "../../assets/images/fram6.png";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import ModalOverlay from "../../customer/Components/Modal-overlay";
 import {
   deleteWahana,
@@ -25,6 +25,7 @@ import {
 import CreateWahanaForm from "../components/CreateWahanaForm";
 import { formatDateAndTime } from "./EventManager";
 import { IoTrashBinSharp } from "react-icons/io5";
+import { Link } from "react-router-dom";
 
 // Main component
 const WahanaManager = () => {
@@ -298,13 +299,15 @@ const WahanaCard = ({ wahana }) => {
               <div>{startInterVal.date}</div>
               <div>{startInterVal.time}</div>
             </div>
-            <button
-              // onClick={toggleExpand}
+            <Link
+              to={`/admin/wahana/${encodeURIComponent(
+                wahana.venueId
+              )}/${encodeURIComponent(wahana.id)}`}
               className="h-8 w-8 rounded-full hover:bg-hover flex items-center justify-center"
             >
               {/* {isExpanded ? <HiChevronUp /> : <HiChevronDown />} */}
               <HiChevronRight />
-            </button>
+            </Link>
           </div>
         </div>
         {/* <AnimatePresence>

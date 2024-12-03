@@ -96,7 +96,7 @@ export const getAllWahanasbyVenue = createAsyncThunk(
         pageNo,
         venueId
       );
-      console.log(response, "response of wahanas by venue");
+      // console.log(response, "response of wahanas by venue");
       return response;
     } catch (error) {
       console.error("Error fetching wahanas:", error);
@@ -113,7 +113,7 @@ export const getWahana = createAsyncThunk(
       // console.log(selectedWahana);
       // console.log(selectedVenue);
       const response = await backend.getWahana(selectedWahana, selectedVenue);
-      // console.log(response, "response");
+      // console.log(response, "response get wahana");
       return response;
     } catch (error) {
       console.error("Error getting wahanas:", error);
