@@ -11,22 +11,22 @@ import Time "mo:base/Time";
 module {
   
   public type Date = Text;
-  public type Dip721NonFungibleToken = {
-    logo: LogoResult;
-    banner: LogoResult;
-    description: Text;
-    created_at: Time.Time;
-    name: Text;
-    symbol: Text;
-    maxLimit : Nat16;
-    collection_type : nft_type;
-    sTicket_limit : Nat;
-    sTicket_price : Nat;
-    vTicket_limit : Nat;
-    vTicket_price : Nat;
-    gTicket_limit : Nat;
-    gTicket_price : Nat;
-  };
+    public type Dip721NonFungibleToken = {
+      logo: LogoResult;
+      banner: LogoResult;
+      description: Text;
+      created_at: Time.Time;
+      name: Text;
+      symbol: Text;
+      maxLimit : Nat16;
+      collection_type : nft_type;
+      sTicket_limit : Nat;
+      sTicket_price : Float;
+      vTicket_limit : Nat;
+      vTicket_price : Float;
+      gTicket_limit : Nat;
+      gTicket_price : Float;
+    };
 
   public type ticket_count = {
     tickettype : ticket_type;
@@ -109,7 +109,7 @@ module {
 
   public type ticket_details = {
     ticket_type : ticket_type;
-    price : Nat;
+    price : Float;
     number_of_seats : Nat;
   };
   public type Nft = {
