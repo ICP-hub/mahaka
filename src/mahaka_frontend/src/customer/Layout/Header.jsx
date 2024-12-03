@@ -128,15 +128,9 @@ const LogoSection = () => {
 const SearchBox = () => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
-  const { searchVenueLoading, searchedVenues } = useSelector(
-    (state) => state.venues
-  );
-  const { searchedEvents, searchEventLoading } = useSelector(
-    (state) => state.events
-  );
-  const { searchedWahana, searchedWahanaLoading } = useSelector(
-    (state) => state.wahana
-  );
+  const { searchVenueLoading, searchedVenues } = useSelector((state) => state.venues);
+  const { searchedEvents, searchEventLoading } = useSelector( (state) => state.events);
+  const { searchedWahana, searchedWahanaLoading } = useSelector((state) => state.wahana);
 
   const [selectedOption, setSelectedOption] = useState("Venues");
   const [enableSearch, setEnableSearch] = useState(false);
