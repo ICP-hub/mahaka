@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { MdSportsCricket } from "react-icons/md";
 // import { FaFootballBall } from "react-icons/fa";
 import { GiMusicalScore } from "react-icons/gi";
@@ -27,8 +27,33 @@ import {
   FaUsers,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { useSelector } from "react-redux";
+import { useAuth } from "../../connect/useClient";
 
 const DashboardAnalytics = () => {
+  const { backend } = useAuth();
+  const { user } = useSelector((state) => state.users);
+  console.log("user", user);
+  const [loading, setLoading] = useState(false);
+  const [dashboardData, setDashboardData] = useState(null);
+
+  useEffect(() => {
+    const fetchdata = async () => {
+      setLoading(true);
+      try {
+        const data = await backend.dashboardStats();
+        setDashboardData(data);
+        console.log("dashboard", data);
+      } catch (error) {
+        console.log("error while fetching data dashboard", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchdata();
+  }, [backend]);
+
   // GoalCard component
   const GoalCard = () => {
     return (
@@ -118,29 +143,39 @@ const DashboardAnalytics = () => {
       },
     ];
 
-    return (
+    return dashboardData.latestTxs != 0 ? (
       <div className="rounded-lg p-3">
         <div className="space-y-1 bg-card p-3 shadow-lg rounded-lg">
           <h2 className="text-2xl font-semibold  mb-4">Transactions</h2>
-          {transactionData.map((transaction) => (
+          {dashboardData?.latestTxs?.map((transaction) => (
             <div
-              key={transaction.id}
+              key={transaction?.id}
               className="flex items-center rounded-lg p-3"
             >
               <div className="text-blue-500 text-2xl mr-4">
                 {transaction.icon}
               </div>
               <div className="flex-1 mr-3">
-                <h3 className="text-md font-semibold">{transaction.method}</h3>
+                <h3 className="text-md font-semibold">{transaction?.method}</h3>
                 <p className="">{transaction.date}</p>
               </div>
               <div className="text-xl font-semibold text-green-400">
-                {transaction.amount}
+                {transaction?.amount}
               </div>
             </div>
           ))}
         </div>
       </div>
+    ) : (
+      <>
+        <div className="grid grid-cols-1 md:gid-cols-2">
+          <div className="bg-card mx-3 my-2 p-2 shadow-lg rounded-lg">
+            <h1 className="text-lg  text-left mb-3 mx-3 font-semibold">
+              No data available{" "}
+            </h1>
+          </div>
+        </div>
+      </>
     );
   };
 
@@ -148,70 +183,79 @@ const DashboardAnalytics = () => {
   const Cards = () => {
     return (
       <>
-        <div className="grid grid-cols-1 md:grid-cols-2">
-          {/* booking card */}
+        {/*      <div className="grid grid-cols-1 md:grid-cols-2">
+        
           <div className="bg-card mx-3 my-2 p-2 shadow-lg rounded-lg grid grid-cols-1">
             <div className="flex flex-col items-center">
               <p className="text-lg ">Bookings</p>
               <h4 className="text-4xl font-semibold">6,30k</h4>
 
-              {/* <span className ="text-5xl"> </span> */}
               <div>
                 <LuSignalHigh className="text-5xl text-orange-400 w-30 h-20" />
               </div>
             </div>
           </div>
-          {/* profit card */}
           <div className="bg-card mx-3 my-2 p-2 shadow-lg rounded-lg grid grid-cols-1">
             <div className="flex flex-col items-center">
               <p className="text-lg ">Profits</p>
               <h4 className="text-4xl font-semibold">2,30k</h4>
 
-              {/* <span className ="text-5xl"> </span> */}
               <div>
                 <TfiPulse className="text-5xl text-yellow-500 w-30 h-20" />
               </div>
             </div>
           </div>
-        </div>
-
+        </div> */}
+        <TransactionCard />
         {/* special card earnings on top events card */}
-        <div className="grid grid-cols-1 md:gid-cols-2">
-          <div className="bg-card mx-3 my-2 p-2 shadow-lg rounded-lg">
-            <h1 className="text-lg  text-left mb-3 mx-3 font-semibold">
-              Earnings On Top Events
-            </h1>
-            <div className="flex justify-around">
-              {/* top event 1 */}
-              <div className="flex flex-col items-center">
-                {/*  */}
-                <h4 className="text-2xl font-semibold">230$</h4>
-                <p className="text-lg ">Music</p>
-                <div className="bg-pink-100 p-2 my-2 rounded-full">
-                  <GiMusicalScore className="text-3xl text-pink-400" />
+        {dashboardData?.top3Events != 0 ? (
+          <div className="grid grid-cols-1 md:gid-cols-2">
+            <div className="bg-card mx-3 my-2 p-2 shadow-lg rounded-lg">
+              <h1 className="text-lg  text-left mb-3 mx-3 font-semibold">
+                Earnings On Top Events
+              </h1>
+              <div className="flex justify-around">
+                {/* top event 1 */}
+                <div className="flex flex-col items-center">
+                  {/*  */}
+                  <h4 className="text-2xl font-semibold">230$</h4>
+                  <p className="text-lg ">Music</p>
+                  <div className="bg-pink-100 p-2 my-2 rounded-full">
+                    <GiMusicalScore className="text-3xl text-pink-400" />
+                  </div>
                 </div>
-              </div>
 
-              {/* top event 2 */}
-              <div className="flex flex-col items-center">
-                <h4 className="text-2xl font-semibold">75$</h4>
-                <p className="text-lg ">Foot Ball</p>
-                <div className="bg-emerald-100 p-2 my-2 rounded-full">
-                  <FaFootballBall className="text-3xl text-emerald-400" />
+                {/* top event 2 */}
+                <div className="flex flex-col items-center">
+                  <h4 className="text-2xl font-semibold">75$</h4>
+                  <p className="text-lg ">Foot Ball</p>
+                  <div className="bg-emerald-100 p-2 my-2 rounded-full">
+                    <FaFootballBall className="text-3xl text-emerald-400" />
+                  </div>
                 </div>
-              </div>
-              {/* top event3 */}
-              <div className="flex flex-col items-center">
-                {/*  */}
-                <h4 className="text-2xl font-semibold">890$</h4>
-                <p className="text-lg ">Cricket</p>
-                <div className="bg-orange-100 p-2 my-2 rounded-full">
-                  <MdSportsCricket className="text-3xl text-orange-400" />
+                {/* top event3 */}
+                <div className="flex flex-col items-center">
+                  {/*  */}
+                  <h4 className="text-2xl font-semibold">890$</h4>
+                  <p className="text-lg ">Cricket</p>
+                  <div className="bg-orange-100 p-2 my-2 rounded-full">
+                    <MdSportsCricket className="text-3xl text-orange-400" />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:gid-cols-2">
+              <div className="bg-card mx-3 my-2 p-2 shadow-lg rounded-lg">
+                <h1 className="text-lg  text-left mb-3 mx-3 font-semibold">
+                  No data available{" "}
+                </h1>
+              </div>
+            </div>{" "}
+          </>
+        )}
       </>
     );
   };
@@ -225,7 +269,7 @@ const DashboardAnalytics = () => {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-lg font-semibold ">
-                Congratulations 🎉 Ankur!
+                Congratulations 🎉 !{user}
               </h3>
               <p className="text-md ">You have won a gold medal </p>
             </div>
@@ -235,34 +279,38 @@ const DashboardAnalytics = () => {
             </div>
           </div>
           <div className="flex items-center mb-4">
-            <h2 className="text-4xl font-bold ">$48.9k</h2>
+            <h2 className="text-4xl font-bold ">
+              {Number(dashboardData?.totalRevenue)}
+            </h2>
           </div>
-          <button className="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
+          {/* <button className="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
             View Sales
-          </button>
+          </button> */}
         </div>
 
         {/* <!-- Statistics Card --> */}
         <div className="bg-card rounded-lg shadow-lg p-4 mx-2 my-2">
           <div className="flex justify-between items-center p-3">
             <h3 className="text-lg font-semibold ">Statistics</h3>
-            <p className="text-sm ">Updated 1 month ago</p>
+            {/* <p className="text-sm ">Updated 1 month ago</p> */}
           </div>
           <div className="flex justify-around">
             {/* <!-- Sales --> */}
-            <div className="flex flex-col items-center">
+            {/* <div className="flex flex-col items-center">
               <div className="bg-purple-100 p-2 rounded-full mb-2">
                 <BsFileBarGraph className="text-3xl text-purple-500" />
               </div>
               <h4 className="text-lg font-semibold">230k</h4>
               <p className="text-lg ">Sales</p>
-            </div>
+            </div> */}
             {/* <!-- Customers --> */}
             <div className="flex flex-col items-center">
               <div className="bg-blue-100 p-2 rounded-full mb-2">
                 <FaUsersCog className="text-3xl text-blue-500" />
               </div>
-              <h4 className="text-lg font-semibold">8.549k</h4>
+              <h4 className="text-lg font-semibold">
+                {Number(dashboardData?.totalUsers)}
+              </h4>
               <p className="text-lg ">Customers</p>
             </div>
             {/* <!-- Products --> */}
@@ -270,7 +318,10 @@ const DashboardAnalytics = () => {
               <div className="bg-red-100 p-2 rounded-full mb-2">
                 <FaTicket className="text-3xl text-red-500" />
               </div>
-              <h4 className="text-lg font-semibold">1.423k</h4>
+              <h4 className="text-lg font-semibold">
+                {" "}
+                {Number(dashboardData?.totalTickets)}
+              </h4>
               <p className="text-lg ">Tickets</p>
             </div>
             {/* <!-- Revenue --> */}
@@ -278,7 +329,10 @@ const DashboardAnalytics = () => {
               <div className="bg-green-100 p-2 rounded-full mb-2">
                 <FaDollarSign className="text-3xl text-green-500" />
               </div>
-              <h4 className="text-lg font-semibold">$9745</h4>
+              <h4 className="text-lg font-semibold">
+                {" "}
+                {Number(dashboardData?.totalRevenue)}
+              </h4>
               <p className="text-lg ">Revenue</p>
             </div>
           </div>
@@ -290,7 +344,7 @@ const DashboardAnalytics = () => {
 
       {/* support tracker card */}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 max-width-auto mx-auto">
+      {/* <div className="grid grid-cols-1 md:grid-cols-3 max-width-auto mx-auto">
         <GoalCard />
         <div className="bg-card shadow-lg rounded-lg p-4 mx-2 text-center my-3">
           <h3 className=" text-2xl font-semibold mb-2 text-left">
@@ -298,9 +352,7 @@ const DashboardAnalytics = () => {
           </h3>
 
           <div className="relative inline-block">
-            {/* <!-- SVG Circle for Dotted Progress with Increased Size --> */}
             <svg className="w-50 h-50">
-              {/* <!-- Increase the size of the SVG --> */}
               <circle
                 cx="50%"
                 cy="50%"
@@ -319,28 +371,23 @@ const DashboardAnalytics = () => {
               </defs>
             </svg>
             {/*     
-    <!-- Center Percentage Text --> */}
             <div className="absolute inset-1 flex flex-col items-center justify-center">
               <span className="text-2xl font-semibold ">83%</span>
-              {/* <!-- Adjusted font size --> */}
               <p className=" text-sm">Completed Tickets</p>
             </div>
           </div>
 
           <div className="flex gap-4 px-2">
-            {/* <!-- New Tickets --> */}
             <div>
               <p className=" text-sm">New Tickets</p>
               <h4 className="text-xl font-bold ">29</h4>
             </div>
 
-            {/* <!-- Open Tickets --> */}
             <div>
               <p className=" text-sm">Open Tickets</p>
               <h4 className="text-xl font-bold ">63</h4>
             </div>
 
-            {/* <!-- Response Time --> */}
             <div>
               <p className=" text-sm">Response Time</p>
               <h4 className="text-xl font-bold ">1d</h4>
@@ -348,7 +395,7 @@ const DashboardAnalytics = () => {
           </div>
         </div>
         <TransactionCard />
-      </div>
+      </div> */}
     </div>
   );
 };
