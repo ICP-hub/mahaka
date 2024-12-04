@@ -11,6 +11,7 @@ import AdminWahana from "../admin/pages/Wahana";
 import AdminBanner from "../admin/pages/Banner";
 import AdminTestimonial from "../admin/pages/AdminTestimonial";
 import EventDetailPage from "../admin/pages/EventDetail";
+import WahanaDetailPage from "../admin/pages/WahanaDetail";
 
 /* Admin routes */
 export const adminRoutes = [
@@ -35,6 +36,10 @@ export const adminRoutes = [
       { path: "sales", element: <Sales /> },
       { path: "purchaseTicket", element: <TicketPurchase /> },
       { path: "wahana", element: <AdminWahana /> },
+      {
+        path: "wahana/:venueId/:id",
+        element: <WahanaDetailPage />,
+      },
       { path: "banner", element: <AdminBanner /> },
       { path: "testimonial", element: <AdminTestimonial /> },
     ],

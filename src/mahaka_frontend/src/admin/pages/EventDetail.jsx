@@ -64,9 +64,7 @@ const EventDetailPage = () => {
               ></img>
             </div>
           </div>
-          <div className="mt-3 truncate text-4xl font-bold">
-            {currentEvent.title}
-          </div>
+          <div className="mt-3 text-4xl font-bold">{currentEvent.title}</div>
           <div className="mt-2 flex flex-wrap items-center">
             <div className="mb-3 mr-3 flex items-center justify-center rounded-full bg-icon px-3 py-1 leading-normal text-white dark:bg-gray-700 dark:text-gray-300">
               <span className="whitespace-nowrap text-sm font-medium max-w-[280px] md:max-w-full flex items-center">

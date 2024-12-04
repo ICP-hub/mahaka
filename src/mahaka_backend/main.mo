@@ -19,6 +19,7 @@ import Time "mo:base/Time";
 import Array "mo:base/Array";
 import Nat "mo:base/Nat";
 import Float "mo:base/Float";
+import Nat16 "mo:base/Nat16";
 // import Uuid "mo:uuid/UUID";
 import Utils "./Utils";
 import nftTypes "../DIP721-NFT/Types";
@@ -140,10 +141,10 @@ actor mahaka {
      };
 
 
-     let LedgerCanister = actor "ryjl3-tyaaa-aaaaa-aaaba-cai" : actor {
-        account_balance : shared query Types.BinaryAccountBalanceArgs -> async Types.Tokens;
-        icrc2_transfer_from : shared Types.TransferFromArgs -> async Types.Result_3;
-    };
+//      let LedgerCanister = actor "ryjl3-tyaaa-aaaaa-aaaba-cai" : actor {
+//         account_balance : shared query Types.BinaryAccountBalanceArgs -> async Types.Tokens;
+//         icrc2_transfer_from : shared Types.TransferFromArgs -> async Types.Result_3;
+//     };
 
      let FiatPayCanister = actor "bkyz2-fmaaa-aaaaa-qaaaq-cai" : actor {
         create_invoice : shared (Principal,FiatTypes.Request.CreateInvoiceBody) -> async Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>>;
@@ -531,10 +532,10 @@ actor mahaka {
      public shared ({caller = user}) func createVenue(
           collection_details : Types.venueCollectionParams, 
           _title : Text,
-          _capacity : Nat, 
+          _capacity : Nat,
           _details : Types.venueDetails , 
           _description : Text
-     ) : async Result.Result<(id : Text,  venue :Types.Venue),Types.UpdateUserError> {
+     ) : async Result.Result<(id : Text,  venue :Types.Venue), Types.UpdateUserError> {
           // if (Principal.isAnonymous(user)) {
           //      return #err(#UserNotAuthenticated); 
           // }; 
@@ -549,9 +550,14 @@ actor mahaka {
           //           };
           //      };
           // };
+          if (collection_details.collection_args.sTicket_price < 10000.0
+               or collection_details.collection_args.vTicket_price < 10000.0
+               or collection_details.collection_args.gTicket_price < 10000.0)
+          {
+               return #err(#TicketPriceError);
+          };
           let availablecycles : Nat = await availableCycles(); 
           if(availablecycles < 800_510_000_000 ){
-               throw Error.reject("Canister doesnt have enough cycles");
                return #err(#CyclesError);
           };
           Cycles.add<system>(800_500_000_000);
@@ -927,9 +933,14 @@ actor mahaka {
           //           };
           //      };
           // };
+          if (eCollection.collection_args.sTicket_price < 10000 
+               or eCollection.collection_args.vTicket_price < 10000 
+               or eCollection.collection_args.gTicket_price < 10000) 
+          {
+               return #err(#TicketPriceError);
+          };
           let availablecycles : Nat = await availableCycles(); 
           if(availablecycles < 800_510_000_000 ){
-               throw Error.reject("Canister doesnt have enough cycles");
                return #err(#CyclesError);
           };
           Cycles.add<system>(800_500_000_000);
@@ -1569,6 +1580,9 @@ actor mahaka {
           collectionActor: actor {
                logoDip721: () -> async Types.LogoResult;
                mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
+               getDIP721details : () -> async nftTypes.Dip721NonFungibleToken;
+               totalSupplyDip721 : () -> async Nat64;
+               getMaxLimitDip721 : () -> async Nat16
           },
           metadata: nftTypes.MetadataDesc,
           ticketType: Types.ticket_info,
@@ -1584,6 +1598,7 @@ actor mahaka {
           caller : Principal
      ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError> {
           let _logo = await collectionActor.logoDip721();
+          let nftDetails = await collectionActor.getDIP721details();
           var mintReceipts: List.List<nftTypes.MintReceiptPart> = List.nil();
           // if (numOfVisitors > Array.size(receivers)) {
           //      throw Error.reject("Receivers Count doesnot match number of visitors");
@@ -1848,7 +1863,41 @@ actor mahaka {
                     let collectionActor = actor (collectionId) : actor {
                          logoDip721: () -> async Types.LogoResult;
                          mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
+                         getDIP721details : ()-> async nftTypes.Dip721NonFungibleToken;
+                         totalSupplyDip721 : () -> async Nat64;
+                         getMaxLimitDip721 : () -> async Nat16
                     };
+                    let totalTickets = await collectionActor.totalSupplyDip721();
+                    let maxLimit = await collectionActor.getMaxLimitDip721();
+                    let dipDetails = await collectionActor.getDIP721details();
+                    if (totalTickets >= Nat64.fromNat(Nat16.toNat(maxLimit))) {
+                         return #err("Max ticket limit reached for the venue.");
+                    };
+                    var selectedTicketLimit: Nat = 0;
+                    switch (_ticket_type.ticket_type) {
+                         case (#SinglePass) {
+                              selectedTicketLimit := dipDetails.sTicket_limit;
+                         };
+                         case (#VipPass) {
+                              selectedTicketLimit := dipDetails.vTicket_limit;
+                         };
+                         case (#GroupPass) {
+                              selectedTicketLimit := dipDetails.gTicket_limit;
+                         };
+                    };
+                    let currentTicketCountResult = await getTicketsCountByType(#Venue, venueId, _ticket_type.ticket_type);
+                    switch (currentTicketCountResult) {
+                         case (#err(e)) {
+                              return #err("Error fetching ticket count by type: " # e);
+                         };
+                         case (#ok(currentTicketCount)) {
+                              if (currentTicketCount >= selectedTicketLimit) {
+                                   return #err("Selected ticket type limit reached.");
+                              };
+                         };
+                    };
+
+
                     switch (paymentType) {
                          case (#Cash) {
                               // throw Error.reject("Cash option is not available");
@@ -1927,6 +1976,38 @@ actor mahaka {
                     let collectionActor = actor (Principal.toText(event.event_collectionid)) : actor {
                          logoDip721: () -> async Types.LogoResult;
                          mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
+                         getDIP721details : ()-> async nftTypes.Dip721NonFungibleToken;
+                         totalSupplyDip721 : () -> async Nat64;
+                         getMaxLimitDip721 : () -> async Nat16
+                    };
+                    let totalTickets = await collectionActor.totalSupplyDip721();
+                    let maxLimit = await collectionActor.getMaxLimitDip721();
+                    let dipDetails = await collectionActor.getDIP721details();
+                    if (totalTickets >= Nat64.fromNat(Nat16.toNat(maxLimit))) {
+                         return #err("Max ticket limit reached for the venue.");
+                    };
+                    var selectedTicketLimit: Nat = 0;
+                    switch (_ticket_type.ticket_type) {
+                         case (#SinglePass) {
+                              selectedTicketLimit := dipDetails.sTicket_limit;
+                         };
+                         case (#VipPass) {
+                              selectedTicketLimit := dipDetails.vTicket_limit;
+                         };
+                         case (#GroupPass) {
+                              selectedTicketLimit := dipDetails.gTicket_limit;
+                         };
+                    };
+                    let currentTicketCountResult = await getTicketsCountByType(#Event, _eventId, _ticket_type.ticket_type);
+                    switch (currentTicketCountResult) {
+                         case (#err(e)) {
+                              return #err("Error fetching ticket count by type: " # e);
+                         };
+                         case (#ok(currentTicketCount)) {
+                              if (currentTicketCount >= selectedTicketLimit) {
+                                   return #err("Selected ticket type limit reached.");
+                              };
+                         };
                     };
                     switch (paymentType) {
                          case (#Cash) {
@@ -2010,6 +2091,20 @@ actor mahaka {
                               memo: ?TypesICRC.Memo;
                               created_at_time: ?TypesICRC.Timestamp;
                          }) -> async TypesICRC.Result<TypesICRC.TxIndex, TypesICRC.TransferError>;
+                         icrc1_total_supply : ()-> async Types.Tokens
+                    };
+                    let maxLimit = await collectionActor.icrc1_total_supply();
+                    let totalTickets = await getTicketsCountByType(#Venue, venueId, #SinglePass);
+                    switch(totalTickets){
+                         case(#err(e)){
+                              return #err(e);
+                         };
+                         case(#ok(count)){
+                              let e8s : Nat64 = Nat64.fromNat(count);
+                              if ( count >= Nat64.toNat(maxLimit.e8s)) {
+                                   return #err("Max ticket limit reached for the venue.");
+                              };
+                         };
                     };
                     switch (paymentType) {
                          case (#Cash) {
@@ -2100,6 +2195,38 @@ actor mahaka {
           let collectionActor = actor (collectionId) : actor {
                logoDip721: () -> async Types.LogoResult;
                mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
+               getDIP721details : ()-> async nftTypes.Dip721NonFungibleToken;
+               totalSupplyDip721 : () -> async Nat64;
+               getMaxLimitDip721 : () -> async Nat16
+          };
+          let totalTickets = await collectionActor.totalSupplyDip721();
+          let maxLimit = await collectionActor.getMaxLimitDip721();
+          let dipDetails = await collectionActor.getDIP721details();
+          if (totalTickets >= Nat64.fromNat(Nat16.toNat(maxLimit))) {
+               return #err("Max ticket limit reached for the venue.");
+          };
+          var selectedTicketLimit: Nat = 0;
+          switch (_ticket_type.ticket_type) {
+               case (#SinglePass) {
+                    selectedTicketLimit := dipDetails.sTicket_limit;
+               };
+               case (#VipPass) {
+                    selectedTicketLimit := dipDetails.vTicket_limit;
+               };
+               case (#GroupPass) {
+                    selectedTicketLimit := dipDetails.gTicket_limit;
+               };
+          };
+          let currentTicketCountResult = await getTicketsCountByType(#Venue, venueId, _ticket_type.ticket_type);
+          switch (currentTicketCountResult) {
+               case (#err(e)) {
+                    return #err("Error fetching ticket count by type: " # e);
+               };
+               case (#ok(currentTicketCount)) {
+                    if (currentTicketCount >= selectedTicketLimit) {
+                         return #err("Selected ticket type limit reached.");
+                    };
+               };
           };
           switch (paymentType) {
                case (#Cash) {
@@ -2144,6 +2271,38 @@ actor mahaka {
                     let collectionActor = actor (Principal.toText(event.event_collectionid)) : actor {
                          logoDip721: () -> async Types.LogoResult;
                          mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
+                         getDIP721details : ()-> async nftTypes.Dip721NonFungibleToken;
+                         totalSupplyDip721 : () -> async Nat64;
+                         getMaxLimitDip721 : () -> async Nat16
+                    };
+                    let totalTickets = await collectionActor.totalSupplyDip721();
+                    let maxLimit = await collectionActor.getMaxLimitDip721();
+                    let dipDetails = await collectionActor.getDIP721details();
+                    if (totalTickets >= Nat64.fromNat(Nat16.toNat(maxLimit))) {
+                         return #err("Max ticket limit reached for the venue.");
+                    };
+                    var selectedTicketLimit: Nat = 0;
+                    switch (_ticket_type.ticket_type) {
+                         case (#SinglePass) {
+                              selectedTicketLimit := dipDetails.sTicket_limit;
+                         };
+                         case (#VipPass) {
+                              selectedTicketLimit := dipDetails.vTicket_limit;
+                         };
+                         case (#GroupPass) {
+                              selectedTicketLimit := dipDetails.gTicket_limit;
+                         };
+                    };
+                    let currentTicketCountResult = await getTicketsCountByType(#Event, _eventId, _ticket_type.ticket_type);
+                    switch (currentTicketCountResult) {
+                         case (#err(e)) {
+                              return #err("Error fetching ticket count by type: " # e);
+                         };
+                         case (#ok(currentTicketCount)) {
+                              if (currentTicketCount >= selectedTicketLimit) {
+                                   return #err("Selected ticket type limit reached.");
+                              };
+                         };
                     };
                     switch (paymentType) {
                          case (#Cash) {
@@ -2195,6 +2354,20 @@ actor mahaka {
                               memo: ?TypesICRC.Memo;
                               created_at_time: ?TypesICRC.Timestamp;
                          }) -> async TypesICRC.Result<TypesICRC.TxIndex, TypesICRC.TransferError>;
+                         icrc1_total_supply : ()-> async Types.Tokens
+                    };
+                    let maxLimit = await collectionActor.icrc1_total_supply();
+                    let totalTickets = await getTicketsCountByType(#Venue, venueId, #SinglePass);
+                    switch(totalTickets){
+                         case(#err(e)){
+                              return #err(e);
+                         };
+                         case(#ok(count)){
+                              let e8s : Nat64 = Nat64.fromNat(count);
+                              if ( count >= Nat64.toNat(maxLimit.e8s)) {
+                                   return #err("Max ticket limit reached for the venue.");
+                              };
+                         };
                     };
                     switch (paymentType) {
                          case (#Cash) {
@@ -2407,6 +2580,123 @@ actor mahaka {
      //           };
      //      };
      // };
+
+     public shared func getTotalTicketsCountByCategory(category : Types.category, id : Text) : async Result.Result<Nat, Text> {
+          switch(category){
+               case(#Venue){
+                    let count = await getVenueTickets(id);
+                    switch(count){
+                         case(#err(e)){
+                              return #err(e);
+                         };
+                         case(#ok(obj)){
+                              return #ok(Array.size<Types.TicketSaleInfo>(obj));
+                         };
+                    };
+               };
+               case(#Event){
+                    let count = await getEventTickets(id);
+                    switch(count){
+                         case(#err(e)){
+                              return #err(e);
+                         };
+                         case(#ok(obj)){
+                              return #ok(Array.size<Types.TicketSaleInfo>(obj));
+                         };
+                    };
+               };
+               case(#Wahana){
+                    let count = await getWahanaTickets(id);
+                    switch(count){
+                         case(#err(e)){
+                              return #err(e);
+                         };
+                         case(#ok(obj)){
+                              return #ok(Array.size<Types.TicketSaleInfo>(obj));
+                         };
+                    };
+               }
+          }
+     };
+
+     public shared func getTicketsCountByType(
+          category: Types.category, 
+          id: Text,
+          ticketType: nftTypes.ticket_type
+     ) : async Result.Result<Nat, Text> {
+          let collectionId = await Utils.extractCanisterId(id);
+          let collectionActor = actor (collectionId) : actor {
+               getNFT: (token_id: nftTypes.TokenId) -> async nftTypes.NftResult;
+          };
+          switch (category) {
+               case (#Venue) {
+                    let ticketsResult = await getVenueTickets(id);
+                    switch (ticketsResult) {
+                         case (#err(e)) {
+                              return #err("Error fetching tickets: " # e);
+                         };
+                         case (#ok(tickets)) {
+                              var count: Nat = 0;
+                              for (ticket in tickets.vals()) {
+                                   let nftDetailsResult = await collectionActor.getNFT(Nat64.fromNat(ticket.ticketId));
+                                   switch (nftDetailsResult) {
+                                        case (#Err(e)) {
+                                             return #err("Error getting NFT details");
+                                        };
+                                        case (#Ok(nftDetails)) {
+                                             // Compare the ticket type
+                                             if (nftDetails.ticket_type == ticketType) {
+                                                  count += 1;
+                                             };
+                                        };
+                                   };
+                              };
+
+                              return #ok(count);
+                         };
+                    };
+               };
+               case (#Event) {
+                    let ticketsResult = await getEventTickets(id);
+                    switch (ticketsResult) {
+                         case (#err(e)) {
+                              return #err("Error fetching tickets: " # e);
+                         };
+                         case (#ok(tickets)) {
+                              var count: Nat = 0;
+                              for (ticket in tickets.vals()) {
+                                   let nftDetailsResult = await collectionActor.getNFT(Nat64.fromNat(ticket.ticketId));
+                                   switch (nftDetailsResult) {
+                                        case (#Err(e)) {
+                                             return #err("Error getting NFT details");
+                                        };
+                                        case (#Ok(nftDetails)) {
+                                             // Compare the ticket type
+                                             if (nftDetails.ticket_type == ticketType) {
+                                                  count += 1;
+                                             };
+                                        };
+                                   };
+                              };
+
+                              return #ok(count);
+                         };
+                    };
+               };
+               case (#Wahana) {
+                    let count = await getWahanaTickets(id);
+                    switch(count){
+                         case(#err(e)){
+                              return #err(e);
+                         };
+                         case(#ok(obj)){
+                              return #ok(Array.size<Types.TicketSaleInfo>(obj));
+                         };
+                    };
+               };
+          };
+     };
+
 
      public shared ({caller}) func getVenueTickets(venueId : Text) : async Result.Result<[Types.TicketSaleInfo], Text> {
           // let roleResult = await getRoleByPrincipal(user);
@@ -3236,7 +3526,6 @@ actor mahaka {
           _decimals : Nat8 , 
           _totalSupply :Nat , 
           description : Text ,
-          _details : Types.wahanaDetails,
           featured : Bool,
           banner : Types.LogoResult, 
           price : Float,
@@ -3259,6 +3548,9 @@ actor mahaka {
           //           };
           //      };
           // };
+          if (price < 10000.0){
+               return #err(#TicketPriceError);
+          };
           let availablecycles : Nat = await availableCycles(); 
           if(availablecycles < 800_510_000_000 ){
                throw Error.reject("Canister doesnt have enough cycles");
@@ -3295,7 +3587,6 @@ actor mahaka {
                id = _name # "#" # Principal.toText(wahana_id); 
                banner = banner;
                description = description;
-               details = _details;
                price = price;
                ride_title = _name;
                creator = user;

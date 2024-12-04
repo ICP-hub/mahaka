@@ -52,11 +52,11 @@ function App() {
   /*  @ Effects : common dispatches.
   /* ----------------------------------------------------------------------------------------------------- */
   useEffect(() => {
-    dispatch(getAllVenues({ backend: backend, pageLimit: 10, currPage: 0 }));
+    dispatch(getAllVenues({ backend: backend, pageLimit: 100, currPage: 0 }));
   }, []);
 
   useEffect(() => {
-    dispatch(getAllWahanas({ backend: backend, pageLimit: 10, currPage: 0 }));
+    dispatch(getAllWahanas({ backend: backend, chunkSize: 10, pageNo: 0 }));
   }, []);
 
   useEffect(() => {
