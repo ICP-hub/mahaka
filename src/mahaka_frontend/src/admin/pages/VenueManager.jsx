@@ -95,9 +95,12 @@ const VenueManager = () => {
             </div>
           </div>
           <div className="sm:ml-auto mt-4 sm:mt-0 flex items-center justify-center w-full sm:w-fit h-full">
-            <div className="bg-indigo-600 hover:bg-indigo-700 rounded-xl cursor-pointer w-full text-white p-4">
+            <button
+              className="bg-indigo-600 hover:bg-indigo-700 rounded-xl cursor-pointer w-full text-white p-4"
+              onClick={() => setIsVenueModalOpen(true)}
+            >
               Add a new venue
-            </div>
+            </button>
           </div>
         </div>
       </div>

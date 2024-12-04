@@ -57,12 +57,12 @@ const WahanaDetailPage = () => {
             </div>
           </div>
           <div className="mt-4 flex flex-col space-y-8 border-t pt-6">
-            <div className="flex sm:items-center">
+            {/* <div className="flex sm:items-center">
               <HiOutlineMapPin size={24} />
               <div className="ml-6 leading-6 font-medium text-lg capitalize">
                 {currentWahana.details.Location}
               </div>
-            </div>
+            </div> */}
             <div className="flex sm:items-center font-medium">
               <p className="text-lg">Wahana id</p>
               <div className="ml-6 leading-6">{currentWahana.id}</div>

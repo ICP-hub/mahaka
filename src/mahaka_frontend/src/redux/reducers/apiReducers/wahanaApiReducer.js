@@ -24,7 +24,7 @@ const initialState = {
 export const createWahana = createAsyncThunk(
   "wahana/createWahana",
   async ({ backend, wahanaData, setIsModalOpen }) => {
-    console.log(wahanaData);
+    // console.log(wahanaData);
     try {
       const response = await backend.createWahana(
         wahanaData.venueId,
@@ -33,13 +33,13 @@ export const createWahana = createAsyncThunk(
         wahanaData.decimal,
         wahanaData.totalSupply,
         wahanaData.description,
-        wahanaData.details,
+        // wahanaData.details,
         wahanaData.isFeatured,
         wahanaData.banner,
         wahanaData.priceIDR
         // wahanaData.priceICP
       );
-      // console.log("wahana created successfully", response);
+      console.log("wahana created successfully", response);
       setIsModalOpen(false);
       return response;
     } catch (error) {

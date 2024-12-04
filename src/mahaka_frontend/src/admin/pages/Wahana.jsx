@@ -228,8 +228,8 @@ const WahanaManager = () => {
 const WahanaCard = ({ wahana }) => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
-  const startInterVal = formatDateAndTime(parseInt(wahana.details.StartDate));
-  const endInterVal = formatDateAndTime(parseInt(wahana.details.EndDate));
+  // const startInterVal = formatDateAndTime(parseInt(wahana.details.StartDate));
+  // const endInterVal = formatDateAndTime(parseInt(wahana.details.EndDate));
   const [isDelete, setIsDelete] = useState(false);
 
   const handleWahanaDelete = () => {
@@ -285,19 +285,26 @@ const WahanaCard = ({ wahana }) => {
           {/* <div className="text-secondary mt-0.5 line-clamp-2">
             {wahana.description}
           </div> */}
-          <div className="flex items-center text-md leading-5 mt-2 uppercase font-medium">
+          {/* <div className="flex items-center text-md leading-5 mt-2 uppercase font-medium">
             <HiMiniMapPin size={14} />
             <div className="ml-1.5">{wahana.details.Location}</div>
-          </div>
+          </div> */}
           <div className="flex items-center text-md leading-5 mt-2 font-medium">
             <div>Creator</div>
             <div className="ml-1.5 truncate">{wahana.creator.toText()}</div>
           </div>
           <div className="flex items-center justify-between mt-2">
-            <div className="flex flex-col font-medium">
+            {/* <div className="flex flex-col font-medium">
               <div>Start Date</div>
               <div>{startInterVal.date}</div>
               <div>{startInterVal.time}</div>
+            </div> */}
+            <div className="flex flex-col font-medium">
+              <div>Price</div>
+              <div className="flex items-center">
+                Rp.<span className="text-xl font-bold">{wahana.price}</span>
+                /Person
+              </div>
             </div>
             <Link
               to={`/admin/wahana/${encodeURIComponent(

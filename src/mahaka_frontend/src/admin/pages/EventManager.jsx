@@ -18,7 +18,7 @@ import CreateEventForm from "../components/CreateEventForm";
 import {
   deleteEvent,
   getAllEventsByVenue,
-  searchEvents
+  searchEvents,
 } from "../../redux/reducers/apiReducers/eventApiReducer";
 import {
   createStaggerContainer,
@@ -58,13 +58,20 @@ export function formatDateAndTime(timestamp) {
 // Main component
 const EventManager = () => {
   const { venues } = useSelector((state) => state.venues);
-  const { events, eventByVenue, eventsLoading, singleEventLoading, searchedEvents, searchEventLoading } = useSelector((state) => state.events);
+  const {
+    events,
+    eventByVenue,
+    eventsLoading,
+    singleEventLoading,
+    searchedEvents,
+    searchEventLoading,
+  } = useSelector((state) => state.events);
   const { backend } = useSelector((state) => state.authentication);
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOptionMenuOpen, setIsOptionMenuOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const [searchPerformed, setSearchPerformed] = useState(false)
+  const [searchPerformed, setSearchPerformed] = useState(false);
   const [selectedVenue, setSelectedVenue] = useState({
     option: "All",
     id: "",
@@ -84,13 +91,18 @@ const EventManager = () => {
     } else {
       return eventByVenue;
     }
-  }, [selectedVenue, events, eventByVenue, searchText, searchedEvents, searchPerformed]);
+  }, [
+    selectedVenue,
+    events,
+    eventByVenue,
+    searchText,
+    searchedEvents,
+    searchPerformed,
+  ]);
 
   useEffect(() => {
     setSearchPerformed(false);
   }, [searchText]);
-
-
 
   useEffect(() => {
     if (selectedVenue.option !== "All") {
@@ -218,7 +230,11 @@ const EventManager = () => {
                     />
                   </div>
                   <div className="ml-auto">
-                    <HiArrowRightCircle size={24} className="cursor-pointer" onClick={handleSearch} />
+                    <HiArrowRightCircle
+                      size={24}
+                      className="cursor-pointer"
+                      onClick={handleSearch}
+                    />
                   </div>
                 </div>
               </div>
@@ -255,7 +271,6 @@ const EventManager = () => {
                 No Events Found
               </div>
             ) : null}
-
           </div>
         </div>
       </div>
