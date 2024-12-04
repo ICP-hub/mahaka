@@ -281,7 +281,7 @@ const PaymentTest = () => {
     const paymentType = { Card: null };
     const ticketDetails = {
       ticket_type: ticketType,
-      price: Number(256000),
+      price: Number(parseFloat(256000.0).toFixed(2)),
     };
     try {
       const response = await backend.buyVenueTicket(

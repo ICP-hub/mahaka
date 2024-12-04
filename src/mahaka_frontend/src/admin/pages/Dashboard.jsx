@@ -143,7 +143,7 @@ const DashboardAnalytics = () => {
       },
     ];
 
-    return dashboardData.latestTxs != 0 ? (
+    return dashboardData?.latestTxs != 0 ? (
       <div className="rounded-lg p-3">
         <div className="space-y-1 bg-card p-3 shadow-lg rounded-lg">
           <h2 className="text-2xl font-semibold  mb-4">Transactions</h2>
