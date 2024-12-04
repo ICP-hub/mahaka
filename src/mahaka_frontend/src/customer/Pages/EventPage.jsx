@@ -349,17 +349,6 @@ const EventPage = () => {
                       aria-labelledby="dashboard-tab"
                     >
                       <div className="p-6 font-sans">
-                        <ul className="list-disc list-inside mb-4">
-                          <li>
-                            <strong>Location:</strong>
-                            {venue?.details.Location}
-                          </li>
-                          <li>
-                            <strong>Last Entry:</strong>
-                            {venue?.details.EndTime && endInterVal.time}
-                          </li>
-                        </ul>
-
                         <div className="space-y-4">{venue.description}</div>
                       </div>
                     </motion.div>
@@ -390,11 +379,17 @@ const EventPage = () => {
                 <div className="p-8">
                   <h1 className="text-2xl font-black">Event Details</h1>
                   <h3 className="text-lg font-normal">
-                    {venue?.details.StartDate && startInterVal.date}-
-                    {venue?.details.EndDate && endInterVal.date}
+                    {" "}
+                    <span className="text-xl font-semibold mr-2">
+                      {" "}
+                      Starts on
+                    </span>
+                    {venue?.details.StartDate && startInterVal.date}{" "}
+                    {venue?.details.StartTime && startInterVal.time}
                   </h3>
                   <h3 className="text-lg font-normal">
-                    {venue?.details.StartTime && startInterVal.time}-
+                    <span className="text-xl font-semibold mr-2"> Ends on</span>
+                    {venue?.details.EndDate && endInterVal.date}{" "}
                     {venue?.details.EndTime && endInterVal.time}
                   </h3>
                   <h3 className="text-lg font-normal">

@@ -390,13 +390,6 @@ export default function SingleEvent() {
                       aria-labelledby="dashboard-tab"
                     >
                       <div className="p-6 font-sans">
-                        <ul className="list-disc list-inside mb-4">
-                          <li>
-                            <strong>Location:</strong>{" "}
-                            {venue?.Details.Location || "Indonesia"}
-                          </li>
-                        </ul>
-
                         <div className="space-y-4">{venue.Description}</div>
                       </div>
                     </motion.div>

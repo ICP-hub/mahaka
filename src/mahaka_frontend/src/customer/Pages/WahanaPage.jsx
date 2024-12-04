@@ -253,17 +253,6 @@ const WahanaPage = () => {
                       aria-labelledby="dashboard-tab"
                     >
                       <div className="p-6 font-sans">
-                        <ul className="list-disc list-inside mb-4">
-                          <li>
-                            <strong>Location:</strong>{" "}
-                            {currentWahana.ride_title || "Indonesia"}
-                          </li>
-                          <li>
-                            <strong>Price:</strong> IDR{" "}
-                            {parseInt(currentWahana.price)}
-                          </li>
-                        </ul>
-
                         <div className="space-y-4">
                           <div>{currentWahana.description || " "}</div>
                         </div>
@@ -296,9 +285,6 @@ const WahanaPage = () => {
                 <div className="p-8">
                   <h1 className="text-2xl font-black">Wahana Details</h1>
 
-                  <h3 className="text-lg font-normal">
-                    Location of the Wahana - {currentWahana?.details.Location}
-                  </h3>
                   <h3 className="text-lg font-normal">
                     {" "}
                     IDR {parseInt(currentWahana?.price)}

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 const UserBookingData = () => {
   const { backend } = useSelector((state) => state.authentication);
   const [tickets, setTickets] = useState([]);
+  const [selectedTicket, setSelectedTicket] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -25,6 +26,8 @@ const UserBookingData = () => {
       getTickets();
     }
   }, [backend]);
+
+  const closeModal = () => setSelectedTicket(null);
 
   if (loading) {
     return (
@@ -91,12 +94,45 @@ const UserBookingData = () => {
               </div>
             </div>
             {/* View Details Button */}
-            <button className="w-full mt-4 py-2 bg-secondary text-white font-medium rounded-lg transition-colors">
+            <button
+              onClick={() => setSelectedTicket(ticket)}
+              className="w-full mt-4 py-2 bg-secondary text-white font-medium rounded-lg transition-colors"
+            >
               View Details
             </button>
           </div>
         ))}
       </div>
+
+      {/* Modal */}
+      {selectedTicket && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h2 className="text-xl font-bold mb-4">
+              Ticket Details - #{selectedTicket.ticketId}
+            </h2>
+            <p className="mb-2">
+              <strong>Category:</strong> {selectedTicket.categoryId}
+            </p>
+            <p className="mb-2">
+              <strong>Visitors:</strong>{" "}
+              {parseInt(selectedTicket.numOfVisitors)}
+            </p>
+            <p className="mb-2">
+              <strong>Price:</strong> ₹{selectedTicket.price.toFixed(2)}
+            </p>
+            <p className="mb-4">
+              <strong>Additional Info:</strong> Lorem ipsum dolor sit amet.
+            </p>
+            <button
+              onClick={closeModal}
+              className="py-2 px-4 bg-red-500 text-white font-medium rounded-lg transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
