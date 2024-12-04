@@ -256,13 +256,15 @@ const EventPayment = () => {
     }
   };
   console.log("s", vanueids);
-
   const handlePayment2 = async (e) => {
     if (!principal) {
       notificationManager.error("Please connect your wallet");
       return;
     }
-
+    if (!timestemp || !ticketprice) {
+      notificationManager.error("Please fill all the details");
+      return;
+    }
     setLoading(true);
     setIsPaymentProcessing(true);
 
@@ -296,19 +298,21 @@ const EventPayment = () => {
     const receiver = principal;
     const numOfVisitors = BigInt(numberOFVisitor);
     const paymentType = { Card: null };
+    const saleDate = BigInt(timestemp);
 
     try {
+      const ticketTypeRecord = {
+        ticket_type: _ticket_type,
+        price: parseFloat(ticketprice),
+      };
+
       const response = await backend.buyEventTicket(
         vanueids,
         _eventIds,
-        {
-          ticket_type: _ticket_type,
-          priceFiat: parseFloat(eventdetail?.gTicket_price || 0),
-          price: BigInt(eventdetail?.price || 100_000),
-        },
+        ticketTypeRecord,
         _metadata,
         receiver,
-        timestemp,
+        saleDate,
         numOfVisitors,
         paymentType
       );
