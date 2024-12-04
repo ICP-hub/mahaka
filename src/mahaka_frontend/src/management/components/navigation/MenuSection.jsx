@@ -1,16 +1,19 @@
 import { HiOutlineStar, HiOutlineUserGroup } from "react-icons/hi2";
 import {
-  MdEventNote,
-  MdInsertChartOutlined,
+  // MdEventNote,
+  // MdInsertChartOutlined,
   MdMap,
-  MdPerson,
-  MdEqualizer,
+  // MdPerson,
+  // MdEqualizer,
   MdEvent,
 } from "react-icons/md";
+import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 
 const MenuSection = () => {
   const location = useLocation();
+
+  const { userRole } = useSelector((state) => state.users);
 
   const menuItems = [
     { path: "/management/venues", label: "Venues", icon: <MdMap size={24} /> },
@@ -19,17 +22,7 @@ const MenuSection = () => {
       label: "Wahana",
       icon: <HiOutlineStar size={24} />,
     },
-    // { path: "/admin/events", label: "Events", icon: <MdEventNote size={24} /> },
-    // { path: "/management/venues", label: "Venues", icon: <MdMap size={24} /> },
-    // { path: "/management/voucher", label: "Voucher", icon: <MdMap size={24} /> },
     { path: "/management/events", label: "Events", icon: <MdMap size={24} /> },
-
-    // {
-    //   path: "/management/users",
-    //   label: "users",
-    //   icon: <HiOutlineUserGroup size={24} />,
-    // },
-    // { path: "/management/sales", label: "Sales", icon: <MdEqualizer size={24} /> },
     {
       path: "/management/useractivity",
       label: "Ticket History",
@@ -51,6 +44,7 @@ const MenuSection = () => {
         <div className="relative flex items-center justify-start p-2.5 font-medium leading-5 no-underline rounded-md text-secondaryText">
           <div className="text-secondaryText">
             <div className="text-white text-md">DASHBOARD</div>
+            <div className="text-sm capitalize">{userRole || "User role"}</div>
           </div>
         </div>
       </div>

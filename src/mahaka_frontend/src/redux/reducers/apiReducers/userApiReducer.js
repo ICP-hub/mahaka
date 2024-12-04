@@ -8,6 +8,7 @@ const initialState = {
   currentUserById: null,
   currentUserByCaller: null,
   userLoading: true,
+  userRole: null,
   error: null,
   currentPage: 1,
   totalPages: 1,
@@ -136,6 +137,7 @@ const userSlice = createSlice({
       .addCase(getUserDetailsByCaller.fulfilled, (state, action) => {
         state.userLoading = false;
         state.currentUserByCaller = action.payload.ok;
+        state.userRole = Object.keys(action.payload.ok.role)[0];
         state.error = null;
       })
       .addCase(getUserDetailsByCaller.rejected, (state, action) => {
@@ -223,6 +225,7 @@ const userSlice = createSlice({
         console.log(action);
         state.newLoading = false;
         state.currentUserByCaller = action.payload.ok[0];
+        state.userRole = Object.keys(action.payload.ok.role)[0];
         state.error = null;
       })
       .addCase(updateUserUserDetails.rejected, (state, action) => {
