@@ -29,6 +29,7 @@ const MenuSection = () => {
       path: "/management/events",
       label: "Events",
       icon: <MdEventNote size={24} />,
+    },
 
     // {
     //   path: "/management/users",
@@ -41,6 +42,9 @@ const MenuSection = () => {
       label: "Ticket History",
       icon: <MdHistory size={24} />,
     },
+    {
+      path: "/management/ticket",
+      label: " Offline Ticket",
       icon: <IoTicketOutline size={26} />,
     },
   ];
