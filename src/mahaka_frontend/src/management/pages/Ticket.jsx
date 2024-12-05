@@ -180,7 +180,10 @@ const MgtTicket = () => {
 
       {/* Show Loader or Ticket Details */}
       {loadingDetails ? (
-        <p>Loading ticket details...</p>
+        <div className="animate-pulse space-x-4 flex">
+          <div className="bg-gray-300 h-50 rounded-2xl w-1/2"></div>
+          <div className="bg-gray-300 h-50 rounded-2xl w-1/2"></div>
+        </div>
       ) : ticketDetails ? (
         <div>
           <div className="flex justify-between  ">
@@ -230,7 +233,10 @@ const MgtTicket = () => {
             ))}
           </select>
           {loadingDetails ? (
-            <p>Loading ticket details...</p>
+            <div className="animate-pulse space-x-4 flex">
+              <div className="bg-gray-300 h-50 rounded-2xl w-1/2"></div>
+              <div className="bg-gray-300 h-50 rounded-2xl w-1/2"></div>
+            </div>
           ) : eventDetails ? (
             <div>
               <EventTickets
@@ -241,6 +247,15 @@ const MgtTicket = () => {
                 id={selectedVenue?.id}
                 availability={parseInt(ticketDetails?.sTicket_limit) || 4}
                 highlightClass={ticketData[0].highlightClass}
+              />
+              <EventTickets
+                type={"GROUP"}
+                gradientClass={ticketData[1].gradientClass}
+                tickets={eventDetails}
+                selectedVenue={selectedEvent}
+                id={selectedVenue?.id}
+                availability={parseInt(ticketDetails?.gTicket_limit) || 4}
+                highlightClass={ticketData[1].highlightClass}
               />
             </div>
           ) : (

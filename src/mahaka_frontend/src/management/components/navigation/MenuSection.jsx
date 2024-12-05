@@ -4,9 +4,10 @@ import {
   MdInsertChartOutlined,
   MdMap,
   MdPerson,
-  MdEqualizer,
+  MdHistory,
   MdEvent,
 } from "react-icons/md";
+import { IoTicketOutline } from "react-icons/io5";
 import { Link, useLocation } from "react-router-dom";
 
 const MenuSection = () => {
@@ -22,7 +23,11 @@ const MenuSection = () => {
     // { path: "/admin/events", label: "Events", icon: <MdEventNote size={24} /> },
     // { path: "/management/venues", label: "Venues", icon: <MdMap size={24} /> },
     // { path: "/management/voucher", label: "Voucher", icon: <MdMap size={24} /> },
-    { path: "/management/events", label: "Events", icon: <MdMap size={24} /> },
+    {
+      path: "/management/events",
+      label: "Events",
+      icon: <MdEventNote size={24} />,
+    },
 
     // {
     //   path: "/management/users",
@@ -33,12 +38,12 @@ const MenuSection = () => {
     {
       path: "/management/useractivity",
       label: "Ticket History",
-      icon: <MdEvent size={24} />,
+      icon: <MdHistory size={24} />,
     },
     {
       path: "/management/ticket",
       label: " Offline Ticket",
-      icon: <MdMap size={24} />,
+      icon: <IoTicketOutline size={26} />,
     },
   ];
 
