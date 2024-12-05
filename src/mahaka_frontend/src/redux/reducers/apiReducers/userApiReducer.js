@@ -136,8 +136,10 @@ const userSlice = createSlice({
       })
       .addCase(getUserDetailsByCaller.fulfilled, (state, action) => {
         state.userLoading = false;
-        state.currentUserByCaller = action.payload.ok;
-        state.userRole = Object.keys(action.payload.ok.role)[0];
+        if (action.payload.ok) {
+          state.currentUserByCaller = action.payload.ok;
+          state.userRole = Object.keys(action.payload.ok.role)[0];
+        }
         state.error = null;
       })
       .addCase(getUserDetailsByCaller.rejected, (state, action) => {

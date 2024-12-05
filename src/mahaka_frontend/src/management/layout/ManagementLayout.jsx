@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import AppBar from "./navigation/AppBar";
 import NavigationVertical from "./navigation/NavigationVertical";
 import ScreenOverlayBlur from "../../common/ScreenOverlay";
@@ -8,6 +8,30 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllEventsByVenue } from "../../redux/reducers/apiReducers/eventApiReducer";
 import { getVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
 import { getAllWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApiReducer";
+
+// Protected :mgt
+const ManagementProtected = ({ children }) => {
+  const { userLoading, userRole } = useSelector((state) => state.users);
+  const [layoutLoader, setLayoutLoader] = useState(true);
+  const navigate = useNavigate();
+
+  // layoutloader : false after userLoading false: after 2 sec. for get the Object Keys
+  useEffect(() => {
+    if (!userLoading) {
+      setTimeout(() => {
+        setLayoutLoader(false);
+      }, [3000]);
+    }
+  }, [userLoading]);
+
+  if (layoutLoader) return <div>Loading...</div>;
+  if (userRole) {
+    return children;
+  } else {
+    notificationManager.error("You are not authorized!");
+    navigate("/");
+  }
+};
 
 const ManagementLayout = () => {
   const { state, toggleNavigation } = useNavigationControl();
@@ -69,7 +93,7 @@ const ManagementLayout = () => {
   }, [currentUserByCaller]);
 
   return (
-    <>
+    <ManagementProtected>
       {state.isOpen && (
         <ScreenOverlayBlur onOverlayClicked={handleNavigationOnSmallScreen} />
       )}
@@ -86,7 +110,7 @@ const ManagementLayout = () => {
           </div>
         </div>
       </div>
-    </>
+    </ManagementProtected>
   );
 };
 
