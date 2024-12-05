@@ -15,7 +15,7 @@ const AppBar = ({ toggleNavigation, selected, setSelected }) => {
       >
         <MdMenu />
       </ButtonWrapper>
-      <TranslateButton />
+      <TranslateButton  isDarkMode={selected}/>
       <SliderToggle selected={selected} setSelected={setSelected} />
     </div>
   );

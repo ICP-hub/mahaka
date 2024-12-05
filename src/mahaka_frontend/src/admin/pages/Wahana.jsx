@@ -16,6 +16,7 @@ import ModalOverlay from "../../customer/Components/Modal-overlay";
 import {
   deleteWahana,
   getAllWahanasbyVenue,
+  searchWahanas,
 } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import {
   createStaggerContainer,
@@ -24,17 +25,23 @@ import {
 import CreateWahanaForm from "../components/CreateWahanaForm";
 import { formatDateAndTime } from "./EventManager";
 import { IoTrashBinSharp } from "react-icons/io5";
+import { HiMiniChevronUpDown } from "react-icons/hi2";
 
 // Main component
 const WahanaManager = () => {
   const { venues } = useSelector((state) => state.venues);
   const { backend } = useSelector((state) => state.authentication);
-  const { wahanas, wahanasByVenue, singleWahanaLoading, loading } = useSelector(
+  const { wahanas, wahanasByVenue, singleWahanaLoading, loading,searchedWahana, searchedWahanaLoading  } = useSelector(
     (state) => state.wahana
   );
+  // console.log("total wahanas are",wahanas)
+  // console.log(" wahanas by venue are",wahanasByVenue)
+  // console.log("search wahanas are",searchedWahana)
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOptionMenuOpen, setIsOptionMenuOpen] = useState(false);
+  const [searchBtnClick, setSearchBtnClick] = useState(false)
+  const [searchInput, setSearchInput] = useState("")
   const [selectedVenue, setSelectedVenue] = useState({
     option: "All",
     id: "",
@@ -49,12 +56,13 @@ const WahanaManager = () => {
 
   // Filtered : memoized
   const filteredWahanas = useMemo(() => {
+    if (searchInput && searchBtnClick) return searchedWahana;
     if (selectedVenue.option === "All") {
       return wahanas;
     } else {
       return wahanasByVenue;
     }
-  }, [selectedVenue, wahanas, wahanasByVenue]);
+  }, [selectedVenue, wahanas, wahanasByVenue,searchInput,searchedWahana,searchBtnClick]);
 
   useEffect(() => {
     if (selectedVenue.option !== "All") {
@@ -69,6 +77,19 @@ const WahanaManager = () => {
     }
   }, [selectedVenue]);
 
+  useEffect(() => {
+    setSearchBtnClick(false); 
+  }, [searchInput]);
+  
+
+
+  const handleSearch = ()=>{
+    if (searchInput.trim()) {
+     setSearchBtnClick(true); 
+  // console.log("search value is",searchInput)
+   dispatch(searchWahanas({backend:backend,searchText:searchInput,chunkSize:10,pageNo:0}))
+    }
+ }
   // console.log("filtered", filteredWahanas);
 
   const containerVariants = createStaggerContainer(0.4);
@@ -114,10 +135,11 @@ const WahanaManager = () => {
                     <div className="flex justify-between">
                       <div className="w-full">
                         <div
-                          className="p-4 truncate"
+                          className="p-4 truncate flex"
                           onClick={toggleOptionMenu}
                         >
                           {selectedVenue.option}
+                          <HiMiniChevronUpDown size={25} className ="ml-auto dark:text-white"/>
                         </div>
                         {isOptionMenuOpen && (
                           <>
@@ -166,11 +188,13 @@ const WahanaManager = () => {
                       type="text"
                       placeholder="Search wahanas..."
                       className="outline-none bg-transparent w-full"
+                      value = {searchInput}
+                      onChange= {(e)=>setSearchInput(e.target.value)}
                     />
                   </div>
-                  <div className="ml-auto">
+                  <button className="ml-auto" onClick ={handleSearch}>
                     <HiArrowRightCircle size={24} className="cursor-pointer" />
-                  </div>
+                  </button>
                 </div>
               </div>
               <div className="sm:ml-auto mt-4 sm:mt-0 flex items-center justify-center w-full sm:w-fit h-full">
@@ -182,7 +206,7 @@ const WahanaManager = () => {
                 </div>
               </div>
             </div>
-            {loading || singleWahanaLoading ? (
+            {loading || singleWahanaLoading ||  searchedWahanaLoading ? (
               <div className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3">
                 <SkeletonLoader />
                 <SkeletonLoader />
@@ -202,7 +226,7 @@ const WahanaManager = () => {
                 ))}
               </motion.div>
             ) : (
-              <div className="mt-8">No Wahana Found</div>
+              <div className="mt-10 flex justify-center text-3xl font-bold text-gray-600">No Wahana Found</div>
             )}
           </div>
         </div>

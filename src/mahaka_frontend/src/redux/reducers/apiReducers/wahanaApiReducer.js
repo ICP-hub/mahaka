@@ -215,7 +215,7 @@ const wahanaSlice = createSlice({
         state.loading = false;
         state.searchedWahanaLoading = false;
         state.searchedWahana = action.payload;
-        state.wahanas = action.payload;
+        //state.wahanas = action.payload;
         state.error = null;
       })
       .addCase(searchWahanas.rejected, (state, action) => {
@@ -254,7 +254,7 @@ const wahanaSlice = createSlice({
       })
       .addCase(getAllWahanas.fulfilled, (state, action) => {
         state.loading = false;
-        state.wahanas = action.payload.ok.data;
+        state.wahanas = [...action.payload.ok.data];
       })
       .addCase(getAllWahanas.rejected, (state) => {
         state.loading = false;

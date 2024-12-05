@@ -37,7 +37,7 @@ const MgtEvents = () => {
     setSelectedVenue((pv) => ({ ...pv, option: option, id: id }));
     setIsOptionMenuOpen(false);
   };
-
+ 
   // Filtered : memoized
   const filteredEvents = useMemo(() => {
     if (searchText && searchPerformed) return searchedEvents;

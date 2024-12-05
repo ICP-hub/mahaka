@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 
-const TranslateButton = () => {
+const TranslateButton = ({ isDarkMode }) => {
+ // console.log("dark mode in translation",isDarkMode)
   useEffect(() => {
     const addGoogleTranslate = () => {
       if (!document.querySelector("#google-translate-script")) {
@@ -19,8 +20,9 @@ const TranslateButton = () => {
       );
     };
 
-    const hidePoweredByGoogle = () => {
+    const applyStyles = () => {
       const style = document.createElement("style");
+      style.id = "custom-translate-styles";
       style.innerHTML = `
         .goog-logo-link { display: none !important; }
         .goog-te-gadget { font-size: 0 !important; }
@@ -30,6 +32,11 @@ const TranslateButton = () => {
         #google_translate_element select {
           width: auto !important;
           max-width: 150px !important;
+          background-color: ${
+            isDarkMode === "dark" ? "#1a202c" : "#ffffff"
+          } !important; /* Background color */
+          color: ${isDarkMode === "dark" ? "#ffffff" : "black"} !important; /* Text color */
+         
         }
         #google_translate_element select::-webkit-scrollbar {
           width: 0px;
@@ -39,12 +46,16 @@ const TranslateButton = () => {
           -ms-overflow-style: none;
         }
       `;
+      const existingStyle = document.querySelector("#custom-translate-styles");
+      if (existingStyle) {
+        existingStyle.remove();
+      }
       document.head.appendChild(style);
     };
 
     addGoogleTranslate();
-    hidePoweredByGoogle();
-  }, []);
+    applyStyles();
+  }, [isDarkMode]);
 
   const styles = {
     translateContainer: {
