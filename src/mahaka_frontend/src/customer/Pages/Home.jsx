@@ -35,7 +35,9 @@ const VenueCard = ({ venue, layout }) => (
       <div className={`${layout.padding} h-full flex flex-col justify-between`}>
         <div>
           <h3 className="text-3xl font-black mb-2">{venue.Title}</h3>
-          <p className="mb-4 text-[14px] font-normal">{venue.Description}</p>
+          <p className="mb-4 text-[14px] font-normal line-clamp-3">
+            {venue.Description}
+          </p>
         </div>
         <div className={`${layout.iconPadding}`}>
           <GoArrowUpRight className="bg-white w-[30px] h-[30px] text-[#E2AF4E] rounded-full p-1" />
@@ -59,9 +61,8 @@ export default function Home() {
   const { wahanas } = useSelector((state) => state.wahana);
   // console.log("venues in home", venues);
   const { backend } = useSelector((state) => state.authentication);
-  const { attractionbanners, banners, bannerLoading } = useSelector(
-    (state) => state.banner
-  );
+  const { attractionbanners, banners, attractionBannerLoading, bannerLoading } =
+    useSelector((state) => state.banner);
   const { testimonials, testimonialLoading } = useSelector(
     (state) => state.testimonial
   );
@@ -69,9 +70,27 @@ export default function Home() {
     (state) => state.ongoingevents
   );
   const dispatch = useDispatch();
-  // console.log("on going events in home", ongoingEvents.length)
-  // console.log("on going events loading in home", ongoingEventsLoading)
+  //  const { banners } = useSelector((state) => state.banner);
+  // console.log("testimonials in home", testimonials);
 
+  // console.log("Attraction Banners home:", attractionbanners);
+  // console.log("Third Party Banners home:", banners);
+
+  // console.log(wahanas, "wahanas");
+
+  // const SkeletonLoader = ()=>{
+
+  //   return (
+  //     <>
+  //     <div className = "p-3">
+  //       <div className = "bg-gray-500 h-30 min-w-full">
+
+  //       </div>
+  //     </div>
+
+  //     </>
+  //   )
+  // }
 
   const chunkArray = (arr, sizes) => {
     let result = [];
@@ -196,16 +215,29 @@ export default function Home() {
 
   return (
     <>
-      
-      
-      {bannerLoading ? <SkeletonLoaderAttraction /> : 
-      attractionbanners && attractionbanners.length ===0 ?
-      <div className = "bg-card rounded-lg p-5 text-center mx-10 shadow-lg mt-10 h-100"> 
-       <h1 className = "text-3xl md:text-7xl text-gray-800 font-bold md:mt-30">No Attraction banners Found.</h1>
-     
-       </div>:
-      
-      <HeroSider />}
+      {attractionBannerLoading ? (
+        <SkeletonLoaderAttraction />
+      ) : attractionbanners && attractionbanners.length === 0 ? (
+        <div className="bg-card rounded-lg p-5 text-center mx-10 shadow-lg mt-10 h-100">
+          <h1 className="text-3xl md:text-7xl text-gray-800 font-bold md:mt-30">
+            No banners Found.
+          </h1>
+        </div>
+      ) : (
+        <HeroSider />
+      )}
+
+      {/* {attractionbanners && attractionbanners.length == 0 ? (
+        <div className="bg-card rounded-lg p-5 text-center mx-10 shadow-lg mt-10 h-100">
+          <h1 className="text-3xl md:text-7xl text-gray-800 font-bold md:mt-30">
+            No banners Found.
+          </h1>
+        </div>
+      ) : bannerLoading ? (
+        <SkeletonLoaderAttraction />
+      ) : (
+        <HeroSider />
+      )} */}
       <section className="py-12">
         {/* -------------------------------------venues section start------------------------------ */}
 
@@ -452,18 +484,29 @@ export default function Home() {
 
         {/* 2 Grid card  end*/}
         {/* OnGoing Event slider Start  */}
-      
+        {/* { ongoingEventsLoading?
+        <SkeletonLoaderEvents/>
+        : ongoingEvents && ongoingEvents.length ===0? "LOading":
 
-        {ongoingEventsLoading ? (
-  <SkeletonLoaderEvents />
-) : ongoingEvents && ongoingEvents.length > 0 ? (
-  <OngoingSlider />
-) : (
-  <div className="bg-card rounded-lg p-5 text-center mt-10 mx-10 shadow-lg">
-    <h1 className="text-4xl text-gray-800 font-bold">No Ongoing Events Found.</h1>
-  </div>
-)}
+        <OngoingSlider />
+} */}
 
+        {ongoingEvents && ongoingEvents.length === 0 ? (
+          <div className=" bg-card rounded-lg p-5 text-center mt-10 mx-10 shadow-lg">
+            <h1 className="text-4xl text-gray-800 font-bold">
+              No Ongoing Events Found.
+            </h1>
+          </div>
+        ) : ongoingEventsLoading ? (
+          <SkeletonLoaderEvents />
+        ) : (
+          <>
+            <h2 className="text-5xl font-bold text-center mb-8">
+              Ongoing events
+            </h2>
+            <OngoingSlider />
+          </>
+        )}
 
         {/* OnGoing Event slider end  */}
         {/* Events and ctivity Section Start  */}
@@ -492,7 +535,7 @@ export default function Home() {
                       <h1 className="text-3xl font-black">
                         {wahana.ride_title}
                       </h1>
-                      <p className="text-base font-normal mt-2">
+                      <p className="text-base font-normal mt-2 line-clamp-1">
                         {wahana.description}
                       </p>
                     </div>

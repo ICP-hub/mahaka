@@ -7,9 +7,11 @@ import VenueManger from "../admin/pages/VenueManager";
 import VenueDetailPage from "../admin/pages/VenueDetail";
 import Sales from "../admin/pages/Sales";
 import TicketPurchase from "../admin/pages/TicketPurchase";
-import AdminWahana from "../admin/pages/Wahana"
-import AdminBanner from "../admin/pages/Banner"
-import AdminTestimonial from "../admin/pages/AdminTestimonial"
+import AdminWahana from "../admin/pages/Wahana";
+import AdminBanner from "../admin/pages/Banner";
+import AdminTestimonial from "../admin/pages/AdminTestimonial";
+import EventDetailPage from "../admin/pages/EventDetail";
+import WahanaDetailPage from "../admin/pages/WahanaDetail";
 
 /* Admin routes */
 export const adminRoutes = [
@@ -21,6 +23,10 @@ export const adminRoutes = [
       { index: true, element: <Navigate to="/admin/dashboard" /> },
       { path: "dashboard", element: <AdminDashboard /> },
       { path: "events", element: <EventManager /> },
+      {
+        path: "events/event/:venueId/:id",
+        element: <EventDetailPage />,
+      },
       { path: "venues", element: <VenueManger /> },
       {
         path: "venues/venue/:title/:id",
@@ -30,12 +36,12 @@ export const adminRoutes = [
       { path: "sales", element: <Sales /> },
       { path: "purchaseTicket", element: <TicketPurchase /> },
       { path: "wahana", element: <AdminWahana /> },
+      {
+        path: "wahana/:venueId/:id",
+        element: <WahanaDetailPage />,
+      },
       { path: "banner", element: <AdminBanner /> },
       { path: "testimonial", element: <AdminTestimonial /> },
-
-
-
-
     ],
   },
 ];

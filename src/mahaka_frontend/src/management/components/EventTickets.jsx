@@ -84,8 +84,8 @@ export default function EventTickets({
             </span>
           </div>
           <div className="w-3/4 p-4">
-            <h3 className="text-2xl font-black">{name}</h3>
-            <p className="text-base font-normal">{tickets.description}</p>
+            <h3 className="text-2xl font-black">Single Tickets</h3>
+            {/* <p className="text-base font-normal">{tickets.description}</p> */}
             <div className="flex justify-between mt-[5rem]">
               <span className="text-lg font-black">
                 ${parseInt(tickets.sTicket_price)}

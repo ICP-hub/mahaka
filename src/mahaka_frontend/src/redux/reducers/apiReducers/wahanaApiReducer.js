@@ -5,8 +5,8 @@ import { MdDetails } from "react-icons/md";
 // Initial state for Wahana
 const initialState = {
   wahanas: [],
-  wahanaByVenue : [],
-  loading: false,
+  wahanaByVenue: [],
+  loading: true,
   error: null,
   currentPage: 1,
   wahanasPerPage: 3,
@@ -24,7 +24,7 @@ const initialState = {
 export const createWahana = createAsyncThunk(
   "wahana/createWahana",
   async ({ backend, wahanaData, setIsModalOpen }) => {
-    console.log(wahanaData);
+    // console.log(wahanaData);
     try {
       const response = await backend.createWahana(
         wahanaData.venueId,
@@ -33,13 +33,13 @@ export const createWahana = createAsyncThunk(
         wahanaData.decimal,
         wahanaData.totalSupply,
         wahanaData.description,
-        wahanaData.details,
+        // wahanaData.details,
         wahanaData.isFeatured,
         wahanaData.banner,
         wahanaData.priceIDR
         // wahanaData.priceICP
       );
-      // console.log("wahana created successfully", response);
+      console.log("wahana created successfully", response);
       setIsModalOpen(false);
       return response;
     } catch (error) {
@@ -96,7 +96,7 @@ export const getAllWahanasbyVenue = createAsyncThunk(
         pageNo,
         venueId
       );
-      console.log(response, "response of wahanas by venue");
+      // console.log(response, "response of wahanas by venue");
       return response;
     } catch (error) {
       console.error("Error fetching wahanas:", error);
@@ -110,11 +110,10 @@ export const getWahana = createAsyncThunk(
   "wahana/getWahana",
   async ({ backend, selectedWahana, selectedVenue }) => {
     try {
-      console.log(selectedWahana);
-      console.log(selectedVenue);
-
+      // console.log(selectedWahana);
+      // console.log(selectedVenue);
       const response = await backend.getWahana(selectedWahana, selectedVenue);
-      // console.log(response, "response");
+      // console.log(response, "response get wahana");
       return response;
     } catch (error) {
       console.error("Error getting wahanas:", error);
@@ -192,7 +191,6 @@ const wahanaSlice = createSlice({
         state.createWahanaLoader = true;
       })
       .addCase(createWahana.fulfilled, (state, action) => {
-
         state.createWahanaLoader = false;
         // console.log(action.payload, "create wahana");
         state.wahanas.push(action.payload.ok);
@@ -211,7 +209,7 @@ const wahanaSlice = createSlice({
         state.searchedWahanaLoading = true;
       })
       .addCase(searchWahanas.fulfilled, (state, action) => {
-       // console.log("searched wahanas in redux",action.payload)
+        // console.log("searched wahanas in redux",action.payload)
         state.loading = false;
         state.searchedWahanaLoading = false;
         state.searchedWahana = action.payload;
@@ -243,7 +241,7 @@ const wahanaSlice = createSlice({
       // .addCase(edit_wahana.rejected, (state, action) => {
       //   state.createWahanaLoader = false;
       //   state.error = action.error.message;
-      
+
       // })
 
       //Getting all wahanas
@@ -258,7 +256,7 @@ const wahanaSlice = createSlice({
       })
       .addCase(getAllWahanas.rejected, (state) => {
         state.loading = false;
-        state.status = "failed";
+        // state.status = "failed";
         state.wahanas = [];
         // (state.loading = false), (state.error = action.error.message);
         // notificationManager.error("Failed to fetch wahanas");

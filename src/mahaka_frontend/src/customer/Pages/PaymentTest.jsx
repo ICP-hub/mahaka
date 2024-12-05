@@ -255,17 +255,23 @@ const PaymentTest = () => {
       notificationManager.error("Please login first");
       return;
     }
-    if (timestemp == 0 || ticketprice == 0) {
-      notificationManager.error("Please fill all the Details");
+
+    if (!timestemp || !ticketprice) {
+      notificationManager.error("Please fill all the details");
       return;
     }
 
     setLoading(true);
     setIsPaymentProcessing(true);
 
-    const _venueId = eventIds;
-    const _ticket_type = { GroupPass: null };
-    const _metadata = [
+    const venueId = eventIds;
+    const _ticket_type =
+      ticketType === "GROUP"
+        ? { GroupPass: null }
+        : ticketType === "VIP"
+        ? { VipPass: null }
+        : { SinglePass: null };
+    const metadata = [
       {
         data: new Uint8Array([0x12, 0x34]),
         description: "Sample ticket image",
@@ -278,37 +284,46 @@ const PaymentTest = () => {
     const receiver = principal;
     const numOfVisitors = BigInt(numberOFVisitor);
     const paymentType = { Card: null };
-
+    const ticketDetails = {
+      ticket_type: _ticket_type,
+      price: parseFloat(ticketprice),
+    };
     try {
-      const ticketDetails = {
-        ticket_type: _ticket_type,
-        priceFiat: Number(vanuedetail?.gTicket_price) || 0,
-        price: BigInt(100_000),
-      };
-
-      console.log("Backend canister:", backend);
-
       const response = await backend.buyVenueTicket(
-        _venueId,
+        venueId,
         ticketDetails,
-        _metadata,
+        metadata,
         receiver,
         paymentType,
-        BigInt(timestemp),
+        timestemp,
         numOfVisitors
       );
 
       console.log("Response:", response);
 
       if ("ok" in response) {
-        console.log("Purchase successful:", response);
-        navigate(`/venues/${canisterId}/primium/payment2/checkout`);
+        const { body } = response.ok;
+        if ("success" in body) {
+          const { id, payment } = body.success;
+          console.log("Purchase successful. Transaction ID:", id);
+          navigate(`/venues/${canisterId}/premium/payment2/checkout`);
+        } else {
+          console.error("Purchase succeeded but body lacks success field.");
+        }
+      } else if ("err" in response) {
+        const errorDetails =
+          typeof response.err === "string"
+            ? response.err
+            : JSON.stringify(response.err);
+        throw new Error(
+          errorDetails || "An unknown error occurred during purchase."
+        );
       } else {
-        throw new Error(response.err || "Purchase failed");
+        throw new Error("Unexpected response format received.");
       }
     } catch (error) {
       console.error("Payment error:", error);
-      alert(`Payment failed: ${error.message}`);
+      alert(`Payment failed: ${error.message || "No error details provided."}`);
     } finally {
       setLoading(false);
       setIsPaymentProcessing(false);

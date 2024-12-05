@@ -390,22 +390,6 @@ export default function SingleEvent() {
                       aria-labelledby="dashboard-tab"
                     >
                       <div className="p-6 font-sans">
-                        <ul className="list-disc list-inside mb-4">
-                          <li>
-                            <strong>Duration:</strong>
-                            {duration || "1 Day"} (approx.)
-                          </li>
-                          <li>
-                            <strong>Location:</strong>{" "}
-                            {venue?.Details.Location || "Indonesia"}
-                          </li>
-                          <li>
-                            <strong>Last Entry:</strong>{" "}
-                            {venue?.Details.EndTime &&
-                              FormatTime(venue.Details.EndTime)}
-                          </li>
-                        </ul>
-
                         <div className="space-y-4">{venue.Description}</div>
                       </div>
                     </motion.div>
@@ -513,7 +497,7 @@ export default function SingleEvent() {
             <h1 className="text-4xl font-black">Wahana</h1>
           </section>
           <div className="max-w-7xl mx-auto">
-            {wahanasByVenue && singleWahanaLoading ? (
+            {singleWahanaLoading ? (
               <div className="flex my-18 space-x-4 px-4 sm:px-6 lg:px-8 mx-auto">
                 {/* Skeleton Loader for each card */}
                 {[...Array(2)].map((_, index) => (

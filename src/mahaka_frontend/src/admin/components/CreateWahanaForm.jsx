@@ -52,14 +52,14 @@ const CreateWahanaForm = ({ setIsModalOpen, venueIdentity }) => {
     venueId: venueIdentity ? venueIdentity : "",
     title: "",
     description: "",
-    location: "",
+    // location: "",
     // priceICP: "",
     priceIDR: "",
     banner: null,
-    startDate: "",
-    startTime: "",
-    endDate: "",
-    endTime: "",
+    // startDate: "",
+    // startTime: "",
+    // endDate: "",
+    // endTime: "",
     totalSupply: "",
     isFeatured: false,
   });
@@ -96,14 +96,14 @@ const CreateWahanaForm = ({ setIsModalOpen, venueIdentity }) => {
       return;
     }
     // // time stamps
-    const startTimestamp = convertToTimestamp(
-      formValues.startDate,
-      formValues.startTime
-    );
-    const endTimestamp = convertToTimestamp(
-      formValues.endDate,
-      formValues.endTime
-    );
+    // const startTimestamp = convertToTimestamp(
+    //   formValues.startDate,
+    //   formValues.startTime
+    // );
+    // const endTimestamp = convertToTimestamp(
+    //   formValues.endDate,
+    //   formValues.endTime
+    // );
 
     const wahanaData = {
       venueId: formValues.venueId,
@@ -119,13 +119,13 @@ const CreateWahanaForm = ({ setIsModalOpen, venueIdentity }) => {
         data: formValues.banner,
         logo_type: "png",
       },
-      details: {
-        StartDate: startTimestamp,
-        StartTime: startTimestamp,
-        Location: formValues.location,
-        EndDate: endTimestamp,
-        EndTime: endTimestamp,
-      },
+      // details: {
+      // StartDate: startTimestamp,
+      // StartTime: startTimestamp,
+      // Location: formValues.location,
+      // EndDate: endTimestamp,
+      // EndTime: endTimestamp,
+      // },
     };
 
     dispatch(createWahana({ backend: backend, wahanaData, setIsModalOpen }));
@@ -153,14 +153,14 @@ const CreateWahanaForm = ({ setIsModalOpen, venueIdentity }) => {
         value={formValues.description}
         onChange={(value) => handleInputChange("description", value)}
       />
-      <FormFieldInput
+      {/* <FormFieldInput
         type="text"
         label="Location"
         value={formValues.location}
         onChange={(value) => handleInputChange("location", value)}
-      />
+      /> */}
 
-      <div className="grid grid-cols-2 gap-4">
+      {/* <div className="grid grid-cols-2 gap-4">
         {" "}
         <FormFieldDate
           label="Start Date"
@@ -186,7 +186,7 @@ const CreateWahanaForm = ({ setIsModalOpen, venueIdentity }) => {
           value={formValues.endTime}
           onChange={(value) => handleInputChange("endTime", value)}
         />
-      </div>
+      </div> */}
 
       <FormFieldInput
         type="number"

@@ -9,6 +9,8 @@ import MgtWahana from "../management/pages/Wahana";
 import MgtVoucher from "../management/pages/Voucher";
 import MgtTicket from "../management/pages/Ticket";
 import MgtEvent from "../management/pages/Event";
+import MgtWahanaDetail from "../management/pages/MgtWahanaDetail";
+import MgtEventDetail from "../management/pages/MgtEventDetail";
 
 /* management routes */
 export const managementRoutes = [
@@ -27,9 +29,17 @@ export const managementRoutes = [
       { path: "venues", element: <MgtVenueManger /> },
       { path: "useractivity", element: <MgtUserActivity /> },
       { path: "wahana", element: <MgtWahana /> },
+      {
+        path: "wahana/:venueId/:id",
+        element: <MgtWahanaDetail />,
+      },
       { path: "voucher", element: <MgtVoucher /> },
       { path: "ticket", element: <MgtTicket /> },
       { path: "events", element: <MgtEvent /> },
+      {
+        path: "events/event/:venueId/:id",
+        element: <MgtEventDetail />,
+      },
     ],
   },
 ];

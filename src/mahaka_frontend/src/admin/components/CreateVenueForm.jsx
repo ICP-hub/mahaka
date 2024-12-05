@@ -42,10 +42,20 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
 
   // Handle value changes
   const handleInputChange = (name, value) => {
-    setFormValues((prevValues) => ({
-      ...prevValues,
-      [name]: value,
-    }));
+    setFormValues((prevValues) => {
+      // Set capcity as max ticket limit
+      if (name === "maxTicketLimit") {
+        return {
+          ...prevValues,
+          [name]: value,
+          capacity: value,
+        };
+      }
+      return {
+        ...prevValues,
+        [name]: value,
+      };
+    });
   };
 
   const handleImageChange = async (name, file) => {
@@ -61,15 +71,17 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
     //   notificationManager.error("Please login first");
     //   return;
     // }
-    // const isFormValid = Object.values(formValues).every(
-    //   (value) => value !== "" && value !== null
-    // );
-    // if (!isFormValid) {
-    //   notificationManager.error(
-    //     "Please check all the fields before proceeding"
-    //   );
-    //   return;
-    // }
+    // Set capacity as max ticket
+
+    const isFormValid = Object.values(formValues).every(
+      (value) => value !== "" && value !== null
+    );
+    if (!isFormValid) {
+      notificationManager.error(
+        "Please check all the fields before proceeding"
+      );
+      return;
+    }
     // time stamps
     // const startTimestamp = convertToTimestamp(
     //   formValues.startDate,
@@ -106,10 +118,11 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
             symbol: "VENUE",
             vTicket_limit: parseInt(formValues.vipTicketLimit),
           },
-          custodian: Principal.fromText('2vxsx-fae'),
+          // remove 2vxsx later
+          custodian: Principal.fromText(principal || "2vxsx-fae"),
         },
         title: formValues.title,
-        capacity: parseInt(formValues.capacity),
+        capacity: parseInt(formValues.maxTicketLimit),
         details: {
           // StartDate: startTimestamp,
           // StartTime: startTimestamp,
@@ -143,20 +156,12 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         onChange={(value) => handleInputChange("location", value)}
       />
 
-      <div className="grid grid-cols-2 gap-4">
-        <FormFieldInput
-          type="number"
-          label="Maximum number of people"
-          value={formValues.capacity}
-          onChange={(value) => handleInputChange("capacity", value)}
-        />
-        <FormFieldInput
-          type="number"
-          label="Maximum ticket limit"
-          value={formValues.maxTicketLimit}
-          onChange={(value) => handleInputChange("maxTicketLimit", value)}
-        />
-      </div>
+      <FormFieldInput
+        type="number"
+        label="Maximum ticket limit"
+        value={formValues.maxTicketLimit}
+        onChange={(value) => handleInputChange("maxTicketLimit", value)}
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-4">
         <FormFieldInput

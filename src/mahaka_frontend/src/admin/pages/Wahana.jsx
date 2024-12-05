@@ -3,6 +3,7 @@ import {
   HiArrowRightCircle,
   HiCheckBadge,
   HiChevronDown,
+  HiChevronRight,
   HiChevronUp,
   // HiClock,
   HiMiniMapPin,
@@ -11,7 +12,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 // import img1 from "../../assets/images/frame3.png";
 // import img2 from "../../assets/images/fram6.png";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import ModalOverlay from "../../customer/Components/Modal-overlay";
 import {
   deleteWahana,
@@ -25,7 +26,7 @@ import {
 import CreateWahanaForm from "../components/CreateWahanaForm";
 import { formatDateAndTime } from "./EventManager";
 import { IoTrashBinSharp } from "react-icons/io5";
-import { HiMiniChevronUpDown } from "react-icons/hi2";
+import { Link } from "react-router-dom";
 
 // Main component
 const WahanaManager = () => {
@@ -93,10 +94,11 @@ const WahanaManager = () => {
   // console.log("filtered", filteredWahanas);
 
   const containerVariants = createStaggerContainer(0.4);
- const cardVariants = createStaggerVariant(0.3);
+  const cardVariants = createStaggerVariant(0.3);
 
   // const containerVariants = createStaggerContainer(0.4);
   // const cardVariants = createStaggerVariant(0.3);
+
   return (
     <div className="flex flex-auto flex-col relative min-h-screen">
       <div className="flex min-w-0 flex-col">
@@ -199,7 +201,7 @@ const WahanaManager = () => {
               </div>
               <div className="sm:ml-auto mt-4 sm:mt-0 flex items-center justify-center w-full sm:w-fit h-full">
                 <div
-                  className="bg-indigo-600 rounded-xl cursor-pointer w-full text-white p-4"
+                  className="bg-indigo-600 hover:bg-indigo-700 rounded-xl cursor-pointer w-full text-white p-4"
                   onClick={() => setIsModalOpen(true)}
                 >
                   Add a new wahana
@@ -248,11 +250,9 @@ const WahanaManager = () => {
 // event cards
 const WahanaCard = ({ wahana }) => {
   const dispatch = useDispatch();
-  const [isExpanded, setIsExpanded] = useState(false);
   const { backend } = useSelector((state) => state.authentication);
-  const toggleExpand = () => setIsExpanded((pv) => !pv);
-  const startInterVal = formatDateAndTime(parseInt(wahana.details.StartDate));
-  const endInterVal = formatDateAndTime(parseInt(wahana.details.EndDate));
+  // const startInterVal = formatDateAndTime(parseInt(wahana.details.StartDate));
+  // const endInterVal = formatDateAndTime(parseInt(wahana.details.EndDate));
   const [isDelete, setIsDelete] = useState(false);
 
   const handleWahanaDelete = () => {
@@ -305,32 +305,42 @@ const WahanaCard = ({ wahana }) => {
             </div>
           </div>
           <div className="mt-4 text-lg font-medium">{wahana.ride_title}</div>
-          <div className="text-secondary mt-0.5 line-clamp-2">
+          {/* <div className="text-secondary mt-0.5 line-clamp-2">
             {wahana.description}
-          </div>
-          <div className="flex items-center text-md leading-5 mt-2 uppercase font-medium">
+          </div> */}
+          {/* <div className="flex items-center text-md leading-5 mt-2 uppercase font-medium">
             <HiMiniMapPin size={14} />
             <div className="ml-1.5">{wahana.details.Location}</div>
-          </div>
+          </div> */}
           <div className="flex items-center text-md leading-5 mt-2 font-medium">
             <div>Creator</div>
             <div className="ml-1.5 truncate">{wahana.creator.toText()}</div>
           </div>
           <div className="flex items-center justify-between mt-2">
-            <div className="flex flex-col font-medium">
+            {/* <div className="flex flex-col font-medium">
               <div>Start Date</div>
               <div>{startInterVal.date}</div>
               <div>{startInterVal.time}</div>
+            </div> */}
+            <div className="flex flex-col font-medium">
+              <div>Price</div>
+              <div className="flex items-center">
+                Rp.<span className="text-xl font-bold">{wahana.price}</span>
+                /Person
+              </div>
             </div>
-            <button
-              onClick={toggleExpand}
+            <Link
+              to={`/admin/wahana/${encodeURIComponent(
+                wahana.venueId
+              )}/${encodeURIComponent(wahana.id)}`}
               className="h-8 w-8 rounded-full hover:bg-hover flex items-center justify-center"
             >
-              {isExpanded ? <HiChevronUp /> : <HiChevronDown />}
-            </button>
+              {/* {isExpanded ? <HiChevronUp /> : <HiChevronDown />} */}
+              <HiChevronRight />
+            </Link>
           </div>
         </div>
-        <AnimatePresence>
+        {/* <AnimatePresence>
           {isExpanded && (
             <motion.div
               initial={{
@@ -358,7 +368,7 @@ const WahanaCard = ({ wahana }) => {
                     <div className="text-xs">{wahana.id}</div>
                   </div>
                 </div>
-                {/* <div className="flex items-center flex-auto mt-4">
+                <div className="flex items-center flex-auto mt-4">
                   <div className="font-mono text-xl">ICP</div>
                   <div className="ml-auto flex items-baseline">
                     <div className="font-bold text-4xl">
@@ -368,7 +378,7 @@ const WahanaCard = ({ wahana }) => {
                       /Person
                     </div>
                   </div>
-                </div> */}
+                </div>
                 <div className="flex items-center flex-auto mt-4">
                   <div className="font-mono text-xl">IDR</div>
                   <div className="ml-auto flex items-baseline">
@@ -381,7 +391,7 @@ const WahanaCard = ({ wahana }) => {
               </div>
             </motion.div>
           )}
-        </AnimatePresence>
+        </AnimatePresence> */}
       </div>
     </>
   );

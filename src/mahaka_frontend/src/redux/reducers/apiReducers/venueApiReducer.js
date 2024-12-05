@@ -102,6 +102,16 @@ export const createVenue = createAsyncThunk(
     description,
     action,
   }) => {
+    console.log(
+      // backend,
+      collectionDetails,
+      title,
+      capacity,
+      details,
+      description
+      // action
+    );
+
     try {
       const response = await backend.createVenue(
         collectionDetails,

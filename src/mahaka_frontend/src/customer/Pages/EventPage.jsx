@@ -70,6 +70,7 @@ const EventPage = () => {
   const [ticketDetails, setTicketDetails] = useState(null);
   const handleModalOpen = () => setIsModalOpen(true);
   const handleModalClose = () => setIsModalOpen(false);
+  const [ticketLoading, setTicketLoading] = useState(true);
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -77,15 +78,23 @@ const EventPage = () => {
 
   const { backend } = useSelector((state) => state.authentication);
   const dispatch = useDispatch();
-  const { currentVenue, error, } = useSelector((state) => state.venues);
-  const { currentEvent, eventsLoading: venueLoading, error: eventError, } = useSelector((state) => state.events);
+  const { currentVenue, error } = useSelector((state) => state.venues);
+  const {
+    currentEvent,
+    singleEventLoading,
+    error: eventError,
+  } = useSelector((state) => state.events);
   const [localError, setLocalError] = useState(null);
   const venue = currentEvent ? currentEvent : null;
 
   const { ids, eventId } = useParams();
   // Replace _ with # and append the hash from window.location.hash
-  const eventIds = `${decodeURIComponent(eventId).replace(/_/g, "#")}${window.location.hash}`;
-  const venueId = `${decodeURIComponent(ids).replace(/_/g, "#")}${window.location.hash}`;
+  const eventIds = `${decodeURIComponent(eventId).replace(/_/g, "#")}${
+    window.location.hash
+  }`;
+  const venueId = `${decodeURIComponent(ids).replace(/_/g, "#")}${
+    window.location.hash
+  }`;
   const navigate = useNavigate();
   console.log(venueId, eventIds);
   const nextpage = (ticket) => {
@@ -110,6 +119,7 @@ const EventPage = () => {
         console.error("Error fetching ticket details:", error);
         setTicketDetails(null);
       } finally {
+        setTicketLoading(false);
       }
     };
     fetchTicketDetails(currentEvent);
@@ -144,18 +154,22 @@ const EventPage = () => {
     }
   }, [dispatch, venueId, backend]);
 
-  const duration = currentEvent?.details?.StartDate && currentEvent?.details?.EndDate
-    ? calculateDuration(currentEvent.details.StartDate, currentEvent.details.EndDate)
-    : "1 Day";
+  const duration =
+    currentEvent?.details?.StartDate && currentEvent?.details?.EndDate
+      ? calculateDuration(
+          currentEvent.details.StartDate,
+          currentEvent.details.EndDate
+        )
+      : "1 Day";
 
   // Safely format dates
   const startInterVal = currentEvent?.details?.StartDate
     ? formatDateAndTime(parseInt(currentEvent.details.StartDate))
-    : { date: '', time: '' };
+    : { date: "", time: "" };
 
   const endInterVal = currentEvent?.details?.EndDate
     ? formatDateAndTime(parseInt(currentEvent.details.EndDate))
-    : { date: '', time: '' };
+    : { date: "", time: "" };
 
   return (
     <>
@@ -184,7 +198,7 @@ const EventPage = () => {
       </div>
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {venueLoading ? (
+          {singleEventLoading ? (
             <h1 className=" animate-pulse bg-gray-300 rounded-2xl w-32 h-12 font-black mb-10"></h1>
           ) : (
             <h1 className="text-4xl font-black pb-10">{venue?.title}</h1>
@@ -193,7 +207,7 @@ const EventPage = () => {
             {/* left side section  */}
             <div className="lg:w-2/3 ">
               <div className="w-full rounded-2xl relative">
-                {venueLoading ? (
+                {singleEventLoading ? (
                   <div className="flex items-center justify-center h-full w-full">
                     <div className="animate-pulse bg-gray-300 rounded-2xl h-90 w-full"></div>
                   </div>
@@ -201,8 +215,9 @@ const EventPage = () => {
                   <img
                     src={venue?.banner?.data}
                     alt={venue?.title}
-                    className={`h-90 w-full rounded-2xl ${venueLoading ? "hidden" : "block"
-                      }`}
+                    className={`h-90 w-full rounded-2xl ${
+                      singleEventLoading ? "hidden" : "block"
+                    }`}
                     onLoad={() => setIsLoading(false)}
                   />
                 )}
@@ -216,10 +231,11 @@ const EventPage = () => {
                   >
                     <li className="me-2" role="presentation">
                       <button
-                        className={`inline-block text-2xl font-black p-4 border-b-2 rounded-t-lg ${activeTab === "profile"
-                          ? "border-blue-500"
-                          : "border-transparent"
-                          }`}
+                        className={`inline-block text-2xl font-black p-4 border-b-2 rounded-t-lg ${
+                          activeTab === "profile"
+                            ? "border-blue-500"
+                            : "border-transparent"
+                        }`}
                         onClick={() => handleTabClick("profile")}
                         type="button"
                         role="tab"
@@ -231,10 +247,11 @@ const EventPage = () => {
                     </li>
                     <li className="me-2" role="presentation">
                       <button
-                        className={`inline-block text-2xl font-normal p-4 border-b-2 rounded-t-lg ${activeTab === "dashboard"
-                          ? "border-blue-500"
-                          : "border-transparent"
-                          } `}
+                        className={`inline-block text-2xl font-normal p-4 border-b-2 rounded-t-lg ${
+                          activeTab === "dashboard"
+                            ? "border-blue-500"
+                            : "border-transparent"
+                        } `}
                         onClick={() => handleTabClick("dashboard")}
                         type="button"
                         role="tab"
@@ -259,24 +276,62 @@ const EventPage = () => {
                       role="tabpanel"
                       aria-labelledby="profile-tab"
                     >
-                      {venueLoading ? (
-                        <div className="animate-pulse space-y-4">
-                          <div className="bg-gray-300 h-50 rounded-2xl w-full"></div>
-                        </div>
+                      {ticketLoading ? (
+                        <>
+                          <div className="animate-pulse space-y-4">
+                            <div className="bg-gray-300 h-50 rounded-2xl w-full"></div>
+                            <div className="bg-gray-300 h-50 rounded-2xl w-full"></div>
+                            <div className="bg-gray-300 h-50 rounded-2xl w-full"></div>
+                          </div>
+                        </>
                       ) : (
                         <div>
+                          <div
+                            className="cursor-pointer"
+                            onClick={() => nextpage("GROUP")}
+                          >
+                            <Ticket
+                              type={"GROUP"}
+                              gradientClass={ticketData[0].gradientClass}
+                              name={"Group Tickets"}
+                              description={ticketDetails?.description}
+                              price={parseInt(ticketDetails?.gTicket_price)}
+                              availability={parseInt(
+                                ticketDetails?.gTicket_limit
+                              )}
+                              highlightClass={ticketData[0].highlightClass}
+                            />
+                          </div>
                           <div
                             className="cursor-pointer"
                             onClick={() => nextpage("SINGLE")}
                           >
                             <Ticket
-                              type={"STUDENT"}
+                              type={"SINGLE"}
                               gradientClass={ticketData[1].gradientClass}
-                              name={"Student Tickets"}
+                              name={"Single Tickets"}
                               description={ticketDetails?.description}
                               price={parseInt(ticketDetails?.sTicket_price)}
-                              availability={parseInt(ticketDetails?.sTicket_limit)}
+                              availability={parseInt(
+                                ticketDetails?.sTicket_limit
+                              )}
                               highlightClass={ticketData[1].highlightClass}
+                            />
+                          </div>
+                          <div
+                            className="cursor-pointer"
+                            onClick={() => nextpage("VIP")}
+                          >
+                            <Ticket
+                              type={"VIP"}
+                              gradientClass={ticketData[2].gradientClass}
+                              name={"VIP Tickets"}
+                              description={ticketDetails?.description}
+                              price={parseInt(ticketDetails?.vTicket_price)}
+                              availability={parseInt(
+                                ticketDetails?.vTicket_limit
+                              )}
+                              highlightClass={ticketData[2].highlightClass}
                             />
                           </div>
                         </div>
@@ -294,22 +349,6 @@ const EventPage = () => {
                       aria-labelledby="dashboard-tab"
                     >
                       <div className="p-6 font-sans">
-                        <ul className="list-disc list-inside mb-4">
-                          <li>
-                            <strong>Duration:</strong>
-                            {duration || "1 Day"} (approx.)
-                          </li>
-                          <li>
-                            <strong>Location:</strong>
-                            {venue?.details.Location}
-                          </li>
-                          <li>
-                            <strong>Last Entry:</strong>
-                            {(venue?.details.EndTime &&
-                              endInterVal.time)}
-                          </li>
-                        </ul>
-
                         <div className="space-y-4">{venue.description}</div>
                       </div>
                     </motion.div>
@@ -318,7 +357,7 @@ const EventPage = () => {
               </>
             </div>
             {/* right side section  */}
-            {venueLoading ? (
+            {singleEventLoading ? (
               <div className="lg:w-1/3 h-[340px] w-full shadow-lg rounded-lg sticky top-0">
                 <div className="p-8 animate-pulse">
                   <div className="h-8 bg-gray-300 rounded w-3/4 mb-4"></div>{" "}
@@ -340,29 +379,27 @@ const EventPage = () => {
                 <div className="p-8">
                   <h1 className="text-2xl font-black">Event Details</h1>
                   <h3 className="text-lg font-normal">
-
-                    {venue?.details.StartDate &&
-                      startInterVal.date}
-                    -
-                    {(venue?.details.EndDate &&
-                      endInterVal.date)}
+                    {" "}
+                    <span className="text-xl font-semibold mr-2">
+                      {" "}
+                      Starts on
+                    </span>
+                    {venue?.details.StartDate && startInterVal.date}{" "}
+                    {venue?.details.StartTime && startInterVal.time}
                   </h3>
                   <h3 className="text-lg font-normal">
-                    {venue?.details.StartTime &&
-                      startInterVal.time}
-                    -
-                    {(venue?.details.EndTime &&
-                      endInterVal.time)}
+                    <span className="text-xl font-semibold mr-2"> Ends on</span>
+                    {venue?.details.EndDate && endInterVal.date}{" "}
+                    {venue?.details.EndTime && endInterVal.time}
                   </h3>
                   <h3 className="text-lg font-normal">
                     Location of the Venue - {venue?.details.Location}
                   </h3>
                 </div>
                 <h2 className="text-2xl font-normal pl-8">
-                  Venue ends on :
+                  Event ends on :
                   <span className="text-red-600">
-                    {(venue?.details.EndDate &&
-                      endInterVal.date)}
+                    {venue?.details.EndDate && endInterVal.date}
                   </span>
                 </h2>
               </div>

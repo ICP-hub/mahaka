@@ -3,6 +3,7 @@ import {
   HiArrowRightCircle,
   HiCheckBadge,
   HiChevronDown,
+  HiChevronRight,
   HiChevronUp,
   // HiClock,
   HiMiniMapPin,
@@ -17,12 +18,14 @@ import CreateEventForm from "../components/CreateEventForm";
 import {
   deleteEvent,
   getAllEventsByVenue,
+  searchEvents,
 } from "../../redux/reducers/apiReducers/eventApiReducer";
 import {
   createStaggerContainer,
   createStaggerVariant,
 } from "../../common/animationVariants";
 import { IoTrashBinSharp } from "react-icons/io5";
+import { Link } from "react-router-dom";
 
 // Timstamp convert
 export function formatDateAndTime(timestamp) {
@@ -55,19 +58,26 @@ export function formatDateAndTime(timestamp) {
 // Main component
 const EventManager = () => {
   const { venues } = useSelector((state) => state.venues);
-  const { events, eventByVenue, eventsLoading, singleEventLoading } =
-    useSelector((state) => state.events);
+  const {
+    events,
+    eventByVenue,
+    eventsLoading,
+    singleEventLoading,
+    searchedEvents,
+    searchEventLoading,
+  } = useSelector((state) => state.events);
   const { backend } = useSelector((state) => state.authentication);
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOptionMenuOpen, setIsOptionMenuOpen] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [searchPerformed, setSearchPerformed] = useState(false);
   const [selectedVenue, setSelectedVenue] = useState({
     option: "All",
     id: "",
   });
 
   const toggleOptionMenu = () => setIsOptionMenuOpen((pv) => !pv);
-
   const handleSelectOption = (option, id) => {
     setSelectedVenue((pv) => ({ ...pv, option: option, id: id }));
     setIsOptionMenuOpen(false);
@@ -75,14 +85,24 @@ const EventManager = () => {
 
   // Filtered : memoized
   const filteredEvents = useMemo(() => {
+    if (searchText && searchPerformed) return searchedEvents;
     if (selectedVenue.option === "All") {
       return events;
     } else {
       return eventByVenue;
     }
-  }, [selectedVenue, events, eventByVenue]);
+  }, [
+    selectedVenue,
+    events,
+    eventByVenue,
+    searchText,
+    searchedEvents,
+    searchPerformed,
+  ]);
 
-  // console.log(filteredEvents, "fe");
+  useEffect(() => {
+    setSearchPerformed(false);
+  }, [searchText]);
 
   useEffect(() => {
     if (selectedVenue.option !== "All") {
@@ -98,6 +118,19 @@ const EventManager = () => {
   }, [selectedVenue]);
 
   // console.log("filtered", filteredEvents);
+  const handleSearch = () => {
+    if (searchText.trim()) {
+      setSearchPerformed(true);
+      dispatch(
+        searchEvents({
+          backend,
+          searchText,
+          chunkSize: 10,
+          pageNo: 0,
+        })
+      );
+    }
+  };
 
   const containerVariants = createStaggerContainer(0.4);
   const cardVariants = createStaggerVariant(0.3);
@@ -192,23 +225,29 @@ const EventManager = () => {
                       type="text"
                       placeholder="Search for events..."
                       className="outline-none bg-transparent w-full"
+                      value={searchText}
+                      onChange={(e) => setSearchText(e.target.value)}
                     />
                   </div>
                   <div className="ml-auto">
-                    <HiArrowRightCircle size={24} className="cursor-pointer" />
+                    <HiArrowRightCircle
+                      size={24}
+                      className="cursor-pointer"
+                      onClick={handleSearch}
+                    />
                   </div>
                 </div>
               </div>
               <div className="sm:ml-auto mt-4 sm:mt-0 flex items-center justify-center w-full sm:w-fit h-full">
                 <div
-                  className="bg-indigo-600 rounded-xl cursor-pointer w-full text-white p-4"
+                  className="bg-indigo-600 hover:bg-indigo-700 rounded-xl cursor-pointer w-full text-white p-4"
                   onClick={() => setIsModalOpen(true)}
                 >
                   Add a new event
                 </div>
               </div>
             </div>
-            {eventsLoading || singleEventLoading ? (
+            {eventsLoading || singleEventLoading || searchEventLoading ? (
               <div className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3">
                 <SkeletonLoader />
                 <SkeletonLoader />
@@ -227,11 +266,11 @@ const EventManager = () => {
                   </motion.div>
                 ))}
               </motion.div>
-            ) : (
+            ) : searchPerformed && !searchEventLoading ? (
               <div className="text-center text-gray-500 md:text-5xl text-3xl font-bold mt-10">
                 No Events Found
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
@@ -252,11 +291,9 @@ const EventManager = () => {
 // event cards
 const EventCard = ({ event }) => {
   const dispatch = useDispatch();
-  const [isExpanded, setIsExpanded] = useState(false);
-  const toggleExpand = () => setIsExpanded((pv) => !pv);
   const { backend } = useSelector((state) => state.authentication);
   const startInterVal = formatDateAndTime(parseInt(event.details.StartDate));
-  const endInterVal = formatDateAndTime(parseInt(event.details.EndDate));
+  // const endInterVal = formatDateAndTime(parseInt(event.details.EndDate));
   const [isDelete, setIsDelete] = useState(false);
 
   const handleDeleteEvent = () => {
@@ -324,9 +361,9 @@ const EventCard = ({ event }) => {
             <div>Creator</div>
             <div className="ml-1.5 truncate">{event.creator.toText()}</div>
           </div>
-          <div className="text-secondary mt-0.5 line-clamp-2">
+          {/* <div className="text-secondary mt-0.5 line-clamp-2">
             {event.description}
-          </div>
+          </div> */}
           <div className="flex items-center text-md leading-5 mt-2 uppercase font-medium">
             <HiMiniMapPin size={14} />
             <div className="ml-1.5">{event.details.Location}</div>
@@ -337,15 +374,18 @@ const EventCard = ({ event }) => {
               <div>{startInterVal.date}</div>
               <div>{startInterVal.time}</div>
             </div>
-            <button
-              onClick={toggleExpand}
+            <Link
+              to={`/admin/events/event/${encodeURIComponent(
+                event.venueId
+              )}/${encodeURIComponent(event.id)}`}
               className="h-8 w-8 rounded-full hover:bg-hover flex items-center justify-center"
             >
-              {isExpanded ? <HiChevronUp /> : <HiChevronDown />}
-            </button>
+              {/* {isExpanded ? <HiChevronUp /> : <HiChevronDown />} */}
+              <HiChevronRight />
+            </Link>
           </div>
         </div>
-        <AnimatePresence>
+        {/* <AnimatePresence>
           {isExpanded && (
             <motion.div
               initial={{
@@ -405,7 +445,7 @@ const EventCard = ({ event }) => {
               </div>
             </motion.div>
           )}
-        </AnimatePresence>
+        </AnimatePresence> */}
       </div>
     </>
   );
@@ -460,7 +500,6 @@ export const DeleteEventModal = ({ closeModal, onEventDelete }) => {
     </div>
   );
 };
-
 export default EventManager;
 
 // const EventManager = () => {

@@ -69,19 +69,12 @@ module {
         #Wahana;
     };
 
-    public type wahanaDetails = {
-        StartDate : Time.Time;
-        StartTime : Time.Time;
-        EndDate : Time.Time;
-        EndTime : Time.Time;
-        Location : Text;
-    };
+
 
     public type Wahana_details = {
         id : Text;
         ride_title : Text;
         description : Text;
-        details : wahanaDetails;
         banner : LogoResult;
         price : Float;
         creator : Principal;
@@ -198,6 +191,7 @@ module {
 
     public type UpdateUserError = {
         #UserNotAuthenticated;
+        #TicketPriceError;
         #UserNotAuthorized;
         #RoleError;
         #UserNotFound;
@@ -214,6 +208,8 @@ module {
     };
 
     public type CommonErrors = {
+        #TicketPriceError;
+        #CyclesError;
         #WahanaNotFound;
         #VenueNotFound;
         #EventNotFound;
@@ -267,6 +263,9 @@ module {
         collectionActor: actor {
                logoDip721: () -> async Types.LogoResult;
                mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: Types.ticket_type, logo: Types.LogoResult) -> async Types.MintReceipt;
+               getDIP721details : () -> async Types.Dip721NonFungibleToken;
+               totalSupplyDip721 : () -> async Nat64;
+               getMaxLimitDip721 : () -> async Nat16
         };
         metadata : Types.MetadataDesc; 
         ticketType : ticket_info;
