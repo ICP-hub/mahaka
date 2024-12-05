@@ -111,7 +111,7 @@ const PaymentStatusUpdate = () => {
     }
   }, [backendActor, identity, mockData.invoiceNo, mockData.isSuccess]);
 
-  const handleNavigateHome = () => navigate("/");
+  const handleNavigateHome = () => navigate("/user/my-booking");
 
   return (
     <div className="flex flex-col items-center justify-center h-screen px-4 bg-gray-50">
@@ -140,7 +140,7 @@ const PaymentStatusUpdate = () => {
             className="mt-6 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             onClick={handleNavigateHome}
           >
-            Go to Home
+            View Ticket
           </button>
         </div>
       )}
