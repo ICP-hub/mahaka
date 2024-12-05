@@ -554,12 +554,12 @@ actor mahaka {
           //           };
           //      };
           // };
-          if (collection_details.collection_args.sTicket_price < 10000.0
+          /* if (collection_details.collection_args.sTicket_price < 10000.0
                or collection_details.collection_args.vTicket_price < 10000.0
                or collection_details.collection_args.gTicket_price < 10000.0)
           {
                return #err(#TicketPriceError);
-          };
+          }; */
           let availablecycles : Nat = await availableCycles(); 
           if(availablecycles < 800_510_000_000 ){
                return #err(#CyclesError);
@@ -937,12 +937,12 @@ actor mahaka {
           //           };
           //      };
           // };
-          if (eCollection.collection_args.sTicket_price < 10000 
+          /* if (eCollection.collection_args.sTicket_price < 10000 
                or eCollection.collection_args.vTicket_price < 10000 
                or eCollection.collection_args.gTicket_price < 10000) 
           {
                return #err(#TicketPriceError);
-          };
+          }; */
           let availablecycles : Nat = await availableCycles(); 
           if(availablecycles < 800_510_000_000 ){
                return #err(#CyclesError);
@@ -3700,9 +3700,9 @@ actor mahaka {
           //           };
           //      };
           // };
-          if (price < 10000.0){
+         /*  if (price < 10000.0){
                return #err(#TicketPriceError);
-          };
+          }; */
           let availablecycles : Nat = await availableCycles(); 
           if(availablecycles < 800_510_000_000 ){
                throw Error.reject("Canister doesnt have enough cycles");
