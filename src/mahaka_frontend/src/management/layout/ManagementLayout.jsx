@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllEventsByVenue } from "../../redux/reducers/apiReducers/eventApiReducer";
 import { getVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
 import { getAllWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApiReducer";
+import notificationManager from "../../common/utils/notificationManager";
 
 // Protected :mgt
 const ManagementProtected = ({ children }) => {
