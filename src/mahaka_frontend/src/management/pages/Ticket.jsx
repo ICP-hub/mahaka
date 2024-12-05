@@ -48,7 +48,7 @@ const MgtTicket = () => {
         backend,
         chunkSize: 100,
         pageNo: 0,
-        venueId: currentVenue?.id,
+        venueId: currentUserByCaller?.assignedVenue?.id,
       })
     );
     // Automatically select the first venue and fetch its ticket details
@@ -172,21 +172,18 @@ const MgtTicket = () => {
 
       {/* Venue Selection */}
 
-      {venuesLoading ? (
-        <div>loading...</div>
-      ) : (
-        <p className="text-2xl">{currentVenue?.Title}</p>
-      )}
+      <p className="text-2xl">{currentUserByCaller?.assignedVenue?.title}</p>
 
       {/* Show Loader or Ticket Details */}
       {loadingDetails ? (
-        <div className="animate-pulse space-x-4 flex">
-          <div className="bg-gray-300 h-50 rounded-2xl w-1/2"></div>
-          <div className="bg-gray-300 h-50 rounded-2xl w-1/2"></div>
+        <div className="animate-pulse  grid grid-cols-1 sm:grid-cols-3 gap-2 p-2">
+          <div className="bg-gray-300 h-50 rounded-2xl "></div>
+          <div className="bg-gray-300 h-50 rounded-2xl "></div>
+          <div className="bg-gray-300 h-50 rounded-2xl  "></div>
         </div>
       ) : ticketDetails ? (
         <div>
-          <div className="flex justify-between  ">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <Ticket
               type={"GROUP"}
               gradientClass={ticketData[0].gradientClass}
@@ -206,6 +203,16 @@ const MgtTicket = () => {
               price={parseInt(ticketDetails?.sTicket_price) || 1}
               availability={parseInt(ticketDetails?.sTicket_limit) || 4}
               highlightClass={ticketData[1].highlightClass}
+              selectedVenue={currentVenue?.id}
+            />
+            <Ticket
+              type={" VIP"}
+              gradientClass={ticketData[2].gradientClass}
+              name={"VIP Tickets"}
+              description={ticketDetails?.description || "description"}
+              price={parseInt(ticketDetails?.vTicket_price) || 1}
+              availability={parseInt(ticketDetails?.vTicket_limit) || 4}
+              highlightClass={ticketData[2].highlightClass}
               selectedVenue={currentVenue?.id}
             />
           </div>
@@ -233,29 +240,45 @@ const MgtTicket = () => {
             ))}
           </select>
           {loadingDetails ? (
-            <div className="animate-pulse space-x-4 flex">
-              <div className="bg-gray-300 h-50 rounded-2xl w-1/2"></div>
-              <div className="bg-gray-300 h-50 rounded-2xl w-1/2"></div>
+            <div className="animate-pulse  grid grid-cols-1 sm:grid-cols-3 gap-2 p-2">
+              <div className="bg-gray-300 h-50 rounded-2xl  "></div>
+              <div className="bg-gray-300 h-50 rounded-2xl  "></div>
+              <div className="bg-gray-300 h-50 rounded-2xl  "></div>
             </div>
           ) : eventDetails ? (
-            <div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <EventTickets
-                type={"SINGLE"}
+                type={"GROUP"}
+                name={"Group Tickets"}
                 gradientClass={ticketData[0].gradientClass}
                 tickets={eventDetails}
                 selectedVenue={selectedEvent}
                 id={selectedVenue?.id}
-                availability={parseInt(ticketDetails?.sTicket_limit) || 4}
+                price={parseInt(eventDetails?.gTicket_price) || 1}
+                availability={parseInt(eventDetails?.gTicket_limit) || 4}
                 highlightClass={ticketData[0].highlightClass}
               />
               <EventTickets
-                type={"GROUP"}
+                type={"SINGLE"}
+                name={"Single Tickets"}
                 gradientClass={ticketData[1].gradientClass}
                 tickets={eventDetails}
                 selectedVenue={selectedEvent}
                 id={selectedVenue?.id}
-                availability={parseInt(ticketDetails?.gTicket_limit) || 4}
+                price={parseInt(eventDetails?.sTicket_price) || 1}
+                availability={parseInt(eventDetails?.sTicket_limit) || 4}
                 highlightClass={ticketData[1].highlightClass}
+              />
+              <EventTickets
+                type={"VIP"}
+                name={"VIP Tickets"}
+                gradientClass={ticketData[2].gradientClass}
+                tickets={eventDetails}
+                selectedVenue={selectedEvent}
+                id={selectedVenue?.id}
+                price={parseInt(eventDetails?.vTicket_price) || 1}
+                availability={parseInt(eventDetails?.vTicket_limit) || 4}
+                highlightClass={ticketData[2].highlightClass}
               />
             </div>
           ) : (

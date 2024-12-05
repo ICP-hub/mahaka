@@ -20,6 +20,7 @@ export default function Ticket({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
   const [ticketQuantity, setTicketQuantity] = useState(1);
+  const [loading, setLoading] = useState(false);
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
@@ -32,6 +33,7 @@ export default function Ticket({
 
   const buyVenueTicketHandler = async () => {
     try {
+      setLoading(true)
       const ticketTypeVariant = { ["SinglePass"]: null };
       const dateInNanoseconds = convertDateToNanoseconds(selectedDate);
 
@@ -54,7 +56,7 @@ export default function Ticket({
         selectedVenue,
         { ticket_type: ticketTypeVariant, price: price },
         record,
-        Principal.fromText(principal),
+        Principal.fromText("2vxsx-fae"),
         dateInNanoseconds,
         { Cash: null },
         ticketQuantity
@@ -68,32 +70,33 @@ export default function Ticket({
       console.error("Error in buying venue tickets:", err);
       toggleModal();
     }
+    finally{
+      setLoading(false)
+    }
   };
 
   return (
-    <div className="flex justify-center w-1/2 p-2 py-5">
+    <div className="flex justify-center p-2 py-5">
       <div
         onClick={toggleModal}
-        className={`relative ${gradientClass} rounded-xl w-full h-[196px] overflow-hidden cursor-pointer`}
+        className={`relative ${gradientClass} rounded-xl w-full h-[160px] overflow-hidden cursor-pointer`}
       >
         <div className="absolute -left-8 top-1/2 transform -translate-y-1/2 h-16 w-16 bg-background rounded-full z-20"></div>
         <div className="absolute -right-8 top-1/2 transform -translate-y-1/2 h-16 w-16 bg-background rounded-full"></div>
         <div className="flex relative z-10">
           <div
-            className={`h-[196px] w-[103px] ${highlightClass} flex items-center justify-center`}
+            className={`h-[160px] w-[103px] ${highlightClass} flex items-center justify-center`}
           >
-            <span className="transform -rotate-90 whitespace-nowrap text-[26px] font-black pt-15 tracking-widest text-white">
+            <span className="transform -rotate-90 whitespace-nowrap text-[20px] font-black pt-15 tracking-widest text-white">
               {type}
             </span>
           </div>
           <div className="w-3/4 p-4">
-            <h3 className="text-2xl font-black">{name}</h3>
+            <h3 className="text-xl font-black">{name}</h3>
             {/* <p className="text-base font-normal">{description}</p> */}
             <div className="flex justify-between mt-[5rem]">
-              <span className="text-lg font-black">Rp.{price}</span>
-              <span className="text-lg font-normal">
-                {availability} TICKETS LEFT
-              </span>
+              <span className="  font-black">Rp.{price}</span>
+              <span className="  font-normal">{availability} TICKETS LEFT</span>
             </div>
           </div>
         </div>
@@ -111,6 +114,12 @@ export default function Ticket({
                 type="date"
                 className="w-full border border-gray-300 rounded-lg p-2"
                 value={selectedDate}
+                min={new Date().toISOString().split("T")[0]} // Today's date
+                max={
+                  new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                    .toISOString()
+                    .split("T")[0]
+                } // One week from now
                 onChange={(e) => setSelectedDate(e.target.value)}
               />
             </div>
@@ -142,7 +151,9 @@ export default function Ticket({
             </div>
             <div className="flex justify-between mb-4">
               <span className="text-lg text-secondary">Price:</span>
-              <span className="text-lg font-semibold">${parseInt(price)}</span>
+              <span className="text-lg font-semibold">
+                Rp.{parseInt(price)}
+              </span>
             </div>
             <div className="flex justify-between mb-4">
               <span className="text-lg text-secondary">Tickets Left:</span>
@@ -154,6 +165,11 @@ export default function Ticket({
               <span className="text-lg text-secondary">Type:</span>
               <span className="text-lg font-semibold">{type}</span>
             </div>
+            <div className="flex justify-between mb-4">
+              <span className="text-lg text-secondary">Payment Mode:</span>
+              <span className="text-lg font-semibold">Cash</span>
+            </div>
+
             <div className="flex justify-end space-x-4">
               <button
                 onClick={toggleModal}
@@ -162,11 +178,14 @@ export default function Ticket({
                 Close
               </button>
               <button
-                className="px-4 py-2 bg-secondary text-white rounded-lg"
-                onClick={buyVenueTicketHandler}
-              >
-                Buy Ticket
-              </button>
+      className={`px-4 py-2 rounded-lg text-white ${
+        loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-secondary hover:bg-secondary-dark'
+      }`}
+      onClick={buyVenueTicketHandler}
+      disabled={loading} // Disable button when loading
+    >
+      {loading ? 'Buying...' : 'Buy Ticket'}
+    </button>
             </div>
           </div>
         </div>
