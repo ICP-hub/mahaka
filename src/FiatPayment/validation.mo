@@ -10,7 +10,7 @@ module {
 
     // Define arrays of supported payment methods and currencies
     let supportedPaymentMethods  : [Text] = ["Stripe", "PayPal"];
-    let supportedCurrencies : [Text] = ["USD", "EUR"];
+    let supportedCurrencies : [Text] = ["USD", "EUR", "IDR"];
 
      // Function to check if the caller is anonymous
     public func isAnonymous (caller : Principal) : Bool {
