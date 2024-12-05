@@ -36,7 +36,7 @@ const MgtWahana = () => {
     searchedWahanaLoading,
   } = useSelector((state) => state.wahana);
   const dispatch = useDispatch();
-  const { currentUserByCaller } = useSelector((state) => state.users);
+  const { currentUserByCaller, userRole } = useSelector((state) => state.users);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [searchClicked, setSearchClicked] = useState(false);
@@ -120,14 +120,16 @@ const MgtWahana = () => {
                   </button>
                 </div>
               </div>
-              <div className="sm:ml-auto mt-4 sm:mt-0 flex items-center justify-center w-full sm:w-fit h-full">
-                <div
-                  className="bg-indigo-600 rounded-xl cursor-pointer w-full text-white p-4"
-                  onClick={() => setIsModalOpen(true)}
-                >
-                  Add a new wahana
+              {(userRole === "staff" || userRole === "supervisor") && (
+                <div className="sm:ml-auto mt-4 sm:mt-0 flex items-center justify-center w-full sm:w-fit h-full">
+                  <div
+                    className="bg-indigo-600 rounded-xl cursor-pointer w-full text-white p-4"
+                    onClick={() => setIsModalOpen(true)}
+                  >
+                    Add a new wahana
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
             {!currentUserByCaller ||
             singleWahanaLoading ||

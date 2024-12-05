@@ -62,7 +62,7 @@ const VenueManager = () => {
   return (
     <div className="flex flex-col sm:overflow-hidden">
       <div className="relative flex-0 overflow-hidden bg-gray-800 px-4 py-8 md:px-8">
-        <div className="relative flex flex-col text-text text-[#E2E8F0]">
+        <div className="relative flex flex-col text-[#E2E8F0]">
           <div className="text-4xl font-extrabold leading-tight tracking-tight sm:text-7xl">
             Venues
           </div>

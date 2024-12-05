@@ -123,15 +123,17 @@ const MgtEvents = () => {
                   </button>
                 </div>
               </div>
-              <div className="sm:ml-auto mt-4 sm:mt-0 flex items-center justify-center w-full sm:w-fit h-full">
-                <button
-                  className="bg-indigo-600 hover:bg-indigo-700 rounded-xl cursor-pointer w-full text-white p-4"
-                  disabled={!currentUserByCaller}
-                  onClick={() => setIsModalOpen(true)}
-                >
-                  Add a new event
-                </button>
-              </div>
+              {(userRole === "staff" || userRole === "supervisor") && (
+                <div className="sm:ml-auto mt-4 sm:mt-0 flex items-center justify-center w-full sm:w-fit h-full">
+                  <button
+                    className="bg-indigo-600 hover:bg-indigo-700 rounded-xl cursor-pointer w-full text-white p-4"
+                    disabled={!currentUserByCaller}
+                    onClick={() => setIsModalOpen(true)}
+                  >
+                    Add a new event
+                  </button>
+                </div>
+              )}
             </div>
             {!currentUserByCaller ||
             singleEventLoading ||
