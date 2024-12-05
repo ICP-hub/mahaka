@@ -8,6 +8,7 @@ import {
   // HiClock,
   HiMiniMapPin,
   HiOutlineMagnifyingGlass,
+  HiMiniChevronUpDown,
 } from "react-icons/hi2";
 import { useDispatch, useSelector } from "react-redux";
 // import img1 from "../../assets/images/frame3.png";
