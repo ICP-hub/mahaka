@@ -20,6 +20,7 @@ import Array "mo:base/Array";
 import Nat "mo:base/Nat";
 import Float "mo:base/Float";
 import Nat16 "mo:base/Nat16";
+import Timer "mo:base/Timer";
 // import Uuid "mo:uuid/UUID";
 import Utils "./Utils";
 import nftTypes "../DIP721-NFT/Types";
@@ -93,7 +94,6 @@ actor mahaka {
           var elems_count : Nat64 = 0;
      };
 
-     private var attractionBanner = TrieMap.TrieMap<Principal, Types.AttractionBanner>(Principal.equal, Principal.hash);
      private stable var _AttractionBanner : [Types.AttractionBanner] = [];
      private stable var _thirdPartyBanner : [Types.AttractionBanner] = [];
      private stable var pendingPayments : [(Nat,Types.ArgsStore)] = [];
@@ -115,6 +115,10 @@ actor mahaka {
      private stable var totalTickets : Nat = 0;
      private stable var totalRevenue : Float = 0.0;
      private stable var users : Nat = 0;
+
+     var eventTimerMap = TrieMap.TrieMap<Text, Timer.TimerId>(Text.equal, Text.hash);
+     private stable var _stableeventTimerMap : [(Text, Timer.TimerId)] = [];
+
 
      // Payment recepient
      private stable var recepient : Principal = Principal.fromText("7yywi-leri6-n33rr-vskr6-yb4nd-dvj6j-xg2b4-reiw6-dljs7-slclz-2ae");
@@ -161,7 +165,7 @@ actor mahaka {
           _stableWahanaTicketsArray := Iter.toArray(_WahanaTicketsMap.entries());
           _stableusers := Iter.toArray(Users.entries());
           _stableTestimonial := Iter.toArray(testimonial.entries());
-          // _stableAttractionBanner := Iter.toArray(attractionBanner.entries());
+          _stableeventTimerMap := Iter.toArray(eventTimerMap.entries());
      };
 
      system func postupgrade(){
@@ -173,12 +177,12 @@ actor mahaka {
           _WahanaTicketsMap := TrieMap.fromEntries(_stableWahanaTicketsArray.vals(), Text.equal, Text.hash);
           Users := TrieMap.fromEntries(_stableusers.vals(), Principal.equal, Principal.hash);
           testimonial := TrieMap.fromEntries(_stableTestimonial.vals(), Principal.equal, Principal.hash);
-          // attractionBanner := TrieMap.fromEntries(_stableAttractionBanner.vals(), Principal.equal, Principal.hash);
+          eventTimerMap := TrieMap.fromEntries(_stableeventTimerMap.vals(), Text.equal, Text.hash);
 
      };
 
 
-    // ---------------------------------------------------------------------------------------------------------------------------------
+    // ----------------------------------------f-----------------------------------------------------------------------------------------
      func regionEnsureSizeBytes(r : Region, new_byte_count : Nat64) {
         let pages = Region.size(r);
         if (new_byte_count > pages << 16) {
@@ -550,12 +554,12 @@ actor mahaka {
           //           };
           //      };
           // };
-          if (collection_details.collection_args.sTicket_price < 10000.0
+          /* if (collection_details.collection_args.sTicket_price < 10000.0
                or collection_details.collection_args.vTicket_price < 10000.0
                or collection_details.collection_args.gTicket_price < 10000.0)
           {
                return #err(#TicketPriceError);
-          };
+          }; */
           let availablecycles : Nat = await availableCycles(); 
           if(availablecycles < 800_510_000_000 ){
                return #err(#CyclesError);
@@ -933,12 +937,12 @@ actor mahaka {
           //           };
           //      };
           // };
-          if (eCollection.collection_args.sTicket_price < 10000 
+          /* if (eCollection.collection_args.sTicket_price < 10000 
                or eCollection.collection_args.vTicket_price < 10000 
                or eCollection.collection_args.gTicket_price < 10000) 
           {
                return #err(#TicketPriceError);
-          };
+          }; */
           let availablecycles : Nat = await availableCycles(); 
           if(availablecycles < 800_510_000_000 ){
                return #err(#CyclesError);
@@ -952,6 +956,14 @@ actor mahaka {
           ignore await eventCollection.wallet_receive();
           let eventCollectionId = await eventCollection.getCanisterId();
           let eventId = Event.title # "#" # Principal.toText(eventCollectionId);
+          let time = Time.now();
+          let eventEndTime = Event.details.EndTime;
+          let eventStartTime = Event.details.StartTime;
+          let status : Types.EventStatus = if(time >= eventStartTime){
+               #Ongoing
+          } else {
+               #AboutToStart
+          };
 
           let newEvent: Types.completeEvent = {
                id = eventId;
@@ -966,6 +978,7 @@ actor mahaka {
                event_collectionid = await eventCollection.getCanisterId();
                creator = user;
                venueId = venueId;
+               status = status;
           };
 
           let existingEvents = _EventsMap.get(venueId);
@@ -1010,8 +1023,81 @@ actor mahaka {
           };
           _EventsMap.put(venueId, eventIndex);
 
+          if (status == #AboutToStart) {
+               await scheduleEventUpdate(eventId, venueId, eventStartTime, #Ongoing);
+          };
+          await scheduleEventUpdate(eventId, venueId, eventEndTime, #Expired);
+          
           return #ok(newEvent);
      };
+
+     func scheduleEventUpdate(eventId : Text, venueId : Text, expiration : Time.Time, targetStatus : Types.EventStatus) : async () {
+        let now = Time.now();
+        let duration = if (expiration > now) expiration - now else now - expiration;
+        let natDuration = Nat64.toNat(Nat64.fromIntWrap(duration));
+        if (duration > 0) {
+            let id = Timer.setTimer<system>(
+                #nanoseconds natDuration,
+                func() : async () {
+                    await updateEvent(eventId, venueId, targetStatus);
+                },
+            );
+            eventTimerMap.put(eventId, id);
+        };
+    };
+
+    func updateEvent(eventId : Text, venueId : Text, newStatus : Types.EventStatus) : async () {
+          let events_object = _EventsMap.get(venueId);
+          switch (events_object) {
+               case null {
+                    throw (Error.reject("No Events Found in the Venue"));
+               };
+               case (?v) {
+                    let events_object_blob = await stable_get(v, Events_state);
+                    let events_object : ?Types.Events_data = from_candid(events_object_blob);
+                    switch (events_object) {
+                         case null {
+                              throw (Error.reject("No object found in the memory"));
+                         };
+                         case (?val) {
+                              var events_list = val.Events;
+                              let updatedEvents = List.map<Types.completeEvent, Types.completeEvent>(
+                              events_list,
+                              func(_event : Types.completeEvent) {
+                                   if (_event.id == eventId) {
+                                        return {
+                                             id = _event.id;
+                                             description = _event.description;
+                                             details = _event.details;
+                                             logo = _event.logo;
+                                             banner = _event.banner;
+                                             gTicket_limit = _event.gTicket_limit;
+                                             sTicket_limit = _event.sTicket_limit;
+                                             title = _event.title;
+                                             vTicket_limit = _event.vTicket_limit;
+                                             event_collectionid = _event.event_collectionid;
+                                             creator = _event.creator;
+                                             venueId = _event.venueId;
+                                             status = newStatus;
+                                        };
+                                   } else {
+                                        return _event;
+                                   }
+                              }
+                         );
+                              let updatedData : Types.Events_data = {
+                              Events = updatedEvents;
+                              EventIds = val.EventIds;
+                              };
+
+                              let updatedBlob = to_candid(updatedData);
+                              let updatedIndex = await update_stable(v, updatedBlob, Events_state);
+                              _EventsMap.put(venueId, updatedIndex);
+                         };
+                    };
+               };
+          };
+          };
 
      public shared ({caller = user}) func getallEventsbyVenue(chunkSize : Nat , pageNo : Nat, venueId : Types.venueId) : async Result.Result<{data : [Types.completeEvent] ; current_page : Nat ; Total_pages : Nat}, Types.UpdateUserError> {
           // let roleResult = await getRoleByPrincipal(user);
@@ -1885,6 +1971,21 @@ actor mahaka {
                               selectedTicketLimit := dipDetails.gTicket_limit;
                          };
                     };
+                    var selectedTicketPrice: Float = 0.0;
+                    switch (_ticket_type.ticket_type) {
+                         case (#SinglePass) {
+                              selectedTicketPrice := dipDetails.sTicket_price;
+                         };
+                         case (#VipPass) {
+                              selectedTicketPrice := dipDetails.vTicket_price;
+                         };
+                         case (#GroupPass) {
+                              selectedTicketPrice := dipDetails.gTicket_price;
+                         };
+                    };
+                    if(_ticket_type.price != selectedTicketPrice){
+                         return #err("Price doesnt match with ticket price set by admin");
+                    };
                     let currentTicketCountResult = await getTicketsCountByType(#Venue, venueId, _ticket_type.ticket_type);
                     switch (currentTicketCountResult) {
                          case (#err(e)) {
@@ -1980,6 +2081,9 @@ actor mahaka {
                          totalSupplyDip721 : () -> async Nat64;
                          getMaxLimitDip721 : () -> async Nat16
                     };
+                    if(event.status != #Ongoing){
+                         return #err("Check the event start and end timeline");
+                    };
                     let totalTickets = await collectionActor.totalSupplyDip721();
                     let maxLimit = await collectionActor.getMaxLimitDip721();
                     let dipDetails = await collectionActor.getDIP721details();
@@ -1997,6 +2101,21 @@ actor mahaka {
                          case (#GroupPass) {
                               selectedTicketLimit := dipDetails.gTicket_limit;
                          };
+                    };
+                    var selectedTicketPrice: Float = 0.0;
+                    switch (_ticket_type.ticket_type) {
+                         case (#SinglePass) {
+                              selectedTicketPrice := dipDetails.sTicket_price;
+                         };
+                         case (#VipPass) {
+                              selectedTicketPrice := dipDetails.vTicket_price;
+                         };
+                         case (#GroupPass) {
+                              selectedTicketPrice := dipDetails.gTicket_price;
+                         };
+                    };
+                    if(_ticket_type.price != selectedTicketPrice){
+                         return #err("Price doesnt match with ticket price set by admin");
                     };
                     let currentTicketCountResult = await getTicketsCountByType(#Event, _eventId, _ticket_type.ticket_type);
                     switch (currentTicketCountResult) {
@@ -2217,6 +2336,21 @@ actor mahaka {
                     selectedTicketLimit := dipDetails.gTicket_limit;
                };
           };
+          var selectedTicketPrice: Float = 0.0;
+          switch (_ticket_type.ticket_type) {
+               case (#SinglePass) {
+                    selectedTicketPrice := dipDetails.sTicket_price;
+               };
+               case (#VipPass) {
+                    selectedTicketPrice := dipDetails.vTicket_price;
+               };
+               case (#GroupPass) {
+                    selectedTicketPrice := dipDetails.gTicket_price;
+               };
+          };
+          if(_ticket_type.price != selectedTicketPrice){
+               return #err("Price doesnt match with ticket price set by admin");
+          };
           let currentTicketCountResult = await getTicketsCountByType(#Venue, venueId, _ticket_type.ticket_type);
           switch (currentTicketCountResult) {
                case (#err(e)) {
@@ -2275,6 +2409,9 @@ actor mahaka {
                          totalSupplyDip721 : () -> async Nat64;
                          getMaxLimitDip721 : () -> async Nat16
                     };
+                    if(event.status != #Ongoing){
+                         return #err("Check the event start and end timeline");
+                    };
                     let totalTickets = await collectionActor.totalSupplyDip721();
                     let maxLimit = await collectionActor.getMaxLimitDip721();
                     let dipDetails = await collectionActor.getDIP721details();
@@ -2292,6 +2429,21 @@ actor mahaka {
                          case (#GroupPass) {
                               selectedTicketLimit := dipDetails.gTicket_limit;
                          };
+                    };
+                    var selectedTicketPrice: Float = 0.0;
+                    switch (_ticket_type.ticket_type) {
+                         case (#SinglePass) {
+                              selectedTicketPrice := dipDetails.sTicket_price;
+                         };
+                         case (#VipPass) {
+                              selectedTicketPrice := dipDetails.vTicket_price;
+                         };
+                         case (#GroupPass) {
+                              selectedTicketPrice := dipDetails.gTicket_price;
+                         };
+                    };
+                    if(_ticket_type.price != selectedTicketPrice){
+                         return #err("Price doesnt match with ticket price set by admin");
                     };
                     let currentTicketCountResult = await getTicketsCountByType(#Event, _eventId, _ticket_type.ticket_type);
                     switch (currentTicketCountResult) {
@@ -2633,7 +2785,7 @@ actor mahaka {
                     let ticketsResult = await getVenueTickets(id);
                     switch (ticketsResult) {
                          case (#err(e)) {
-                              return #err("Error fetching tickets: " # e);
+                              return #ok(0);
                          };
                          case (#ok(tickets)) {
                               var count: Nat = 0;
@@ -2668,7 +2820,7 @@ actor mahaka {
                                    let nftDetailsResult = await collectionActor.getNFT(Nat64.fromNat(ticket.ticketId));
                                    switch (nftDetailsResult) {
                                         case (#Err(e)) {
-                                             return #err("Error getting NFT details");
+                                             return #ok(0);
                                         };
                                         case (#Ok(nftDetails)) {
                                              // Compare the ticket type
@@ -2687,7 +2839,7 @@ actor mahaka {
                     let count = await getWahanaTickets(id);
                     switch(count){
                          case(#err(e)){
-                              return #err(e);
+                              return #ok(0);
                          };
                          case(#ok(obj)){
                               return #ok(Array.size<Types.TicketSaleInfo>(obj));
@@ -3548,9 +3700,9 @@ actor mahaka {
           //           };
           //      };
           // };
-          if (price < 10000.0){
+         /*  if (price < 10000.0){
                return #err(#TicketPriceError);
-          };
+          }; */
           let availablecycles : Nat = await availableCycles(); 
           if(availablecycles < 800_510_000_000 ){
                throw Error.reject("Canister doesnt have enough cycles");

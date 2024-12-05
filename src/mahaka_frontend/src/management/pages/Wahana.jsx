@@ -1,64 +1,73 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import {
   HiArrowRightCircle,
   HiCheckBadge,
-  HiChevronDown,
-  HiChevronUp,
+  // HiChevronDown,
+  HiChevronRight,
+  // HiChevronUp,
   // HiClock,
-  HiMiniMapPin,
+  // HiMiniMapPin,
   HiOutlineMagnifyingGlass,
 } from "react-icons/hi2";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { IoTrashBinSharp } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import {
   createStaggerContainer,
   createStaggerVariant,
 } from "../../common/animationVariants";
-import { formatDateAndTime } from "../../admin/pages/EventManager";
+// import { formatDateAndTime } from "../../admin/pages/EventManager";
 import ModalOverlay from "../../customer/Components/Modal-overlay";
 import CreateWahanaForm from "../../admin/components/CreateWahanaForm";
-import { deleteWahana,searchWahanas,} from "../../redux/reducers/apiReducers/wahanaApiReducer";
+import {
+  deleteWahana,
+  searchWahanas,
+} from "../../redux/reducers/apiReducers/wahanaApiReducer";
+import { Link } from "react-router-dom";
 
 // Main component
 const MgtWahana = () => {
   const { backend } = useSelector((state) => state.authentication);
-  const { wahanasByVenue, singleWahanaLoading,  searchedWahana,wahanas, searchedWahanaLoading } = useSelector(
-    (state) => state.wahana
-  );
+  const {
+    wahanasByVenue,
+    singleWahanaLoading,
+    searchedWahana,
+    // wahanas,
+    searchedWahanaLoading,
+  } = useSelector((state) => state.wahana);
+  const dispatch = useDispatch();
   const { currentUserByCaller } = useSelector((state) => state.users);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const [searchClicked, setSearchClicked] = useState(false);
+
   const containerVariants = createStaggerContainer(0.4);
   const cardVariants = createStaggerVariant(0.3);
-  const [searchInput, setSearchInput] = useState("")
-  const [searchBtnClick, setSearchBtnClick] = useState(false)
-  const dispatch = useDispatch()
 
-// console.log("wahana by venues are", wahanasByVenue)
-//  console.log("searched wahanas  are", searchedWahana)
-// // console.log("searched wahanas by venues are", wahanas)
+  const handleSearch = () => {
+    dispatch(
+      searchWahanas({
+        backend: backend,
+        searchText: searchInput,
+        chunkSize: 10,
+        pageNo: 0,
+      })
+    );
+    setSearchClicked(true);
+  };
 
-const filteredWahanas = useMemo(() => {
-  if (searchInput && searchBtnClick) {
-    return searchedWahana;
-  } else {
-    return wahanasByVenue;
-  }
-}, [ wahanasByVenue,searchedWahana,searchInput]);
+  useEffect(() => {
+    if (searchedWahana && !searchInput) {
+      setSearchClicked(false);
+    }
+  }, [searchInput, searchedWahana]);
 
-
-useEffect(() => {
-  setSearchBtnClick(false); 
-}, [searchInput]);
-
-
-  const handleSearch = ()=>{
-     if (searchInput.trim()) {
-      setSearchBtnClick(true); 
-   // console.log("search value is",searchInput)
-    dispatch(searchWahanas({backend:backend,searchText:searchInput,chunkSize:10,pageNo:0}))
-     }
-  }
+  const filteredWahanas =
+    searchClicked && searchedWahana
+      ? searchedWahana.filter(
+          (wahana) => wahana.venueId === currentUserByCaller.assignedVenue.id
+        )
+      : wahanasByVenue;
 
   return (
     <div className="flex flex-auto flex-col relative min-h-screen">
@@ -102,12 +111,11 @@ useEffect(() => {
                       type="text"
                       placeholder="Search wahanas..."
                       className="outline-none bg-transparent w-full"
-                     value = {searchInput}
-                      //setSearchInput = {setSearchInput}
-                      onChange = {(e)=>setSearchInput(e.target.value)}
+                      value={searchInput}
+                      onChange={(e) => setSearchInput(e.target.value)}
                     />
                   </div>
-                  <button className="ml-auto" onClick = {handleSearch}>
+                  <button className="ml-auto" onClick={handleSearch}>
                     <HiArrowRightCircle size={24} className="cursor-pointer" />
                   </button>
                 </div>
@@ -121,7 +129,9 @@ useEffect(() => {
                 </div>
               </div>
             </div>
-            {!currentUserByCaller || singleWahanaLoading ||  searchedWahanaLoading? (
+            {!currentUserByCaller ||
+            singleWahanaLoading ||
+            searchedWahanaLoading ? (
               <div className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3">
                 <SkeletonLoader />
                 <SkeletonLoader />
@@ -140,10 +150,11 @@ useEffect(() => {
                   </motion.div>
                 ))}
               </motion.div>
-            ) : 
-            
-              <div className="mt-10 text-4xl text-gray-600 font-bold flex justify-center">No Wahana Found</div>
-            }
+            ) : (
+              <div className="mt-10 text-4xl text-gray-600 font-bold flex justify-center">
+                No Wahana Found
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -167,11 +178,7 @@ useEffect(() => {
 // event cards
 const WahanaCard = ({ wahana }) => {
   const dispatch = useDispatch();
-  const [isExpanded, setIsExpanded] = useState(false);
   const { backend } = useSelector((state) => state.authentication);
-  const toggleExpand = () => setIsExpanded((pv) => !pv);
-  const startInterVal = formatDateAndTime(parseInt(wahana.details.StartDate));
-  const endInterVal = formatDateAndTime(parseInt(wahana.details.EndDate));
   const [isDelete, setIsDelete] = useState(false);
 
   const handleWahanaDelete = () => {
@@ -224,83 +231,28 @@ const WahanaCard = ({ wahana }) => {
             </div>
           </div>
           <div className="mt-4 text-lg font-medium">{wahana.ride_title}</div>
-          <div className="text-secondary mt-0.5 line-clamp-2">
-            {wahana.description}
-          </div>
-          <div className="flex items-center text-md leading-5 mt-2 uppercase font-medium">
-            <HiMiniMapPin size={14} />
-            <div className="ml-1.5">{wahana.details.Location}</div>
-          </div>
           <div className="flex items-center text-md leading-5 mt-2 font-medium">
             <div>Creator</div>
             <div className="ml-1.5 truncate">{wahana.creator.toText()}</div>
           </div>
           <div className="flex items-center justify-between mt-2">
             <div className="flex flex-col font-medium">
-              <div>Start Date</div>
-              <div>{startInterVal.date}</div>
-              <div>{startInterVal.time}</div>
+              <div>Price</div>
+              <div className="flex items-center">
+                Rp.<span className="text-xl font-bold">{wahana.price}</span>
+                /Person
+              </div>
             </div>
-            <button
-              onClick={toggleExpand}
+            <Link
+              to={`/management/wahana/${encodeURIComponent(
+                wahana.venueId
+              )}/${encodeURIComponent(wahana.id)}`}
               className="h-8 w-8 rounded-full hover:bg-hover flex items-center justify-center"
             >
-              {isExpanded ? <HiChevronUp /> : <HiChevronDown />}
-            </button>
+              <HiChevronRight />
+            </Link>
           </div>
         </div>
-        <AnimatePresence>
-          {isExpanded && (
-            <motion.div
-              initial={{
-                opacity: 0,
-                height: 0,
-              }}
-              animate={{
-                opacity: 1,
-                height: "auto",
-              }}
-              exit={{
-                opacity: 0,
-                height: 0,
-              }}
-            >
-              <div className="border-t border-border p-4">
-                <div className="flex justify-between">
-                  <div className="flex flex-col font-medium w-1/2">
-                    <div>End Date</div>
-                    <div>{endInterVal.date}</div>
-                    <div>{endInterVal.time}</div>
-                  </div>
-                  <div className="flex flex-col font-medium w-1/2">
-                    <div>Wahana ID</div>
-                    <div className="text-xs">{wahana.id}</div>
-                  </div>
-                </div>
-                {/* <div className="flex items-center flex-auto mt-4">
-                  <div className="font-mono text-xl">ICP</div>
-                  <div className="ml-auto flex items-baseline">
-                    <div className="font-bold text-4xl">
-                      {parseInt(wahana.priceICP)}
-                    </div>
-                    <div className="text-secondary font-semibold text-lg">
-                      /Person
-                    </div>
-                  </div>
-                </div> */}
-                <div className="flex items-center flex-auto mt-4">
-                  <div className="font-mono text-xl">IDR</div>
-                  <div className="ml-auto flex items-baseline">
-                    <div className="font-bold text-4xl">{wahana.price}</div>
-                    <div className="text-secondary font-semibold text-lg">
-                      /Person
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
     </>
   );

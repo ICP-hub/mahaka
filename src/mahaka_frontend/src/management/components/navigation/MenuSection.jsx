@@ -1,7 +1,7 @@
 import { HiOutlineStar, HiOutlineUserGroup } from "react-icons/hi2";
 import {
-  MdEventNote,
-  MdInsertChartOutlined,
+  // MdEventNote,
+  // MdInsertChartOutlined,
   MdMap,
   MdPerson,
   MdHistory,
@@ -12,6 +12,8 @@ import { Link, useLocation } from "react-router-dom";
 
 const MenuSection = () => {
   const location = useLocation();
+
+  const { userRole } = useSelector((state) => state.users);
 
   const menuItems = [
     { path: "/management/venues", label: "Venues", icon: <MdMap size={24} /> },
@@ -27,7 +29,6 @@ const MenuSection = () => {
       path: "/management/events",
       label: "Events",
       icon: <MdEventNote size={24} />,
-    },
 
     // {
     //   path: "/management/users",
@@ -40,9 +41,6 @@ const MenuSection = () => {
       label: "Ticket History",
       icon: <MdHistory size={24} />,
     },
-    {
-      path: "/management/ticket",
-      label: " Offline Ticket",
       icon: <IoTicketOutline size={26} />,
     },
   ];
@@ -56,6 +54,7 @@ const MenuSection = () => {
         <div className="relative flex items-center justify-start p-2.5 font-medium leading-5 no-underline rounded-md text-secondaryText">
           <div className="text-secondaryText">
             <div className="text-white text-md">DASHBOARD</div>
+            <div className="text-sm capitalize">{userRole || "User role"}</div>
           </div>
         </div>
       </div>

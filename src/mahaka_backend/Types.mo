@@ -117,6 +117,14 @@ module {
         gTicket_limit : Nat;
         creator : Principal;
         venueId : Text;
+        status: EventStatus;
+    };
+
+    public type EventStatus = {
+        #Completed;
+        #Expired;
+        #Ongoing;
+        #AboutToStart;
     };
 
     public type completeEvent = Events and {

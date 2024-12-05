@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { HiOutlineMinusSmall, HiOutlinePlusSmall } from "react-icons/hi2";
 
-const VisitorPicker = ({ numberOFVisitor, setNumberOFVisitor }) => {
+const VisitorPicker = ({ numberOFVisitor = 1, setNumberOFVisitor }) => {
   const increment = () => setNumberOFVisitor(numberOFVisitor + 1);
   const decrement = () =>
-    setNumberOFVisitor(numberOFVisitor > 0 ? numberOFVisitor - 1 : 0);
+    setNumberOFVisitor(numberOFVisitor > 1 ? numberOFVisitor - 1 : 1);
 
   return (
     <div className="flex flex-col sm:flex-row w-full justify-between">

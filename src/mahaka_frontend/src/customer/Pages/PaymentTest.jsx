@@ -265,7 +265,12 @@ const PaymentTest = () => {
     setIsPaymentProcessing(true);
 
     const venueId = eventIds;
-    const ticketType = { GroupPass: null };
+    const _ticket_type =
+      ticketType === "GROUP"
+        ? { GroupPass: null }
+        : ticketType === "VIP"
+        ? { VipPass: null }
+        : { SinglePass: null };
     const metadata = [
       {
         data: new Uint8Array([0x12, 0x34]),
@@ -280,8 +285,8 @@ const PaymentTest = () => {
     const numOfVisitors = BigInt(numberOFVisitor);
     const paymentType = { Card: null };
     const ticketDetails = {
-      ticket_type: ticketType,
-      price: Number(parseFloat(256000.0).toFixed(2)),
+      ticket_type: _ticket_type,
+      price: parseFloat(ticketprice),
     };
     try {
       const response = await backend.buyVenueTicket(
@@ -290,7 +295,7 @@ const PaymentTest = () => {
         metadata,
         receiver,
         paymentType,
-        BigInt(timestemp),
+        timestemp,
         numOfVisitors
       );
 
