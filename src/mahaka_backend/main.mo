@@ -1665,6 +1665,7 @@ actor mahaka {
      private func processMint(
           collectionActor: actor {
                logoDip721: () -> async Types.LogoResult;
+               bannerDip721: () -> async Types.LogoResult;
                mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
                getDIP721details : () -> async nftTypes.Dip721NonFungibleToken;
                totalSupplyDip721 : () -> async Nat64;
@@ -1684,6 +1685,7 @@ actor mahaka {
           caller : Principal
      ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError> {
           let _logo = await collectionActor.logoDip721();
+          let _banner = await collectionActor.bannerDip721();
           let nftDetails = await collectionActor.getDIP721details();
           var mintReceipts: List.List<nftTypes.MintReceiptPart> = List.nil();
           // if (numOfVisitors > Array.size(receivers)) {
@@ -1709,6 +1711,7 @@ actor mahaka {
                               ticketType = offlineOrOnline; 
                               recepient = recepient;
                               price = ticketPrice;
+                              banner = _banner.data;
                          };
                          let res = await recordTicketSale(categoryId, ticketSaleInfo, saleType);
                          totalTickets := totalTickets + 1;
@@ -1742,7 +1745,8 @@ actor mahaka {
           saleDate : Time.Time,
           ticketPrice: Float,
           recepient : Principal,
-          caller : Principal
+          caller : Principal,
+          banner : Text
      ) : async Result.Result<[icrcTypes.TxIndex], icrcTypes.TransferError> {
           var transferReceipts: List.List<icrcTypes.TxIndex> = List.nil();
 
@@ -1777,6 +1781,7 @@ actor mahaka {
                               ticketType = offlineOrOnline; 
                               recepient = recepient;
                               price = ticketPrice;
+                              banner = banner;
                          };
                          let res = await recordTicketSale(wahanaId, ticketSaleInfo, #Wahana);
                          totalTickets := totalTickets + 1;
@@ -1870,7 +1875,8 @@ actor mahaka {
                                    args.saleDate,
                                    args.price,
                                    args.recepient,
-                                   args.caller
+                                   args.caller,
+                                   args.banner
                               );
                               switch (transferResult) {
                                    case (#ok(txIndices)) {
@@ -1948,6 +1954,7 @@ actor mahaka {
                     let collectionId = await Utils.extractCanisterId(venueId);
                     let collectionActor = actor (collectionId) : actor {
                          logoDip721: () -> async Types.LogoResult;
+                         bannerDip721: () -> async Types.LogoResult;
                          mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
                          getDIP721details : ()-> async nftTypes.Dip721NonFungibleToken;
                          totalSupplyDip721 : () -> async Nat64;
@@ -2076,6 +2083,7 @@ actor mahaka {
                case (#ok(event)) {
                     let collectionActor = actor (Principal.toText(event.event_collectionid)) : actor {
                          logoDip721: () -> async Types.LogoResult;
+                         bannerDip721: () -> async Types.LogoResult;
                          mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
                          getDIP721details : ()-> async nftTypes.Dip721NonFungibleToken;
                          totalSupplyDip721 : () -> async Nat64;
@@ -2266,6 +2274,7 @@ actor mahaka {
                                              price = wahana.price;
                                              recepient = receiver;
                                              caller = caller;
+                                             banner = wahana.banner.data
                                         };
                                         pendingPaymentsWahana := Array.append<(Nat,Types.ArgsStoreWahana)>([(invoice_id,args)],pendingPaymentsWahana);
                                         return #ok(create_invoice_response);
@@ -2313,6 +2322,7 @@ actor mahaka {
           let collectionId = await Utils.extractCanisterId(venueId);
           let collectionActor = actor (collectionId) : actor {
                logoDip721: () -> async Types.LogoResult;
+               bannerDip721: () -> async Types.LogoResult;
                mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
                getDIP721details : ()-> async nftTypes.Dip721NonFungibleToken;
                totalSupplyDip721 : () -> async Nat64;
@@ -2404,6 +2414,7 @@ actor mahaka {
                case (#ok(event)) {
                     let collectionActor = actor (Principal.toText(event.event_collectionid)) : actor {
                          logoDip721: () -> async Types.LogoResult;
+                         bannerDip721: () -> async Types.LogoResult;
                          mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: nftTypes.ticket_type, logo: Types.LogoResult) -> async nftTypes.MintReceipt;
                          getDIP721details : ()-> async nftTypes.Dip721NonFungibleToken;
                          totalSupplyDip721 : () -> async Nat64;
@@ -2523,7 +2534,7 @@ actor mahaka {
                     };
                     switch (paymentType) {
                          case (#Cash) {
-                              await processTransfer(collectionActor, receiver, numOfVisitors, wahanaId, paymentType, #Offline, saleDate,  wahana.price, receiver, caller);
+                              await processTransfer(collectionActor, receiver, numOfVisitors, wahanaId, paymentType, #Offline, saleDate,  wahana.price, receiver, caller,wahana.banner.data);
                          };
                          case (#Card) {
                               // throw Error.reject("Card option is not available");
