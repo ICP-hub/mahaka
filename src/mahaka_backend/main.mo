@@ -150,7 +150,7 @@ actor mahaka {
 //         icrc2_transfer_from : shared Types.TransferFromArgs -> async Types.Result_3;
 //     };
 
-     let FiatPayCanister = actor "bkyz2-fmaaa-aaaaa-qaaaq-cai" : actor {
+     let FiatPayCanister = actor "xfxqj-piaaa-aaaak-ao53q-cai" : actor {
         create_invoice : shared (Principal,FiatTypes.Request.CreateInvoiceBody) -> async Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>>;
         get_invoice : (Nat)->async Http.Response<Http.ResponseStatus<FiatTypes.Invoice, {}>>;
         get_all_invoices_to_admin : () -> async Http.Response<Http.ResponseStatus<[FiatTypes.Invoice], {}>>
@@ -4252,7 +4252,11 @@ actor mahaka {
           "http://127.0.0.1:4943/?canisterId=bd3sg-teaaa-aaaaa-qaaba-cai", 
           "http://127.0.0.1:4943/?canisterId=bkyz2-fmaaa-aaaaa-qaaaq-cai", 
           "https://nfid.one",
-          "https://dev.nfid.one","https://3rwjt-vqaaa-aaaak-akusq-cai.icp0.io"];
+          "https://dev.nfid.one",
+          "https://3rwjt-vqaaa-aaaak-akusq-cai.icp0.io",
+          "https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=xfxqj-piaaa-aaaak-ao53q-cai",
+          "https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.icp0.io/?id=3wxph-yiaaa-aaaak-akusa-cai",
+          "https://icp0.io/api/v2/canister/xfxqj-piaaa-aaaak-ao53q-cai"];
 
           return {
                trusted_origins = trusted_origins;
