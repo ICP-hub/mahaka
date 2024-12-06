@@ -137,6 +137,7 @@ const CardCheckout = ({}) => {
                     paymentMethod={data?.paymentMethod}
                     amount={data?.amount}
                     item={data?.items}
+                    currency={data?.currency}
                   />
                 </ModalOverlay>
               )}
@@ -157,12 +158,15 @@ const CardCheckout = ({}) => {
 
 export default CardCheckout;
 
-const Detail = ({ item, status, paymentMethod, amount, onClose }) => {
+const Detail = ({ item, status, paymentMethod, amount, onClose, currency }) => {
   return (
     <div className="bg-transparent px-1 py-1">
       <div className="flex justify-between">
         <div className="px-2 py-2 bg-gray-100 rounded">
-          Total Amount: <span className="text-emerald-500">{amount} USD</span>
+          Total Amount:{" "}
+          <span className="text-emerald-500">
+            {amount} {currency}
+          </span>
         </div>
         <div className="px-2 py-2 bg-gray-100 rounded">
           Payment Method:{" "}
