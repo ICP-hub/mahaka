@@ -8,7 +8,7 @@ import i18n from "../../../i18n";
 import TranslateButton from "../../../Translation";
 
 const AppBar = ({ toggleNavigation, selected, setSelected }) => {
-  console.log("selected in app baer",selected)
+ // console.log("selected in app baer",selected)
   
   const { t, i18n } = useTranslation();
   const changeLanguage = (lng) => {

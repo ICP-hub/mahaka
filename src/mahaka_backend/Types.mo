@@ -265,11 +265,13 @@ module {
         recepient : Principal;
         ticketType : TicketType;
         price : Float;
+        banner : Text;
     };
 
     public type ArgsStore = {
         collectionActor: actor {
                logoDip721: () -> async Types.LogoResult;
+               bannerDip721: () -> async Types.LogoResult;
                mintDip721: (to: Principal, metadata: Types.MetadataDesc, ticket_details: Types.ticket_type, logo: Types.LogoResult) -> async Types.MintReceipt;
                getDIP721details : () -> async Types.Dip721NonFungibleToken;
                totalSupplyDip721 : () -> async Nat64;
@@ -308,7 +310,8 @@ module {
         saleDate : Time.Time;
         price: Float;
         recepient : Principal; 
-        caller : Principal
+        caller : Principal;
+        banner : Text
     };
 
 
