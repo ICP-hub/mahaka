@@ -23,8 +23,7 @@ const AdminTestimonial = ()=>{
     const dispatch = useDispatch()
 
   const {  testimonials,testimonialLoading} = useSelector((state) => state.testimonial);
-  console.log("testimonials are",testimonials)
-  console.log("testimonials loading",testimonialLoading)
+ 
   const { backend } = useSelector((state) => state.authentication);
 
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
@@ -47,8 +46,6 @@ const TestimonialCard = ({ testimonial, testimonialLoading}) => {
       </p>
       <p className="text-sm text-gray-600">{testimonial.description}</p>
     </div>
-      
-    
       </>
   );
 };

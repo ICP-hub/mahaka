@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 import store from "./redux/store";
 import App from "./App";
 import { AuthProvider } from "./connect/useClient";
+import { Canister } from "@dfinity/utils";
 
 export default function IdentityWrapper() {
   const [isMounted, setIsMounted] = useState(false);
@@ -25,7 +26,7 @@ export default function IdentityWrapper() {
       theme={IdentityKitTheme.SYSTEM}
       authType={IdentityKitAuthType.DELEGATION}
       signerClientOptions={{
-        targets: [canisterID],
+        targets: [canisterID, canisterIDFiat],
       }}
     >
       <Provider store={store}>

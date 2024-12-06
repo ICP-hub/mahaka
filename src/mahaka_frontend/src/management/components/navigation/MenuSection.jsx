@@ -1,14 +1,15 @@
 import { HiOutlineStar, HiOutlineUserGroup } from "react-icons/hi2";
 import {
-  // MdEventNote,
-  // MdInsertChartOutlined,
+  MdEventNote,
+  MdInsertChartOutlined,
   MdMap,
-  // MdPerson,
-  // MdEqualizer,
+  MdPerson,
+  MdHistory,
   MdEvent,
 } from "react-icons/md";
-import { useSelector } from "react-redux";
+import { IoTicketOutline } from "react-icons/io5";
 import { Link, useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
 const MenuSection = () => {
   const location = useLocation();
@@ -22,16 +23,30 @@ const MenuSection = () => {
       label: "Wahana",
       icon: <HiOutlineStar size={24} />,
     },
-    { path: "/management/events", label: "Events", icon: <MdMap size={24} /> },
+    // { path: "/admin/events", label: "Events", icon: <MdEventNote size={24} /> },
+    // { path: "/management/venues", label: "Venues", icon: <MdMap size={24} /> },
+    // { path: "/management/voucher", label: "Voucher", icon: <MdMap size={24} /> },
+    {
+      path: "/management/events",
+      label: "Events",
+      icon: <MdEventNote size={24} />,
+    },
+
+    // {
+    //   path: "/management/users",
+    //   label: "users",
+    //   icon: <HiOutlineUserGroup size={24} />,
+    // },
+    // { path: "/management/sales", label: "Sales", icon: <MdEqualizer size={24} /> },
     {
       path: "/management/useractivity",
       label: "Ticket History",
-      icon: <MdEvent size={24} />,
+      icon: <MdHistory size={24} />,
     },
     {
       path: "/management/ticket",
       label: " Offline Ticket",
-      icon: <MdMap size={24} />,
+      icon: <IoTicketOutline size={26} />,
     },
   ];
 
