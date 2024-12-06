@@ -42,15 +42,32 @@ const initialState = {
       try {
        
         const response = await backend.getAllTestimonials(
-          
-           
-          
         );
         // action(false);
        // console.log("testimonials fetshed successfully")
         return response;
       } catch (error) {
         throw error;
+      }
+    }
+  );
+
+  // clear all testimonials 
+
+  export const deleteTestimonial= createAsyncThunk(
+    "testimonial/deleteTestimonial",
+    async ({ backend,setDeleteModalVisible}) => {
+      try {
+        const response = await backend.deleteTestimonial();
+        if (response.ok) {
+          setDeleteModalVisible(false)
+          return response.ok; // Success message
+         
+        } else {
+          throw new Error(response.err); // Handle error
+        }
+      } catch (error) {
+        console.log("Error in clear testimonials", e);
       }
     }
   );
@@ -82,28 +99,43 @@ const initialState = {
         state.error = action.error.message;
       })
 
+      // get all testimonials
 
       .addCase(getAllTestimonials.pending, (state) => {
         state.testimonialLoading = true;
       })
       .addCase(getAllTestimonials.fulfilled, (state, action) => {
         state.testimonialLoading = false;
+        if (action.payload.ok){
+          state.testimonials= [...action.payload.ok]
 
-        if (action.payload.ok) {
-          state.testimonials= action.payload.ok
-         
-        } else {
-          state.testimonials = [];
-          
         }
-
+      
         state.error = null;
       })
 
       .addCase(getAllTestimonials.rejected, (state, action) => {
         state.testimonialLoading = false;
         state.error = action.error.message;
-      });
+        state.testimonials = [];
+      })
+
+      // delete testimonials
+      .addCase(deleteTestimonial.pending, (state) => {
+        state.testimonialLoading = true;
+      })
+      .addCase(deleteTestimonial.fulfilled, (state, action) => {
+        state.testimonialLoading = false;
+        state.testimonials= []
+        state.error = null;
+      })
+
+      .addCase(deleteTestimonial.rejected, (state, action) => {
+        state.testimonialLoading = false;
+        state.error = action.error.message;
+        // state.testimonials = [];
+      })
+
 
 
     }
