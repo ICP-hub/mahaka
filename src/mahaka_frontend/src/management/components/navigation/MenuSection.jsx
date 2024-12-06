@@ -1,7 +1,7 @@
 import { HiOutlineStar, HiOutlineUserGroup } from "react-icons/hi2";
 import {
-  // MdEventNote,
-  // MdInsertChartOutlined,
+  MdEventNote,
+  MdInsertChartOutlined,
   MdMap,
   MdPerson,
   MdHistory,
@@ -9,6 +9,7 @@ import {
 } from "react-icons/md";
 import { IoTicketOutline } from "react-icons/io5";
 import { Link, useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
 const MenuSection = () => {
   const location = useLocation();

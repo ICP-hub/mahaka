@@ -4,6 +4,7 @@ import { createActor } from "../../../../declarations/mahaka_backend";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
+import { getAllWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 
 import { useIdentityKit } from "@nfid/identitykit/react";
 import { getAllEventsByVenue } from "../../redux/reducers/apiReducers/eventApiReducer";
@@ -29,6 +30,9 @@ const MgtTicket = () => {
   const { currentUserByCaller } = useSelector((state) => state.users);
 
   const { events, eventLoading } = useSelector((state) => state.events);
+  // const { wahanasByVenue, singleWahanaLoading } = useSelector(
+  //   (state) => state.wahanas
+  // );
   const { backend } = useSelector((state) => state.authentication);
   const [eventDetails, setEventDetails] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -51,6 +55,16 @@ const MgtTicket = () => {
         venueId: currentUserByCaller?.assignedVenue?.id,
       })
     );
+
+    dispatch(
+      getAllWahanasbyVenue({
+        backend,
+        chunkSize: 100,
+        pageNo: 0,
+        venueId: currentUserByCaller?.assignedVenue?.id,
+      })
+    );
+
     // Automatically select the first venue and fetch its ticket details
     if (!venuesLoading && currentVenue) {
       const defaultVenue = currentVenue;

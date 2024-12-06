@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { Principal } from "@dfinity/principal";
 import notificationManager from "../../common/utils/notificationManager";
+import { FaPlus, FaMinus } from "react-icons/fa";
 
 export default function EventTickets({
   type,
@@ -17,13 +18,21 @@ export default function EventTickets({
 }) {
   const { backend, principal } = useSelector((state) => state.authentication);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [ticketQuantity, setTicketQuantity] = useState(1);
+  const [loading, setLoading] = useState(false);
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
+  const convertDateToNanoseconds = (dateString) => {
+    const date = new Date(dateString);
+    return date.getTime() * 1_000_000; // Convert milliseconds to nanoseconds
+  };
 
   const buyVenueTicketHandler = async () => {
     try {
+      setLoading(true);
       const ticketTypeVariant = { ["SinglePass"]: null };
       const record = [
         {
@@ -39,6 +48,7 @@ export default function EventTickets({
 
       console.log(record);
       console.log(selectedVenue);
+      const dateInNanoseconds = convertDateToNanoseconds(selectedDate);
 
       const response = await backend.buyOfflineEventTicket(
         id,
@@ -47,22 +57,21 @@ export default function EventTickets({
         record,
 
         Principal.fromText(principal),
-        12345,
+        dateInNanoseconds,
 
-        1,
+        ticketQuantity,
         { Cash: null }
       );
 
       console.log("event ticket purchased successfully:", response);
       notificationManager.success("Ticket purchase successfully");
-      const ticket = await backend.getVenueTickets(
-        "h7yxq-n6yb2-6js2j-af5hk-h4inj-edrce-oevyj-kbs7a-76kft-vrqrw-nqe"
-      );
-      console.log(ticket);
+
       toggleModal();
     } catch (err) {
       console.error("Error in buying event tickets:", err);
       toggleModal();
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -99,9 +108,49 @@ export default function EventTickets({
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded-lg p-6 w-96">
             <h2 className="text-2xl text-secondary   mb-4">{name}</h2>
-            {/* <p className="text-base text-gray-600 mb-4">
-              {tickets.description}
-            </p> */}
+            <div className="mb-4">
+              <label className="block text-secondary text-lg mb-2">
+                Select Date:
+              </label>
+              <input
+                type="date"
+                className="w-full border border-gray-300 rounded-lg p-2"
+                value={selectedDate}
+                min={new Date().toISOString().split("T")[0]} // Today's date
+                max={
+                  new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                    .toISOString()
+                    .split("T")[0]
+                } // One week from now
+                onChange={(e) => setSelectedDate(e.target.value)}
+              />
+            </div>
+            <div className="flex justify-between">
+              <label className="block text-secondary text-lg mb-2">
+                Quantity:
+              </label>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() =>
+                    setTicketQuantity(Math.max(1, ticketQuantity - 1))
+                  }
+                  className="px-2 py-1 bg-gray-200 rounded-md"
+                >
+                  <FaMinus size={8} />
+                </button>
+                <span className="text-lg">{ticketQuantity}</span>
+                <button
+                  onClick={() =>
+                    setTicketQuantity(
+                      Math.min(ticketQuantity + 1, availability)
+                    )
+                  }
+                  className="px-2 py-1 bg-gray-200 rounded-md"
+                >
+                  <FaPlus size={8} />
+                </button>
+              </div>
+            </div>
             <div className="flex justify-between mb-4">
               <span className="text-lg text-secondary  ">Price:</span>
               <span className="text-lg font-semibold">
@@ -131,10 +180,15 @@ export default function EventTickets({
                 Close
               </button>
               <button
-                className="px-4 py-2  bg-secondary text-white rounded-lg"
+                className={`px-4 py-2 rounded-lg text-white ${
+                  loading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-secondary hover:bg-secondary-dark"
+                }`}
                 onClick={buyVenueTicketHandler}
+                disabled={loading} // Disable button when loading
               >
-                Buy Ticket
+                {loading ? "Buying..." : "Buy Ticket"}
               </button>
             </div>
           </div>
