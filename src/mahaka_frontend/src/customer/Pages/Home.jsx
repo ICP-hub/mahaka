@@ -213,6 +213,24 @@ export default function Home() {
     );
   };
 
+  const SkeletonLoaderWahanas = () => {
+    return (
+      <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-[33px] mt-12">
+        {[1, 2, 3].map((item) => (
+          <div key={item} className="overflow-hidden">
+            <div className="rounded-2xl w-full h-full shadow-md animate-pulse">
+              <div className="bg-gray-400 w-full h-120 rounded-2xl"></div>
+              <div className="p-4">
+                <div className="h-6 bg-gray-300 mb-2 w-3/4 rounded"></div>
+                <div className="h-4 bg-gray-300 w-full rounded"></div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <>
       {attractionBannerLoading ? (
@@ -446,13 +464,12 @@ export default function Home() {
               {chunkArray(banners, [1, 2, 3]).map((group, index) => (
                 <div
                   key={index}
-                  className={`grid ${
-                    index === 0
+                  className={`grid ${index === 0
                       ? "lg:grid-cols-1 md:grid-cols-1"
                       : index === 1
-                      ? "lg:grid-cols-2 md:grid-cols-2"
-                      : "lg:grid-cols-3 md:grid-cols-3"
-                  } gap-[33px] my-5`}
+                        ? "lg:grid-cols-2 md:grid-cols-2"
+                        : "lg:grid-cols-3 md:grid-cols-3"
+                    } gap-[33px] my-5`}
                 >
                   {group.map((banner, bannerIndex) => (
                     <div
@@ -519,37 +536,49 @@ export default function Home() {
             </div>
           </section>
           {/* cards box start  */}
-          <div className="grid lg:grid-cols-3 md:grid-cols-2   gap-[33px] mt-12">
-            {/* first Card  start*/}
-            {wahanas
-              ?.filter((wahana) => wahana.featured)
-              ?.map((wahana) => (
-                <div className="overflow-hidden" key={wahana.id}>
-                  <div className="rounded-2xl w-full h-full shadow-md">
-                    <img
-                      src={wahana.banner.data}
-                      alt={wahana.title}
-                      className="object-cover w-full h-120 rounded-2xl"
-                    />
-                    <div className="p-4">
-                      <h1 className="text-3xl font-black">
-                        {wahana.ride_title}
-                      </h1>
-                      <p className="text-base font-normal mt-2 line-clamp-1">
-                        {wahana.description}
-                      </p>
+          {loading ? (
+            <SkeletonLoaderWahanas />
+          ) : wahanas && wahanas.length === 0 ? (
+            // <div className="flex justify-center items-center mt-12">
+              <div className="bg-card rounded-lg p-5 mt-10 text-center shadow-lg">
+                <h1 className="text-4xl text-gray-800 font-bold">
+                  No Wahanas Found.
+                </h1>
+              {/* </div> */}
+            </div>
+          ) : (
+            <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-[33px] mt-12">
+              {wahanas
+                ?.filter((wahana) => wahana.featured)
+                ?.map((wahana) => (
+                  <div className="overflow-hidden" key={wahana.id}>
+                    <div className="rounded-2xl w-full h-full shadow-md">
+                      <img
+                        src={wahana.banner.data}
+                        alt={wahana.title}
+                        className="object-cover w-full h-120 rounded-2xl"
+                      />
+                      <div className="p-4">
+                        <h1 className="text-3xl font-black">
+                          {wahana.ride_title}
+                        </h1>
+                        <p className="text-base font-normal mt-2 line-clamp-1">
+                          {wahana.description}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-          </div>
-          {/* cards box end  */}
-          {/* <section className="flex flex-col justify-center items-center pt-10">
+                ))}
+            </div>
+          )}
+        </div>
+        {/* cards box end  */}
+        {/* <section className="flex flex-col justify-center items-center pt-10">
             <button className="px-14 py-3 bg-[#F08E1E] text-white rounded-[10px] font-normal text-base">
               Explore
             </button>
           </section> */}
-        </div>
+
         {/* Events and ctivity Section end  */}
         {/* Testimonial start  */}
 
