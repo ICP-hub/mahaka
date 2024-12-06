@@ -2823,7 +2823,7 @@ actor mahaka {
                     let ticketsResult = await getEventTickets(id);
                     switch (ticketsResult) {
                          case (#err(e)) {
-                              return #err("Error fetching tickets: " # e);
+                              return #ok(0);
                          };
                          case (#ok(tickets)) {
                               var count: Nat = 0;
@@ -2831,7 +2831,7 @@ actor mahaka {
                                    let nftDetailsResult = await collectionActor.getNFT(Nat64.fromNat(ticket.ticketId));
                                    switch (nftDetailsResult) {
                                         case (#Err(e)) {
-                                             return #ok(0);
+                                             return #err("Error getting NFT details");
                                         };
                                         case (#Ok(nftDetails)) {
                                              // Compare the ticket type
