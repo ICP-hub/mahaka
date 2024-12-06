@@ -46,14 +46,12 @@ export default function EventTickets({
         },
       ];
 
-      console.log(record);
-      console.log(selectedVenue);
       const dateInNanoseconds = convertDateToNanoseconds(selectedDate);
 
       const response = await backend.buyOfflineEventTicket(
         id,
         selectedVenue.id,
-        { ticket_type: ticketTypeVariant, price: 1, priceFiat: 1 },
+        { ticket_type: ticketTypeVariant, price: price },
         record,
 
         Principal.fromText(principal),

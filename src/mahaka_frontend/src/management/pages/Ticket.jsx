@@ -267,7 +267,7 @@ const MgtTicket = () => {
                 gradientClass={ticketData[0].gradientClass}
                 tickets={eventDetails}
                 selectedVenue={selectedEvent}
-                id={selectedVenue?.id}
+                id={currentVenue?.id}
                 price={parseInt(eventDetails?.gTicket_price) || 1}
                 availability={parseInt(eventDetails?.gTicket_limit) || 4}
                 highlightClass={ticketData[0].highlightClass}
@@ -278,7 +278,7 @@ const MgtTicket = () => {
                 gradientClass={ticketData[1].gradientClass}
                 tickets={eventDetails}
                 selectedVenue={selectedEvent}
-                id={selectedVenue?.id}
+                id={currentVenue?.id}
                 price={parseInt(eventDetails?.sTicket_price) || 1}
                 availability={parseInt(eventDetails?.sTicket_limit) || 4}
                 highlightClass={ticketData[1].highlightClass}
@@ -289,7 +289,7 @@ const MgtTicket = () => {
                 gradientClass={ticketData[2].gradientClass}
                 tickets={eventDetails}
                 selectedVenue={selectedEvent}
-                id={selectedVenue?.id}
+                id={currentVenue?.id}
                 price={parseInt(eventDetails?.vTicket_price) || 1}
                 availability={parseInt(eventDetails?.vTicket_limit) || 4}
                 highlightClass={ticketData[2].highlightClass}

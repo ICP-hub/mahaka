@@ -30,7 +30,7 @@ export function imageToFileBlob(imageFile) {
 // Convert to timestamp date and time
 export const convertToTimestamp = (date, time) => {
   const dateTime = new Date(`${date}T${time}`);
-  return dateTime.getTime() * 1_000_000; 
+  return dateTime.getTime() * 1_000_000;
 };
 /* ----------------------------------------------------------------------------------------------------- */
 /*  @ Main component
@@ -110,7 +110,8 @@ const CreateEventForm = ({ setIsModalOpen, venueIdentity }) => {
           id: "",
           venueId: formValues.venueId,
           title: formValues.title,
-          creator: Principal.fromText(principal || '2vxsx-fae'),
+          creator: Principal.fromText(principal || "2vxsx-fae"),
+          status: { AboutToStart: null },
           sTicket_limit: parseInt(formValues.studentTicketLimit),
           description: formValues.description,
           logo: {

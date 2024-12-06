@@ -33,7 +33,7 @@ export default function Ticket({
 
   const buyVenueTicketHandler = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       const ticketTypeVariant = { ["SinglePass"]: null };
       const dateInNanoseconds = convertDateToNanoseconds(selectedDate);
 
@@ -56,7 +56,7 @@ export default function Ticket({
         selectedVenue,
         { ticket_type: ticketTypeVariant, price: price },
         record,
-        Principal.fromText("2vxsx-fae"),
+        Principal.fromText(principal),
         dateInNanoseconds,
         { Cash: null },
         ticketQuantity
@@ -69,9 +69,8 @@ export default function Ticket({
     } catch (err) {
       console.error("Error in buying venue tickets:", err);
       toggleModal();
-    }
-    finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -178,14 +177,16 @@ export default function Ticket({
                 Close
               </button>
               <button
-      className={`px-4 py-2 rounded-lg text-white ${
-        loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-secondary hover:bg-secondary-dark'
-      }`}
-      onClick={buyVenueTicketHandler}
-      disabled={loading} // Disable button when loading
-    >
-      {loading ? 'Buying...' : 'Buy Ticket'}
-    </button>
+                className={`px-4 py-2 rounded-lg text-white ${
+                  loading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-secondary hover:bg-secondary-dark"
+                }`}
+                onClick={buyVenueTicketHandler}
+                disabled={loading} // Disable button when loading
+              >
+                {loading ? "Buying..." : "Buy Ticket"}
+              </button>
             </div>
           </div>
         </div>
