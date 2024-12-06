@@ -58,9 +58,7 @@ const WahanaPayment = () => {
 
         setwahanadetail(data1);
         if (paymenttype == "Card") {
-          setTicketPrice(data1?.ok?.priceFiat);
-        } else {
-          setTicketPrice(data1?.ok?.priceICP);
+          setTicketPrice(data1?.ok?.price);
         }
         console.log("wahana", data1);
       } catch (error) {
@@ -124,54 +122,63 @@ const WahanaPayment = () => {
     }
   };
   const handlePayment2 = async (e) => {
-    if (principal == undefined) {
+    if (!principal) {
       notificationManager.error("Please connect your wallet");
       return;
     }
+    if (!timestemp) {
+      notificationManager.error("Please fill all details");
+      return;
+    }
+
     setLoading(true);
     setIsPaymentProcessing(true);
-    const _venueId = vanueid;
 
-    const _ticket_type = { GroupPass: null };
-    const _metadata = [
-      {
-        data: new Uint8Array([0x12, 0x34]),
-        description: "Sample ticket image",
-        key_val_data: [
-          { key: "exampleKey", val: { TextContent: "exampleValue" } },
-        ],
-        purpose: { Rendered: null },
-      },
-    ];
+    const _venueId = vanueid;
     const receiver = principal;
     const numOfVisitors = BigInt(numberOFVisitor);
-
     const paymentType = { Card: null };
+    const timestamp = BigInt(timestemp);
 
-    console.log("backend", backend);
+    console.log("Backend service instance:", backend);
+
     try {
       const response = await backend.buyWahanaToken(
         _venueId,
         wahanaid,
         receiver,
-        BigInt(timestemp),
+        timestamp,
         numOfVisitors,
         paymentType
       );
-      console.log("res", response);
+
+      console.log("Response from backend:", response);
+
+      // Handle response success
       if ("ok" in response) {
-        console.log("Purchase response:", response);
-        navigate(`/payment/checkout`);
+        const { status, body } = response.ok;
+        if (status && "success" in body) {
+          console.log("Purchase successful:", body.success);
+          navigate(`/payment/checkout`);
+        } else if ("err" in body) {
+          throw new Error("Purchase failed: " + body.err.message);
+        }
       } else {
-        throw new Error(response.err || "Purchase failed");
+        throw new Error(
+          response.err || "Unknown error occurred during purchase"
+        );
       }
     } catch (error) {
       console.error("Payment error:", error);
+      notificationManager.error(
+        error.message || "An error occurred while processing the payment."
+      );
     } finally {
       setLoading(false);
       setIsPaymentProcessing(false);
     }
   };
+
   return (
     <div className="w-full bg-white m-auto">
       <div className="max-w-7xl w-full  mx-auto   rounded-lg shadow-md grid grid-cols-1 md:grid-cols-2 md:gap-6">
@@ -181,7 +188,7 @@ const WahanaPayment = () => {
           <div className="mb-5">
             {loadingdata ? (
               <p className="text-xl font-semibold">
-                Vanue id:-{" "}
+                wahana id:-{" "}
                 <span className="px-20 rounded-lg py-[2px] animate-spin bg-gray-200"></span>
               </p>
             ) : (
