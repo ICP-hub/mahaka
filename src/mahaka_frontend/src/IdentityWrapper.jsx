@@ -12,7 +12,7 @@ export default function IdentityWrapper() {
 
   const canisterID = process.env.CANISTER_ID_MAHAKA_BACKEND;
   const canisterIDFiat = process.env.CANISTER_ID_FIATPAYMENT;
-  const signers = [NFIDW];
+  const signers = [NFIDW, Plug];
 
   useEffect(() => {
     setIsMounted(true);
