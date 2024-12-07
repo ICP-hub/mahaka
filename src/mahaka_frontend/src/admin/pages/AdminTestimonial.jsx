@@ -122,7 +122,7 @@ const SkeletonLoader = () => {
 
 
         <div className="flex w-full flex-col sm:flex-row bg-card p-7 justify-end items-center">
-        <div className="mt-4 border w-full sm:ml-4 sm:mt-0 sm:w-72 bg-card p-4 rounded-xl mr-auto">
+        {/* <div className="mt-4 border w-full sm:ml-4 sm:mt-0 sm:w-72 bg-card p-4 rounded-xl mr-auto">
                 <div className="relative flex items-center flex-auto">
                   <div>
                     <HiOutlineMagnifyingGlass size={24} />
@@ -143,7 +143,7 @@ const SkeletonLoader = () => {
                     />
                   </div>
                 </div>
-              </div>
+              </div> */}
 <div>
   <div
     className="mt-8 sm:mt-0"
