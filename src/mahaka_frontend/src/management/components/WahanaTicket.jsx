@@ -5,7 +5,7 @@ import notificationManager from "../../common/utils/notificationManager";
 
 import { FaPlus, FaMinus } from "react-icons/fa";
 
-export default function Ticket({
+export default function WahanaTicket({
   type,
   gradientClass,
   name,
@@ -15,6 +15,7 @@ export default function Ticket({
   highlightClass,
   tickets,
   selectedVenue,
+  id,
 }) {
   const { backend, principal } = useSelector((state) => state.authentication);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,40 +35,27 @@ export default function Ticket({
   const buyVenueTicketHandler = async () => {
     try {
       setLoading(true);
-      const ticketTypeVariant = { ["SinglePass"]: null };
+
       const dateInNanoseconds = convertDateToNanoseconds(selectedDate);
 
-      const record = [
-        {
-          data: new Uint8Array([1, 2, 3]),
-          description: "Ticket metadata",
-          key_val_data: [
-            { key: "venueName", val: { TextContent: "Amazing Concert" } },
-            { key: "date", val: { TextContent: selectedDate } },
-          ],
-          purpose: { Rendered: null },
-        },
-      ];
-
-      console.log(record);
       console.log(selectedVenue);
 
-      const response = await backend.buyOfflineVenueTicket(
+      const response = await backend.buyOfflineWahanaToken(
         selectedVenue,
-        { ticket_type: ticketTypeVariant, price: price },
-        record,
+        id,
+
         Principal.fromText(principal),
+        ticketQuantity,
         dateInNanoseconds,
-        { Cash: null },
-        ticketQuantity
+        { Cash: null }
       );
 
-      console.log("venue ticket purchased successfully:", response);
+      console.log("wahana ticket purchased successfully:", response);
       notificationManager.success("Ticket purchase successfully");
 
       toggleModal();
     } catch (err) {
-      console.error("Error in buying venue tickets:", err);
+      console.error("Error in buying wahana tickets:", err);
       toggleModal();
     } finally {
       setLoading(false);
@@ -95,7 +83,6 @@ export default function Ticket({
             {/* <p className="text-base font-normal">{description}</p> */}
             <div className="flex justify-between mt-[5rem]">
               <span className="  font-black">Rp.{price}</span>
-              <span className="  font-normal">{availability} TICKETS LEFT</span>
             </div>
           </div>
         </div>
@@ -103,12 +90,12 @@ export default function Ticket({
 
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
-          <div className="bg-white rounded-3xl shadow-lg p-8 w-full max-w-md relative">
-            <h2 className="text-3xl font-bold text-secondary mb-6 text-center">
+          <div className="bg-white rounded-3xl shadow-lg p-6 w-96">
+            <h2 className="text-2xl font-bold text-secondary mb-4 text-center">
               {name}
             </h2>
             <div className="mb-6">
-              <label className="block text-lg font-semibold text-gray-800 mb-2">
+              <label className="block text-secondary text-lg font-semibold mb-2">
                 Select Date:
               </label>
               <input
@@ -124,8 +111,8 @@ export default function Ticket({
                 onChange={(e) => setSelectedDate(e.target.value)}
               />
             </div>
-            <div className="flex items-center justify-between mb-6">
-              <label className="text-lg font-semibold text-gray-800">
+            <div className="flex justify-between items-center mb-6">
+              <label className="block text-secondary text-lg font-semibold">
                 Quantity:
               </label>
               <div className="flex items-center space-x-4">
@@ -133,54 +120,50 @@ export default function Ticket({
                   onClick={() =>
                     setTicketQuantity(Math.max(1, ticketQuantity - 1))
                   }
-                  className="px-3 py-2 bg-gray-100 rounded-xl text-gray-600 hover:bg-gray-200 shadow-sm"
+                  className="px-3 py-2 bg-gray-200 rounded-xl text-gray-600 hover:bg-gray-300 transition shadow-sm"
                 >
-                  <FaMinus />
+                  <FaMinus size={12} />
                 </button>
-                <span className="text-xl font-semibold">{ticketQuantity}</span>
+                <span className="text-lg font-semibold">{ticketQuantity}</span>
                 <button
                   onClick={() =>
                     setTicketQuantity(
                       Math.min(ticketQuantity + 1, availability)
                     )
                   }
-                  className="px-3 py-2 bg-gray-100 rounded-xl text-gray-600 hover:bg-gray-200 shadow-sm"
+                  className="px-3 py-2 bg-gray-200 rounded-xl text-gray-600 hover:bg-gray-300 transition shadow-sm"
                 >
-                  <FaPlus />
+                  <FaPlus size={12} />
                 </button>
               </div>
             </div>
-            <div className="flex justify-between items-center text-gray-700 mb-4">
-              <span className="text-lg font-medium">Price:</span>
-              <span className="text-lg font-semibold text-secondary">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-lg font-medium text-secondary">Price:</span>
+              <span className="text-lg font-semibold text-gray-800">
                 Rp.{parseInt(price) * ticketQuantity}
               </span>
             </div>
-            <div className="flex justify-between items-center text-gray-700 mb-4">
-              <span className="text-lg font-medium">Tickets Left:</span>
-              <span className="text-lg font-semibold text-secondary">
-                {parseInt(availability)}
-              </span>
-            </div>
-            <div className="flex justify-between items-center text-gray-700 mb-4">
-              <span className="text-lg font-medium">Type:</span>
-              <span className="text-lg font-semibold text-secondary">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-lg font-medium text-secondary">Type:</span>
+              <span className="text-lg font-semibold text-gray-800">
                 {type}
               </span>
             </div>
-            <div className="flex justify-between items-center text-gray-700 mb-6">
-              <span className="text-lg font-medium">Payment Mode:</span>
-              <span className="text-lg font-semibold">Cash</span>
+            <div className="flex justify-between items-center mb-6">
+              <span className="text-lg font-medium text-secondary">
+                Payment Mode:
+              </span>
+              <span className="text-lg font-semibold text-gray-800">Cash</span>
             </div>
             <div className="flex justify-end space-x-4">
               <button
                 onClick={toggleModal}
-                className="px-6 py-3 bg-gray-200 text-gray-800 rounded-full hover:bg-gray-300 transition duration-200 shadow-md"
+                className="px-6 py-3 bg-gray-200 text-gray-800 rounded-full hover:bg-gray-300 transition shadow-md"
               >
                 Close
               </button>
               <button
-                className={`px-6 py-3 rounded-full text-white transition duration-200 shadow-md ${
+                className={`px-6 py-3 rounded-full text-white transition shadow-md ${
                   loading
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-secondary hover:bg-secondary-dark"
@@ -190,12 +173,6 @@ export default function Ticket({
               >
                 {loading ? "Buying..." : "Buy Ticket"}
               </button>
-            </div>
-            <div
-              className="absolute top-3 right-3 text-gray-500 text-xl cursor-pointer hover:text-gray-700 transition duration-200"
-              onClick={toggleModal}
-            >
-              &times;
             </div>
           </div>
         </div>

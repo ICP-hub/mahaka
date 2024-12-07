@@ -103,16 +103,18 @@ export default function EventTickets({
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg p-6 w-96">
-            <h2 className="text-2xl text-secondary   mb-4">{name}</h2>
-            <div className="mb-4">
-              <label className="block text-secondary text-lg mb-2">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
+          <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md relative">
+            <h2 className="text-3xl font-bold text-secondary mb-6 text-center">
+              {name}
+            </h2>
+            <div className="mb-6">
+              <label className="block text-lg font-semibold text-gray-800 mb-2">
                 Select Date:
               </label>
               <input
                 type="date"
-                className="w-full border border-gray-300 rounded-lg p-2"
+                className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-secondary"
                 value={selectedDate}
                 min={new Date().toISOString().split("T")[0]} // Today's date
                 max={
@@ -123,71 +125,78 @@ export default function EventTickets({
                 onChange={(e) => setSelectedDate(e.target.value)}
               />
             </div>
-            <div className="flex justify-between">
-              <label className="block text-secondary text-lg mb-2">
+            <div className="flex items-center justify-between mb-6">
+              <label className="text-lg font-semibold text-gray-800">
                 Quantity:
               </label>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-4">
                 <button
                   onClick={() =>
                     setTicketQuantity(Math.max(1, ticketQuantity - 1))
                   }
-                  className="px-2 py-1 bg-gray-200 rounded-md"
+                  className="px-3 py-2 bg-gray-100 rounded-xl text-gray-600 hover:bg-gray-200 shadow-sm"
                 >
-                  <FaMinus size={8} />
+                  <FaMinus />
                 </button>
-                <span className="text-lg">{ticketQuantity}</span>
+                <span className="text-xl font-semibold">{ticketQuantity}</span>
                 <button
                   onClick={() =>
                     setTicketQuantity(
                       Math.min(ticketQuantity + 1, availability)
                     )
                   }
-                  className="px-2 py-1 bg-gray-200 rounded-md"
+                  className="px-3 py-2 bg-gray-100 rounded-xl text-gray-600 hover:bg-gray-200 shadow-sm"
                 >
-                  <FaPlus size={8} />
+                  <FaPlus />
                 </button>
               </div>
             </div>
-            <div className="flex justify-between mb-4">
-              <span className="text-lg text-secondary  ">Price:</span>
-              <span className="text-lg font-semibold">
-                Rp.{parseInt(tickets.sTicket_price)}
+            <div className="flex justify-between items-center text-gray-700 mb-4">
+              <span className="text-lg font-medium">Price:</span>
+              <span className="text-lg font-semibold text-secondary">
+                Rp.{parseInt(tickets.sTicket_price) * ticketQuantity}
               </span>
             </div>
-            <div className="flex justify-between mb-4">
-              <span className="text-lg  text-secondary ">Tickets Left:</span>
-              <span className="text-lg font-semibold">
+            <div className="flex justify-between items-center text-gray-700 mb-4">
+              <span className="text-lg font-medium">Tickets Left:</span>
+              <span className="text-lg font-semibold text-secondary">
                 {parseInt(tickets.sTicket_limit)}
               </span>
             </div>
-            <div className="flex justify-between mb-4">
-              <span className="text-lg text-secondary  ">Type:</span>
-              <span className="text-lg font-semibold">{type}</span>
+            <div className="flex justify-between items-center text-gray-700 mb-4">
+              <span className="text-lg font-medium">Type:</span>
+              <span className="text-lg font-semibold text-secondary">
+                {type}
+              </span>
             </div>
-            <div className="flex justify-between mb-4">
-              <span className="text-lg text-secondary  ">Payment Mode:</span>
+            <div className="flex justify-between items-center text-gray-700 mb-6">
+              <span className="text-lg font-medium">Payment Mode:</span>
               <span className="text-lg font-semibold">Cash</span>
             </div>
-
             <div className="flex justify-end space-x-4">
               <button
                 onClick={toggleModal}
-                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg"
+                className="px-6 py-3 bg-gray-200 text-gray-800 rounded-full hover:bg-gray-300 transition duration-200 shadow-md"
               >
                 Close
               </button>
               <button
-                className={`px-4 py-2 rounded-lg text-white ${
+                className={`px-6 py-3 rounded-full text-white transition duration-200 shadow-md ${
                   loading
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-secondary hover:bg-secondary-dark"
                 }`}
                 onClick={buyVenueTicketHandler}
-                disabled={loading} // Disable button when loading
+                disabled={loading}
               >
                 {loading ? "Buying..." : "Buy Ticket"}
               </button>
+            </div>
+            <div
+              className="absolute top-3 right-3 text-gray-500 text-xl cursor-pointer hover:text-gray-700 transition duration-200"
+              onClick={toggleModal}
+            >
+              &times;
             </div>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import { useSelector } from "react-redux";
 import React, { useState, useEffect } from "react";
+import Ticket from "../MahakaTicket";
 
 const UserBookingData = () => {
   const { backend } = useSelector((state) => state.authentication);
@@ -69,7 +70,7 @@ const UserBookingData = () => {
               {/* Dummy Image */}
               <div className="h-72 w-full bg-gray-200 rounded-md mb-4">
                 <img
-                  src="https://tessajunephotography.com/wp-content/uploads/2022/12/014_WeddingatThePaseovenueinApacheJunction2CArizonaonly45minutesfromPhoenix-2048x1366.jpg"
+                  src={ticket.banner}
                   alt="Ticket Category"
                   className="h-full w-full object-cover rounded-md"
                 />
@@ -105,48 +106,15 @@ const UserBookingData = () => {
 
       {/* Modal */}
       {selectedTicket && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+          onClick={closeModal}
+        >
           <div className="bg-white rounded-lg shadow-xl w-[90%] max-w-2xl relative">
             {/* Close Button */}
-            <button
-              onClick={closeModal}
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-800 transition"
-            >
-              ✕
-            </button>
+
+            <Ticket ticket={selectedTicket} />
             {/* Modal Header */}
-            <div className="p-6 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-t-lg text-white">
-              <h2 className="text-2xl font-bold">Ticket Details</h2>
-            </div>
-            {/* Modal Content */}
-            <div className="p-6 space-y-4">
-              <p className="text-lg font-semibold">
-                <strong>Category:</strong> {selectedTicket.categoryId}
-              </p>
-              <p className="text-sm">
-                <strong>Ticket ID:</strong> #{parseInt(selectedTicket.ticketId)}
-              </p>
-              <p className="text-sm">
-                <strong>Visitors:</strong>{" "}
-                {parseInt(selectedTicket.numOfVisitors)}
-              </p>
-              <p className="text-sm">
-                <strong>Price:</strong> ₹{selectedTicket.price.toFixed(2)}
-              </p>
-              <p className="text-sm">
-                <strong>Description:</strong> Enjoy an exclusive experience with
-                this ticket.
-              </p>
-            </div>
-            {/* Modal Footer */}
-            <div className="p-6 flex justify-end">
-              <button
-                onClick={closeModal}
-                className="px-4 py-2 bg-secondary text-white rounded-lg font-medium hover:bg-secondary-dark transition"
-              >
-                Close
-              </button>
-            </div>
           </div>
         </div>
       )}

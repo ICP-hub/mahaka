@@ -8,11 +8,39 @@ const ProfileSection = () => {
 
   const handleCopyPrincipal = () => {
     if (principal) {
-      navigator.clipboard.writeText(principal).then(() => {
-        notificationManager.success("Principal copied", "Success");
-      }).catch(() => {
-        notificationManager.error("Failed to copy principal", "Error");
-      });
+      // Try using the modern Clipboard API first
+      if (navigator.clipboard) {
+        navigator.clipboard
+          .writeText(principal)
+          .then(() => {
+            notificationManager.success("Principal copied");
+          })
+          .catch((err) => {
+            console.error("Clipboard API failed:", err);
+            fallbackCopy();
+          });
+      } else {
+        // Fallback to document.execCommand if Clipboard API is unavailable
+        fallbackCopy();
+      }
+    } else {
+      notificationManager.error("No principal to copy");
+    }
+  };
+
+  // Fallback method using document.execCommand
+  const fallbackCopy = () => {
+    const textArea = document.createElement("textarea");
+    textArea.value = principal;
+    document.body.appendChild(textArea);
+    textArea.select();
+    const successful = document.execCommand("copy");
+    document.body.removeChild(textArea);
+
+    if (successful) {
+      notificationManager.success("Principal copied");
+    } else {
+      notificationManager.error("Failed to copy principal");
     }
   };
 
@@ -30,7 +58,8 @@ const ProfileSection = () => {
         <div className="w-full overflow-hidden text-ellipsis whitespace-nowrap text-center font-medium leading-normal text-white">
           Admin Name
         </div>
-        <div className="text-secondaryText mt-0.5 w-full overflow-hidden text-ellipsis whitespace-nowrap text-center text-md font-medium leading-normal cursor-pointer"
+        <div
+          className="text-secondaryText mt-0.5 w-full overflow-hidden text-ellipsis whitespace-nowrap text-center text-md font-medium leading-normal cursor-pointer"
           onClick={handleCopyPrincipal}
         >
           {principal}

@@ -128,9 +128,15 @@ const LogoSection = () => {
 const SearchBox = () => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
-  const { searchVenueLoading, searchedVenues } = useSelector((state) => state.venues);
-  const { searchedEvents, searchEventLoading } = useSelector( (state) => state.events);
-  const { searchedWahana, searchedWahanaLoading } = useSelector((state) => state.wahana);
+  const { searchVenueLoading, searchedVenues } = useSelector(
+    (state) => state.venues
+  );
+  const { searchedEvents, searchEventLoading } = useSelector(
+    (state) => state.events
+  );
+  const { searchedWahana, searchedWahanaLoading } = useSelector(
+    (state) => state.wahana
+  );
 
   const [selectedOption, setSelectedOption] = useState("Venues");
   const [enableSearch, setEnableSearch] = useState(false);
@@ -399,12 +405,37 @@ const ProfileMenu = ({ onClose }) => {
   const { isConnected, login, logout, balance, principal } = useAuth();
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(user?.principal?.toText());
-    notificationManager.success("Wallet address copied!");
-    // navigator.clipboard
-    //   .writeText(user.principal.toText())
-    //   .then(() => notificationManager.success("Wallet address copied!"))
-    //   .catch((err) => console.error("Failed to copy text:", err));
+    // Check if the clipboard API is available
+    if (navigator.clipboard) {
+      navigator.clipboard
+        .writeText(user?.principal?.toString()) // Ensure toString() is called on the principal
+        .then(() => {
+          notificationManager.success("Wallet address copied!");
+        })
+        .catch((err) => {
+          console.error("Clipboard API failed:", err);
+          fallbackCopy(); // Fallback if clipboard write fails
+        });
+    } else {
+      // Fallback if navigator.clipboard is not supported (old browsers or non-HTTPS environments)
+      fallbackCopy();
+    }
+  };
+
+  // Fallback to execCommand if clipboard API is not supported or fails
+  const fallbackCopy = () => {
+    const textArea = document.createElement("textarea");
+    textArea.value = user?.principal?.toString() || ""; // Ensure there's a value to copy
+    document.body.appendChild(textArea);
+    textArea.select();
+    const success = document.execCommand("copy");
+    document.body.removeChild(textArea);
+
+    if (success) {
+      notificationManager.success("Wallet address copied!");
+    } else {
+      notificationManager.error("Failed to copy wallet address");
+    }
   };
 
   return (

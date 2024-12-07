@@ -14,15 +14,13 @@ import EventTickets from "../components/EventTickets";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
-
-// import required modules
-import { Autoplay, Pagination } from "swiper/modules";
+import WahanaTicket from "../components/WahanaTicket";
 
 const MgtTicket = () => {
-  const [selectedVenue, setSelectedVenue] = useState(null);
   const [ticketDetails, setTicketDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedWahana, setSelectedWahana] = useState(null);
   const { currentVenue, loading: venuesLoading } = useSelector(
     (state) => state.venues
   );
@@ -30,9 +28,9 @@ const MgtTicket = () => {
   const { currentUserByCaller } = useSelector((state) => state.users);
 
   const { events, eventLoading } = useSelector((state) => state.events);
-  // const { wahanasByVenue, singleWahanaLoading } = useSelector(
-  //   (state) => state.wahanas
-  // );
+  const { wahanasByVenue, singleWahanaLoading } = useSelector(
+    (state) => state.wahana
+  );
   const { backend } = useSelector((state) => state.authentication);
   const [eventDetails, setEventDetails] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -98,6 +96,14 @@ const MgtTicket = () => {
       eventData();
     }
   }, [eventLoading, events]);
+  useEffect(() => {
+    // Automatically select the first venue and fetch its ticket details
+    if (!singleWahanaLoading && wahanasByVenue.length > 0) {
+      const defaultVenue = wahanasByVenue[0];
+
+      setSelectedWahana(defaultVenue);
+    }
+  }, [singleWahanaLoading, wahanasByVenue]);
 
   const fetchTicketDetails = async (venue) => {
     console.log("hello");
@@ -147,6 +153,18 @@ const MgtTicket = () => {
       }
     }
   };
+  const handleWahanaChange = async (event) => {
+    const selectedWahanaId = event.target.value; // Get the selected Wahana ID
+    const selectedWahana = wahanasByVenue.find(
+      (wahana) => wahana.id === selectedWahanaId
+    ); // Find the Wahana in the array
+
+    if (selectedWahana) {
+      setSelectedWahana(selectedWahana); // Update the state with the selected Wahana
+    }
+  };
+
+  console.log(selectedWahana);
 
   const ticketData = [
     {
@@ -237,7 +255,7 @@ const MgtTicket = () => {
 
       {events.length > 0 && (
         <>
-          <label className="block mb-2 text-lg font-medium">Select event</label>
+          <label className="block mb-2 text-lg font-medium">Select Event</label>
           <select
             id="event"
             className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-6"
@@ -253,13 +271,13 @@ const MgtTicket = () => {
               </option>
             ))}
           </select>
-          {loadingDetails ? (
+          {loading ? (
             <div className="animate-pulse  grid grid-cols-1 sm:grid-cols-3 gap-2 p-2">
               <div className="bg-gray-300 h-50 rounded-2xl  "></div>
               <div className="bg-gray-300 h-50 rounded-2xl  "></div>
               <div className="bg-gray-300 h-50 rounded-2xl  "></div>
             </div>
-          ) : eventDetails ? (
+          ) : (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <EventTickets
                 type={"GROUP"}
@@ -295,11 +313,39 @@ const MgtTicket = () => {
                 highlightClass={ticketData[2].highlightClass}
               />
             </div>
-          ) : (
-            <p>No ticket details available for the selected venue.</p>
           )}
         </>
       )}
+
+      <label className="block mb-2 text-lg font-medium">Select Wahana</label>
+      <select
+        id="wahana"
+        className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-6"
+        value={selectedWahana?.id || ""}
+        onChange={handleWahanaChange}
+      >
+        <option value="" disabled>
+          Choose a Wahana
+        </option>
+        {wahanasByVenue?.map((wahana) => (
+          <option key={wahana.id} value={wahana.id}>
+            {wahana.ride_title}
+          </option>
+        ))}
+      </select>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <WahanaTicket
+          type={"SINGLE"}
+          gradientClass={ticketData[1].gradientClass}
+          name={"Single Tickets"}
+          description={selectedWahana?.description || "description"}
+          price={parseInt(selectedWahana?.price) || 1}
+          availability={4}
+          highlightClass={ticketData[1].highlightClass}
+          selectedVenue={currentVenue?.id}
+          id={selectedWahana?.id}
+        />
+      </div>
     </div>
   );
 };
