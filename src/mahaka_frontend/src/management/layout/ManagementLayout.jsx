@@ -9,6 +9,7 @@ import { getAllEventsByVenue } from "../../redux/reducers/apiReducers/eventApiRe
 import { getVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
 import { getAllWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import notificationManager from "../../common/utils/notificationManager";
+import LoadingScreenLarge from "../../common/components/LoadingScreenLarge";
 
 // Protected :mgt
 const ManagementProtected = ({ children }) => {
@@ -25,7 +26,7 @@ const ManagementProtected = ({ children }) => {
     }
   }, [userLoading]);
 
-  if (layoutLoader) return <div>Loading...</div>;
+  if (layoutLoader) return <LoadingScreenLarge />;
   if (userRole) {
     return children;
   } else {
