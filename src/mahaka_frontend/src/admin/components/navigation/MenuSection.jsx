@@ -5,6 +5,8 @@ import {
   MdPerson,
   MdEqualizer,
   MdEvent,
+  MdOutlineSpaceDashboard,
+  MdOutlineLibraryBooks
 } from "react-icons/md";
 import { HiOutlineStar, HiOutlineUserGroup } from "react-icons/hi2";
 import { Link, useLocation } from "react-router-dom";
@@ -16,7 +18,7 @@ const MenuSection = () => {
     {
       path: "/admin/dashboard",
       label: "Dashboard",
-      icon: <MdInsertChartOutlined size={24} />,
+      icon: <MdOutlineSpaceDashboard size={24} />,
     },
     { path: "/admin/venues", label: "Venues", icon: <MdMap size={24} /> },
     { path: "/admin/events", label: "Events", icon: <MdEventNote size={24} /> },
@@ -27,7 +29,7 @@ const MenuSection = () => {
     },
     { path: "/admin/members", label: "Members", icon: <MdPerson size={24} /> },
     { path: "/admin/banner", label: "Banner", icon: <MdEqualizer size={24} /> },
-    { path: "/admin/testimonial", label: "Testimonial", icon: <MdMap size={24} /> },
+    { path: "/admin/testimonial", label: "Testimonial", icon: <MdOutlineLibraryBooks size={24} /> },
     // { path: "/admin/sales", label: "Sales", icon: <MdEqualizer size={24} /> },
     // {
     //   path: "/admin/purchaseTicket",
