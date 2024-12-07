@@ -36,7 +36,7 @@ shared actor class Dip721NFT(custodian : Principal, init : Types.Dip721NonFungib
   stable var GROUP_TICKET_DETAILS : Types.ticket_details = {
     ticket_type = #SinglePass;
     number_of_seats = init.gTicket_limit;
-    price = init.sTicket_price;
+    price = init.gTicket_price;
   };
 
   stable var VIP_TICKET_DETAILS : Types.ticket_details = {

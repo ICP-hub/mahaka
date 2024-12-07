@@ -53,7 +53,7 @@
   width: 6px;
 }
 .custom-scroll::-webkit-scrollbar-track {
-  background: #f1f1f1; /* Track color */ 
+  background: #f1f1f1; /* Track color */
 }
 .custom-scroll::-webkit-scrollbar-thumb {
   background: #888; /* Scrollbar color */

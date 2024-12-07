@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { listUsers } from "../../redux/reducers/apiReducers/userApiReducer";
 import { getAllWahanas } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import notificationManager from "../../common/utils/notificationManager";
+import LoadingScreenLarge from "../../common/components/LoadingScreenLarge";
 
 // Protected route for admin
 const AdminProtected = ({ children }) => {
@@ -35,7 +36,7 @@ const AdminProtected = ({ children }) => {
     }
   }, [currentUserByCaller]);
 
-  if (layoutLoader) return <div>Loading...</div>;
+  if (layoutLoader) return <LoadingScreenLarge />;
   if (isAdmin) {
     return children;
   } else {
