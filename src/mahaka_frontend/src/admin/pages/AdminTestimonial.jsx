@@ -36,15 +36,15 @@ const AdminTestimonial = ()=>{
 const TestimonialCard = ({ testimonial, testimonialLoading}) => {
   return (
     <>
-    <div className="flex flex-col p-8 shadow-lg rounded-lg bg-[#F9F9F9]">
+    <div className="flex flex-col p-8 shadow-lg rounded-lg bg-[#F9F9F9] dark:bg-slate-600">
       <img src={Frame} alt="frame" className="h-12 w-16 mb-4" />
-      <p className="mb-4 text-2xl font-medium text-gray-700 text-justify">
+      <p className="mb-4 text-2xl font-medium text-gray-700 text-justify dark:text-white">
         {testimonial.title}
       </p>
-      <p className="text-lg font-light text-gray-600 mt-12">
+      <p className="text-lg font-light text-gray-600 mt-12 dark:text-white">
         {testimonial.location}
       </p>
-      <p className="text-sm text-gray-600">{testimonial.description}</p>
+      <p className="text-md text-gray-600 dark:text-white">{testimonial.description}</p>
     </div>
       </>
   );
@@ -52,7 +52,11 @@ const TestimonialCard = ({ testimonial, testimonialLoading}) => {
 
 
 const onTestimonialDelete =()=>{
+  if(testimonials?.length>0){
   dispatch(deleteTestimonial({backend:backend,setDeleteModalVisible:setDeleteModalVisible}))
+  }else{
+    setDeleteModalVisible(false)
+  }
   
 }
 
@@ -117,7 +121,7 @@ const SkeletonLoader = () => {
         </div>
 
 
-        <div className="flex w-full sm:flex-row bg-card p-7 justify-end items-center">
+        <div className="flex w-full flex-col sm:flex-row bg-card p-7 justify-end items-center">
         <div className="mt-4 border w-full sm:ml-4 sm:mt-0 sm:w-72 bg-card p-4 rounded-xl mr-auto">
                 <div className="relative flex items-center flex-auto">
                   <div>
@@ -140,24 +144,27 @@ const SkeletonLoader = () => {
                   </div>
                 </div>
               </div>
-
-  <button
+<div>
+  <div
     className="mt-8 sm:mt-0"
     onClick={() => setIsModalOpen(true)}
   >
-    <div className="bg-secondary px-3 py-2 rounded-full text-white">
-      + Add Testimonial
+    <div className="bg-secondary px-7 py-2 rounded-full text-white mx-2 flex">
+        Add Testimonial
     </div>
-  </button>
+  </div>
+  </div>
 
-  <button
-    className="mt-8 sm:mt-0"
+<div>
+  <div
+    className="mt-8 sm:mt-0 mx-4"
     onClick={() => setDeleteModalVisible(true)}
   >
-    <div className="bg-secondary px-3 py-2 mx-2 rounded-full text-white">
+    <div className="bg-secondary px-7 py-2 rounded-full text-white md:min-w-full text-center">
       Clear Testimonial
     </div>
-  </button>
+  </div>
+  </div>
 </div>
 
 <div>

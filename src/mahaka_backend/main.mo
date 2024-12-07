@@ -2096,7 +2096,7 @@ actor mahaka {
                     let maxLimit = await collectionActor.getMaxLimitDip721();
                     let dipDetails = await collectionActor.getDIP721details();
                     if (totalTickets >= Nat64.fromNat(Nat16.toNat(maxLimit))) {
-                         return #err("Max ticket limit reached for the venue.");
+                         return #err("Max ticket limit reached for the Event.");
                     };
                     var selectedTicketLimit: Nat = 0;
                     switch (_ticket_type.ticket_type) {
@@ -2209,6 +2209,7 @@ actor mahaka {
           switch (wahanaResult) {
                case (#ok(wahana)) {
                     let collId = await Utils.extractCanisterId(wahana.id);
+                    Debug.print(debug_show(collId));
                     let collectionActor = actor (collId) : actor {
                          icrc1_transfer: ({
                               from_subaccount: ?TypesICRC.Subaccount;
@@ -2218,18 +2219,17 @@ actor mahaka {
                               memo: ?TypesICRC.Memo;
                               created_at_time: ?TypesICRC.Timestamp;
                          }) -> async TypesICRC.Result<TypesICRC.TxIndex, TypesICRC.TransferError>;
-                         icrc1_total_supply : ()-> async Types.Tokens
+                         getTotalSupply : ()-> async Nat
                     };
-                    let maxLimit = await collectionActor.icrc1_total_supply();
-                    let totalTickets = await getTicketsCountByType(#Venue, venueId, #SinglePass);
+                    let totalTickets = await getTicketsCountByType(#Wahana, wahanaId, #SinglePass);
+                    let maxLimit : Nat = await collectionActor.getTotalSupply();
                     switch(totalTickets){
                          case(#err(e)){
                               return #err(e);
                          };
                          case(#ok(count)){
-                              let e8s : Nat64 = Nat64.fromNat(count);
-                              if ( count >= Nat64.toNat(maxLimit.e8s)) {
-                                   return #err("Max ticket limit reached for the venue.");
+                              if ( count >= maxLimit) {
+                                   return #err("Max ticket limit reached for the Wahana.");
                               };
                          };
                     };
@@ -2427,7 +2427,7 @@ actor mahaka {
                     let maxLimit = await collectionActor.getMaxLimitDip721();
                     let dipDetails = await collectionActor.getDIP721details();
                     if (totalTickets >= Nat64.fromNat(Nat16.toNat(maxLimit))) {
-                         return #err("Max ticket limit reached for the venue.");
+                         return #err("Max ticket limit reached for the Event.");
                     };
                     var selectedTicketLimit: Nat = 0;
                     switch (_ticket_type.ticket_type) {
@@ -2517,18 +2517,17 @@ actor mahaka {
                               memo: ?TypesICRC.Memo;
                               created_at_time: ?TypesICRC.Timestamp;
                          }) -> async TypesICRC.Result<TypesICRC.TxIndex, TypesICRC.TransferError>;
-                         icrc1_total_supply : ()-> async Types.Tokens
+                         getTotalSupply : ()-> async Nat
                     };
-                    let maxLimit = await collectionActor.icrc1_total_supply();
-                    let totalTickets = await getTicketsCountByType(#Venue, venueId, #SinglePass);
+                    let totalTickets = await getTicketsCountByType(#Wahana, wahanaId, #SinglePass);
+                    let maxLimit : Nat = await collectionActor.getTotalSupply();
                     switch(totalTickets){
                          case(#err(e)){
                               return #err(e);
                          };
                          case(#ok(count)){
-                              let e8s : Nat64 = Nat64.fromNat(count);
-                              if ( count >= Nat64.toNat(maxLimit.e8s)) {
-                                   return #err("Max ticket limit reached for the venue.");
+                              if (count >= maxLimit) {
+                                   return #err("Max ticket limit reached for the Wahana.");
                               };
                          };
                     };
