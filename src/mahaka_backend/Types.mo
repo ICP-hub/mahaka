@@ -300,7 +300,8 @@ module {
                     fee: ?TypesICRC.Tokens;
                     memo: ?TypesICRC.Memo;
                     created_at_time: ?TypesICRC.Timestamp;
-               }) -> async TypesICRC.Result<TypesICRC.TxIndex, TypesICRC.TransferError>
+               }) -> async TypesICRC.Result<TypesICRC.TxIndex, TypesICRC.TransferError>;
+               getTotalSupply : ()-> async Nat
           };
         receiver : Principal; 
         numOfVisitors : Nat;
@@ -317,6 +318,10 @@ module {
 
     public type MintError = {
         #MintErr;
+        #MaxLimitErr;
+        #TicketTypeLimitErr;
+        #PriceErr;
+        #FetchErr;
         #ReceiversCountError;
         #EventError;
         #WahanaError;

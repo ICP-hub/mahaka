@@ -1684,6 +1684,50 @@ actor mahaka {
           recepient : Principal,
           caller : Principal
      ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError> {
+          let totalTicks = await collectionActor.totalSupplyDip721();
+          let maxLimit = await collectionActor.getMaxLimitDip721();
+          let dipDetails = await collectionActor.getDIP721details();
+          if ((totalTicks + Nat64.fromNat(numOfVisitors)) > Nat64.fromNat(Nat16.toNat(maxLimit))) {
+               return #err(#MaxLimitErr);
+          };
+          var selectedTicketLimit: Nat = 0;
+          switch (ticketType.ticket_type) {
+               case (#SinglePass) {
+                    selectedTicketLimit := dipDetails.sTicket_limit;
+               };
+               case (#VipPass) {
+                    selectedTicketLimit := dipDetails.vTicket_limit;
+               };
+               case (#GroupPass) {
+                    selectedTicketLimit := dipDetails.gTicket_limit;
+               };
+          };
+          var selectedTicketPrice: Float = 0.0;
+          switch (ticketType.ticket_type) {
+               case (#SinglePass) {
+                    selectedTicketPrice := dipDetails.sTicket_price;
+               };
+               case (#VipPass) {
+                    selectedTicketPrice := dipDetails.vTicket_price;
+               };
+               case (#GroupPass) {
+                    selectedTicketPrice := dipDetails.gTicket_price;
+               };
+          };
+          if(ticketType.price != selectedTicketPrice){
+               return #err(#PriceErr);
+          };
+          let currentTicketCountResult = await getTicketsCountByType(saleType, categoryId, ticketType.ticket_type);
+          switch (currentTicketCountResult) {
+               case (#err(e)) {
+                    return #err(#FetchErr);
+               };
+               case (#ok(currentTicketCount)) {
+                    if ((currentTicketCount + numOfVisitors) > selectedTicketLimit) {
+                         return #err(#TicketTypeLimitErr);
+                    };
+               };
+          };
           let _logo = await collectionActor.logoDip721();
           let _banner = await collectionActor.bannerDip721();
           let nftDetails = await collectionActor.getDIP721details();
@@ -1735,7 +1779,8 @@ actor mahaka {
                     fee: ?TypesICRC.Tokens;
                     memo: ?TypesICRC.Memo;
                     created_at_time: ?TypesICRC.Timestamp;
-               }) -> async TypesICRC.Result<TypesICRC.TxIndex, TypesICRC.TransferError>
+               }) -> async TypesICRC.Result<TypesICRC.TxIndex, TypesICRC.TransferError>;
+               getTotalSupply : ()-> async Nat
           },
           receiver: Principal,
           numOfVisitors: Nat,
@@ -1754,7 +1799,18 @@ actor mahaka {
           //      throw Error.reject("Receivers Count doesnot match number of visitors");
           //      return #err(#ReceiversCountError);
           // };
-
+          let totalTicks = await getTicketsCountByType(#Wahana, wahanaId, #SinglePass);
+          let maxLimit : Nat = await collectionActor.getTotalSupply();
+          switch(totalTicks){
+               case(#err(e)){
+                    return #err(#TemporarilyUnavailable);
+               };
+               case(#ok(count)){
+                    if ((count + numOfVisitors) > maxLimit) {
+                         return #err(#TemporarilyUnavailable);
+                    };
+               };
+          };
           for (i in Iter.range(0, numOfVisitors - 1)) {
                let transferObj = {
                     from_subaccount = null;
@@ -1963,7 +2019,7 @@ actor mahaka {
                     let totalTickets = await collectionActor.totalSupplyDip721();
                     let maxLimit = await collectionActor.getMaxLimitDip721();
                     let dipDetails = await collectionActor.getDIP721details();
-                    if (totalTickets >= Nat64.fromNat(Nat16.toNat(maxLimit))) {
+                    if ((totalTickets + Nat64.fromNat(numOfVisitors)) > Nat64.fromNat(Nat16.toNat(maxLimit))) {
                          return #err("Max ticket limit reached for the venue.");
                     };
                     var selectedTicketLimit: Nat = 0;
@@ -1999,7 +2055,7 @@ actor mahaka {
                               return #err("Error fetching ticket count by type: " # e);
                          };
                          case (#ok(currentTicketCount)) {
-                              if (currentTicketCount >= selectedTicketLimit) {
+                              if ((currentTicketCount + numOfVisitors) > selectedTicketLimit) {
                                    return #err("Selected ticket type limit reached.");
                               };
                          };
@@ -2095,7 +2151,7 @@ actor mahaka {
                     let totalTickets = await collectionActor.totalSupplyDip721();
                     let maxLimit = await collectionActor.getMaxLimitDip721();
                     let dipDetails = await collectionActor.getDIP721details();
-                    if (totalTickets >= Nat64.fromNat(Nat16.toNat(maxLimit))) {
+                    if ((totalTickets + Nat64.fromNat(numOfVisitors)) > Nat64.fromNat(Nat16.toNat(maxLimit))) {
                          return #err("Max ticket limit reached for the Event.");
                     };
                     var selectedTicketLimit: Nat = 0;
@@ -2131,7 +2187,7 @@ actor mahaka {
                               return #err("Error fetching ticket count by type: " # e);
                          };
                          case (#ok(currentTicketCount)) {
-                              if (currentTicketCount >= selectedTicketLimit) {
+                              if ((currentTicketCount + numOfVisitors) > selectedTicketLimit) {
                                    return #err("Selected ticket type limit reached.");
                               };
                          };
@@ -2228,7 +2284,7 @@ actor mahaka {
                               return #err(e);
                          };
                          case(#ok(count)){
-                              if ( count >= maxLimit) {
+                              if ((count + numOfVisitors) > maxLimit) {
                                    return #err("Max ticket limit reached for the Wahana.");
                               };
                          };
@@ -2331,7 +2387,7 @@ actor mahaka {
           let totalTickets = await collectionActor.totalSupplyDip721();
           let maxLimit = await collectionActor.getMaxLimitDip721();
           let dipDetails = await collectionActor.getDIP721details();
-          if (totalTickets >= Nat64.fromNat(Nat16.toNat(maxLimit))) {
+          if ((totalTickets + Nat64.fromNat(numOfVisitors)) > Nat64.fromNat(Nat16.toNat(maxLimit))) {
                return #err("Max ticket limit reached for the venue.");
           };
           var selectedTicketLimit: Nat = 0;
@@ -2367,7 +2423,7 @@ actor mahaka {
                     return #err("Error fetching ticket count by type: " # e);
                };
                case (#ok(currentTicketCount)) {
-                    if (currentTicketCount >= selectedTicketLimit) {
+                    if ((currentTicketCount + numOfVisitors) > selectedTicketLimit) {
                          return #err("Selected ticket type limit reached.");
                     };
                };
@@ -2426,7 +2482,7 @@ actor mahaka {
                     let totalTickets = await collectionActor.totalSupplyDip721();
                     let maxLimit = await collectionActor.getMaxLimitDip721();
                     let dipDetails = await collectionActor.getDIP721details();
-                    if (totalTickets >= Nat64.fromNat(Nat16.toNat(maxLimit))) {
+                    if ((totalTickets + Nat64.fromNat(numOfVisitors)) > Nat64.fromNat(Nat16.toNat(maxLimit))) {
                          return #err("Max ticket limit reached for the Event.");
                     };
                     var selectedTicketLimit: Nat = 0;
@@ -2462,7 +2518,7 @@ actor mahaka {
                               return #err("Error fetching ticket count by type: " # e);
                          };
                          case (#ok(currentTicketCount)) {
-                              if (currentTicketCount >= selectedTicketLimit) {
+                              if ((currentTicketCount + numOfVisitors) > selectedTicketLimit) {
                                    return #err("Selected ticket type limit reached.");
                               };
                          };
@@ -2526,7 +2582,7 @@ actor mahaka {
                               return #err(e);
                          };
                          case(#ok(count)){
-                              if (count >= maxLimit) {
+                              if ((count + numOfVisitors) >= maxLimit) {
                                    return #err("Max ticket limit reached for the Wahana.");
                               };
                          };
