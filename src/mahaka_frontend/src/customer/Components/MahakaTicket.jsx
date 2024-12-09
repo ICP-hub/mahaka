@@ -18,7 +18,7 @@ const Ticket = ({ ticket }) => {
   };
 
   return (
-    <div className="flex w-full max-w-3xl border border-gray-300 rounded-md shadow-lg overflow-hidden">
+    <div className="flex w-full max-w-3xl border border-white bg-opacity-50 z-100  rounded-md shadow-lg overflow-hidden">
       {/* Left Section */}
       <div className="w-3/5 p-6">
         <h1 className="text-3xl lg:text-3xl font-bold text-gray-900 mb-2">
@@ -46,7 +46,7 @@ const Ticket = ({ ticket }) => {
                 {convertNanosecondsToDate(ticket?.saleDate)}
               </td>
               <td className="border border-gray-500 px-3 lg:px-5 py-2 text-center font-bold text-sm lg:text-base text-blue-600">
-                Price:{ticket?.price}
+                Price:Rp{ticket?.price}
               </td>
             </tr>
           </tbody>

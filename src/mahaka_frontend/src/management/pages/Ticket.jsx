@@ -15,6 +15,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
 import WahanaTicket from "../components/WahanaTicket";
+import { Null } from "@dfinity/candid/lib/cjs/idl";
 
 const MgtTicket = () => {
   const [ticketDetails, setTicketDetails] = useState(null);
@@ -225,6 +226,7 @@ const MgtTicket = () => {
               availability={parseInt(ticketDetails?.gTicket_limit) || 4}
               highlightClass={ticketData[0].highlightClass}
               selectedVenue={currentVenue?.id}
+              ticketType={"GroupPass"}
             />
 
             <Ticket
@@ -236,6 +238,7 @@ const MgtTicket = () => {
               availability={parseInt(ticketDetails?.sTicket_limit) || 4}
               highlightClass={ticketData[1].highlightClass}
               selectedVenue={currentVenue?.id}
+              ticketType={"SinglePass"}
             />
             <Ticket
               type={" VIP"}
@@ -246,6 +249,7 @@ const MgtTicket = () => {
               availability={parseInt(ticketDetails?.vTicket_limit) || 4}
               highlightClass={ticketData[2].highlightClass}
               selectedVenue={currentVenue?.id}
+              ticketType={"VipPass"}
             />
           </div>
         </div>
@@ -289,6 +293,7 @@ const MgtTicket = () => {
                 price={parseInt(eventDetails?.gTicket_price) || 1}
                 availability={parseInt(eventDetails?.gTicket_limit) || 4}
                 highlightClass={ticketData[0].highlightClass}
+                ticketType={"GroupPass"}
               />
               <EventTickets
                 type={"SINGLE"}
@@ -300,6 +305,7 @@ const MgtTicket = () => {
                 price={parseInt(eventDetails?.sTicket_price) || 1}
                 availability={parseInt(eventDetails?.sTicket_limit) || 4}
                 highlightClass={ticketData[1].highlightClass}
+                ticketType={"SinglePass"}
               />
               <EventTickets
                 type={"VIP"}
@@ -311,41 +317,48 @@ const MgtTicket = () => {
                 price={parseInt(eventDetails?.vTicket_price) || 1}
                 availability={parseInt(eventDetails?.vTicket_limit) || 4}
                 highlightClass={ticketData[2].highlightClass}
+                ticketType={"VipPass"}
               />
             </div>
           )}
         </>
       )}
 
-      <label className="block mb-2 text-lg font-medium">Select Wahana</label>
-      <select
-        id="wahana"
-        className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-6"
-        value={selectedWahana?.id || ""}
-        onChange={handleWahanaChange}
-      >
-        <option value="" disabled>
-          Choose a Wahana
-        </option>
-        {wahanasByVenue?.map((wahana) => (
-          <option key={wahana.id} value={wahana.id}>
-            {wahana.ride_title}
-          </option>
-        ))}
-      </select>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-        <WahanaTicket
-          type={"SINGLE"}
-          gradientClass={ticketData[1].gradientClass}
-          name={"Single Tickets"}
-          description={selectedWahana?.description || "description"}
-          price={parseInt(selectedWahana?.price) || 1}
-          availability={4}
-          highlightClass={ticketData[1].highlightClass}
-          selectedVenue={currentVenue?.id}
-          id={selectedWahana?.id}
-        />
-      </div>
+      {wahanasByVenue.length > 0 && (
+        <>
+          <label className="block mb-2 text-lg font-medium">
+            Select Wahana
+          </label>
+          <select
+            id="wahana"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-6"
+            value={selectedWahana?.id || ""}
+            onChange={handleWahanaChange}
+          >
+            <option value="" disabled>
+              Choose a Wahana
+            </option>
+            {wahanasByVenue?.map((wahana) => (
+              <option key={wahana.id} value={wahana.id}>
+                {wahana.ride_title}
+              </option>
+            ))}
+          </select>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <WahanaTicket
+              type={"SINGLE"}
+              gradientClass={ticketData[1].gradientClass}
+              name={"Single Tickets"}
+              description={selectedWahana?.description || "description"}
+              price={parseInt(selectedWahana?.price) || 1}
+              availability={4}
+              highlightClass={ticketData[1].highlightClass}
+              selectedVenue={currentVenue?.id}
+              id={selectedWahana?.id}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 };
