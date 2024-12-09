@@ -150,7 +150,7 @@ actor mahaka {
 //         icrc2_transfer_from : shared Types.TransferFromArgs -> async Types.Result_3;
 //     };
 
-     let FiatPayCanister = actor "xfxqj-piaaa-aaaak-ao53q-cai" : actor {
+     let FiatPayCanister = actor "bkyz2-fmaaa-aaaaa-qaaaq-cai" : actor {
         create_invoice : shared (Principal,FiatTypes.Request.CreateInvoiceBody) -> async Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>>;
         get_invoice : (Nat)->async Http.Response<Http.ResponseStatus<FiatTypes.Invoice, {}>>;
         get_all_invoices_to_admin : () -> async Http.Response<Http.ResponseStatus<[FiatTypes.Invoice], {}>>
@@ -568,9 +568,7 @@ actor mahaka {
           let venueCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), collection_details.collection_args);
           ignore await venueCollection.wallet_receive();
           let new_custodian = await venueCollection.addcustodians(user);
-          Debug.print(" New added custodian is : " # debug_show (new_custodian));
           let nftcustodians = await venueCollection.showcustodians();
-          Debug.print("These are the list of current custodians : " #debug_show (nftcustodians));
           let venueCollectionId = await venueCollection.getCanisterId();
           let venue_id =  _title # "#" # Principal.toText(venueCollectionId) ;
           let Venue : Types.Venue = {
@@ -676,9 +674,7 @@ actor mahaka {
      //                          let venueCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), collection_details.collection_args);
      //                          ignore await venueCollection.wallet_receive();
      //                          let new_custodian = await venueCollection.addcustodians(caller);
-     //                          Debug.print(" New added custodian is : " # debug_show (new_custodian));
      //                          let nftcustodians = await venueCollection.showcustodians();
-     //                          Debug.print("These are the list of current custodians : " #debug_show (nftcustodians));
      //                          let collection_id = await venueCollection.getCanisterId();
      //                          let venue_id =  Title # "#" # Principal.toText(collection_id) ;
      //                          let Venue : Types.Venue = {
@@ -950,9 +946,7 @@ actor mahaka {
           Cycles.add<system>(800_500_000_000);
           let eventCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), eCollection.collection_args);
           let new_custodian = await eventCollection.addcustodians(user);
-          Debug.print("New added custodian is: " # debug_show(new_custodian));
           let nftcustodians = await eventCollection.showcustodians();
-          Debug.print("These are the list of current custodians: " # debug_show(nftcustodians));
           ignore await eventCollection.wallet_receive();
           let eventCollectionId = await eventCollection.getCanisterId();
           let eventId = Event.title # "#" # Principal.toText(eventCollectionId);
@@ -1372,9 +1366,7 @@ actor mahaka {
      //                                    Cycles.add<system>(500_500_000_000);
      //                                    let eventCollection = await NFTactor.Dip721NFT(Principal.fromActor(mahaka), _eCollection.collection_args);
      //                                    let new_custodian = await eventCollection.addcustodians(user);
-     //                                    Debug.print(" New added custodian is : " # debug_show (new_custodian));
      //                                    let nftcustodians = await eventCollection.showcustodians();
-     //                                    Debug.print("These are the list of current custodians : " #debug_show (nftcustodians));
      //                                    ignore await eventCollection.wallet_receive();
      //                                    let eventCollectionId = await eventCollection.getCanisterId();
      //                                    let event_id =  _event.title # "#" # Principal.toText(eventCollectionId);
@@ -1516,7 +1508,6 @@ actor mahaka {
 
           // Convert the list of matching events to an array for pagination
           let matchingEventsArray = List.toArray(matchingEvents);
-          Debug.print(debug_show(matchingEventsArray));
           let indexPages = Utils.paginate<Types.completeEvent>(matchingEventsArray, chunkSize);
           
           // Handle pagination
@@ -1654,7 +1645,6 @@ actor mahaka {
      //      };
 
      //      let response = await  collection_actor.icrc1_transfer(transferObj);
-     //      Debug.print(debug_show(response));
 
      // };
 
@@ -1742,7 +1732,6 @@ actor mahaka {
                switch (_ticketResult) {
                     case (#Ok(mintReceipt)) {
                          mintReceipts := List.push(mintReceipt, mintReceipts);
-                         Debug.print(debug_show(ticketPrice));
                          let ticketSaleInfo: Types.TicketSaleInfo = {
                               ticketId = Nat64.toNat(mintReceipt.token_id);
                               category = saleType;
@@ -2077,7 +2066,6 @@ actor mahaka {
                                         categoryId = venueId;
                                         categoryTitle = venue.Title;
                                         name = "Venue Ticket";
-                                        quantity = 1;
                                         price = _ticket_type.price;
                                    }]);
                               };
@@ -2089,7 +2077,6 @@ actor mahaka {
                                    items = items
                               };
                               let create_invoice_response : Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>> = await FiatPayCanister.create_invoice(caller, invoice);
-                              Debug.print(debug_show(create_invoice_response));
                               switch (create_invoice_response.body) {
                                    case (#success(responseBody)) {
                                         let invoice_id = responseBody.id;
@@ -2207,7 +2194,6 @@ actor mahaka {
                                         categoryId = _eventId;
                                         categoryTitle = event.title;
                                         name = "Event Ticket";
-                                        quantity = 1;
                                         price = _ticket_type.price;
                                    }]);
                               };
@@ -2219,7 +2205,6 @@ actor mahaka {
                                    items = items
                               };
                               let create_invoice_response : Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>> = await FiatPayCanister.create_invoice(caller, invoice);
-                              Debug.print(debug_show(create_invoice_response));
                               switch (create_invoice_response.body) {
                                    case (#success(responseBody)) {
                                         let invoice_id = responseBody.id;
@@ -2261,11 +2246,9 @@ actor mahaka {
           paymentType: Types.PaymentType
      ) : async Result.Result<Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>>, Text> {
           let wahanaResult = await getWahana(wahanaId, venueId);
-          Debug.print(debug_show(wahanaResult));
           switch (wahanaResult) {
                case (#ok(wahana)) {
                     let collId = await Utils.extractCanisterId(wahana.id);
-                    Debug.print(debug_show(collId));
                     let collectionActor = actor (collId) : actor {
                          icrc1_transfer: ({
                               from_subaccount: ?TypesICRC.Subaccount;
@@ -2303,7 +2286,6 @@ actor mahaka {
                                         categoryId = wahanaId;
                                         categoryTitle = wahana.ride_title;
                                         name = "Wahana Ticket";
-                                        quantity = 1;
                                         price = wahana.price;
                                    }]);
                               };
@@ -2315,7 +2297,6 @@ actor mahaka {
                                    items = items
                               };
                               let create_invoice_response : Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>> = await FiatPayCanister.create_invoice(caller, invoice);
-                              Debug.print(debug_show(create_invoice_response));
                               switch (create_invoice_response.body) {
                                    case (#success(responseBody)) {
                                         let invoice_id = responseBody.id;
@@ -2656,10 +2637,8 @@ actor mahaka {
      //                     };
 
      //                     let res = await recordTicketSale(venueId, ticketSaleInfo, "venue");
-     //                     Debug.print(debug_show(res));
      //                };
      //                case (#Err(e)) {
-     //                     Debug.print(debug_show(e));
      //                     return #err(#MintErr);
      //                };
      //           };
@@ -2717,7 +2696,6 @@ actor mahaka {
      //                               let res = await recordTicketSale(_eventId, ticketSaleInfo, "event");
      //                          };
      //                          case (#Err(e)) {
-     //                               Debug.print(debug_show(e));
      //                               return #err(#MintErr);
      //                          };
      //                     };
@@ -2785,10 +2763,8 @@ actor mahaka {
      //                                    price = _wahana.price
      //                               };
      //                               let res = await recordTicketSale(wahanaId, ticketSaleInfo, "wahana");
-     //                               Debug.print(debug_show(res));
      //                          };
      //                          case (#Err(e)) {
-     //                               Debug.print(debug_show(e));
      //                               return #err(e);
      //                          };
      //                     };
@@ -3615,9 +3591,7 @@ actor mahaka {
 
             case (?val){
                 let user_blob = await stable_get(val, Users_state);
-                Debug.print("The blob for the " # debug_show(caller) # " is: " # debug_show(user_blob));
                 let user : ?Types.User = from_candid(user_blob);
-                Debug.print("The user data for the " # debug_show(caller) # " is: " # debug_show(user));
                 switch(user){
                     case null {
                         throw Error.reject("no blob found in stable memory for the caller");
@@ -3639,9 +3613,7 @@ actor mahaka {
 
                case (?val){
                     let user_blob = await stable_get(val, Users_state);
-                    Debug.print("The blob for the " # debug_show(id) # " is: " # debug_show(user_blob));
                     let user : ?Types.User = from_candid(user_blob);
-                    Debug.print("The user data for the " # debug_show(id) # " is: " # debug_show(user));
                     switch(user){
                          case null {
                               throw Error.reject("no blob found in stable memory for the caller");
@@ -3813,15 +3785,12 @@ actor mahaka {
           };
           
           let existingWahanas = _WahanaMap.get(venueId);
-          Debug.print(debug_show(List.fromArray([new_wahana])));
           let updatedWahanas: Types.Wahana_data = switch (existingWahanas) {
                case (null) {
-                    Debug.print("wahanamap null");
                     let Wahanas : Types.Wahana_data = {
                          Wahanas = List.fromArray([new_wahana]);
                          WahanaIds = List.fromArray([new_wahana.id]);
                     };
-                    Debug.print(debug_show(Wahanas));
                     Wahanas
                };
                case (?wahanaIndex) {
@@ -3829,8 +3798,6 @@ actor mahaka {
                     let existingData: ?Types.Wahana_data = from_candid(wahanasBlob);
                     switch (existingData) {
                          case null {
-                              Debug.print("null");
-                              
                               let Wahanas : Types.Wahana_data = {
                                    Wahanas = List.fromArray([new_wahana]);
                                    WahanaIds = List.fromArray([new_wahana.id]);
@@ -3839,7 +3806,6 @@ actor mahaka {
                               Wahanas
                          };
                          case (?data) {
-                                   Debug.print("existing data");
                               let Wahanas : Types.Wahana_data = {
                                    Wahanas = List.append<Types.Wahana_details>(data.Wahanas, List.fromArray([new_wahana]));
                                    WahanaIds = List.append<Text>(data.WahanaIds, List.fromArray([new_wahana.id]));
@@ -3849,7 +3815,6 @@ actor mahaka {
                     }
                };
           };
-          Debug.print(debug_show(updatedWahanas));
           let updatedVenue = await updateVenuewithWahanas(venueId,List.toArray(updatedWahanas.WahanaIds));
           let wahana_blob = to_candid(updatedWahanas);
           let wahana_index = switch (existingWahanas) {

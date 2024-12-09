@@ -17,36 +17,6 @@ module {
             url : Text;
             headers : [HttpHeader];
             body : ?Blob;
-            max_response_bytes : ?Nat64;
-            transform : ?TransformRawResponseFunction;
-        };
-
-        public type TransformRawResponseFunction = {
-            function : shared query TransformArgs -> async HttpResponsePayload;
-            context : Blob;
-        };
-
-        public type TransformArgs = {
-            response : HttpResponsePayload;
-            context : Blob;
-        };
-
-        public type TransformContext = {
-            function : shared query TransformArgs -> async HttpResponsePayload;
-            context : Blob;
-        };
-
-        public type HttpResponsePayload = {
-            status : Nat;
-            headers : [HttpHeader];
-            body : [Nat8];
-        };
-
-
-        public type CanisterHttpResponsePayload = {
-            status : Nat;
-            headers : [HttpHeader];
-            body : [Nat8];
         };
 
         public type HttpMethod = {
@@ -63,7 +33,6 @@ module {
     };
 
 
-
     public type HeaderField = (Text, Text);
 
     public type HttpRequest = {
@@ -73,13 +42,33 @@ module {
         body : Blob;
     };
 
+    public type HttpStreamingCallbackToken =  {
+        content_encoding: Text;
+        index: Nat;
+        key: Text;
+        sha256: ?Blob;
+    };
+
+    public type HttpStreamingStrategy = {
+        #Callback: {
+            callback: query (HttpStreamingCallbackToken) -> async (HttpStreamingCallbackResponse);
+            token: HttpStreamingCallbackToken;
+        };
+    };
+
+    public type HttpStreamingCallbackResponse = {
+        body: Blob;
+        token: ?HttpStreamingCallbackToken;
+    };
+
     public type HttpResponse = {
         status_code: Nat16;
         headers: [HeaderField];
         body: Blob;
-        upgrade: Bool; 
+        streaming_strategy: ?HttpStreamingStrategy;
     };
 
+   
     public type ResponseStatus<success, err> = {
         #success : success;
         #err : err
