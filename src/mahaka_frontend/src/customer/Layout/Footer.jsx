@@ -11,8 +11,10 @@ import {
   FaYoutube,
 } from "react-icons/fa";
 import { MdMailOutline } from "react-icons/md";
+import { useNavigate } from 'react-router-dom';
 
 export default function Footer() {
+  const navigate = useNavigate();
   const currentYear = new Date().getFullYear();
   const address = "345 Faulconer Drive, Suite 4 • Charlottesville, CA, 12345";
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
@@ -64,7 +66,8 @@ export default function Footer() {
           <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 font-medium cursor-pointer">
             Privacy Policy
           </div>
-          <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 font-medium cursor-pointer">
+          <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 font-medium cursor-pointer" onClick={() => navigate('/terms-conditions')}
+ >
             Terms
           </div>
         </div>

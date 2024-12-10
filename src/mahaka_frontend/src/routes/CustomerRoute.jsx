@@ -59,7 +59,7 @@ export const customerRoutes = [
       { path: "contact-us", element: <ContactMahaka /> },
       // { path: "ticket", element: <Ticket /> },
       // { path: "wahanas", element: <HeaderWahanas /> },
-      { path: "termsandconditions", element: <TermsAndConditions /> },
+      { path: "terms-conditions", element: <TermsAndConditions /> },
     ],
   },
 ];

@@ -4,20 +4,20 @@ const TermsAndConditions = () => {
   return (
     <div className="min-h-screen bg-gray-100 text-gray-800">
     
-      <div className="bg-card text-white py-7 shadow-md">
+      <div className="bg-card text-white py-10">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl font-bold text-gray-700">Terms and Conditions</h1>
         </div>
       </div>
 
      
-      <div className="container mx-auto px-7 py-8">
+      <div className="container mx-auto px-10 md:px-30 py-8">
         
-        <div className="mb-6">
-          <h2 className="text-3xl font-semibold text-blue-600 mb-3">
+        <div className="mb-15">
+          <h2 className="text-3xl font-semibold text-secondary mb-3">
             Welcome to Our Service
           </h2>
-          <p className="text-gray-700 text-lg">
+          <p className="text-gray-700 text-lg font-semibold">
             By accessing or using our platform, you agree to be bound by these
             terms and conditions. Please read them carefully before using our
             services.
@@ -25,7 +25,7 @@ const TermsAndConditions = () => {
         </div>
 
         <div className="mb-6">
-          <h3 className="text-2xl font-semibold text-blue-500 mb-2">
+          <h3 className="text-2xl font-semibold text-secondary mb-2">
             1. Use of the Platform
           </h3>
           <p className="text-gray-700 text-lg">
@@ -37,7 +37,7 @@ const TermsAndConditions = () => {
 
       
         <div className="mb-6">
-          <h3 className="text-2xl font-semibold text-blue-500 mb-2">
+          <h3 className="text-2xl font-semibold text-secondary mb-2">
             2. Privacy Policy
           </h3>
           <p className="text-gray-700 text-lg">
@@ -48,7 +48,7 @@ const TermsAndConditions = () => {
 
       
         <div className="mb-6">
-          <h3 className="text-2xl font-semibold text-blue-500 mb-2">
+          <h3 className="text-2xl font-semibold text-secondary mb-2">
             3. User Obligations
           </h3>
           <ul className="list-disc list-inside text-gray-700 text-lg">
@@ -63,7 +63,7 @@ const TermsAndConditions = () => {
 
        
         <div className="mb-6">
-          <h3 className="text-2xl font-semibold text-blue-500 mb-2">
+          <h3 className="text-2xl font-semibold text-secondary mb-2">
             4. Changes to Terms
           </h3>
           <p className="text-gray-700 text-lg">
