@@ -37,7 +37,6 @@ module {
     public type Item = {
         id: Nat;
         name: Text;
-        quantity: Int;
         price: Float;
         categoryId : Text;
         categoryTitle : Text
