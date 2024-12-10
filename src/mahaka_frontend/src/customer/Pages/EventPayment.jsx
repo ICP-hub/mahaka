@@ -49,7 +49,7 @@ const EventPayment = () => {
   const ICP_API_HOST = "https://icp-api.io/";
   const [unauthenticatedAgent, setUnauthenticatedAgent] = useState(null);
   const [ticketprice, setTicketPrice] = useState(0);
-
+  const [ticketleft, SetTicketLeft] = useState(1);
   useEffect(() => {
     (async () => {
       const agent = new HttpAgent({ host: ICP_API_HOST });
@@ -83,128 +83,18 @@ const EventPayment = () => {
   useEffect(() => {
     if (eventdetail) {
       if (ticketType === "GROUP") {
-        setTicketPrice(eventdetail.gTicket_price || 0);
+        setTicketPrice(eventdetail?.gTicket_price || 0);
+        SetTicketLeft(eventdetail?.gTicket_limit || 0);
       } else if (ticketType === "SINGLE") {
-        setTicketPrice(eventdetail.sTicket_price || 0);
+        setTicketPrice(eventdetail?.sTicket_price || 0);
+        SetTicketLeft(eventdetail?.sTicket_limit || 0);
       } else if (ticketType === "VIP") {
-        setTicketPrice(eventdetail.vTicket_price || 0);
+        setTicketPrice(eventdetail?.vTicket_price || 0);
+        SetTicketLeft(eventdetail?.vTicket_limit || 0);
       }
     }
   }, [eventdetail, ticketType]);
 
-  // const handlePayment = async () => {
-  //   if (!user) {
-  //     alert("Please login first");
-  //   }
-
-  //   // Create Actor for payment
-  //   const actor = Actor.createActor(idlFactory, {
-  //     agent: authenticatedAgent,
-  //     canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
-  //   });
-  //   console.log("object", actor, authenticatedAgent);
-  //   const acc = {
-  //     owner: Principal.fromText(process.env.CANISTER_ID_MAHAKA_BACKEND),
-  //     subaccount: [],
-  //   };
-
-  //   const icrc2_approve_args = {
-  //     from_subaccount: [],
-  //     spender: acc,
-  //     fee: [],
-  //     memo: [],
-  //     amount: BigInt(10000),
-  //     created_at_time: [],
-  //     expected_allowance: [],
-  //     expires_at: [],
-  //   };
-
-  //   try {
-  //     setIsPaymentProcessing(true);
-  //     const response = await actor.icrc2_approve(icrc2_approve_args);
-  //     console.log("Response from payment approve", response);
-
-  //     if (response.Ok) {
-  //       console.log("Payment approved! run further steps");
-  //     } else {
-  //       console.error("Payment failed");
-  //     }
-  //   } catch (err) {
-  //     console.error("Error in payment approve", err);
-  //   } finally {
-  //     setIsPaymentProcessing(false);
-  //   }
-
-  //   // const transferArgs = {
-  //   //   from_subaccount: [],
-  //   //   spender: {
-  //   //     owner: Principal.fromText("bd3sg-teaaa-aaaaa-qaaba-cai"),
-  //   //     subaccount: [],
-  //   //   },
-  //   //   amount: BigInt(coffeeAmount * 10 ** 8 + 10000),
-  //   //   fee: [],
-  //   //   memo: [],
-  //   //   created_at_time: [],
-  //   //   expected_allowance: [],
-  //   //   expires_at: [],
-  //   // };
-  //   // console.log("Transfer Args:", transferArgs);
-  //   // try {
-  //   //   const response = await actor.icrc2_approve(transferArgs);
-  //   //   console.log("Response from icrc2_approve:", response);
-  //   //   if (response && response.Ok) {
-  //   //     setMessage(`Transferred ${coffeeAmount} ICP`);
-  //   //     setPaymentStatus("Payment successful");
-  //   //     await buyEventTicketHandler();
-  //   //   } else {
-  //   //     console.error("Unexpected response format or error:", response);
-  //   //     throw new Error(response?.Err || "Payment failed");
-  //   //   }
-  //   // } catch (error) {
-  //   //   setMessage("Payment failed");
-  //   //   setPaymentStatus("Payment failed");
-  //   //   console.error("Payment error:", error);
-  //   // } finally {
-  //   //   setLoading(false);
-  //   //   setProcessing(false);
-  //   //   setTimeout(() => setMessage("Make Payment"), 5000);
-  //   // }
-  // };
-
-  // const buyEventTicketHandler = async () => {
-  //   try {
-  //     const ticketTypeVariant = { [ticketType]: null };
-  //     const record = [
-  //       {
-  //         data: new Uint8Array([1, 2, 3]),
-  //         description: "Ticket metadata",
-  //         key_val_data: [
-  //           { key: "eventName", val: { TextContent: "Amazing Concert" } },
-  //           { key: "date", val: { TextContent: "2024-12-31" } },
-  //         ],
-  //         purpose: { Rendered: null },
-  //       },
-  //     ];
-
-  //     const response = await backend.buyVenueTicket(
-  //       "current venue#br5f7-7uaaa-aaaaa-qaaca-cai",
-  //       { ticket_type: ticketTypeVariant, price: 1 },
-  //       record,
-  //       [
-  //         Principal.fromText(
-  //           "h7yxq-n6yb2-6js2j-af5hk-h4inj-edrce-oevyj-kbs7a-76kft-vrqrw-nqe"
-  //         ),
-  //       ],
-  //       { ICP: null },
-  //       1
-  //     );
-
-  //     console.log("Event ticket purchased successfully:", response);
-  //     navigate("/ticket");
-  //   } catch (err) {
-  //     console.error("Error in buying event tickets:", err);
-  //   }
-  // };
   const handlePayment = async (e) => {
     if (principal == undefined) {
       alert("jgh");
@@ -356,16 +246,14 @@ const EventPayment = () => {
               </p>
             ) : (
               <p className="text-xl text-green-400 font-semibold">
-                Number of Tickets Left:{" "}
-                {eventdetail?.gTicket_limit !== undefined
-                  ? Number(eventdetail.maxLimit)
-                  : "N/A"}
+                Number of Tickets Left: {Number(ticketleft)}
               </p>
             )}
           </div>
           <div className="py-4 space-y-12 ">
             <DatePicker timestemp={timestemp} setTimeStemp={setTimeStemp} />
             <VisitorPicker
+              maxTicket={Number(ticketleft)}
               numberOFVisitor={numberOFVisitor}
               setNumberOFVisitor={setNumberOFVisitor}
             />

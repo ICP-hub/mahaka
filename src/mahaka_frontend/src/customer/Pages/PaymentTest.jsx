@@ -40,6 +40,7 @@ const PaymentTest = () => {
   const ICP_API_HOST = "https://icp-api.io/";
   const [unauthenticatedAgent, setUnauthenticatedAgent] = useState(null);
   const [ticketprice, setTicketPrice] = useState(0);
+  const [ticketleft, SetTicketLeft] = useState(1);
 
   useEffect(() => {
     (async () => {
@@ -77,10 +78,13 @@ const PaymentTest = () => {
     if (vanuedetail) {
       if (ticketType === "GROUP") {
         setTicketPrice(vanuedetail.gTicket_price || 0);
+        SetTicketLeft(vanuedetail?.gTicket_limit || 0);
       } else if (ticketType === "SINGLE") {
         setTicketPrice(vanuedetail.sTicket_price || 0);
+        SetTicketLeft(vanuedetail?.sTicket_limit || 0);
       } else if (ticketType === "VIP") {
         setTicketPrice(vanuedetail.vTicket_price || 0);
+        SetTicketLeft(vanuedetail?.vTicket_limit || 0);
       }
     }
   }, [vanuedetail, ticketType]);
@@ -347,21 +351,19 @@ const PaymentTest = () => {
             )}
             {loadingdata ? (
               <p className="text-xl text-green-400 font-semibold mt-2">
-                Number of Tickets Left: :{" "}
+                Number of Tickets Left :{" "}
                 <span className="px-6 rounded-lg  py-[2px] animate-spin bg-gray-200"></span>
               </p>
             ) : (
               <p className="text-xl text-green-400 font-semibold">
-                Number of Tickets Left:{" "}
-                {vanuedetail?.gTicket_limit !== undefined
-                  ? Number(vanuedetail.maxLimit)
-                  : "N/A"}
+                Number of Tickets Left : {Number(ticketleft)}
               </p>
             )}
           </div>
           <div className="py-4 space-y-12 ">
             <DatePicker timestemp={timestemp} setTimeStemp={setTimeStemp} />
             <VisitorPicker
+              max={Number(ticketleft)}
               numberOFVisitor={numberOFVisitor}
               setNumberOFVisitor={setNumberOFVisitor}
             />
@@ -382,7 +384,7 @@ const PaymentTest = () => {
           <hr className="my-3 text-[#ACACAC]" />
           <div className="flex items-center mb-8 mt-8 w-full ">
             <img
-              src={payimg}
+              src={vanuedetail?.logo?.data}
               alt="Ticket"
               className="w-12 h-12 object-cover rounded-md mr-4"
             />

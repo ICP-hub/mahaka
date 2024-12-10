@@ -30,11 +30,7 @@ export const customerRoutes = [
       { path: "venues/:id", element: <SingleEvent /> },
       {
         path: "venues/:id/:id/payment2",
-        element: (
-          <ProtectedRoute>
-            <PaymentTest />
-          </ProtectedRoute>
-        ),
+        element: <PaymentTest />,
       },
       { path: "venues/:id/:id/payment2/checkout", element: <CardCheckout /> },
       { path: "payment/checkout", element: <CardCheckout /> },
