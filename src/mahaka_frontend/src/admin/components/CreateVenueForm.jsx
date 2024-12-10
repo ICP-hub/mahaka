@@ -76,10 +76,10 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
   };
 
   const handleEventSubmit = () => {
-    if (!principal) {
-      notificationManager.error("Please login first");
-      return;
-    }
+    // if (!principal) {
+    //   notificationManager.error("Please login first");
+    //   return;
+    // }
     // Set capacity as max ticket
     const isFormValid = Object.values(formValues).every(
       (value) => value !== "" && value !== null
