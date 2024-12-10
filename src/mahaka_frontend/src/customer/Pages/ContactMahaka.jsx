@@ -25,7 +25,7 @@ const ContactMahaka = () => {
               <input
                 type="hidden"
                 name="access_key"
-                value="YOUR_ACCESS_KEY_HERE"
+                value="41fd433c-a687-4180-94c5-4b86a96feae1"
               />
 
               <div className="mb-4">
