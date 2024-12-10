@@ -1741,7 +1741,8 @@ actor mahaka {
                               saleDate = saleDate;
                               createdAt = Time.now();
                               ticketIssuer = caller;
-                              ticketType = offlineOrOnline; 
+                              ticketType = offlineOrOnline;
+                              passType =  ticketType.ticket_type;
                               recepient = recepient;
                               price = ticketPrice;
                               banner = _banner.data;
@@ -1824,6 +1825,7 @@ actor mahaka {
                               createdAt = Time.now();
                               ticketIssuer = caller;
                               ticketType = offlineOrOnline; 
+                              passType =  #SinglePass;
                               recepient = recepient;
                               price = ticketPrice;
                               banner = banner;
@@ -2818,10 +2820,6 @@ actor mahaka {
           id: Text,
           ticketType: nftTypes.ticket_type
      ) : async Result.Result<Nat, Text> {
-          let collectionId = await Utils.extractCanisterId(id);
-          let collectionActor = actor (collectionId) : actor {
-               getNFT: (token_id: nftTypes.TokenId) -> async nftTypes.NftResult;
-          };
           switch (category) {
                case (#Venue) {
                     let ticketsResult = await getVenueTickets(id);
@@ -2832,17 +2830,8 @@ actor mahaka {
                          case (#ok(tickets)) {
                               var count: Nat = 0;
                               for (ticket in tickets.vals()) {
-                                   let nftDetailsResult = await collectionActor.getNFT(Nat64.fromNat(ticket.ticketId));
-                                   switch (nftDetailsResult) {
-                                        case (#Err(e)) {
-                                             return #err("Error getting NFT details");
-                                        };
-                                        case (#Ok(nftDetails)) {
-                                             // Compare the ticket type
-                                             if (nftDetails.ticket_type == ticketType) {
-                                                  count += 1;
-                                             };
-                                        };
+                                   if (ticket.passType == ticketType) {
+                                        count += 1;
                                    };
                               };
 
@@ -2859,17 +2848,8 @@ actor mahaka {
                          case (#ok(tickets)) {
                               var count: Nat = 0;
                               for (ticket in tickets.vals()) {
-                                   let nftDetailsResult = await collectionActor.getNFT(Nat64.fromNat(ticket.ticketId));
-                                   switch (nftDetailsResult) {
-                                        case (#Err(e)) {
-                                             return #err("Error getting NFT details");
-                                        };
-                                        case (#Ok(nftDetails)) {
-                                             // Compare the ticket type
-                                             if (nftDetails.ticket_type == ticketType) {
-                                                  count += 1;
-                                             };
-                                        };
+                                   if (ticket.passType == ticketType) {
+                                        count += 1;
                                    };
                               };
 

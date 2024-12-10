@@ -263,6 +263,7 @@ module {
         ticketIssuer : Principal;
         recepient : Principal;
         ticketType : TicketType;
+        passType : Types.ticket_type;
         price : Float;
         banner : Text;
     };
