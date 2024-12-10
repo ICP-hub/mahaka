@@ -28,10 +28,10 @@ const About = () => {
       <div className="bg-card">
         <div className="container mx-auto flex flex-0 flex-col p-6 dark:bg-transparent sm:flex-row sm:items-center sm:justify-between sm:px-10 sm:py-8 font-medium">
           <div className="min-w-0 flex-1">
-            <div className="whitespace-nowrap text-indigo-500">About us</div>
+            {/* <div className="whitespace-nowrap text-indigo-500">MAHAKA'S</div> */}
             <div className="mt-2">
               <h2 className="truncate text-3xl font-extrabold leading-7 tracking-tight sm:leading-10 md:text-4xl">
-                MAHAKA
+                About Us
               </h2>
             </div>
           </div>

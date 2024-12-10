@@ -13,12 +13,13 @@ import { useLocation } from "react-router-dom";
 import { useAuth } from "../../connect/useClient";
 import { HttpAgent } from "@dfinity/agent";
 import notificationManager from "../../common/utils/notificationManager";
+import { ConnectWallet } from "@nfid/identitykit/react";
 
 const PaymentTest = () => {
   const authenticatedAgent = useAgent();
   const { user, icpBalance } = useIdentityKit();
   const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
-  const [vanuedetail, setVanueDetail] = useState(null);
+  const [venuedetail, setvenueDetail] = useState(null);
   const location = useLocation();
   const fullPath = location.pathname + location.hash;
   const match = fullPath.match(/venues\/(.+?)\/(.+?)\/payment2/);
@@ -33,14 +34,15 @@ const PaymentTest = () => {
   const eventIds = `${decodeURIComponent(canisterId).replace(/_/g, "#")}${
     window.location.hash
   }`;
-  const { backend, principal } = useAuth();
+  const { backend, principal, login } = useAuth();
   const [timestemp, setTimeStemp] = useState(0);
+  const [ticketSold, setTicketSold] = useState(0);
   // const { backend } = useSelector((state) => state.authentication);
   const { identity } = useIdentityKit();
   const ICP_API_HOST = "https://icp-api.io/";
   const [unauthenticatedAgent, setUnauthenticatedAgent] = useState(null);
   const [ticketprice, setTicketPrice] = useState(0);
-  const [ticketleft, SetTicketLeft] = useState(1);
+  const [ticketleft, SetTicketLeft] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -56,15 +58,31 @@ const PaymentTest = () => {
   }
 
   const eventprincipal = Principal.fromText(extractCanisterId(fullPath));
+  const _ticket_type =
+    ticketType === "GROUP"
+      ? { GroupPass: null }
+      : ticketType === "VIP"
+      ? { VipPass: null }
+      : { SinglePass: null };
   useEffect(() => {
     const fetchVenue = async () => {
       setLoadingData(true);
       try {
         const data1 = await backend.getDIPdetails(eventprincipal);
-        const ticket = await backend.getAllCallerTickets(10, 0);
-        setVanueDetail(data1);
-        console.log("vandaataaa", data1);
-        console.log("ticket", ticket);
+        const ticketResponse = await backend.getTicketsCountByType(
+          { Venue: null },
+          eventIds,
+          _ticket_type
+        );
+        if (ticketResponse.ok) {
+          setTicketSold(ticketResponse?.ok);
+        } else {
+          console.error("Error fetching tickets:", ticketResponse);
+        }
+
+        setvenueDetail(data1);
+        console.log("venue detail", data1);
+        console.log("ticket sold", ticketResponse.ok);
       } catch (error) {
         console.error("Error fetching:", error);
       } finally {
@@ -75,185 +93,20 @@ const PaymentTest = () => {
     fetchVenue();
   }, [backend]);
   useEffect(() => {
-    if (vanuedetail) {
+    if (venuedetail) {
       if (ticketType === "GROUP") {
-        setTicketPrice(vanuedetail.gTicket_price || 0);
-        SetTicketLeft(vanuedetail?.gTicket_limit || 0);
+        setTicketPrice(venuedetail.gTicket_price || 0);
+        SetTicketLeft(venuedetail?.gTicket_limit || 0);
       } else if (ticketType === "SINGLE") {
-        setTicketPrice(vanuedetail.sTicket_price || 0);
-        SetTicketLeft(vanuedetail?.sTicket_limit || 0);
+        setTicketPrice(venuedetail.sTicket_price || 0);
+        SetTicketLeft(venuedetail?.sTicket_limit || 0);
       } else if (ticketType === "VIP") {
-        setTicketPrice(vanuedetail.vTicket_price || 0);
-        SetTicketLeft(vanuedetail?.vTicket_limit || 0);
+        setTicketPrice(venuedetail.vTicket_price || 0);
+        SetTicketLeft(venuedetail?.vTicket_limit || 0);
       }
     }
-  }, [vanuedetail, ticketType]);
+  }, [venuedetail, ticketType]);
 
-  // const handlePayment = async () => {
-  //   if (!user) {
-  //     alert("Please login first");
-  //   }
-
-  //   // Create Actor for payment
-  //   const actor = Actor.createActor(idlFactory, {
-  //     agent: authenticatedAgent,
-  //     canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
-  //   });
-  //   console.log("object", actor, authenticatedAgent);
-  //   const acc = {
-  //     owner: Principal.fromText(process.env.CANISTER_ID_MAHAKA_BACKEND),
-  //     subaccount: [],
-  //   };
-
-  //   const icrc2_approve_args = {
-  //     from_subaccount: [],
-  //     spender: acc,
-  //     fee: [],
-  //     memo: [],
-  //     amount: BigInt(10000),
-  //     created_at_time: [],
-  //     expected_allowance: [],
-  //     expires_at: [],
-  //   };
-
-  //   try {
-  //     setIsPaymentProcessing(true);
-  //     const response = await actor.icrc2_approve(icrc2_approve_args);
-  //     console.log("Response from payment approve", response);
-
-  //     if (response.Ok) {
-  //       console.log("Payment approved! run further steps");
-  //     } else {
-  //       console.error("Payment failed");
-  //     }
-  //   } catch (err) {
-  //     console.error("Error in payment approve", err);
-  //   } finally {
-  //     setIsPaymentProcessing(false);
-  //   }
-
-  //   // const transferArgs = {
-  //   //   from_subaccount: [],
-  //   //   spender: {
-  //   //     owner: Principal.fromText("bd3sg-teaaa-aaaaa-qaaba-cai"),
-  //   //     subaccount: [],
-  //   //   },
-  //   //   amount: BigInt(coffeeAmount * 10 ** 8 + 10000),
-  //   //   fee: [],
-  //   //   memo: [],
-  //   //   created_at_time: [],
-  //   //   expected_allowance: [],
-  //   //   expires_at: [],
-  //   // };
-  //   // console.log("Transfer Args:", transferArgs);
-  //   // try {
-  //   //   const response = await actor.icrc2_approve(transferArgs);
-  //   //   console.log("Response from icrc2_approve:", response);
-  //   //   if (response && response.Ok) {
-  //   //     setMessage(`Transferred ${coffeeAmount} ICP`);
-  //   //     setPaymentStatus("Payment successful");
-  //   //     await buyEventTicketHandler();
-  //   //   } else {
-  //   //     console.error("Unexpected response format or error:", response);
-  //   //     throw new Error(response?.Err || "Payment failed");
-  //   //   }
-  //   // } catch (error) {
-  //   //   setMessage("Payment failed");
-  //   //   setPaymentStatus("Payment failed");
-  //   //   console.error("Payment error:", error);
-  //   // } finally {
-  //   //   setLoading(false);
-  //   //   setProcessing(false);
-  //   //   setTimeout(() => setMessage("Make Payment"), 5000);
-  //   // }
-  // };
-
-  // const buyEventTicketHandler = async () => {
-  //   try {
-  //     const ticketTypeVariant = { [ticketType]: null };
-  //     const record = [
-  //       {
-  //         data: new Uint8Array([1, 2, 3]),
-  //         description: "Ticket metadata",
-  //         key_val_data: [
-  //           { key: "eventName", val: { TextContent: "Amazing Concert" } },
-  //           { key: "date", val: { TextContent: "2024-12-31" } },
-  //         ],
-  //         purpose: { Rendered: null },
-  //       },
-  //     ];
-
-  //     const response = await backend.buyVenueTicket(
-  //       "current venue#br5f7-7uaaa-aaaaa-qaaca-cai",
-  //       { ticket_type: ticketTypeVariant, price: 1 },
-  //       record,
-  //       [
-  //         Principal.fromText(
-  //           "h7yxq-n6yb2-6js2j-af5hk-h4inj-edrce-oevyj-kbs7a-76kft-vrqrw-nqe"
-  //         ),
-  //       ],
-  //       { ICP: null },
-  //       1
-  //     );
-
-  //     console.log("Event ticket purchased successfully:", response);
-  //     navigate("/ticket");
-  //   } catch (err) {
-  //     console.error("Error in buying event tickets:", err);
-  //   }
-  // };
-
-  console.log("timestem", timestemp);
-  const handlePayment = async (e) => {
-    if (principal == undefined) {
-      notificationManager.error("Please login first");
-      return;
-    }
-    e.preventDefault();
-    setLoading(true);
-    const coffeeAmount = 0.0001;
-
-    if (!unauthenticatedAgent) {
-      console.error("Agent not initialized");
-      return;
-    }
-
-    const actor = Actor.createActor(idlFactory, {
-      agent: unauthenticatedAgent,
-      canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
-    });
-
-    const transferArgs = {
-      from_subaccount: [],
-      spender: {
-        owner: Principal.fromText(process.env.CANISTER_ID_MAHAKA_BACKEND),
-        subaccount: [],
-      },
-      amount: BigInt(coffeeAmount * 10 ** 8 + 10000),
-      fee: [],
-      memo: [],
-      created_at_time: [],
-      expected_allowance: [],
-      expires_at: [],
-    };
-
-    try {
-      console.log("transferArgs:", transferArgs);
-      const response = await actor.icrc2_approve(transferArgs);
-      console.log("res of icp payment", response);
-
-      if (response.Ok) {
-        console.log("Payment successful:", response.Ok);
-      } else {
-        throw new Error(response.Err || "Payment failed");
-      }
-    } catch (error) {
-      console.error("Payment error:", error);
-    } finally {
-      setLoading(false);
-      e.target.disabled = false;
-    }
-  };
   const handlePayment2 = async (e) => {
     if (!principal) {
       notificationManager.error("Please login first");
@@ -269,12 +122,7 @@ const PaymentTest = () => {
     setIsPaymentProcessing(true);
 
     const venueId = eventIds;
-    const _ticket_type =
-      ticketType === "GROUP"
-        ? { GroupPass: null }
-        : ticketType === "VIP"
-        ? { VipPass: null }
-        : { SinglePass: null };
+
     const metadata = [
       {
         data: new Uint8Array([0x12, 0x34]),
@@ -343,11 +191,11 @@ const PaymentTest = () => {
           <div className="mb-5">
             {loadingdata ? (
               <p className="text-xl font-semibold">
-                Vanue id:-{" "}
+                Venue id:-{" "}
                 <span className="px-20 rounded-lg py-[2px] animate-spin bg-gray-200"></span>
               </p>
             ) : (
-              <p className="text-xl font-semibold">Vanue id:-{eventIds}</p>
+              <p className="text-xl font-semibold">Venue id:-{eventIds}</p>
             )}
             {loadingdata ? (
               <p className="text-xl text-green-400 font-semibold mt-2">
@@ -356,14 +204,15 @@ const PaymentTest = () => {
               </p>
             ) : (
               <p className="text-xl text-green-400 font-semibold">
-                Number of Tickets Left : {Number(ticketleft)}
+                Number of Tickets Left :{" "}
+                {Number(ticketleft) - Number(ticketSold)}
               </p>
             )}
           </div>
           <div className="py-4 space-y-12 ">
             <DatePicker timestemp={timestemp} setTimeStemp={setTimeStemp} />
             <VisitorPicker
-              max={Number(ticketleft)}
+              max={Number(ticketleft) - Number(ticketSold)}
               numberOFVisitor={numberOFVisitor}
               setNumberOFVisitor={setNumberOFVisitor}
             />
@@ -384,12 +233,12 @@ const PaymentTest = () => {
           <hr className="my-3 text-[#ACACAC]" />
           <div className="flex items-center mb-8 mt-8 w-full ">
             <img
-              src={vanuedetail?.logo?.data}
+              src={venuedetail?.logo?.data}
               alt="Ticket"
               className="w-12 h-12 object-cover rounded-md mr-4"
             />
             <div>
-              <h3 className="text-2xl font-black">{vanuedetail?.name}</h3>
+              <h3 className="text-2xl font-black">{venuedetail?.name}</h3>
               <p className="text-base font-normal text-[#ACACAC]">
                 {ticketType}
               </p>
@@ -462,8 +311,15 @@ const PaymentTest = () => {
                 : "bg-orange-500 hover:bg-orange-600"
             }`}
             type="submit"
-            disabled={isPaymentProcessing}
-            onClick={paymenttype === "Card" ? handlePayment2 : handlePayment}
+            disabled={
+              isPaymentProcessing ||
+              Number(ticketleft) - Number(ticketSold) == 0
+            }
+            onClick={
+              paymenttype === "Card"
+                ? handlePayment2
+                : alert("somthing went wrong")
+            }
           >
             {isPaymentProcessing
               ? "Processing..."
@@ -688,3 +544,168 @@ export default PaymentTest;
 // };
 
 // export default PaymentTest;
+// const handlePayment = async () => {
+//   if (!user) {
+//     alert("Please login first");
+//   }
+
+//   // Create Actor for payment
+//   const actor = Actor.createActor(idlFactory, {
+//     agent: authenticatedAgent,
+//     canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
+//   });
+//   console.log("object", actor, authenticatedAgent);
+//   const acc = {
+//     owner: Principal.fromText(process.env.CANISTER_ID_MAHAKA_BACKEND),
+//     subaccount: [],
+//   };
+
+//   const icrc2_approve_args = {
+//     from_subaccount: [],
+//     spender: acc,
+//     fee: [],
+//     memo: [],
+//     amount: BigInt(10000),
+//     created_at_time: [],
+//     expected_allowance: [],
+//     expires_at: [],
+//   };
+
+//   try {
+//     setIsPaymentProcessing(true);
+//     const response = await actor.icrc2_approve(icrc2_approve_args);
+//     console.log("Response from payment approve", response);
+
+//     if (response.Ok) {
+//       console.log("Payment approved! run further steps");
+//     } else {
+//       console.error("Payment failed");
+//     }
+//   } catch (err) {
+//     console.error("Error in payment approve", err);
+//   } finally {
+//     setIsPaymentProcessing(false);
+//   }
+
+//   // const transferArgs = {
+//   //   from_subaccount: [],
+//   //   spender: {
+//   //     owner: Principal.fromText("bd3sg-teaaa-aaaaa-qaaba-cai"),
+//   //     subaccount: [],
+//   //   },
+//   //   amount: BigInt(coffeeAmount * 10 ** 8 + 10000),
+//   //   fee: [],
+//   //   memo: [],
+//   //   created_at_time: [],
+//   //   expected_allowance: [],
+//   //   expires_at: [],
+//   // };
+//   // console.log("Transfer Args:", transferArgs);
+//   // try {
+//   //   const response = await actor.icrc2_approve(transferArgs);
+//   //   console.log("Response from icrc2_approve:", response);
+//   //   if (response && response.Ok) {
+//   //     setMessage(`Transferred ${coffeeAmount} ICP`);
+//   //     setPaymentStatus("Payment successful");
+//   //     await buyEventTicketHandler();
+//   //   } else {
+//   //     console.error("Unexpected response format or error:", response);
+//   //     throw new Error(response?.Err || "Payment failed");
+//   //   }
+//   // } catch (error) {
+//   //   setMessage("Payment failed");
+//   //   setPaymentStatus("Payment failed");
+//   //   console.error("Payment error:", error);
+//   // } finally {
+//   //   setLoading(false);
+//   //   setProcessing(false);
+//   //   setTimeout(() => setMessage("Make Payment"), 5000);
+//   // }
+// };
+
+// const buyEventTicketHandler = async () => {
+//   try {
+//     const ticketTypeVariant = { [ticketType]: null };
+//     const record = [
+//       {
+//         data: new Uint8Array([1, 2, 3]),
+//         description: "Ticket metadata",
+//         key_val_data: [
+//           { key: "eventName", val: { TextContent: "Amazing Concert" } },
+//           { key: "date", val: { TextContent: "2024-12-31" } },
+//         ],
+//         purpose: { Rendered: null },
+//       },
+//     ];
+
+//     const response = await backend.buyVenueTicket(
+//       "current venue#br5f7-7uaaa-aaaaa-qaaca-cai",
+//       { ticket_type: ticketTypeVariant, price: 1 },
+//       record,
+//       [
+//         Principal.fromText(
+//           "h7yxq-n6yb2-6js2j-af5hk-h4inj-edrce-oevyj-kbs7a-76kft-vrqrw-nqe"
+//         ),
+//       ],
+//       { ICP: null },
+//       1
+//     );
+
+//     console.log("Event ticket purchased successfully:", response);
+//     navigate("/ticket");
+//   } catch (err) {
+//     console.error("Error in buying event tickets:", err);
+//   }
+// };
+
+// console.log("timestem", timestemp);
+// const handlePayment = async (e) => {
+//   if (principal == undefined) {
+//     notificationManager.error("Please login first");
+//     return;
+//   }
+//   e.preventDefault();
+//   setLoading(true);
+//   const coffeeAmount = 0.0001;
+
+//   if (!unauthenticatedAgent) {
+//     console.error("Agent not initialized");
+//     return;
+//   }
+
+//   const actor = Actor.createActor(idlFactory, {
+//     agent: unauthenticatedAgent,
+//     canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
+//   });
+
+//   const transferArgs = {
+//     from_subaccount: [],
+//     spender: {
+//       owner: Principal.fromText(process.env.CANISTER_ID_MAHAKA_BACKEND),
+//       subaccount: [],
+//     },
+//     amount: BigInt(coffeeAmount * 10 ** 8 + 10000),
+//     fee: [],
+//     memo: [],
+//     created_at_time: [],
+//     expected_allowance: [],
+//     expires_at: [],
+//   };
+
+//   try {
+//     console.log("transferArgs:", transferArgs);
+//     const response = await actor.icrc2_approve(transferArgs);
+//     console.log("res of icp payment", response);
+
+//     if (response.Ok) {
+//       console.log("Payment successful:", response.Ok);
+//     } else {
+//       throw new Error(response.Err || "Payment failed");
+//     }
+//   } catch (error) {
+//     console.error("Payment error:", error);
+//   } finally {
+//     setLoading(false);
+//     e.target.disabled = false;
+//   }
+// };

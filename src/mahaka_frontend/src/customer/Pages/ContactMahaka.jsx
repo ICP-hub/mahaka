@@ -21,11 +21,11 @@ const ContactMahaka = () => {
       <div className="flex-auto p-6 sm:p-10 container mx-auto font-medium">
         <div className="grid grid-cols-1 md:grid-cols-2 rounded-2xl gap-6">
           <div>
-            <form action="https://web3forms.com/submit" method="POST">
+            <form action="https://api.web3forms.com/submit" method="POST">
               <input
                 type="hidden"
                 name="access_key"
-                value="YOUR_ACCESS_KEY_HERE"
+                value="41fd433c-a687-4180-94c5-4b86a96feae1"
               />
 
               <div className="mb-4">

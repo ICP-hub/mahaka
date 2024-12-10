@@ -37,19 +37,7 @@ const CardCheckout = ({}) => {
     window.location.hash
   }`;
   console.log("id", eventIds);
-  const {
-    isInitializing,
-    user,
-    isUserConnecting,
-    icpBalance,
-    signer,
-    identity,
-    delegationType,
-    accounts,
-    connect,
-    disconnect,
-    fetchIcpBalance,
-  } = useIdentityKit();
+  const { identity } = useIdentityKit();
   useEffect(() => {
     const backendActor1 = createActor(canisterIDFiat, {
       agentOptions: { identity, verifyQuerySignatures: false },
@@ -92,7 +80,7 @@ const CardCheckout = ({}) => {
           <div className="w-1/6 text-center">Action</div>
         </div>
 
-        {invoice?.body.success.map((data, index) => (
+        {invoice?.map((data, index) => (
           <div
             key={index}
             className={`flex justify-between px-4 py-2 items-center border border-[#124076] ${
@@ -184,10 +172,9 @@ const Detail = ({ item, status, paymentMethod, amount, onClose, currency }) => {
         </div>
       </div>
 
-      <h1 className="text-xl font-semibold py-4">Items</h1>
+      <h1 className="text-xl font-semibold py-4">Items/ Number of visitors </h1>
       <div className="flex justify-between border font-semibold text-lg border-gray-200">
         <div className="px-2 py-2 rounded">Ticket Type</div>
-        <div className="px-2 py-2 rounded">Quantity</div>
         <div className="px-2 py-2 rounded">Price</div>
         <div className="px-2 py-2 rounded">Total</div>
       </div>
@@ -198,11 +185,8 @@ const Detail = ({ item, status, paymentMethod, amount, onClose, currency }) => {
           className="flex justify-between border text-lg border-gray-200"
         >
           <div className="px-2 py-2 rounded">{data?.name}</div>
-          <div className="px-2 py-2 rounded">{Number(data?.quantity)}</div>
           <div className="px-2 py-2 rounded">{data?.price}</div>
-          <div className="px-2 py-2 rounded">
-            {Number(data?.quantity) * data?.price}.00
-          </div>
+          <div className="px-2 py-2 rounded">{data?.price}.00</div>
         </div>
       ))}
     </div>
