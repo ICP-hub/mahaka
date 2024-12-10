@@ -3,7 +3,7 @@ import { useIdentityKit } from "@nfid/identitykit/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { createActor } from "../../../../declarations/Fiatpayment/index";
 import { useAuth } from "../../connect/useClient";
-
+import Confetti from "react-confetti";
 const PaymentStatusUpdate = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -116,8 +116,13 @@ const PaymentStatusUpdate = () => {
   return (
     <div className="flex flex-col items-center justify-center h-screen px-4 bg-gray-50">
       {loading ? (
-        <div className="text-lg font-semibold text-gray-700">
-          {responseMessage}
+        <div className="fixed inset-0 z-[50001] flex items-center justify-center bg-black bg-opacity-50">
+          <div className="flex flex-col items-center">
+            <div className="loader border-t-transparent border-4 border-gray-400 rounded-full w-12 h-12 animate-spin"></div>
+            <div className="mt-4 text-lg font-semibold text-gray-700">
+              {responseMessage}
+            </div>
+          </div>
         </div>
       ) : paymentStatus === "success" ? (
         <div className="text-center">
@@ -129,8 +134,9 @@ const PaymentStatusUpdate = () => {
             className="mt-6 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             onClick={handleNavigateHome}
           >
-            Go to Home
+            View Ticket
           </button>
+          <Confetti width="1029px" height="1000px" />
         </div>
       ) : (
         <div className="text-center">
@@ -140,7 +146,7 @@ const PaymentStatusUpdate = () => {
             className="mt-6 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             onClick={handleNavigateHome}
           >
-            View Ticket
+            Back to Home
           </button>
         </div>
       )}

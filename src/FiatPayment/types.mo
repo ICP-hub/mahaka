@@ -4,7 +4,6 @@ import Http "http";
 import nftTypes "../DIP721-NFT/Types";
 import Types "../mahaka_backend/Types";
 
-
 module {
 
     public type Invoice = {
@@ -20,6 +19,14 @@ module {
         createdAt: Int;
     };
 
+    public type Item = {
+        id: Nat;
+        name: Text;
+        price: Float;
+        categoryId : Text;
+        categoryTitle : Text
+    };
+
     public type MintArgs = {
           metadata: nftTypes.MetadataDesc;
           ticketType: nftTypes.ticket_type;
@@ -33,22 +40,12 @@ module {
           recepient : Principal;
           caller : Principal
     };
-
-    public type Item = {
-        id: Nat;
-        name: Text;
-        quantity: Int;
-        price: Float;
-        categoryId : Text;
-        categoryTitle : Text
-    };
     
     public module InvoiceStatus = {
         public let Pending              : Text = "Pending";
         public let Completed            : Text = "Completed";
         public let Cancelled            : Text = "Cancelled";
         public let CancelledByAdmin     : Text = "Cancelled by admin";
-        public let CancelledBySystem     : Text = "Cancelled by system";
     };
 
     public type CreateSession = {

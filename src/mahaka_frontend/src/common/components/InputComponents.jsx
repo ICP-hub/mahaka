@@ -1,7 +1,13 @@
 import { useEffect, useRef } from "react";
 
 // input field
-export const FormFieldInput = ({ type, value, onChange, label }) => {
+export const FormFieldInput = ({
+  type,
+  value,
+  onChange,
+  label,
+  disabled = false,
+}) => {
   return (
     <div className="relative">
       <div className="absolute inset-0 border border-border rounded-md -z-1"></div>
@@ -11,6 +17,14 @@ export const FormFieldInput = ({ type, value, onChange, label }) => {
           className="bg-transparent w-full my-3"
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          disabled={disabled}
+          onKeyDown={(e) => {
+            const key = e.key;
+            // console.log(key);
+            if (type === "number" && key === "-") {
+              e.preventDefault();
+            }
+          }}
         />
       </div>
       <div className="absolute -top-6">{label}</div>
