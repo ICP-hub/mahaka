@@ -11,6 +11,7 @@ import {
   FaYoutube,
 } from "react-icons/fa";
 import { MdMailOutline } from "react-icons/md";
+import { Link } from "react-router-dom";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -36,39 +37,44 @@ export default function Footer() {
           </div>
           <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 cursor-pointer font-medium">
             <FaLinkedinIn size={16} />
-            <span>Linkdn</span>
+            <span>Linkedin</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 cursor-pointer font-medium">
             <FaTwitter size={16} />
             <span>Twitter</span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 cursor-pointer font-medium">
-            <MdMailOutline size={16} />
-            <span>Email</span>
-          </div>
         </div>
         <div className="space-y-4">
           <span className="  font-bold">Site</span>
-          <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 font-medium cursor-pointer">
+          <Link
+            className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 font-medium cursor-pointer"
+            to="/"
+          >
             Home
-          </div>
-          <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 font-medium cursor-pointer">
+          </Link>
+          <Link
+            className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 font-medium cursor-pointer"
+            to="/about-us"
+          >
             About Mahaka
-          </div>
+          </Link>
         </div>
         <div className="space-y-4">
           <span className=" font-bold">Legal</span>
           <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 font-medium cursor-pointer">
             License
           </div>
-          <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 font-medium cursor-pointer">
+          <Link
+            className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 font-medium cursor-pointer"
+            to="/privacy-policy"
+          >
             Privacy Policy
-          </div>
+          </Link>
           <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 font-medium cursor-pointer">
             Terms
           </div>
         </div>
-        <div className="mx-auto flex ml-6  flex-col-reverse items-center justify-between gap-4 text-xs sm:flex-row">
+        <div className="mx-auto flex ml-6  text-md     flex-col-reverse items-center justify-between gap-4  sm:flex-row">
           <span>© 2024 MAHAKA, LLC. All rights reserved.</span>
         </div>
       </div>

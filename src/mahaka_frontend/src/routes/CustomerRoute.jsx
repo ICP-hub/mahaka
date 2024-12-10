@@ -20,6 +20,7 @@ import PaymentStatusUpdate from "../customer/Pages/PaymentStatusUpdate.jsx";
 import EventPayment from "../customer/Pages/EventPayment.jsx";
 import WahanaPayment from "../customer/Pages/WahanaPayment.jsx";
 import ProtectedRoute from "../customer/Pages/ProtectedRoute.jsx";
+import PrivacyPolicy from "../customer/Pages/PrivacyPolicy.jsx";
 
 export const customerRoutes = [
   {
@@ -62,6 +63,7 @@ export const customerRoutes = [
       { path: "contact-us", element: <ContactMahaka /> },
       { path: "ticket", element: <Ticket /> },
       { path: "wahanas", element: <HeaderWahanas /> },
+      { path: "privacy-policy", element: <PrivacyPolicy /> },
     ],
   },
 ];

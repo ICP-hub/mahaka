@@ -122,7 +122,11 @@ export default function Header() {
 }
 
 const LogoSection = () => {
-  return <div className="text-2xl font-black" >MAHAKA</div>;
+  return (
+    <Link className="text-2xl font-black" to="/">
+      MAHAKA
+    </Link>
+  );
 };
 
 const SearchBox = () => {
