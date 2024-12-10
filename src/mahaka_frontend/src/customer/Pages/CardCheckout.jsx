@@ -58,40 +58,40 @@ const CardCheckout = ({}) => {
 
   return (
     <>
-      <div className=" my-10 ml-10 flex items-center gap-6">
+      <div className="my-6 flex items-center gap-4 px-4 sm:px-8">
         <button
-          className="px-2 py-1 bg-amber-500 rounded-sm text-xl text-white"
-          onClick={() => {
-            navigate(-1);
-          }}
+          className="px-2 py-1 bg-amber-500 rounded text-sm sm:text-lg text-white flex items-center gap-1"
+          onClick={() => navigate(-1)}
         >
-          <IoChevronBackCircleOutline className="w-6 h-6" />
+          <IoChevronBackCircleOutline className="w-5 h-5 sm:w-6 sm:h-6" />
+          Back
         </button>
-        <h1 className="text-xl font-semibold ">Invoices </h1>
+        <h1 className="text-lg sm:text-xl font-semibold">Invoices</h1>
       </div>
-      <div className="my-20 mx-10">
-        <div className="flex justify-between bg-[#1241767f] font-semibold px-4 py-3 border text-white border-[#124076] rounded-t">
-          <div className="w-1/6 text-center">Invoice No</div>
-          <div className="w-1/6 text-center">Amount</div>
-          <div className="w-1/6 text-center">Currency</div>
-          <div className="w-1/6 text-center">Payment Method</div>
-          <div className="w-1/6 text-center">Status</div>
-          <div className="w-1/6 text-center">Created At</div>
-          <div className="w-1/6 text-center">Action</div>
+      <div className="my-10 px-4 sm:px-8">
+        <div className="grid grid-cols-3 sm:grid-cols-7 gap-2 bg-[#1241767f] font-semibold px-2 py-3 text-sm sm:text-base border text-white border-[#124076] rounded-t">
+          <div className="text-center">Invoice No</div>
+          <div className="hidden sm:block text-center">Amount</div>
+          <div className="hidden sm:block text-center">Currency</div>
+          <div className="hidden sm:block text-center">Payment Method</div>
+          <div className="text-center">Status</div>
+          <div className="hidden sm:block text-center">Created At</div>
+          <div className="text-center">Action</div>
         </div>
-
         {invoice?.map((data, index) => (
           <div
             key={index}
-            className={`flex justify-between px-4 py-2 items-center border border-[#124076] ${
+            className={`grid grid-cols-3 sm:grid-cols-7 gap-2 items-center px-2 py-2 text-sm sm:text-base border ${
               index % 2 === 0 ? "bg-white" : "bg-gray-100"
             }`}
           >
-            <div className="w-1/6 text-center">{Number(data?.id)}</div>
-            <div className="w-1/6 text-center">{data?.amount}</div>
-            <div className="w-1/6 text-center">{data?.currency}</div>
-            <div className="w-1/6 text-center">{data?.paymentMethod}</div>
-            <div className="w-1/6 text-center">
+            <div className="text-center">{Number(data?.id)}</div>
+            <div className="hidden sm:block text-center">{data?.amount}</div>
+            <div className="hidden sm:block text-center">{data?.currency}</div>
+            <div className="hidden sm:block text-center">
+              {data?.paymentMethod}
+            </div>
+            <div className="text-center">
               <span
                 className={`py-1 px-2 rounded ${
                   data?.status === "Pending"
@@ -102,17 +102,16 @@ const CardCheckout = ({}) => {
                 {data?.status}
               </span>
             </div>
-            <div className="w-1/6 text-center">
+            <div className="hidden sm:block text-center">
               {new Date(Number(data?.createdAt) / 1_000_000).toLocaleString()}
             </div>
-            <div className="w-1/6 text-center flex gap-2 justify-center">
+            <div className="text-center flex justify-center gap-2">
               <button
-                className="bg-orange-400 hover:bg-orange-400 text-white px-3 py-2 rounded"
+                className="bg-orange-400 hover:bg-orange-500 text-white p-2 rounded"
                 onClick={() => setIsModalOpen(index)}
               >
                 <IoEyeOutline />
               </button>
-
               {isModalOpen === index && (
                 <ModalOverlay
                   isOpen={true}
@@ -129,9 +128,8 @@ const CardCheckout = ({}) => {
                   />
                 </ModalOverlay>
               )}
-
               <a
-                className="bg-orange-500 hover:bg-orange-700 text-white px-3 py-2 rounded"
+                className="bg-orange-500 hover:bg-orange-700 text-white p-2 rounded"
                 href={data?.paymentLink}
               >
                 Pay Now
