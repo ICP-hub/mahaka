@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { HiOutlineMinusSmall, HiOutlinePlusSmall } from "react-icons/hi2";
 
-const VisitorPicker = ({ numberOFVisitor = 1, setNumberOFVisitor }) => {
+const VisitorPicker = ({
+  numberOFVisitor = 1,
+  setNumberOFVisitor,
+  max = 1,
+}) => {
   const increment = () => setNumberOFVisitor(numberOFVisitor + 1);
   const decrement = () =>
     setNumberOFVisitor(numberOFVisitor > 1 ? numberOFVisitor - 1 : 1);
@@ -23,6 +27,7 @@ const VisitorPicker = ({ numberOFVisitor = 1, setNumberOFVisitor }) => {
         </span>
         <button
           onClick={increment}
+          disabled={numberOFVisitor == max}
           className="p-2 border-secondary text-gray-700 rounded-lg border-2 border-gray-300 focus:outline-none focus:bg-secondary focus:text-white"
         >
           <HiOutlinePlusSmall size={20} />
