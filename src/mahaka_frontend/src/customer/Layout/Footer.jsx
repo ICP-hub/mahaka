@@ -14,6 +14,7 @@ import { MdMailOutline } from "react-icons/md";
 import { Link } from "react-router-dom";
 
 export default function Footer() {
+ 
   const currentYear = new Date().getFullYear();
   const address = "345 Faulconer Drive, Suite 4 • Charlottesville, CA, 12345";
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
@@ -70,9 +71,11 @@ export default function Footer() {
           >
             Privacy Policy
           </Link>
-          <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 font-medium cursor-pointer">
+          <Link className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 font-medium cursor-pointer"
+           to ="/terms-conditions"
+           >
             Terms
-          </div>
+          </Link>
         </div>
         <div className="mx-auto flex ml-6  text-md     flex-col-reverse items-center justify-between gap-4  sm:flex-row">
           <span>© 2024 MAHAKA, LLC. All rights reserved.</span>
