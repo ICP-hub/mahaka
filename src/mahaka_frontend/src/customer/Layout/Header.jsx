@@ -62,7 +62,7 @@ export default function Header() {
 
   return (
     <div className="bg-[#124076]">
-      <div className="flex px-6 md:px-8 container mx-auto user_header items-center z-999">
+      <div className="flex px-6 md:px-8 container mx-auto user_header items-center z-10">
         <LogoSection />
         <div className="hidden md:flex items-center w-full">
           <div className="flex items-center relative gap-8 w-full px-6">
@@ -72,7 +72,7 @@ export default function Header() {
             </div> */}
           </div>
         </div>
-        <div className="flex items-center space-x-4 ml-auto">
+        <div className="flex items-center  z-10 space-x-4 ml-auto">
           <TranslationForCustomer />
           <div className="flex items-center space-x-2">
             <div className="p-1 rounded-full relative h-10 w-10 flex items-center justify-center hover:bg-hover">
@@ -122,7 +122,7 @@ export default function Header() {
 }
 
 const LogoSection = () => {
-  return <div className="text-2xl font-black">LOGO</div>;
+  return <div className="text-2xl font-black" >MAHAKA</div>;
 };
 
 const SearchBox = () => {

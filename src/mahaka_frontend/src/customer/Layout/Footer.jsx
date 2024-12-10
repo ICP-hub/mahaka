@@ -25,7 +25,7 @@ export default function Footer() {
           <span className="font-black italic text-4xl ml-10">MAHAKA</span>
         </div>
         <div className="space-y-4">
-          <span className="block font-bold">Socials</span>
+          <span className="  font-bold">Socials</span>
           <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 cursor-pointer font-medium">
             <FaFacebookSquare size={16} />
             <span>Facebook</span>
@@ -48,7 +48,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="space-y-4">
-          <span className="block font-bold">Site</span>
+          <span className="  font-bold">Site</span>
           <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 font-medium cursor-pointer">
             Home
           </div>
@@ -57,7 +57,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="space-y-4">
-          <span className="block font-bold">Legal</span>
+          <span className=" font-bold">Legal</span>
           <div className="flex items-center gap-2 text-sm text-neutral-300 transition-colors hover:text-indigo-300 font-medium cursor-pointer">
             License
           </div>
@@ -68,9 +68,12 @@ export default function Footer() {
             Terms
           </div>
         </div>
+        <div className="mx-auto flex ml-6  flex-col-reverse items-center justify-between gap-4 text-xs sm:flex-row">
+          <span>© 2024 MAHAKA, LLC. All rights reserved.</span>
+        </div>
       </div>
       <div className="-mx-4 mt-12 border-t-[1px] border-border p-4">
-        <div className="mx-auto flex ml-6  flex-col-reverse items-center justify-between gap-4 text-xs sm:flex-row">
+        <div className=" ">
           <span>© 2024 MAHAKA, LLC. All rights reserved.</span>
         </div>
       </div>

@@ -15,6 +15,7 @@ export default function EventTickets({
   tickets,
   selectedVenue,
   id,
+  ticketType,
 }) {
   const { backend, principal } = useSelector((state) => state.authentication);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,7 +34,7 @@ export default function EventTickets({
   const buyVenueTicketHandler = async () => {
     try {
       setLoading(true);
-      const ticketTypeVariant = { ["SinglePass"]: null };
+      const ticketTypeVariant = { [ticketType]: null };
       const record = [
         {
           data: new Uint8Array([1, 2, 3]),

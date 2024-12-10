@@ -94,7 +94,9 @@ const UserBookingData = () => {
               </div>
               {/* View Details Button */}
               <button
-                onClick={() => setSelectedTicket(ticket)}
+                onClick={() => {
+                  setSelectedTicket(ticket);
+                }}
                 className="w-full mt-4 py-2 bg-secondary text-white font-medium rounded-lg transition-colors"
               >
                 View Details

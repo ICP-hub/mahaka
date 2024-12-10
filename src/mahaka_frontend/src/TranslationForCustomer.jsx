@@ -42,6 +42,7 @@ const TranslationForCustomer = () => {
           font-weight: 530 !important;
           width: auto !important;
           max-width: 165px !important;
+      
         }
         #google_translate_element select option {
           background-color: #124076 !important;
