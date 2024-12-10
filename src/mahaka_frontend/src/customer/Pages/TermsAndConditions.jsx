@@ -11,7 +11,7 @@ const TermsAndConditions = () => {
       </div>
 
      
-      <div className="container mx-auto px-10 md:px-30 py-8">
+      <div className="container mx-auto px-10 py-8">
         
         <div className="mb-15">
           <h2 className="text-3xl font-semibold text-secondary mb-3">

@@ -6,80 +6,65 @@ import Blob "mo:base/Blob";
 import Debug "mo:base/Debug";
 import Text "mo:base/Text";
 import Int "mo:base/Int";
-import Nat "mo:base/Nat";
 import Nat8 "mo:base/Nat8";
-import Nat64 "mo:base/Nat64";
 import Float "mo:base/Float";
 import Cycles "mo:base/ExperimentalCycles";
 import serdeJson "mo:serde/JSON";
 import Result "mo:base/Result";
 import Time "mo:base/Time";
-import Bool "mo:base/Bool";
 import Base64 "lib/Base64";
-import Messages "messages";
 
 module {
 
     let ic : Types.IC = actor ("aaaaa-aa");
-    private let api_token = "idVMaJOz4zZ5ebi3SQ8M5oQD8nz6JF8o9AbLkhJgVMdORlna33iRkwaauby6";
-    private let base_url = "https://ipv6.mcti.io/api/";
-    // private let base_url = "https://ipv6.mcti.io/api/";
 
-    public type Message = Text;
 
     public module Stripe {
 
+        private let base_url = "https://api.stripe.com/v1/";
         private let secret_key = "sk_test_51QKxqbG4kNs1irDHlNLNyLDInjXpY2K6ZyxqG0Ssu1R9YhT4OKz9XUyBtc59nfmzxI7UDCrXQLwbgJTQryrNh0xh00DdigkPiC";
-        
-        public type CreateSessionApi = {
-            status: Bool;
-            message: Message;
-            data: ?CreateSession;
-        };
 
         public type CreateSession = {
             id: Text;
             url: Text;
         };
 
-        public type RetrieveSessionApi = {
-            status: Bool;
-            message: Message;
-            data: ?RetrieveSession;
-        };
-
         public type RetrieveSession = {
             payment_status: Text;
         };
 
+        public type ErrorResponse = {
+            error: {
+                code                : Text;
+                doc_url             : Text;
+                message             : Text;
+                param               : Text;
+                request_log_url     : Text;
+            };
+        };
 
-        // public func create_session(invoiceNo:Nat, invoice : Types.Request.CreateInvoiceBody, transform: shared query (Http.IcHttp.TransformArgs) -> async Http.IcHttp.CanisterHttpResponsePayload) : async Result.Result<?CreateSession, ?Message>  {
-        public func create_session(invoiceNo:Nat, invoice : Types.Request.CreateInvoiceBody, transform_context: Http.IcHttp.TransformContext) : async Result.Result<?CreateSession, ?Message>  {
+        public func create_session(invoiceNo:Nat, invoice : Types.Request.CreateInvoiceBody) : async Result.Result<?CreateSession, ?ErrorResponse>  {
             // Set the request headers
             let request_headers = [
-                {   name = "Content-Type";      value = "application/x-www-form-urlencoded" },
-                {   name = "Accept";            value = "application/json" },
-                {   name = "token";             value = api_token },
-                {   name = "invoice-number";    value = Nat.toText(invoiceNo)},
+                {   name = "Content-Type";     value = "application/x-www-form-urlencoded" },
+                {   name = "Authorization";    value = "Bearer " # secret_key }
             ];
 
             // Construct the request body string
             let request_body_str: Text = "cancel_url="# Config.get_stripe_cancel_url(invoiceNo) #"&" # 
-                "success_url="# Config.get_stripe_success_url(invoiceNo) #"&"#
-                "currency="# invoice.currency #"&secret_key="# secret_key #"&unit_amount="# Int.toText(Float.toInt(invoice.amount * 100)) #"&"#
-                "quantity=1";
+                "success_url="# Config.get_stripe_success_url(invoiceNo) #"&mode=payment&payment_method_types[0]=card&"#
+                "line_items[0][price_data][currency]="# invoice.currency #"&line_items[0][price_data][product_data][name]=token&line_items[0][price_data][unit_amount]="# Int.toText(Float.toInt(invoice.amount * 100)) #"&"#
+                "line_items[0][quantity]=1";
 
             // Encode the request body as Blob
             let request_body_as_Blob: Blob = Text.encodeUtf8(request_body_str); 
 
             // Create the HTTP request object
             let http_request : Http.IcHttp.HttpRequest = {
-                url = base_url # "stripe/create-session";
+                url = base_url # "checkout/sessions";
                 headers = request_headers;
                 body = ?request_body_as_Blob; 
                 method = #post;
-                transform = ?transform_context;
-                max_response_bytes= null;
             };
 
             // Minimum cycles needed to pass the CI tests. Cycles needed will vary on many things, such as the size of the HTTP response and subnet.
@@ -90,7 +75,7 @@ module {
 
             // Decode the response body text
             let decoded_text: Text = switch (Text.decodeUtf8(http_response.body)) {
-                case (null) { "{\"status\" : \"false\", \"message\" : \"No value returned\", \"data\" : \"null\"}" };
+                case (null) { "{\"error\": {\"code\" : \"\", \"message\" : \"No value returned\", \"doc_url\" : \"\", \"param\" : \"\", \"request_log_url\" : \"\"}}" };
                 case (?y) { y };
             };
 
@@ -98,48 +83,33 @@ module {
             let blob = serdeJson.fromText(decoded_text);
 
             // Deserialize the blob to CreateSession type
-            let session : ?CreateSessionApi = from_candid(blob);
+            let session : ?CreateSession = from_candid(blob);
 
             return switch(session){
                 case(null) {
-                     return #err(null);
+                    let errResponse : ?ErrorResponse = from_candid(blob);
+                    return #err(errResponse);
                 };
-                case(?_session) {
-                    return switch(_session.status){
-                        case (false) {
-                            return #err(?_session.message);
-                        };
-                        case(true) {
-                            return #ok(_session.data);
-                        };
-                    };
+                case(_session) {
+                    return #ok(_session);
                 };
             };
         };
 
-        public func retrieve_session(session_id:Text, transform_context: Http.IcHttp.TransformContext) : async Result.Result<?RetrieveSession, ?Message>  {
+        public func retrieve_session(session_id:Text) : async Result.Result<?RetrieveSession, ?ErrorResponse>  {
 
              // Set the request headers
             let request_headers = [
-                {   name = "Content-Type";      value = "application/x-www-form-urlencoded" },
-                {   name = "Accept";            value = "application/json" },
-                {   name = "token";             value = api_token },
+                {   name = "Content-Type";     value = "application/x-www-form-urlencoded" },
+                {   name = "Authorization";    value = "Bearer " # secret_key }
             ];
-
-             // Construct the request body string
-            let request_body_str: Text = "secret_key=" # secret_key;
-
-            // Encode the request body as Blob
-            let request_body_as_Blob: Blob = Text.encodeUtf8(request_body_str); 
 
             // Create the HTTP request object
             let http_request : Http.IcHttp.HttpRequest = {
-                url = base_url # "stripe/retrieve-session/" # session_id;
+                url = base_url # "checkout/sessions/" # session_id;
                 headers = request_headers;
-                body = ?request_body_as_Blob; 
-                method = #post;
-                transform = ?transform_context;
-                max_response_bytes= null;
+                body = null; 
+                method = #get;
             };
 
             // Minimum cycles needed to pass the CI tests. Cycles needed will vary on many things, such as the size of the HTTP response and subnet.
@@ -150,7 +120,7 @@ module {
 
             // Decode the response body text
             let decoded_text: Text = switch (Text.decodeUtf8(http_response.body)) {
-                case (null) { "{\"status\" : \"false\", \"message\" : \"No value returned\", \"data\" : \"null\"}" };
+                case (null) { "{\"error\": {\"code\" : \"\", \"message\" : \"No value returned\", \"doc_url\" : \"\", \"param\" : \"\", \"request_log_url\" : \"\"}}" };
                 case (?y) { y };
             };
 
@@ -158,34 +128,43 @@ module {
             let blob = serdeJson.fromText(decoded_text);
 
             // Deserialize the blob to RetrieveSession type
-            let session : ?RetrieveSessionApi = from_candid(blob);
+            let session : ?RetrieveSession = from_candid(blob);
 
             return switch(session){
                 case(null) {
-                     return #err(null);
+                    let errResponse : ?ErrorResponse = from_candid(blob);
+                    return #err(errResponse);
                 };
-                case(?_session) {
-                    return switch(_session.status){
-                        case (false) {
-                            return #err(?_session.message);
-                        };
-                        case(true) {
-                            return #ok(_session.data);
-                        };
-                    };
+                case(_session) {
+                    return #ok(_session);
                 };
             };
         };
     };
 
     public module Paypal {
+        private let base_url = "https://api-m.sandbox.paypal.com/";
         private let client_id:Text = "AZUPT0s8SzC8SkFaBNRzOnVPIr4cZ6XcgiIaXtWFtTMlp2ePzJlfHvoZp0IaxOvlI9nk8aljvlcaihxR";
         private let client_secret:Text = "EFx8zu_5VtYja8nXx6Xs8BPJOepsALxXHvCIjWlKKOAx8UKIXlXwfWx-8Ai6DaUq4zt9hKsk33keit1x";       
 
-        public type CreateOrderApi = {
-            status: Bool;
-            message: Message;
-            data: ?CreateOrder;
+        public type ErrorResponse = {
+            error                : Text;
+            error_description    : Text;
+        };
+
+        public type Oauth2Token = {
+            access_token: Text;
+        };
+
+        private type CreateOrderApi = {
+            id: Text;
+            links: [
+                {
+                    href: Text;
+                    rel: Text;
+                    method: Text;
+                }
+            ];
         };
 
         public type CreateOrder = {
@@ -193,97 +172,104 @@ module {
             url: Text;
         };
 
-        public type RetrieveOrderApi = {
-            status: Bool;
-            message: Message;
-            data: ?RetrieveOrder;
-        };
-
         public type RetrieveOrder = {
             status: Text;
         };
 
-        public func create_order(invoiceNo:Nat, invoice : Types.Request.CreateInvoiceBody, transform_context: Http.IcHttp.TransformContext): async Result.Result<?CreateOrder, ?Message> {
+        public func create_order(invoiceNo:Nat, invoice : Types.Request.CreateInvoiceBody): async Result.Result<?CreateOrder, ?ErrorResponse> {
             
-            let request_headers = [
-                {   name = "Content-Type";      value = "application/x-www-form-urlencoded" },
-                {   name = "Accept";            value = "application/json" },
-                {   name = "token";             value = api_token },
-                {   name = "invoice-number";    value = Nat.toText(invoiceNo)},
-            ];
-
-            let request_body_str: Text = "client_id=" # client_id # "&client_secret=" # client_secret # "&cancel_url="# Config.get_paypal_cancel_url(invoiceNo) #
-                "&success_url="# Config.get_paypal_success_url(invoiceNo) # "&currency="# invoice.currency #"&amount="# Utils.convertNumber(invoice.amount);
-
-            let request_body_as_Blob: Blob = Text.encodeUtf8(request_body_str);
-
-
-            let http_request : Http.IcHttp.HttpRequest = {
-                url = base_url # "paypal/create-order";
-                headers = request_headers;
-                body = ?request_body_as_Blob; 
-                method = #post;
-                transform = ?transform_context;
-                max_response_bytes= null;
-            };
-
-            Cycles.add(220_131_200_000); 
-
-            // Send the HTTP request and await the response
-            let http_response : Http.IcHttp.HttpResponse = await ic.http_request(http_request);
-
-
-            // Decode the response body text
-            let decoded_text: Text = switch (Text.decodeUtf8(http_response.body)) {
-                case (null) { "{\"status\" : \"false\", \"message\" : \"No value returned\", \"data\" : \"null\"}" };
-                case (?y) { y };
-            };
-
-            //  Debug.print(decoded_text);
-
-            let blob = serdeJson.fromText(decoded_text);
-
-            // Deserialize the blob to CreateSession type
-            let checkout : ?CreateOrderApi = from_candid(blob);
-
-            return switch(checkout){
-                case(null) {
-                     return #err(null);
-                };
-                case(?_checkout) {
-                    return switch(_checkout.status){
-                        case (false) {
-                            return #err(?_checkout.message);
+           let sessionResult:Result.Result<?Oauth2Token, ?ErrorResponse> = await generate_access_token();
+            switch (sessionResult) {
+                case (#err err) { 
+                      switch(err) {
+                        case(null) {
+                            return #err(?{
+                                error= "";
+                                error_description = "";
+                            });
                         };
-                        case(true) {
-                            return #ok(_checkout.data);
+                        case(?_err) {
+                            return #err(err);
                         };
                     };
+                };
+                case (#ok session) { 
+                    switch(session) {
+                        case(null){
+                            return #err(?{
+                                error= "";
+                                error_description = "";
+                            });
+                        };
+                        case(?_session) {
+
+                            let request_headers = [
+                                { name= "Content-Type"; value = "application/json" },
+                                { name= "Authorization"; value = "Bearer " # _session.access_token }
+                            ];
+
+                            let request_body_str: Text = "{\"intent\":\"CAPTURE\",\"purchase_units\":[{\"amount\":{\"currency_code\":\""# invoice.currency #"\",\"value\":\""# Int.toText(Float.toInt(invoice.amount)) #"\"}}],\"application_context\":{\"return_url\":\""# Config.get_paypal_success_url(invoiceNo) #"\",\"cancel_url\":\""# Config.get_paypal_cancel_url(invoiceNo) #"\"}}";
+                            let request_body_as_Blob: Blob = Text.encodeUtf8(request_body_str);
+
+                            let http_request : Http.IcHttp.HttpRequest = {
+                                url = base_url # "v2/checkout/orders";
+                                headers = request_headers;
+                                body = ?request_body_as_Blob; 
+                                method = #post;
+                           };
+
+                            Cycles.add(220_131_200_000); 
+
+                            // Send the HTTP request and await the response
+                            let http_response : Http.IcHttp.HttpResponse = await ic.http_request(http_request);
+
+                            // Decode the response body text
+                            let decoded_text: Text = switch (Text.decodeUtf8(http_response.body)) {
+                                case (null) { "{\"error\" : \"\", \"error_description\" : \"No value returned\"}" };
+                                case (?y) { y };
+                            };
+
+                            let blob = serdeJson.fromText(decoded_text);
+
+                            // Deserialize the blob to CreateSession type
+                            let checkout : ?CreateOrderApi = from_candid(blob);
+
+                             return switch(checkout) {
+                                case(null) {
+                                    let errResponse : ?ErrorResponse = from_candid(blob);
+                                    #err(errResponse);
+                                };
+                                case(?_checkout) {
+                                    return #ok(?{
+                                        id= _checkout.id;
+                                        url= _checkout.links[1].href;
+                                    });
+                                };
+                            };
+                        };
+                   };
                 };
             };
         };   
 
-        public func retrieve_order(order_id:Text, transform_context: Http.IcHttp.TransformContext) : async Result.Result<?RetrieveOrder, ?Message>  {
+        private func generate_access_token() : async Result.Result<?Oauth2Token, ?ErrorResponse> {
+            let text2Nat8:[Nat8] = Utils.text2Nat8Array(client_id # ":" # client_secret);
 
-            // Set the request headers
             let request_headers = [
-                {   name = "Content-Type";      value = "application/x-www-form-urlencoded" },
-                {   name = "Accept";            value = "application/json" },
-                {   name = "token";             value = api_token },
+                {   name = "Content-Type";     value = "application/x-www-form-urlencoded" },
+                {   name = "Authorization";    value = "Basic " # Base64.StdEncoding.encode(text2Nat8) }
             ];
 
-            let request_body_str: Text = "client_id=" # client_id # "&client_secret=" # client_secret # "&order_id=" # order_id;
+            let request_body_str: Text = "grant_type=client_credentials&ignoreCache=true";
 
-            let request_body_as_Blob: Blob = Text.encodeUtf8(request_body_str);
+            let request_body_as_Blob: Blob = Text.encodeUtf8(request_body_str); 
 
             // Create the HTTP request object
             let http_request : Http.IcHttp.HttpRequest = {
-                url = base_url # "paypal/retrieve-order";
+                url = base_url # "v1/oauth2/token";
                 headers = request_headers;
                 body = ?request_body_as_Blob; 
                 method = #post;
-                transform = ?transform_context;
-                max_response_bytes= null;
             };
 
             // Minimum cycles needed to pass the CI tests. Cycles needed will vary on many things, such as the size of the HTTP response and subnet.
@@ -294,7 +280,166 @@ module {
 
             // Decode the response body text
             let decoded_text: Text = switch (Text.decodeUtf8(http_response.body)) {
-                case (null) { "{\"status\" : \"false\", \"message\" : \"No value returned\", \"data\" : \"null\"}" };
+                case (null) { "{\"error\" : \"\", \"error_description\" : \"No value returned\"}" };
+                case (?y) { y };
+            };
+
+            let blob = serdeJson.fromText(decoded_text);
+
+            // Deserialize the blob to CreateSession type
+            let token : ?Oauth2Token = from_candid(blob);
+
+            return switch(token) {
+                case(null) {
+                    let errResponse : ?ErrorResponse = from_candid(blob);
+                    #err(errResponse);
+                };
+                case(_token) {
+                    // access_token := _token.access_token;
+                    // expires_time := Time.now() + (_token.expires_in * 10 ** 9);
+                    return #ok(_token);
+                };
+            };
+        };
+
+        public func retrieve_order(order_id:Text) : async Result.Result<?RetrieveOrder, ?ErrorResponse>  {
+
+            let sessionResult:Result.Result<?Oauth2Token, ?ErrorResponse> = await generate_access_token();
+            switch (sessionResult) {
+                case (#err err) { 
+                      switch(err) {
+                        case(null) {
+                            return #err(?{
+                                error= "";
+                                error_description = "";
+                            });
+                        };
+                        case(?_err) {
+                            return #err(err);
+                        };
+                    };
+                };
+                case (#ok session) { 
+                    switch(session) {
+                        case(null){
+                            return #err(?{
+                                error= "";
+                                error_description = "";
+                            });
+                        };
+                        case(?_session) {
+
+                            // Set the request headers
+                            let request_headers = [
+                                { name= "Content-Type"; value = "application/json" },
+                                { name= "Authorization"; value = "Bearer " # _session.access_token }
+                            ];
+
+                            // Create the HTTP request object
+                            let http_request : Http.IcHttp.HttpRequest = {
+                                url = base_url # "v2/checkout/orders/" # order_id;
+                                headers = request_headers;
+                                body = null; 
+                                method = #get;
+                            };
+
+                            // Minimum cycles needed to pass the CI tests. Cycles needed will vary on many things, such as the size of the HTTP response and subnet.
+                            Cycles.add(220_131_200_000); 
+
+                            // Send the HTTP request and await the response
+                            let http_response : Http.IcHttp.HttpResponse = await ic.http_request(http_request);
+
+                            // Decode the response body text
+                            let decoded_text: Text = switch (Text.decodeUtf8(http_response.body)) {
+                                case (null) { "{\"error\" : \"\", \"error_description\" : \"No value returned\"}" };
+                                case (?y) { y };
+                            };
+
+                            // Convert the decoded text to Blob
+                            let blob = serdeJson.fromText(decoded_text);
+
+                            // Deserialize the blob to RetrieveSession type
+                            let order : ?RetrieveOrder = from_candid(blob);
+
+                            return switch(order){
+                                case(null) {
+                                    let errResponse : ?ErrorResponse = from_candid(blob);
+                                    return #err(errResponse);
+                                };
+                                case(?_order) {
+
+                                    if(Text.equal(_order.status, "APPROVED")) {
+                                        let captureResult: Result.Result<?RetrieveOrder, ?ErrorResponse> =  await capture_order(_session.access_token, order_id);
+
+                                        return switch (captureResult) {
+                                            case (#err err) { 
+                                                switch(err) {
+                                                    case(null) {
+                                                        return #err(?{
+                                                            error= "";
+                                                            error_description = "";
+                                                        });
+                                                    };
+                                                    case(?_err) {
+                                                        return #err(err);
+                                                    };
+                                                };
+                                            };
+
+                                            case (#ok capture) { 
+                                                switch(capture) {
+                                                    case(null){
+                                                        return #err(?{
+                                                            error= "";
+                                                            error_description = "";
+                                                        });
+                                                    };
+                                                    case(?_capture) {
+                                                        return #ok(capture);
+                                                    };
+                                                };
+                                            };
+
+                                        };
+
+                                    } else {
+                                        return #ok(order);
+                                    };
+
+                                };
+                            };
+
+                        };
+                   };
+                };
+            };
+        };
+
+        private func capture_order(access_token:Text, order_id:Text) : async Result.Result<?RetrieveOrder, ?ErrorResponse>  {
+
+            // Set the request headers
+            let request_headers = [
+                { name= "Content-Type"; value = "application/json" },
+                { name= "Authorization"; value = "Bearer " # access_token }
+            ];
+
+            // Create the HTTP request object
+            let http_request : Http.IcHttp.HttpRequest = {
+                url = base_url # "v2/checkout/orders/" # order_id # "/capture";
+                headers = request_headers;
+                body = null; 
+                method = #post;
+            };
+
+            // Minimum cycles needed to pass the CI tests. Cycles needed will vary on many things, such as the size of the HTTP response and subnet.
+            Cycles.add(220_131_200_000); 
+
+            // Send the HTTP request and await the response
+            let http_response : Http.IcHttp.HttpResponse = await ic.http_request(http_request);
+
+            // Decode the response body text
+            let decoded_text: Text = switch (Text.decodeUtf8(http_response.body)) {
+                case (null) { "{\"error\" : \"\", \"error_description\" : \"No value returned\"}" };
                 case (?y) { y };
             };
 
@@ -302,24 +447,17 @@ module {
             let blob = serdeJson.fromText(decoded_text);
 
             // Deserialize the blob to RetrieveSession type
-            let order : ?RetrieveOrderApi = from_candid(blob);
+            let result : ?RetrieveOrder = from_candid(blob);
 
-            return switch(order){
+            return switch(result){
                 case(null) {
-                     return #err(null);
+                    let errResponse : ?ErrorResponse = from_candid(blob);
+                    return #err(errResponse);
                 };
-                case(?_order) {
-                    return switch(_order.status){
-                        case (false) {
-                            return #err(?_order.message);
-                        };
-                        case(true) {
-                            return #ok(_order.data);
-                        };
-                    };
+                case(_result) {
+                    return #ok(_result);
                 };
             };
-
         };
     };
 }

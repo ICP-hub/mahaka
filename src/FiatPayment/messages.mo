@@ -4,11 +4,11 @@ module {
     // Global Messages
     public let not_authorized:Text = "Not Authorized";
     public let not_owner:Text = "You are not owner";
-    public let invalid_principal:Text = "Invalid Principal";
     public let success_operation:Text = "Success Operation";
+    public let invalid_principal:Text = "Invalid Principal";
+    public let owner_is_required:Text = "The new owner is required";
 
     // Validation messages
-    public let owner_is_required:Text = "The new owner is required";
     public let payment_method_is_required:Text = "The payment method is required";
     public let payment_method_invalid_value:Text = "The Payment method Invalid value";
     public let currency_is_required:Text = "The currency is required";
@@ -30,7 +30,7 @@ module {
     public let created_invoice_successfully:Text = "Invoice created successfully";
     public let created_invoice_failed:Text = "Invoice creation failed";
 
-    public let confirmed_invoice_successfully:Text = "Invoice completed successfully";
+    public let confirmed_invoice_successfully:Text = "Invoice confirmed successfully";
     public let cancelled_invoice_successfully:Text = "Invoice cancelled successfully";
     public let confirmed_invoice_failed:Text = "Invoice confirmed failed";    
 

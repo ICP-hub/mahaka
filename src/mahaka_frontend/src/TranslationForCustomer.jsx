@@ -72,10 +72,10 @@ const TranslationForCustomer = () => {
 
   const styles = {
     translateContainer: {
-      textAlign: "right",
+      textAlign: "",
     },
     googleTranslateElement: {
-      display: "inline-block",
+      display: "",
       padding: "5px",
     },
     select: {

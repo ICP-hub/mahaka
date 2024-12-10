@@ -73,7 +73,6 @@ export default function Header() {
           </div>
         </div>
         <div className="flex items-center  z-10 space-x-4 ml-auto">
-          <TranslationForCustomer />
           <div className="flex items-center space-x-2">
             <div className="p-1 rounded-full relative h-10 w-10 flex items-center justify-center hover:bg-hover">
               <button onClick={toggleNavigation}>
@@ -122,7 +121,11 @@ export default function Header() {
 }
 
 const LogoSection = () => {
-  return <div className="text-2xl font-black" >MAHAKA</div>;
+  return (
+    <Link className="text-2xl font-black" to="/">
+      MAHAKA
+    </Link>
+  );
 };
 
 const SearchBox = () => {
@@ -358,15 +361,19 @@ const NavVertical = ({ isNavOpen, onNavOpen }) => {
       transition={{ stiffness: 100, damping: 25, duration: 0.5 }}
       className="absolute border-gray-500 inset-x-0 bg-[#124076] text-white z-50 h-screen"
     >
-      <div className="flex flex-col container mx-auto p-4 md:p-6 text-4xl md:text-7xl font-black">
+      <div className="flex flex-col container mx-auto p-4 md:p-6 text-xl md:text-xl font-black">
+        <div className="flex justify-start">
+          <TranslationForCustomer />
+        </div>
         {NavLinks.map((link, index) => (
           // Replace button with Link later
           <Link to={link.url} key={index} onClick={() => onNavOpen(false)}>
-            <div key={index} className="py-4">
+            <div key={index} className="py-4 px-4">
               <h4 className="hover:text-indigo-300">{link.title}</h4>
             </div>
           </Link>
         ))}
+
         <div className="block sm:hidden">
           <ConnectBtn />
         </div>

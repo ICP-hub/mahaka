@@ -1,7 +1,6 @@
 
 import Trie "mo:base/Trie";
 import Nat "mo:base/Nat";
-import Nat64 "mo:base/Nat64";
 import Float "mo:base/Float";
 import Iter "mo:base/Iter";
 import Result "mo:base/Result";
@@ -12,7 +11,6 @@ import Array "mo:base/Array";
 import List "mo:base/List";
 import Time "mo:base/Time";
 import Principal "mo:base/Principal";
-import Bool "mo:base/Bool";
 
 import Http "http";
 import Types "types";
@@ -22,10 +20,7 @@ import Utils "utils";
 import Base64 "lib/Base64";
 import Service "service";
 import Util "mo:xtended-numbers/Util";
-import Nat16 "mo:base/Nat16";
 import Cycles "mo:base/ExperimentalCycles";
-
-import serdeJson "mo:serde/JSON";
 
 
 actor Fiat {
@@ -41,19 +36,40 @@ actor Fiat {
     // Trie to store owner's invoices
     private stable var ownerInvoicesTrie : Trie.Trie<Principal, List.List<Nat>> = Trie.empty();
 
-    // List to store pending invoices
-    private stable var pendingInvoiceList: List.List<Nat> = List.nil<Nat>();
-
     // Owner's identifier
-    private var owner:Text = "vm3ub-w2pbo-ok2ox-famss-6b732-fqtat-klxbe-xcrni-iy3uk-yiaps-lae";
+    private var owner:Text = "vpand-plyes-o5rtf-vm4oo-3b2fe-obah4-e3rd2-g42ip-vuuqd-3jnee-4qe";
 
     // Owner's identifier
     public func getOwner() : async Text {
         return owner
     };
 
+    // Check if the caller is the owner
+    public shared query (msg) func isOwner() : async Bool {
+        return (owner == Principal.toText(msg.caller))
+    };
+
+    // Return the number of invoices in the trie
+    public func invoiceCount() : async Nat {
+        Trie.size(invoicesTrie)
+    };
+
     public query func availableCycles() : async Nat {
         return Cycles.balance();
+    };
+
+    // This is a private function named '_calculate_total_price' that calculates the total price of a list of items.
+    // It takes in the following parameter:
+    // - 'items': An array of 'Types.Item' representing the items for which the total price will be calculated.
+    // The function returns an asynchronous Float representing the calculated total price.
+    private func _calculate_total_price(items: [Types.Item]): async Float {
+        // Use 'Array.foldLeft' to iterate through the 'items' array and calculate the sum of item prices.
+        // The starting sum is set to 0, and for each item 'x', the price is added to the 'sumSoFar'.
+        return Array.foldLeft<Types.Item, Float>(
+            items,
+            0, // start the sum at 0
+            func(sumSoFar, x) = sumSoFar + x.price // this entire function can be replaced with `add`!
+        );
     };
 
     public shared({caller}) func setOwner(newOwner : Text) : async Http.Response<Http.ResponseStatus<Bool, {}>> {
@@ -76,34 +92,10 @@ actor Fiat {
                     Http.Status.OK);
     };
 
-    // Check if the caller is the owner
-    public shared query (msg) func is_owner() : async Bool {
-        return (owner == Principal.toText(msg.caller))
-    };
-
-    // Return the number of invoices in the trie
-    public query func invoice_count() : async Nat {
-        Trie.size(invoicesTrie)
-    };
-
-    // This is a private function named '_calculate_total_price' that calculates the total price of a list of items.
-    // It takes in the following parameter:
-    // - 'items': An array of 'Types.Item' representing the items for which the total price will be calculated.
-    // The function returns an asynchronous Float representing the calculated total price.
-    private func _calculate_total_price(items: [Types.Item]): Float {
-        // Use 'Array.foldLeft' to iterate through the 'items' array and calculate the sum of item prices.
-        // The starting sum is set to 0, and for each item 'x', the price is added to the 'sumSoFar'.
-        return Array.foldLeft<Types.Item, Float>(
-            items,
-            0, // start the sum at 0
-            func(sumSoFar, x) = sumSoFar + Float.mul(x.price , Float.fromInt(x.quantity)) // this entire function can be replaced with `add`!
-        );
-    };
-
 
     public shared ({ caller }) func create_invoice(sender : Principal, invoice : Types.Request.CreateInvoiceBody) : async Http.Response<Http.ResponseStatus<Types.Response.CreateInvoiceBody, {}>> {
         
-        let amount = _calculate_total_price(invoice.items);
+        let amount = (await _calculate_total_price(invoice.items));
         // Check if the caller is anonymous
         if (Validation.isAnonymous(sender)) {
             // return Utils.generalResponse(false, Messages.not_authorized, #err({}), Http.Status.UnprocessableEntity);
@@ -133,22 +125,17 @@ actor Fiat {
             return Utils.generalResponse(false, Messages.sum_invoice_items_is_incorrect, #err({}), Http.Status.UnprocessableEntity);
         };
 
-        let transform_context : Http.IcHttp.TransformContext = {
-            function = transform;
-            context = Blob.fromArray([]);
-        };
-
         // Check if the payment method specified in the invoice is "Stripe"
         if (Validation.isEqual(invoice.paymentMethod, "Stripe")) {
             // If it's "Stripe", create a Stripe payment session using the 'Service.Stripe.create_session' function
-            let sessionResult: Result.Result<?Service.Stripe.CreateSession, ?Service.Message> = await Service.Stripe.create_session(noInvoice + 1, invoice, transform_context);
+            let sessionResult: Result.Result<?Service.Stripe.CreateSession, ?Service.Stripe.ErrorResponse> = await Service.Stripe.create_session(noInvoice + 1, invoice);
             // Call the '_stripe_invoice' function with the appropriate parameters and wait for the result
             return await _stripe_invoice(sender, invoice, sessionResult);
         } else {
             // If the payment method is not "Stripe", assume it's "PayPal" and create a PayPal payment session
-            let sessionResult: Result.Result<?Service.Paypal.CreateOrder, ?Service.Message> = await Service.Paypal.create_order(noInvoice + 1, invoice, transform_context);
+            let sessionResult: Result.Result<?Service.Paypal.CreateOrder, ?Service.Paypal.ErrorResponse> = await Service.Paypal.create_order(noInvoice + 1, invoice);
             // Call the '_paypal_invoice' function with the appropriate parameters and wait for the result
-            return await _paypal_invoice(caller, invoice, sessionResult);
+            return await _paypal_invoice(sender, invoice, sessionResult);
         };
 
 
@@ -160,7 +147,7 @@ actor Fiat {
     // - 'invoice': The data of the invoice to be created (of type 'Types.Request.CreateInvoiceBody').
     // - 'sessionResult': The result of a previous operation, either an Ok value containing 'Service.Stripe.CreateSession' or an Err value containing 'Service.Stripe.ErrorResponse'.
     // The function returns an asynchronous HTTP response of type 'Http.Response<Http.ResponseStatus<Types.Response.CreateInvoiceBody, {}>>'.
-    private func _stripe_invoice(caller: Principal, invoice: Types.Request.CreateInvoiceBody, sessionResult: Result.Result<?Service.Stripe.CreateSession, ?Service.Message>): async Http.Response<Http.ResponseStatus<Types.Response.CreateInvoiceBody, {}>> {
+    private func _stripe_invoice(caller: Principal, invoice: Types.Request.CreateInvoiceBody, sessionResult: Result.Result<?Service.Stripe.CreateSession, ?Service.Stripe.ErrorResponse>): async Http.Response<Http.ResponseStatus<Types.Response.CreateInvoiceBody, {}>> {
         // The function uses a 'switch' statement to handle different cases based on 'sessionResult'.
         return switch (sessionResult) {
             case (#err err) {
@@ -173,7 +160,7 @@ actor Fiat {
                     case (?_err) {
                         // If the error is of type '_err' (when the error type is known but not specified in this code snippet),
                         // return an internal server error with the error message and an empty response body.
-                        return Utils.generalResponse(false, _err, #err({}), Http.Status.InternalServerError);
+                        return Utils.generalResponse(false, _err.error.message, #err({}), Http.Status.InternalServerError);
                     };
                 };
             };
@@ -188,7 +175,7 @@ actor Fiat {
                         // If the session is of type '_session' (when the session type is known but not specified in this code snippet),
                         // call the '_create_invoice' function with the provided parameters and return its result.
                         // The '_create_invoice' function seems to be responsible for creating the actual invoice.
-                        return  _create_invoice(caller, invoice, _session, "Stripe");
+                        return await _create_invoice(caller, invoice, _session, "Stripe");
                     };
                 };
             };
@@ -201,7 +188,7 @@ actor Fiat {
     // - 'invoice': The data of the invoice to be created (of type 'Types.Request.CreateInvoiceBody').
     // - 'sessionResult': The result of a previous operation, either an Ok value containing 'Service.Paypal.CreateOrder' or an Err value containing 'Service.Paypal.ErrorResponse'.
     // The function returns an asynchronous HTTP response of type 'Http.Response<Http.ResponseStatus<Types.Response.CreateInvoiceBody, {}>>'.
-    private func _paypal_invoice(caller: Principal, invoice: Types.Request.CreateInvoiceBody, sessionResult: Result.Result<?Service.Paypal.CreateOrder, ?Service.Message>): async Http.Response<Http.ResponseStatus<Types.Response.CreateInvoiceBody, {}>> {
+    private func _paypal_invoice(caller: Principal, invoice: Types.Request.CreateInvoiceBody, sessionResult: Result.Result<?Service.Paypal.CreateOrder, ?Service.Paypal.ErrorResponse>): async Http.Response<Http.ResponseStatus<Types.Response.CreateInvoiceBody, {}>> {
         // The function uses a 'switch' statement to handle different cases based on 'sessionResult'.
         return switch (sessionResult) {
             case (#err err) {
@@ -214,7 +201,7 @@ actor Fiat {
                     case (?_err) {
                         // If the error is of type '_err' (when the error type is known but not specified in this code snippet),
                         // return an internal server error with the error description and an empty response body.
-                        return Utils.generalResponse(false, _err, #err({}), Http.Status.InternalServerError);
+                        return Utils.generalResponse(false, _err.error_description, #err({}), Http.Status.InternalServerError);
                     };
                 };
             };
@@ -229,7 +216,7 @@ actor Fiat {
                         // If the session is of type '_session' (when the session type is known but not specified in this code snippet),
                         // call the '_create_invoice' function with the provided parameters and return its result.
                         // The '_create_invoice' function seems to be responsible for creating the actual invoice.
-                        return _create_invoice(caller, invoice, _session, "PayPal");
+                        return await _create_invoice(caller, invoice, _session, "PayPal");
                     };
                 };
             };
@@ -243,7 +230,7 @@ actor Fiat {
     // - '_session': The session data (of type 'Types.CreateSession') related to the payment method.
     // - 'payment': The payment method used for the invoice (e.g., "PayPal" or "Stripe").
     // The function returns an asynchronous HTTP response of type 'Http.Response<Http.ResponseStatus<Types.Response.CreateInvoiceBody, {}>>'.
-    private func _create_invoice(caller: Principal, invoice: Types.Request.CreateInvoiceBody, _session: Types.CreateSession, payment: Text): Http.Response<Http.ResponseStatus<Types.Response.CreateInvoiceBody, {}>> {
+    private func _create_invoice(caller: Principal, invoice: Types.Request.CreateInvoiceBody, _session: Types.CreateSession, payment: Text): async Http.Response<Http.ResponseStatus<Types.Response.CreateInvoiceBody, {}>> {
 
         // Increment the invoice number (assuming 'noInvoice' is a global variable)
         noInvoice += 1;
@@ -276,9 +263,6 @@ actor Fiat {
         // Add the new invoice number to the owner's list of invoices
         ownerInvoicesList := List.push(noInvoice, ownerInvoicesList);
 
-        // Add the new invoice number to the pending's list of invoices
-        pendingInvoiceList := List.push(noInvoice, pendingInvoiceList);
-
         // Update the owner's invoices in the trie (assuming 'ownerInvoicesTrie' is a global variable)
         ownerInvoicesTrie := Trie.replace(
             ownerInvoicesTrie,
@@ -300,7 +284,7 @@ actor Fiat {
 
     ///////////////////////// Admin Fucntion /////////////////////////
 
-    public query({caller}) func get_all_invoices_to_admin() : async Http.Response<Http.ResponseStatus<[Invoice], {}>> {
+    public shared({caller}) func get_all_invoices_to_admin() : async Http.Response<Http.ResponseStatus<[Invoice], {}>> {
 
         if (not(Validation.isEqual(owner, Principal.toText(caller)))) {
             return Utils.generalResponse(false, Messages.not_owner, #err({}), Http.Status.UnprocessableEntity);
@@ -342,9 +326,12 @@ actor Fiat {
                 return Utils.generalResponse(false, Messages.invoice_not_found, #err({}), Http.Status.InternalServerError);
             };
             case (?invoiceFind) {
-                
+                // Check if the caller is the owner of the invoice
+                if(not(Text.equal(Principal.toText(caller), Principal.toText(invoiceFind.owner)))) {
+                    return Utils.generalResponse(false, Messages.invoice_not_found, #err({}), Http.Status.UnprocessableEntity);
+                }
                 // Check if the payment method matches the invoice
-                if(not(Validation.isEqual(invoiceFind.paymentMethod, invoiceReq.paymentMethod))) {
+                else if(not(Validation.isEqual(invoiceFind.paymentMethod, invoiceReq.paymentMethod))) {
                     return Utils.generalResponse(false, Messages.invoice_not_found, #err({}), Http.Status.UnprocessableEntity);
                 }
                 // Check if the invoice is in the pending status
@@ -376,8 +363,6 @@ actor Fiat {
                     ?newInvoice,
                 ).0;
 
-                pendingInvoiceList := List.filter(pendingInvoiceList, func(_invoiceNo : Nat) : Bool = _invoiceNo != invoiceFind.id);
-
                 // Return an HTTP response indicating the success of the status update and providing relevant information.
                 return Utils.generalResponse(true, 
                     // Use a 'switch' statement to determine the success message based on the invoice request status.
@@ -394,7 +379,7 @@ actor Fiat {
 
     ///////////////////////// Admin Fucntion /////////////////////////
 
-    public query({caller}) func get_my_invoices() : async Http.Response<Http.ResponseStatus<[Invoice], {}>> {
+    public query({caller}) func get_my_invoices() : async [Invoice] {
         // Retrieve the list of invoice numbers belonging to the caller
         var invoiceNumberList : List.List<Nat> = switch (Trie.find(ownerInvoicesTrie, Utils.keyPrincipal(caller),Principal.equal)) {
             case null List.nil<Nat>();
@@ -402,18 +387,13 @@ actor Fiat {
         };
 
         // Convert the list of invoice numbers into an array of invoices
-        let arr = List.toArray(List.map<Nat, Invoice>(invoiceNumberList, func (invoiceNo: Nat): Invoice { 
+        List.toArray(List.map<Nat, Invoice>(invoiceNumberList, func (invoiceNo: Nat): Invoice { 
             // Retrieve the invoice value using the invoice number
             let invoiceVal = Trie.find(invoicesTrie, Utils.keyNat(invoiceNo), Nat.equal);
             return switch(invoiceVal) {
                 case (?invoice) invoice;
             };
         }));
-
-        return Utils.generalResponse(true, 
-            Messages.success_operation,
-            #success(arr), 
-            Http.Status.OK);
     };
 
     public query func get_invoice(invoiceId : Nat) : async Http.Response<Http.ResponseStatus<Invoice, {}>> {
@@ -435,14 +415,10 @@ actor Fiat {
             Http.Status.OK);
     };
 
-    // public func _change_invoice_status (invoiceReq: Types.Request.ConfirmInvoiceBody) : async Http.Response<Http.ResponseStatus<Types.Response.ConfirmInvoiceBody, {}>> {
-
-    // };
-
     public shared({caller}) func change_invoice_status (invoiceReq: Types.Request.ConfirmInvoiceBody) : async Http.Response<Http.ResponseStatus<Types.Response.ConfirmInvoiceBody, {}>> {
         // Check if the caller is anonymous
         if (Validation.isAnonymous(caller)) {
-            // return Utils.generalResponse(false, Messages.not_authorized, #err({}), Http.Status.UnprocessableEntity);
+            return Utils.generalResponse(false, Messages.not_authorized, #err({}), Http.Status.UnprocessableEntity);
         }
         // Check if the payment method is empty
         else if (Validation.isEmpty(invoiceReq.paymentMethod)) {
@@ -473,21 +449,16 @@ actor Fiat {
                 else if(not(Validation.isEqual(invoiceFind.status, Types.InvoiceStatus.Pending))) {
                     return Utils.generalResponse(false, Messages.invoice_not_pending, #err({}), Http.Status.UnprocessableEntity);
                 };
-
-                let transform_context : Http.IcHttp.TransformContext = {
-                    function = transform;
-                    context = Blob.fromArray([]);
-                };
                 
                 // Check if the payment method specified in 'invoiceFind' is "Stripe".
                 if (Validation.isEqual(invoiceFind.paymentMethod, "Stripe")) {
                     // If the payment method is "Stripe", retrieve the session information using 'Service.Stripe.retrieve_session' function.
-                    let invoiceResult: Result.Result<?Service.Stripe.RetrieveSession, ?Service.Message> = await Service.Stripe.retrieve_session(invoiceFind.transactionId, transform_context);
+                    let invoiceResult: Result.Result<?Service.Stripe.RetrieveSession, ?Service.Stripe.ErrorResponse> = await Service.Stripe.retrieve_session(invoiceFind.transactionId);
                     // Call the '_change_invoice_status_stripe' function with the retrieved information and wait for the result.
                     return await _change_invoice_status_stripe(invoiceFind, invoiceReq, invoiceResult);
                 } else {
                     // If the payment method is not "Stripe", assume it's "PayPal" and retrieve the order information using 'Service.Paypal.retrieve_order' function.
-                    let invoiceResult: Result.Result<?Service.Paypal.RetrieveOrder, ?Service.Message> = await Service.Paypal.retrieve_order(invoiceFind.transactionId, transform_context);
+                    let invoiceResult: Result.Result<?Service.Paypal.RetrieveOrder, ?Service.Paypal.ErrorResponse> = await Service.Paypal.retrieve_order(invoiceFind.transactionId);
                     // Call the '_change_invoice_status_paypal' function with the retrieved information and wait for the result.
                     return await _change_invoice_status_paypal(invoiceFind, invoiceReq, invoiceResult);
                 };
@@ -503,7 +474,7 @@ actor Fiat {
     // - 'invoiceReq': The request to confirm the invoice (of type 'Types.Request.ConfirmInvoiceBody').
     // - 'invoiceResult': The result of retrieving the session from Stripe (of type 'Result.Result<?Service.Stripe.RetrieveSession, ?Service.Stripe.ErrorResponse>').
     // The function returns an asynchronous HTTP response of type 'Http.Response<Http.ResponseStatus<Types.Response.ConfirmInvoiceBody, {}>>'.
-    private func _change_invoice_status_stripe(invoiceFind: Invoice, invoiceReq: Types.Request.ConfirmInvoiceBody, invoiceResult: Result.Result<?Service.Stripe.RetrieveSession, ?Service.Message>): async Http.Response<Http.ResponseStatus<Types.Response.ConfirmInvoiceBody, {}>> {
+    private func _change_invoice_status_stripe(invoiceFind: Invoice, invoiceReq: Types.Request.ConfirmInvoiceBody, invoiceResult: Result.Result<?Service.Stripe.RetrieveSession, ?Service.Stripe.ErrorResponse>): async Http.Response<Http.ResponseStatus<Types.Response.ConfirmInvoiceBody, {}>> {
         // The function uses a 'switch' statement to handle different cases based on 'invoiceResult'.
         switch (invoiceResult) {
             case (#err err) {
@@ -516,7 +487,7 @@ actor Fiat {
                     case (?_err) {
                         // If the error is of type '_err' (when the error type is known but not specified in this code snippet),
                         // return an internal server error with the error message and an empty response body.
-                        return Utils.generalResponse(false, _err, #err({}), Http.Status.InternalServerError);
+                        return Utils.generalResponse(false, _err.error.message, #err({}), Http.Status.InternalServerError);
                     };
                 };
             };
@@ -556,7 +527,7 @@ actor Fiat {
     // - 'invoiceReq': The request to confirm the invoice (of type 'Types.Request.ConfirmInvoiceBody').
     // - 'invoiceResult': The result of retrieving the order from PayPal (of type 'Result.Result<?Service.Paypal.RetrieveOrder, ?Service.Paypal.ErrorResponse>').
     // The function returns an asynchronous HTTP response of type 'Http.Response<Http.ResponseStatus<Types.Response.ConfirmInvoiceBody, {}>>'.
-    private func _change_invoice_status_paypal(invoiceFind: Invoice, invoiceReq: Types.Request.ConfirmInvoiceBody, invoiceResult: Result.Result<?Service.Paypal.RetrieveOrder, ?Service.Message>): async Http.Response<Http.ResponseStatus<Types.Response.ConfirmInvoiceBody, {}>> {
+    private func _change_invoice_status_paypal(invoiceFind: Invoice, invoiceReq: Types.Request.ConfirmInvoiceBody, invoiceResult: Result.Result<?Service.Paypal.RetrieveOrder, ?Service.Paypal.ErrorResponse>): async Http.Response<Http.ResponseStatus<Types.Response.ConfirmInvoiceBody, {}>> {
         // The function uses a 'switch' statement to handle different cases based on 'invoiceResult'.
         switch (invoiceResult) {
             case (#err err) {
@@ -569,7 +540,7 @@ actor Fiat {
                     case (?_err) {
                         // If the error is of type '_err' (when the error type is known but not specified in this code snippet),
                         // return an internal server error with the error description and an empty response body.
-                        return Utils.generalResponse(false, _err, #err({}), Http.Status.InternalServerError);
+                        return Utils.generalResponse(false, _err.error_description, #err({}), Http.Status.InternalServerError);
                     };
                 };
             };
@@ -634,8 +605,6 @@ actor Fiat {
             ?newInvoice,
         ).0;
 
-        pendingInvoiceList := List.filter(pendingInvoiceList, func(_invoiceNo : Nat) : Bool = _invoiceNo != invoiceFind.id);
-
         // Return an HTTP response indicating the success of the status update and providing relevant information.
         return Utils.generalResponse(true, 
             // Use a 'switch' statement to determine the success message based on the invoice request status.
@@ -657,114 +626,6 @@ actor Fiat {
     public query func get_actor_id_as_text() : async Text {
         // Convert the actor ID to text
         Principal.toText(Principal.fromActor(Fiat));
-    };
-
-    ////////////////////// Cron Job /////////////////////////////////
-    // This private function is responsible for checking pending invoices.
-    private func check_pending_invoices(): async () {
-        // Iterate through each invoice number in the 'pendingInvoiceList'.
-        List.iterate<Nat>(pendingInvoiceList, func(invoiceNo: Nat): () {
-            // Find the invoice details associated with the current invoice number in the 'invoicesTrie'.
-            switch (Trie.find(invoicesTrie, Utils.keyNat(invoiceNo), Nat.equal)) {
-                case (null) {
-                    // If no invoice details are found for the given invoice number, do nothing.
-                    // This means the invoice is not present in the 'invoicesTrie'.
-                    // This case shouldn't happen, but it's handled gracefully by doing nothing.
-                };
-                case (?invoiceFind) {
-                    // If invoice details are found (of type 'invoiceFind') for the given invoice number:
-
-                    // Check if the invoice status is "Pending" and if it has exceeded the 24-hours threshold.
-                    if (Validation.isEqual(invoiceFind.status, Types.InvoiceStatus.Pending) and 
-                        (invoiceFind.createdAt + (24 * 60 * 60 * (10 ** 9))) <= Time.now()) {
-                        
-                        // If the conditions are met, create a new invoice with updated status "CancelledBySystem".
-                        let newInvoice = {
-                            id = invoiceFind.id;
-                            owner = invoiceFind.owner;
-                            amount = invoiceFind.amount;
-                            status = Types.InvoiceStatus.CancelledBySystem;
-                            items = invoiceFind.items;
-                            transactionId = invoiceFind.transactionId;
-                            paymentLink = invoiceFind.paymentLink;
-                            paymentMethod = invoiceFind.paymentMethod;
-                            currency = invoiceFind.currency;
-                            createdAt = invoiceFind.createdAt;
-                        };
-
-                        // Replace the old invoice with the new invoice in the 'invoicesTrie' using 'Trie.replace'.
-                        invoicesTrie := Trie.replace(
-                            invoicesTrie,
-                            Utils.keyNat(invoiceFind.id),
-                            Nat.equal, 
-                            ?newInvoice,
-                        ).0;
-
-                        // Remove the current invoice number from the 'pendingInvoiceList' using 'List.filter'.
-                        pendingInvoiceList := List.filter(pendingInvoiceList, func(_invoiceNo: Nat): Bool = _invoiceNo != invoiceFind.id);
-
-                        // Print a debug message indicating the removal of the invoice.
-                        Debug.print("removed! " # Nat.toText(invoiceFind.id));
-                    };
-                };
-            };
-        });
-    };
-
-    // Declare a mutable variable 'count' of type 'Nat' and initialize it with 0.
-    private var count: Nat = 0;
-
-    // Define the system function 'heartbeat'.
-    system func heartbeat(): async () {
-        // Check if 'count' has reached 600 (approximately 5 minute).
-        if (count > 600) {
-            // If 'count' is greater than 600, reset 'count' to 0.
-            count := 0;
-
-            // Call the 'check_pending_invoices()' function to process pending invoices.
-            // This function is executed once every 600 iterations of the 'heartbeat' function (approximately 5 minute).
-            await check_pending_invoices();
-        };
-
-        // Increment the value of 'count' by 1.
-        count += 1;
-
-        // Print a debug message to show the current value of 'count'.
-        // Debug.print("no! " # Nat.toText(count));
-    };
-
-    //function to transform the response
-    public query func transform(raw : Http.IcHttp.TransformArgs) : async Http.IcHttp.CanisterHttpResponsePayload {
-        let transformed : Http.IcHttp.CanisterHttpResponsePayload = {
-            status = raw.response.status;
-            body = raw.response.body;
-            headers = [
-                {
-                    name = "Content-Security-Policy";
-                    value = "default-src 'self'";
-                },
-                { 
-                    name = "Referrer-Policy"; 
-                    value = "strict-origin" 
-                },
-                { 
-                    name = "Permissions-Policy"; 
-                    value = "geolocation=(self)" },
-                {
-                    name = "Strict-Transport-Security";
-                    value = "max-age=63072000";
-                },
-                { 
-                    name = "X-Frame-Options"; 
-                    value = "DENY" 
-                },
-                { 
-                    name = "X-Content-Type-Options"; 
-                    value = "nosniff" 
-                },
-            ];
-        };
-        transformed;
     };
     
 }
