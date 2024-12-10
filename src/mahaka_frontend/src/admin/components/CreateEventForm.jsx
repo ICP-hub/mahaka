@@ -98,10 +98,10 @@ const CreateEventForm = ({ setIsModalOpen, venueIdentity }) => {
 
   const handleEventSubmit = () => {
     // no principal return
-    // if (!principal) {
-    //   notificationManager.error("Please login first");
-    //   return;
-    // }
+    if (!principal) {
+      notificationManager.error("Please login first");
+      return;
+    }
     const isFormValid = Object.values(formValues).every(
       (value) => value !== "" && value !== null
     );
