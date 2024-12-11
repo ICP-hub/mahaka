@@ -199,7 +199,7 @@ const SearchBox = () => {
     }
   }, [searchedVenues, searchedEvents, searchedWahana]);
 
-  console.log("sr", searchedResults);
+  // console.log("sr", searchedResults);
 
   return (
     <div className="flex items-center w-full relative">
@@ -443,7 +443,12 @@ const ProfileMenu = ({ onClose }) => {
         )}
 
       {currentUserByCaller &&
-        Object.keys(currentUserByCaller?.role)[0] === "manager" && (
+        Object.keys(
+          (currentUserByCaller?.role)[0] === "manager" ||
+            "supervisor" ||
+            "staff" ||
+            "bod"
+        ) && (
           <Link
             to="/management"
             className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto space-x-2"
