@@ -144,26 +144,74 @@ const DashboardAnalytics = () => {
     ];
 
     return dashboardData?.latestTxs != 0 ? (
-      <div className="rounded-lg p-3">
-        <div className="space-y-1 bg-card p-3 shadow-lg rounded-lg">
-          <h2 className="text-2xl font-semibold  mb-4">Transactions</h2>
-          {dashboardData?.latestTxs?.map((transaction) => (
-            <div
-              key={transaction?.id}
-              className="flex items-center rounded-lg p-3"
-            >
-              <div className="text-blue-500 text-2xl mr-4">
-                {transaction.icon}
+      <div className="grid grid-cols-1 md:gid-cols-2">
+        <div className="bg-card mx-3 my-2 p-3 shadow-lg rounded-lg">
+          <h2 className="text-2xl mt-4 font-bold text-gray-800 mb-6 border-b pb-4">
+            Transactions Overview
+          </h2>
+
+          <div className="space-y-2">
+            {dashboardData?.latestTxs?.map((transaction) => (
+              <div
+                key={transaction?.transactionId}
+                className="flex flex-col md:flex-row items-start md:items-center justify-between bg-gray-50 hover:bg-gray-100 transition rounded-lg p-2 shadow"
+              >
+                <div className="flex items-center space-x-4 mb-4 md:mb-0">
+                  <div
+                    className={`rounded-full p-2 flex items-center ${
+                      transaction.status === "Completed"
+                        ? "bg-green-200 text-green-500"
+                        : "bg-red-100 text-red-500"
+                    }`}
+                  >
+                    {transaction.status === "Completed" ? "✔️" : "❌"}
+                  </div>
+                  <div>
+                    <p className="text-lg font-semibold text-gray-800">
+                      {transaction.status}
+                    </p>
+                    {/* <p className="text-sm text-gray-500 line-clamp-1">
+                      Transaction ID: {transaction.transactionId}
+                    </p> */}
+                  </div>
+                </div>
+
+                <div className="flex-1 md:ml-6">
+                  <p className="text-sm text-gray-500">
+                    Payment Method:{" "}
+                    <span className="font-medium text-gray-700">
+                      {transaction?.paymentMethod}
+                    </span>
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Date:{" "}
+                    <span className="font-medium">
+                      {new Date(
+                        Number(transaction.createdAt / 1_000_000n)
+                      ).toLocaleString()}
+                    </span>
+                  </p>
+                  <a
+                    href={transaction.paymentLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-500 hover:underline"
+                  >
+                    View Payment Details
+                  </a>
+                </div>
+
+                <div className="mt-4 md:mt-0 text-right">
+                  <p className="text-2xl font-bold text-green-600">
+                    {new Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: transaction.currency,
+                    }).format(transaction?.amount)}
+                  </p>
+                </div>
               </div>
-              <div className="flex-1 mr-3">
-                <h3 className="text-md font-semibold">{transaction?.method}</h3>
-                <p className="">{transaction.date}</p>
-              </div>
-              <div className="text-xl font-semibold text-green-400">
-                {transaction?.amount}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     ) : (
@@ -210,9 +258,9 @@ const DashboardAnalytics = () => {
         {/* special card earnings on top events card */}
         <div className="grid grid-cols-1 md:gid-cols-2">
           <div className="bg-card mx-3 my-2 p-2 shadow-lg rounded-lg">
-            <h1 className="text-lg  text-left mb-3 mx-3 font-semibold">
+            <h2 className="text-2xl mt-4 font-bold text-gray-800 mb-6 border-b pb-4">
               Earnings On Top Events
-            </h1>
+            </h2>
             {dashboardData?.top3Events != 0 ? (
               dashboardData?.top3Events?.map((data, index) => (
                 <>
@@ -222,7 +270,7 @@ const DashboardAnalytics = () => {
                         ID : - {data[0]?.eventId}
                       </p>
                       <p className="text-green-500 font-semibold">
-                        Revenue : - {data[0]?.totalRevenue}
+                        Revenue : - IDR {data[0]?.totalRevenue}
                       </p>
                     </div>
                   </div>

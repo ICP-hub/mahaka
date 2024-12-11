@@ -50,7 +50,7 @@ const EventPayment = () => {
   const ICP_API_HOST = "https://icp-api.io/";
   const [unauthenticatedAgent, setUnauthenticatedAgent] = useState(null);
   const [ticketprice, setTicketPrice] = useState(0);
-  const [ticketleft, SetTicketLeft] = useState(1);
+  const [ticketleft, SetTicketLeft] = useState(0);
   useEffect(() => {
     (async () => {
       const agent = new HttpAgent({ host: ICP_API_HOST });
