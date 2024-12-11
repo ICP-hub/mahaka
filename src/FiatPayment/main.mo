@@ -283,10 +283,11 @@ actor Fiat {
 
 
     ///////////////////////// Admin Fucntion /////////////////////////
+    private stable var devMahaka : Text = "bd3sg-teaaa-aaaaa-qaaba-cai";
+    private stable var liveMahaka : Text = "3wxph-yiaaa-aaaak-akusa-cai";
 
     public shared({caller}) func get_all_invoices_to_admin() : async Http.Response<Http.ResponseStatus<[Invoice], {}>> {
-
-        if (not(Validation.isEqual(owner, Principal.toText(caller)))) {
+        if (not(Validation.isEqual(liveMahaka, Principal.toText(caller)) or Validation.isEqual(owner, Principal.toText(caller)))) {
             return Utils.generalResponse(false, Messages.not_owner, #err({}), Http.Status.UnprocessableEntity);
         };
 
