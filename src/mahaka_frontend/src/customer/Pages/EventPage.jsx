@@ -173,29 +173,7 @@ const EventPage = () => {
 
   return (
     <>
-      <div className="z-999">
-        <ModalOne open={isModalOpen} setOpen={setIsModalOpen}>
-          <div className="w-full flex flex-col h-full">
-            <h1 className="text-2xl font-medium flex w-full items-center justify-center uppercase py-4">
-              Main Gate Pass
-            </h1>
-            <div className="flex w-full bg-white rounded-b-3xl">
-              <div className="py-4 space-y-12 w-full h-full lg:mx-80">
-                <DatePicker />
-                <VisitorPicker />
-              </div>
-            </div>
-            <Link
-              to="/payment"
-              className="flex w-full items-center justify-center mt-auto mb-12"
-            >
-              <span className="font-medium px-12 py-2 rounded-md bg-secondary text-white text-lg">
-                Proceed to checkout
-              </span>
-            </Link>
-          </div>
-        </ModalOne>
-      </div>
+      <div className="z-999"></div>
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {singleEventLoading ? (
@@ -222,6 +200,56 @@ const EventPage = () => {
                   />
                 )}
               </div>
+              {singleEventLoading ? (
+                <div className="lg:w-1/3 h-[340px] w-full shadow-lg  lg:hidden  rounded-lg   mt-10">
+                  <div className="p-8 animate-pulse">
+                    <div className="h-8 bg-gray-300 rounded w-3/4 mb-4"></div>{" "}
+                    {/* Title skeleton */}
+                    <div className="h-6 bg-gray-300 rounded w-1/2 mb-2"></div>{" "}
+                    {/* Date skeleton */}
+                    <div className="h-6 bg-gray-300 rounded w-1/3 mb-2"></div>{" "}
+                    {/* Time skeleton */}
+                    <div className="h-6 bg-gray-300 rounded w-full mb-4"></div>{" "}
+                    {/* Location skeleton */}
+                  </div>
+                  <div className="pl-8">
+                    <div className="h-6 bg-gray-300 rounded w-1/2 mb-2"></div>{" "}
+                    {/* Event end date skeleton */}
+                  </div>
+                </div>
+              ) : (
+                <div className="lg:w-1/3 h-[340px] w-full shadow-lg  lg:hidden mt-10  rounded-lg  ">
+                  <div className="p-8">
+                    <h1 className="text-2xl font-black">Event Details</h1>
+                    <h3 className="text-lg font-normal">
+                      {" "}
+                      <span className="text-xl font-semibold mr-2">
+                        {" "}
+                        Starts on
+                      </span>
+                      {venue?.details.StartDate && startInterVal.date}{" "}
+                      {venue?.details.StartTime && startInterVal.time}
+                    </h3>
+                    <h3 className="text-lg font-normal">
+                      <span className="text-xl font-semibold mr-2">
+                        {" "}
+                        Ends on
+                      </span>
+                      {venue?.details.EndDate && endInterVal.date}{" "}
+                      {venue?.details.EndTime && endInterVal.time}
+                    </h3>
+                    <h3 className="text-lg font-normal">
+                      Location of the Event - {venue?.details.Location}
+                    </h3>
+                  </div>
+                  <h2 className="text-2xl font-normal pl-8">
+                    Event ends on :
+                    <span className="text-red-600">
+                      {venue?.details.EndDate && endInterVal.date}
+                    </span>
+                  </h2>
+                </div>
+              )}
               <>
                 {/* tabs navlink */}
                 <div className="mb-4 mt-8">
@@ -358,7 +386,7 @@ const EventPage = () => {
             </div>
             {/* right side section  */}
             {singleEventLoading ? (
-              <div className="lg:w-1/3 h-[340px] w-full shadow-lg rounded-lg sticky top-0">
+              <div className="lg:w-1/3 h-[340px] w-full shadow-lg hidden  lg:block rounded-lg sticky top-0">
                 <div className="p-8 animate-pulse">
                   <div className="h-8 bg-gray-300 rounded w-3/4 mb-4"></div>{" "}
                   {/* Title skeleton */}
@@ -375,7 +403,7 @@ const EventPage = () => {
                 </div>
               </div>
             ) : (
-              <div className="lg:w-1/3 h-[340px] w-full shadow-lg rounded-lg sticky top-0">
+              <div className="lg:w-1/3 h-[340px] w-full shadow-lg hidden  lg:block rounded-lg sticky top-0">
                 <div className="p-8">
                   <h1 className="text-2xl font-black">Event Details</h1>
                   <h3 className="text-lg font-normal">
@@ -393,7 +421,7 @@ const EventPage = () => {
                     {venue?.details.EndTime && endInterVal.time}
                   </h3>
                   <h3 className="text-lg font-normal">
-                    Location of the Venue - {venue?.details.Location}
+                    Location of the Event - {venue?.details.Location}
                   </h3>
                 </div>
                 <h2 className="text-2xl font-normal pl-8">

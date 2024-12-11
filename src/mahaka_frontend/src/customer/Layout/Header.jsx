@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import "../style/index.css";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   HiMagnifyingGlass,
@@ -411,40 +412,6 @@ const ProfileMenu = ({ onClose }) => {
   const { currentUserByCaller } = useSelector((state) => state.users);
   const { isConnected, login, logout, balance, principal } = useAuth();
 
-  const handleCopy = () => {
-    // Check if the clipboard API is available
-    if (navigator.clipboard) {
-      navigator.clipboard
-        .writeText(user?.principal?.toString()) // Ensure toString() is called on the principal
-        .then(() => {
-          notificationManager.success("Wallet address copied!");
-        })
-        .catch((err) => {
-          console.error("Clipboard API failed:", err);
-          fallbackCopy(); // Fallback if clipboard write fails
-        });
-    } else {
-      // Fallback if navigator.clipboard is not supported (old browsers or non-HTTPS environments)
-      fallbackCopy();
-    }
-  };
-
-  // Fallback to execCommand if clipboard API is not supported or fails
-  const fallbackCopy = () => {
-    const textArea = document.createElement("textarea");
-    textArea.value = user?.principal?.toString() || ""; // Ensure there's a value to copy
-    document.body.appendChild(textArea);
-    textArea.select();
-    const success = document.execCommand("copy");
-    document.body.removeChild(textArea);
-
-    if (success) {
-      notificationManager.success("Wallet address copied!");
-    } else {
-      notificationManager.error("Failed to copy wallet address");
-    }
-  };
-
   return (
     <div className="flex flex-col p-2 rounded-xl overflow-hidden">
       {currentUserByCaller &&
@@ -500,12 +467,11 @@ const ProfileMenu = ({ onClose }) => {
           <div>Wallet</div>
         </div>
         <div className="ml-auto flex items-center space-x-2">
-          <button
-            className="p-2 hover:bg-indigo-600 rounded-full"
-            onClick={handleCopy}
-          >
-            <GrCopy />
-          </button>
+          <CopyToClipboard text={principal?.toText()}>
+            <button className="p-2 hover:bg-indigo-600 rounded-full">
+              <GrCopy />
+            </button>
+          </CopyToClipboard>
           <div className="bg-gray-500 rounded-md px-2 min-w-36 max-w-36 overflow-hidden truncate">
             {principal?.toText()}
           </div>
