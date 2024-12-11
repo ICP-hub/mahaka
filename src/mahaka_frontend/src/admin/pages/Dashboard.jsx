@@ -159,7 +159,7 @@ const DashboardAnalytics = () => {
                 <div className="flex items-center space-x-4 mb-4 md:mb-0">
                   <div
                     className={`rounded-full p-2 flex items-center ${
-                      transaction.status === "Completed"
+                      transaction?.status === "Completed"
                         ? "bg-green-200 text-green-500"
                         : "bg-red-100 text-red-500"
                     }`}
@@ -168,7 +168,7 @@ const DashboardAnalytics = () => {
                   </div>
                   <div>
                     <p className="text-lg font-semibold text-gray-800">
-                      {transaction.status}
+                      {transaction?.status}
                     </p>
                     {/* <p className="text-sm text-gray-500 line-clamp-1">
                       Transaction ID: {transaction.transactionId}
@@ -187,12 +187,12 @@ const DashboardAnalytics = () => {
                     Date:{" "}
                     <span className="font-medium">
                       {new Date(
-                        Number(transaction.createdAt / 1_000_000n)
+                        Number(transaction?.createdAt / 1_000_000n)
                       ).toLocaleString()}
                     </span>
                   </p>
                   <a
-                    href={transaction.paymentLink}
+                    href={transaction?.paymentLink}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-blue-500 hover:underline"
@@ -205,7 +205,7 @@ const DashboardAnalytics = () => {
                   <p className="text-2xl font-bold text-green-600">
                     {new Intl.NumberFormat("en-US", {
                       style: "currency",
-                      currency: transaction.currency,
+                      currency: transaction?.currency,
                     }).format(transaction?.amount)}
                   </p>
                 </div>
