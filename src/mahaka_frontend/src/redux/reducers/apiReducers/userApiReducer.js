@@ -50,6 +50,29 @@ export const listUsers = createAsyncThunk(
   }
 );
 
+// Create user
+export const createUser = createAsyncThunk(
+  "users/createUser",
+  async ({ backend, principal, user, onToggle }, { rejectWithValue }) => {
+    try {
+      const response = await backend.createUser(
+        Principal.fromText(principal),
+        user.email,
+        user.firstname,
+        user.lastname
+      );
+      // console.log("response creating profile", response);
+      notificationManager.success("User profile created successfully!");
+      onToggle(false);
+      return response;
+    } catch (err) {
+      console.error("Failed to create profile", err);
+      notificationManager.error("Failed to create profile!");
+      return rejectWithValue(err || "An unexpected error occurred");
+    }
+  }
+);
+
 // Update user
 export const updateUser = createAsyncThunk(
   "users/updateUser",
@@ -68,8 +91,9 @@ export const updateUser = createAsyncThunk(
         notificationManager.success("User updated!");
         onToggle(false);
         return response;
+      } else {
+        return response;
       }
-      throw new Error("Failed to update user");
     } catch (error) {
       notificationManager.error("Failed to update member details!");
       console.error("Error creating member", error);
@@ -88,13 +112,14 @@ export const updateUserUserDetails = createAsyncThunk(
         user.firstname,
         user.lastname
       );
-      // console.log("response updating user data", response);
+      console.log("response updating user data", response);
       if (response.ok) {
         notificationManager.success("User updated!");
         onToggle(false);
         return response;
+      } else {
+        return response;
       }
-      throw new Error("Failed to update user");
     } catch (error) {
       // notificationManager.error("Failed to update member details!");
       console.error("Error creating member", error);
@@ -224,13 +249,29 @@ const userSlice = createSlice({
         state.newLoading = true;
       })
       .addCase(updateUserUserDetails.fulfilled, (state, action) => {
-        console.log(action);
         state.newLoading = false;
-        state.currentUserByCaller = action.payload.ok[0];
-        state.userRole = Object.keys(action.payload.ok.role)[0];
+        if (action.payload.ok) {
+          state.currentUserByCaller = action.payload.ok[0];
+          state.userRole = Object.keys(action.payload.ok[0].role)[0];
+        } else {
+          notificationManager.error("Failed to update user");
+        }
         state.error = null;
       })
       .addCase(updateUserUserDetails.rejected, (state, action) => {
+        state.newLoading = false;
+        state.error = action.error.message;
+      })
+      // create user
+      .addCase(createUser.pending, (state) => {
+        state.newLoading = true;
+      })
+      .addCase(createUser.fulfilled, (state, action) => {
+        state.newLoading = false;
+        state.currentUserByCaller = action.payload.ok[0];
+        state.error = null;
+      })
+      .addCase(createUser.rejected, (state, action) => {
         state.newLoading = false;
         state.error = action.error.message;
       });

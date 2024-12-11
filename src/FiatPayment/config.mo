@@ -3,7 +3,7 @@ import Nat "mo:base/Nat";
 
 module {
 
-    private let devConfig = {
+    private let liveConfig = {
         // Define the frontend canister ID used for constructing URLs
         frontendCanisterId = "";
         //baseUrl = "localhost:3000";
@@ -12,14 +12,14 @@ module {
         http = "https://";
     };
 
-    // private let liveConfig = {
-    //     // Define the frontend canister ID used for constructing URLs
-    //     frontendCanisterId= "";
-    //     baseUrl= "localhost:3000";
-    //     http= "http://";
-    // };
+    private let devConfig = {
+        // Define the frontend canister ID used for constructing URLs
+        frontendCanisterId= "";
+        baseUrl= "localhost:3000";
+        http= "http://";
+    };
 
-    private let config = devConfig;
+    private let config = liveConfig;
 
     // Function to generate the Stripe success URL for a specific invoice
     public func get_stripe_success_url(invoiceNo : Nat) : Text {

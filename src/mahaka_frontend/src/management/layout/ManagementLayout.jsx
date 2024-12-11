@@ -27,7 +27,7 @@ const ManagementProtected = ({ children }) => {
   }, [userLoading]);
 
   if (layoutLoader) return <LoadingScreenLarge />;
-  if (userRole) {
+  if (["manager", "supervisor", "staff", "bod"].includes(userRole)) {
     return children;
   } else {
     notificationManager.error("You are not authorized!");

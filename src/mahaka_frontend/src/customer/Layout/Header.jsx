@@ -199,6 +199,8 @@ const SearchBox = () => {
     }
   }, [searchedVenues, searchedEvents, searchedWahana]);
 
+  // console.log("sr", searchedResults);
+
   return (
     <div className="flex items-center w-full relative">
       <div className="border-2 border-gray-300 flex min-h-12 items-center px-4 rounded-md w-full">
@@ -271,11 +273,23 @@ const SearchBox = () => {
                 <Link
                   to={
                     selectedOption === "Events"
-                      ? `${item.venueId}/events/${item.id}`
+                      ? `/${decodeURIComponent(item.venueId).replace(
+                          /#/g,
+                          "_"
+                        )}/events/${decodeURIComponent(item.id).replace(
+                          /#/g,
+                          "_"
+                        )}`
                       : selectedOption === "Venues"
                       ? `/venues/${item.id}`
                       : selectedOption === "Wahanas"
-                      ? `${item.id}/wahanas/${item.venueId}`
+                      ? `/${decodeURIComponent(item.venueId).replace(
+                          /#/g,
+                          "_"
+                        )}/wahanas/${decodeURIComponent(item.id).replace(
+                          /#/g,
+                          "_"
+                        )}`
                       : "#"
                   }
                   key={index}
@@ -409,27 +423,28 @@ const ConnectBtn = () => {
 // Profile menu : export if required
 const ProfileMenu = ({ onClose }) => {
   const { user, icpBalance, disconnect } = useIdentityKit();
-  const { currentUserByCaller } = useSelector((state) => state.users);
+  const { currentUserByCaller, userRole } = useSelector((state) => state.users);
   const { isConnected, login, logout, balance, principal } = useAuth();
+
+  console.log(userRole);
 
   return (
     <div className="flex flex-col p-2 rounded-xl overflow-hidden">
-      {currentUserByCaller &&
-        Object.keys(currentUserByCaller?.role)[0] === "admin" && (
-          <Link
-            to="/admin"
-            className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto space-x-2"
-            onClick={onClose}
-          >
-            <div>
-              <GrUserAdmin size={20} />
-            </div>
-            <div>Admin Dashboard</div>
-          </Link>
-        )}
+      {currentUserByCaller && userRole === "admin" && (
+        <Link
+          to="/admin"
+          className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto space-x-2"
+          onClick={onClose}
+        >
+          <div>
+            <GrUserAdmin size={20} />
+          </div>
+          <div>Admin Dashboard</div>
+        </Link>
+      )}
 
       {currentUserByCaller &&
-        Object.keys(currentUserByCaller?.role)[0] === "manager" && (
+        ["manager", "supervisor", "staff", "bod"].includes(userRole) && (
           <Link
             to="/management"
             className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto space-x-2"

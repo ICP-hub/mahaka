@@ -42,6 +42,7 @@ const WahanaPayment = () => {
   const ICP_API_HOST = "https://icp-api.io/";
   const [unauthenticatedAgent, setUnauthenticatedAgent] = useState(null);
   const [ticketprice, setTicketPrice] = useState(0);
+  const [ticketSold, setTicketSold] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -55,7 +56,16 @@ const WahanaPayment = () => {
       setLoadingData(true);
       try {
         const data1 = await backend.getWahana(wahanaid, vanueid);
-
+        const ticketResponse = await backend.getTicketsCountByType(
+          { Wahana: null },
+          wahanaid,
+          { SinglePass: null }
+        );
+        if (ticketResponse.ok) {
+          setTicketSold(ticketResponse?.ok);
+        } else {
+          console.error("Error fetching tickets:", ticketResponse);
+        }
         setwahanadetail(data1);
         if (paymenttype == "Card") {
           setTicketPrice(data1?.ok?.price);
@@ -193,20 +203,22 @@ const WahanaPayment = () => {
             ) : (
               <p className="text-xl font-semibold">wahana id:-{wahanaid}</p>
             )}
-            {/* {loadingdata ? (
+            {loadingdata ? (
               <p className="text-xl text-green-400 font-semibold mt-2">
                 Number of Tickets Left: :{" "}
                 <span className="px-6 rounded-lg  py-[2px] animate-spin bg-gray-200"></span>
               </p>
             ) : (
               <p className="text-xl text-green-400 font-semibold">
-                Number of Tickets Left: 100
+                Number of Tickets Left:{" "}
+                {Number(wahanadetail?.ok?.totalTickets) - Number(ticketSold)}
               </p>
-            )} */}
+            )}
           </div>
           <div className="py-4 space-y-12 ">
             <DatePicker timestemp={timestemp} setTimeStemp={setTimeStemp} />
             <VisitorPicker
+              max={Number(wahanadetail?.ok?.totalTickets) - Number(ticketSold)}
               numberOFVisitor={numberOFVisitor}
               setNumberOFVisitor={setNumberOFVisitor}
             />
@@ -227,14 +239,19 @@ const WahanaPayment = () => {
           <hr className="my-3 text-[#ACACAC]" />
           <div className="flex items-center mb-8 mt-8 w-full ">
             <img
-              src={wahanadetail?.banner?.data}
+              src={loadingdata ? payimg : wahanadetail?.ok?.banner?.data}
               alt="Ticket"
               className="w-12 h-12 object-cover rounded-md mr-4"
             />
             <div>
-              <h3 className="text-2xl font-black">
-                {wahanadetail?.ok.ride_title}
-              </h3>
+              {loadingdata ? (
+                <span className="px-4 rounded-lg  py-[2px] animate-spin bg-gray-200"></span>
+              ) : (
+                <h3 className="text-2xl font-black">
+                  {wahanadetail?.ok.ride_title}
+                </h3>
+              )}
+
               <p className="text-base font-normal text-[#ACACAC]">
                 {ticketType}
               </p>
@@ -307,7 +324,10 @@ const WahanaPayment = () => {
                 : "bg-orange-500 hover:bg-orange-600"
             }`}
             type="submit"
-            disabled={isPaymentProcessing}
+            disabled={
+              isPaymentProcessing ||
+              Number(wahanadetail?.ok?.totalTickets) - Number(ticketSold) == 0
+            }
             onClick={paymenttype === "Card" ? handlePayment2 : handlePayment}
           >
             {isPaymentProcessing

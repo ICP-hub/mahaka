@@ -31,7 +31,7 @@ const UserProfile = () => {
                 to={link}
                 className={`${"text-primary hover:text-slate-600"} font-bold md:text-xl transition-colors px-2.5 py-4 border-primary relative border-b-2 min-w-40 max-w-min flex items-center justify-center`}
               >
-                <div className="relative z-10">{tab}</div>
+                <div className="relative">{tab}</div>
                 {selectedIndex === index && (
                   <motion.span
                     layoutId="pill-tab"

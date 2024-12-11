@@ -79,6 +79,7 @@ module {
         creator : Principal;
         venueId : Text;
         featured : Bool;
+        totalTickets : Nat;
     };
 
     public type Wahana_data = {
