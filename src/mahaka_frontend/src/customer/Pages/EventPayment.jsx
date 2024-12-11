@@ -42,6 +42,7 @@ const EventPayment = () => {
     window.location.hash
   }`;
   const [timestemp, setTimeStemp] = useState(0);
+  const [ticketSold, setTicketSold] = useState(0);
 
   const { backend, principal } = useAuth();
   // const { backend } = useSelector((state) => state.authentication);
@@ -62,12 +63,28 @@ const EventPayment = () => {
     );
     return match ? match[0] : null;
   }
+  const _ticket_type =
+    ticketType === "GROUP"
+      ? { GroupPass: null }
+      : ticketType === "VIP"
+      ? { VipPass: null }
+      : { SinglePass: null };
   const eventprincipal = Principal.fromText(extractCanisterId(eventId));
   useEffect(() => {
     const fetchEvent = async () => {
       setLoadingData(true);
       try {
         const data1 = await backend.getDIPdetails(eventprincipal);
+        const ticketResponse = await backend.getTicketsCountByType(
+          { Event: null },
+          eventIds,
+          _ticket_type
+        );
+        if (ticketResponse.ok) {
+          setTicketSold(ticketResponse?.ok);
+        } else {
+          console.error("Error fetching tickets:", ticketResponse);
+        }
 
         seteventdetail(data1);
         console.log("event detail", data1);
@@ -159,12 +176,6 @@ const EventPayment = () => {
     setIsPaymentProcessing(true);
 
     const _eventIds = eventIds;
-    const _ticket_type =
-      ticketType === "GROUP"
-        ? { GroupPass: null }
-        : ticketType === "VIP"
-        ? { VipPass: null }
-        : { SinglePass: null };
 
     const _metadata = [
       {
@@ -246,14 +257,15 @@ const EventPayment = () => {
               </p>
             ) : (
               <p className="text-xl text-green-400 font-semibold">
-                Number of Tickets Left: {Number(ticketleft)}
+                Number of Tickets Left:{" "}
+                {Number(ticketleft) - Number(ticketSold)}
               </p>
             )}
           </div>
           <div className="py-4 space-y-12 ">
             <DatePicker timestemp={timestemp} setTimeStemp={setTimeStemp} />
             <VisitorPicker
-              maxTicket={Number(ticketleft)}
+              max={Number(ticketleft) - Number(ticketSold)}
               numberOFVisitor={numberOFVisitor}
               setNumberOFVisitor={setNumberOFVisitor}
             />
@@ -352,7 +364,10 @@ const EventPayment = () => {
                 : "bg-orange-500 hover:bg-orange-600"
             }`}
             type="submit"
-            disabled={isPaymentProcessing}
+            disabled={
+              isPaymentProcessing ||
+              Number(ticketleft) - Number(ticketSold) == 0
+            }
             onClick={paymenttype === "Card" ? handlePayment2 : handlePayment}
           >
             {isPaymentProcessing
