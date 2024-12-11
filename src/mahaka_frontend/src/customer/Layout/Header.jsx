@@ -423,32 +423,28 @@ const ConnectBtn = () => {
 // Profile menu : export if required
 const ProfileMenu = ({ onClose }) => {
   const { user, icpBalance, disconnect } = useIdentityKit();
-  const { currentUserByCaller } = useSelector((state) => state.users);
+  const { currentUserByCaller, userRole } = useSelector((state) => state.users);
   const { isConnected, login, logout, balance, principal } = useAuth();
+
+  console.log(userRole);
 
   return (
     <div className="flex flex-col p-2 rounded-xl overflow-hidden">
-      {currentUserByCaller &&
-        Object.keys(currentUserByCaller?.role)[0] === "admin" && (
-          <Link
-            to="/admin"
-            className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto space-x-2"
-            onClick={onClose}
-          >
-            <div>
-              <GrUserAdmin size={20} />
-            </div>
-            <div>Admin Dashboard</div>
-          </Link>
-        )}
+      {currentUserByCaller && userRole === "admin" && (
+        <Link
+          to="/admin"
+          className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto space-x-2"
+          onClick={onClose}
+        >
+          <div>
+            <GrUserAdmin size={20} />
+          </div>
+          <div>Admin Dashboard</div>
+        </Link>
+      )}
 
       {currentUserByCaller &&
-        Object.keys(
-          (currentUserByCaller?.role)[0] === "manager" ||
-            "supervisor" ||
-            "staff" ||
-            "bod"
-        ) && (
+        ["manager", "supervisor", "staff", "bod"].includes(userRole) && (
           <Link
             to="/management"
             className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto space-x-2"
