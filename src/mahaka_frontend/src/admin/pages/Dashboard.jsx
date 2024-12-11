@@ -263,7 +263,7 @@ const DashboardAnalytics = () => {
               <span className="w-10 h-10 bg-gray-600 rounded-lg animate-pulse"></span>
             ) : (
               <h2 className="text-4xl font-bold ">
-                IDR {Number(dashboardData?.totalRevenue)}
+                IDR {dashboardData?.totalRevenue}
               </h2>
             )}
           </div>
@@ -326,7 +326,7 @@ const DashboardAnalytics = () => {
               ) : (
                 <h4 className="text-lg font-semibold">
                   {" "}
-                  IDR {Number(dashboardData?.totalRevenue)}
+                  IDR {dashboardData?.totalRevenue}
                 </h4>
               )}
 

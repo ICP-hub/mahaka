@@ -286,12 +286,16 @@ const EventPayment = () => {
           <hr className="my-3 text-[#ACACAC]" />
           <div className="flex items-center mb-8 mt-8 w-full ">
             <img
-              src={payimg}
+              src={loadingdata ? payimg : eventdetail?.logo?.data}
               alt="Ticket"
               className="w-12 h-12 object-cover rounded-md mr-4"
             />
             <div>
-              <h3 className="text-2xl font-black">{eventdetail?.name}</h3>
+              {loadingdata ? (
+                <span className="px-8 rounded-lg  py-[2px] animate-spin bg-gray-200"></span>
+              ) : (
+                <h3 className="text-2xl font-black">{eventdetail?.name}</h3>
+              )}
               <p className="text-base font-normal text-[#ACACAC]">
                 {ticketType}
               </p>
