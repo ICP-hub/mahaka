@@ -22,7 +22,7 @@ const UserProfile = () => {
 
   return (
     <>
-      <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 min-h-screen">
+      <div className="container mx-auto py-8 px-6 md:px-8 min-h-screen">
         <div className="flex justify-between mb-8 items-center relative">
           <div className="flex items-center flex-wrap">
             {profileTabs.map(({ tab, link }, index) => (
