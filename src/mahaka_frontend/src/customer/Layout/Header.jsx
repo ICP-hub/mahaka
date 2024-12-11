@@ -199,6 +199,8 @@ const SearchBox = () => {
     }
   }, [searchedVenues, searchedEvents, searchedWahana]);
 
+  console.log("sr", searchedResults);
+
   return (
     <div className="flex items-center w-full relative">
       <div className="border-2 border-gray-300 flex min-h-12 items-center px-4 rounded-md w-full">
@@ -271,11 +273,23 @@ const SearchBox = () => {
                 <Link
                   to={
                     selectedOption === "Events"
-                      ? `${item.venueId}/events/${item.id}`
+                      ? `/${decodeURIComponent(item.venueId).replace(
+                          /#/g,
+                          "_"
+                        )}/events/${decodeURIComponent(item.id).replace(
+                          /#/g,
+                          "_"
+                        )}`
                       : selectedOption === "Venues"
                       ? `/venues/${item.id}`
                       : selectedOption === "Wahanas"
-                      ? `${item.id}/wahanas/${item.venueId}`
+                      ? `/${decodeURIComponent(item.venueId).replace(
+                          /#/g,
+                          "_"
+                        )}/wahanas/${decodeURIComponent(item.id).replace(
+                          /#/g,
+                          "_"
+                        )}`
                       : "#"
                   }
                   key={index}
