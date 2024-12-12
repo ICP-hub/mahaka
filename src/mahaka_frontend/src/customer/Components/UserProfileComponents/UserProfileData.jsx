@@ -1,11 +1,15 @@
 import { MdLogout } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import Avvvatars from "avvvatars-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CiEdit } from "react-icons/ci";
 import { motion } from "framer-motion";
 import { HiClipboardDocumentCheck } from "react-icons/hi2";
-import { updateUserUserDetails } from "../../../redux/reducers/apiReducers/userApiReducer";
+import {
+  createUser,
+  updateUserUserDetails,
+} from "../../../redux/reducers/apiReducers/userApiReducer";
+import { Principal } from "@dfinity/principal";
 
 const UserProfileData = () => {
   const { currentUserByCaller, userLoading } = useSelector(
@@ -79,10 +83,20 @@ const ProfileDetailsComponent = ({ editModalOpen, setEditModalOpen }) => {
   const { principal, backend } = useSelector((state) => state.authentication);
   const dispatch = useDispatch();
   const [formValues, setFormValues] = useState({
-    firstname: currentUserByCaller ? currentUserByCaller.firstName : "",
-    lastname: currentUserByCaller ? currentUserByCaller.lastName : "",
-    email: currentUserByCaller ? currentUserByCaller.email : "",
+    firstname: "",
+    lastname: "",
+    email: "",
   });
+
+  useEffect(() => {
+    if (currentUserByCaller) {
+      setFormValues({
+        firstname: currentUserByCaller.firstName || "",
+        lastname: currentUserByCaller.lastName || "",
+        email: currentUserByCaller.email || "",
+      });
+    }
+  }, [currentUserByCaller]);
 
   const handleInputChange = (name, value) => {
     setFormValues((prevValues) => ({
@@ -91,15 +105,29 @@ const ProfileDetailsComponent = ({ editModalOpen, setEditModalOpen }) => {
     }));
   };
 
+  // console.log(currentUserByCaller);
+  // console.log(formValues);
+
   const handleFormSubmit = () => {
-    console.log(formValues);
-    dispatch(
-      updateUserUserDetails({
-        backend: backend,
-        user: formValues,
-        onToggle: setEditModalOpen,
-      })
-    );
+    // console.log(formValues);
+    if (currentUserByCaller) {
+      dispatch(
+        updateUserUserDetails({
+          backend: backend,
+          user: formValues,
+          onToggle: setEditModalOpen,
+        })
+      );
+    } else {
+      dispatch(
+        createUser({
+          backend: backend,
+          principal: principal,
+          user: formValues,
+          onToggle: setEditModalOpen,
+        })
+      );
+    }
   };
 
   if (editModalOpen) {
@@ -197,11 +225,11 @@ const ProfileDetailsComponent = ({ editModalOpen, setEditModalOpen }) => {
             {currentUserByCaller && currentUserByCaller.email}
           </p>
         </div>
-        <div className="flex items-center p-4">
+        <div className="flex md:items-center flex-col md:flex-row p-4">
           <label className="block text-gray-700 font-semibold w-32">
             Principal ID
           </label>
-          <p className="font-semibold break-all">{principal}</p>
+          <p className="font-semibold break-all mt-4 md:mt-0">{principal}</p>
         </div>
       </div>
     );

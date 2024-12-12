@@ -464,12 +464,13 @@ export default function Home() {
               {chunkArray(banners, [1, 2, 3]).map((group, index) => (
                 <div
                   key={index}
-                  className={`grid ${index === 0
+                  className={`grid ${
+                    index === 0
                       ? "lg:grid-cols-1 md:grid-cols-1"
                       : index === 1
-                        ? "lg:grid-cols-2 md:grid-cols-2"
-                        : "lg:grid-cols-3 md:grid-cols-3"
-                    } gap-[33px] my-5`}
+                      ? "lg:grid-cols-2 md:grid-cols-2"
+                      : "lg:grid-cols-3 md:grid-cols-3"
+                  } gap-[33px] my-5`}
                 >
                   {group.map((banner, bannerIndex) => (
                     <div
@@ -540,10 +541,10 @@ export default function Home() {
             <SkeletonLoaderWahanas />
           ) : wahanas && wahanas.length === 0 ? (
             // <div className="flex justify-center items-center mt-12">
-              <div className="bg-card rounded-lg p-5 mt-10 text-center shadow-lg">
-                <h1 className="text-4xl text-gray-800 font-bold">
-                  No Wahanas Found.
-                </h1>
+            <div className="bg-card rounded-lg p-5 mt-10 text-center shadow-lg">
+              <h1 className="text-4xl text-gray-800 font-bold">
+                No Wahanas Found.
+              </h1>
               {/* </div> */}
             </div>
           ) : (
@@ -552,7 +553,7 @@ export default function Home() {
                 ?.filter((wahana) => wahana.featured)
                 ?.map((wahana) => (
                   <div className="overflow-hidden" key={wahana.id}>
-                    <div className="rounded-2xl w-full h-full shadow-md">
+                    <div className="  w-full h-full ">
                       <img
                         src={wahana.banner.data}
                         alt={wahana.title}

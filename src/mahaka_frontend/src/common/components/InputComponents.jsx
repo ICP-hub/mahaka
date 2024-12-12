@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import notificationManager from "../utils/notificationManager";
 
 // input field
 export const FormFieldInput = ({
@@ -82,13 +83,19 @@ export const FormFieldOptions = ({
   );
 };
 
-// Form field image
 export const FormFieldImageUpload = ({ label, image, onChange }) => {
   const fileInputRef = useRef(null);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
+      if (file.size > 200 * 1024) {
+        // alert(
+        //   "The file is too large. Please upload an image smaller than 200KB."
+        // );
+        notificationManager.error("Please upload an image smaller than 200KB.");
+        return;
+      }
       onChange(file);
     }
   };

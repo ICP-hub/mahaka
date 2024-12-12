@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import "../style/index.css";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   HiMagnifyingGlass,
@@ -198,6 +199,8 @@ const SearchBox = () => {
     }
   }, [searchedVenues, searchedEvents, searchedWahana]);
 
+  // console.log("sr", searchedResults);
+
   return (
     <div className="flex items-center w-full relative">
       <div className="border-2 border-gray-300 flex min-h-12 items-center px-4 rounded-md w-full">
@@ -270,11 +273,23 @@ const SearchBox = () => {
                 <Link
                   to={
                     selectedOption === "Events"
-                      ? `${item.venueId}/events/${item.id}`
+                      ? `/${decodeURIComponent(item.venueId).replace(
+                          /#/g,
+                          "_"
+                        )}/events/${decodeURIComponent(item.id).replace(
+                          /#/g,
+                          "_"
+                        )}`
                       : selectedOption === "Venues"
                       ? `/venues/${item.id}`
                       : selectedOption === "Wahanas"
-                      ? `${item.id}/wahanas/${item.venueId}`
+                      ? `/${decodeURIComponent(item.venueId).replace(
+                          /#/g,
+                          "_"
+                        )}/wahanas/${decodeURIComponent(item.id).replace(
+                          /#/g,
+                          "_"
+                        )}`
                       : "#"
                   }
                   key={index}
@@ -408,61 +423,28 @@ const ConnectBtn = () => {
 // Profile menu : export if required
 const ProfileMenu = ({ onClose }) => {
   const { user, icpBalance, disconnect } = useIdentityKit();
-  const { currentUserByCaller } = useSelector((state) => state.users);
+  const { currentUserByCaller, userRole } = useSelector((state) => state.users);
   const { isConnected, login, logout, balance, principal } = useAuth();
 
-  const handleCopy = () => {
-    // Check if the clipboard API is available
-    if (navigator.clipboard) {
-      navigator.clipboard
-        .writeText(user?.principal?.toString()) // Ensure toString() is called on the principal
-        .then(() => {
-          notificationManager.success("Wallet address copied!");
-        })
-        .catch((err) => {
-          console.error("Clipboard API failed:", err);
-          fallbackCopy(); // Fallback if clipboard write fails
-        });
-    } else {
-      // Fallback if navigator.clipboard is not supported (old browsers or non-HTTPS environments)
-      fallbackCopy();
-    }
-  };
-
-  // Fallback to execCommand if clipboard API is not supported or fails
-  const fallbackCopy = () => {
-    const textArea = document.createElement("textarea");
-    textArea.value = user?.principal?.toString() || ""; // Ensure there's a value to copy
-    document.body.appendChild(textArea);
-    textArea.select();
-    const success = document.execCommand("copy");
-    document.body.removeChild(textArea);
-
-    if (success) {
-      notificationManager.success("Wallet address copied!");
-    } else {
-      notificationManager.error("Failed to copy wallet address");
-    }
-  };
+  console.log(userRole);
 
   return (
     <div className="flex flex-col p-2 rounded-xl overflow-hidden">
-      {currentUserByCaller &&
-        Object.keys(currentUserByCaller?.role)[0] === "admin" && (
-          <Link
-            to="/admin"
-            className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto space-x-2"
-            onClick={onClose}
-          >
-            <div>
-              <GrUserAdmin size={20} />
-            </div>
-            <div>Admin Dashboard</div>
-          </Link>
-        )}
+      {currentUserByCaller && userRole === "admin" && (
+        <Link
+          to="/admin"
+          className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto space-x-2"
+          onClick={onClose}
+        >
+          <div>
+            <GrUserAdmin size={20} />
+          </div>
+          <div>Admin Dashboard</div>
+        </Link>
+      )}
 
       {currentUserByCaller &&
-        Object.keys(currentUserByCaller?.role)[0] === "manager" && (
+        ["manager", "supervisor", "staff", "bod"].includes(userRole) && (
           <Link
             to="/management"
             className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto space-x-2"
@@ -500,12 +482,11 @@ const ProfileMenu = ({ onClose }) => {
           <div>Wallet</div>
         </div>
         <div className="ml-auto flex items-center space-x-2">
-          <button
-            className="p-2 hover:bg-indigo-600 rounded-full"
-            onClick={handleCopy}
-          >
-            <GrCopy />
-          </button>
+          <CopyToClipboard text={principal?.toText()}>
+            <button className="p-2 hover:bg-indigo-600 rounded-full">
+              <GrCopy />
+            </button>
+          </CopyToClipboard>
           <div className="bg-gray-500 rounded-md px-2 min-w-36 max-w-36 overflow-hidden truncate">
             {principal?.toText()}
           </div>

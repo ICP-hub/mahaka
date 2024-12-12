@@ -185,7 +185,7 @@ const PaymentTest = () => {
   return (
     <div className="w-full bg-white m-auto">
       <div className="max-w-7xl w-full  mx-auto   rounded-lg shadow-md grid grid-cols-1 md:grid-cols-2 md:gap-6">
-        <div className="order-1 md:order-1 bg-white p-16 ">
+        <div className="order-1 md:order-1 bg-white md:p-12 p-4 ">
           <h2 className="text-3xl font-black ">Ticket Details </h2>
           <hr className="my-3 text-[#ACACAC]" />
           <div className="mb-5">
@@ -228,17 +228,21 @@ const PaymentTest = () => {
             enim cursus sed in in. Quis malesuada mattis.
           </p> */}
         </div>
-        <div className="order-2 md:order-2 bg-[#F9FAFA] p-16">
+        <div className="order-2 md:order-2 bg-[#F9FAFA] md:p-12 p-4">
           <h2 className="text-3xl font-black ">Order Summary</h2>
           <hr className="my-3 text-[#ACACAC]" />
           <div className="flex items-center mb-8 mt-8 w-full ">
             <img
-              src={venuedetail?.logo?.data}
+              src={loadingdata ? payimg : venuedetail?.logo?.data}
               alt="Ticket"
               className="w-12 h-12 object-cover rounded-md mr-4"
             />
             <div>
-              <h3 className="text-2xl font-black">{venuedetail?.name}</h3>
+              {loadingdata ? (
+                <span className="px-8 rounded-lg  py-[2px] animate-spin bg-gray-200"></span>
+              ) : (
+                <h3 className="text-2xl font-black">{venuedetail?.name}</h3>
+              )}
               <p className="text-base font-normal text-[#ACACAC]">
                 {ticketType}
               </p>

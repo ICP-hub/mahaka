@@ -109,29 +109,7 @@ const WahanaPage = () => {
 
   return (
     <>
-      <div className="z-999">
-        <ModalOne open={isModalOpen} setOpen={setIsModalOpen}>
-          <div className="w-full flex flex-col h-full">
-            <h1 className="text-2xl font-medium flex w-full items-center justify-center uppercase py-4">
-              Main Gate Pass
-            </h1>
-            <div className="flex w-full bg-white rounded-b-3xl">
-              <div className="py-4 space-y-12 w-full h-full lg:mx-80">
-                <DatePicker />
-                <VisitorPicker />
-              </div>
-            </div>
-            <Link
-              to="/wahana-payment"
-              className="flex w-full items-center justify-center mt-auto mb-12"
-            >
-              <span className="font-medium px-12 py-2 rounded-md bg-secondary text-white text-lg">
-                Proceed to checkout
-              </span>
-            </Link>
-          </div>
-        </ModalOne>
-      </div>
+      <div className="z-999"></div>
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {loading ? (
@@ -281,7 +259,7 @@ const WahanaPage = () => {
                 </div>
               </div>
             ) : (
-              <div className="lg:w-1/3 h-[340px] w-full shadow-lg rounded-lg sticky top-0">
+              <div className="lg:w-1/3 h-[340px] w-full shadow-lg hidden lg:block rounded-lg sticky top-0">
                 <div className="p-8">
                   <h1 className="text-2xl font-black">Wahana Details</h1>
 

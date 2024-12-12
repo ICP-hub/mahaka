@@ -167,7 +167,13 @@ const UpdateMember = ({ member, onToggle, isEditing, setIsEditing }) => {
   const [firstName, setFirstName] = useState(member ? member.firstName : "");
   const [lastName, setLastName] = useState(member ? member.lastName : "");
   const [email, setEmail] = useState(member ? member.email : "");
-  const [role, setRole] = useState(member ? Object.keys(member.role)[0] : "");
+  const [role, setRole] = useState(
+    member
+      ? Object.keys(member.role)[0] === "user"
+        ? ""
+        : Object.keys(member.role)[0]
+      : ""
+  );
   const [principalId, setPrincipalId] = useState(
     member ? member.id.toText() : ""
   );
@@ -197,14 +203,14 @@ const UpdateMember = ({ member, onToggle, isEditing, setIsEditing }) => {
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       ) ||
       !validateField(role, "Role is required.") ||
-      !validateField(selectedVenue, "Assigned venue is required.")
+      !validateField(selectedVenue.id, "Assigned venue is required.")
     ) {
       return;
     }
 
     // pass validation
 
-    console.log(selectedVenue);
+    // console.log(selectedVenue);
 
     const userDataForUpdate = {
       firstName: firstName,
@@ -217,6 +223,8 @@ const UpdateMember = ({ member, onToggle, isEditing, setIsEditing }) => {
         title: selectedVenue.Title || selectedVenue.title,
       },
     };
+
+    // console.log(userDataForUpdate);
 
     dispatch(
       updateUser({
