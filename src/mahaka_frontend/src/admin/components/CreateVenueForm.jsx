@@ -153,7 +153,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         onChange={(value) => handleInputChange("title", value)}
       />
       <FormFieldTextArea
-        label="Venue Description"
+        label="Venue description"
         value={formValues.description}
         onChange={(value) => handleInputChange("description", value)}
       />
