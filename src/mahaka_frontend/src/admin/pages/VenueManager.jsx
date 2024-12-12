@@ -17,12 +17,15 @@ import {
 
 const VenueManager = () => {
   const [isVenueModalOpen, setIsVenueModalOpen] = useState(false);
-  // const { backend } = useSelector((state) => state.authentication);
-  const { venues, loading, totalPages, currentPage } = useSelector(
+  const { venues, loading, totalPages, currentPage, searchedVenues } = useSelector(
     (state) => state.venues
   );
+  const { backend } = useSelector((state) => state.authentication);
   const [searchInput, setSearchInput] = useState("");
+  const [displayVenues, setDisplayVenues] = useState([]);
+  const dispatch = useDispatch();
 
+  
   // const [page, setPage] = useState(1);
 
   // // Function to fetch venues based on search input or all venues
@@ -59,6 +62,39 @@ const VenueManager = () => {
   //   }
   // };
 
+  const fetchVenues = () => {
+    if (searchInput.trim()) {
+      dispatch(
+        searchVenues({
+          backend,
+          searchText: searchInput.trim(),
+          pageLimit: 10,
+          currPage: 0,
+        })
+      );
+    } else {
+      dispatch(
+        getAllVenues({
+          backend,
+          pageLimit: 10,
+          currPage: 0,
+        })
+      );
+    }
+  };
+
+  const handleSearch = () => {
+    fetchVenues();
+  };
+
+  useEffect(() => {
+    if (searchInput.trim()) {
+      setDisplayVenues(searchedVenues || []);
+    } else {
+      setDisplayVenues(venues);
+    }
+  }, [searchInput, venues, searchedVenues]);
+
   return (
     <div className="flex flex-col sm:overflow-hidden">
       <div className="relative flex-0 overflow-hidden bg-gray-800 px-4 py-8 md:px-8">
@@ -71,7 +107,7 @@ const VenueManager = () => {
               <div className="bg-gray-500 animate-pulse h-6 w-24 rounded-md"></div>
             ) : (
               <div>
-                {venues?.length || 0} {venues?.length > 1 ? "Venues" : "Venue"}
+                {displayVenues?.length || 0} {displayVenues?.length > 1 ? "Venues" : "Venue"}
               </div>
             )}
           </div>
@@ -87,10 +123,17 @@ const VenueManager = () => {
                   type="text"
                   placeholder="Search venues..."
                   className="outline-none bg-transparent w-full"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 />
               </div>
               <div className="ml-auto">
-                <HiArrowRightCircle size={24} className="cursor-pointer" />
+                <HiArrowRightCircle 
+                  size={24} 
+                  className="cursor-pointer" 
+                  onClick={handleSearch}
+                />
               </div>
             </div>
           </div>
@@ -104,7 +147,7 @@ const VenueManager = () => {
           </div>
         </div>
       </div>
-      {/* <PageIntro
+       {/* <PageIntro
         title="Venue"
         count={(venues && venues.length) || 0}
         actionOnButton={() => setIsVenueModalOpen(true)}
@@ -112,7 +155,7 @@ const VenueManager = () => {
         searchInput={searchInput}
         setSearchInput={setSearchInput}
       /> */}
-      <VenueTableFormat filteredVenues={venues} />
+      <VenueTableFormat filteredVenues={displayVenues} />
       {/* Modal for creating a new venue */}
       {isVenueModalOpen && (
         <ModalOverlay
