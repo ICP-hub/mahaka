@@ -11,7 +11,7 @@ const UserBookingData = () => {
 
   const getTickets = async () => {
     try {
-      const res = await backend.getAllCallerTickets(10, 0);
+      const res = await backend.getAllCallerEventTickets(10, 0);
       console.log(res);
       setTickets(res.ok.data || []);
       setLoading(false);
@@ -21,6 +21,7 @@ const UserBookingData = () => {
       setLoading(false);
     }
   };
+  console.log(backend);
 
   useEffect(() => {
     if (backend) {

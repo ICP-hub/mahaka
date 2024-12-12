@@ -236,7 +236,7 @@ export default function Home() {
       {attractionBannerLoading ? (
         <SkeletonLoaderAttraction />
       ) : attractionbanners && attractionbanners.length === 0 ? (
-        <div className="bg-card rounded-lg p-5 text-center mx-10 shadow-lg mt-10 h-100">
+        <div className="max-w-7xl w-full m-auto my-18 px-6 md:px-8 container mx-auto">
           <h1 className="text-3xl md:text-7xl text-gray-800 font-bold md:mt-30">
             No banners Found.
           </h1>
@@ -259,8 +259,10 @@ export default function Home() {
       <section className="py-12">
         {/* -------------------------------------venues section start------------------------------ */}
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-5xl font-bold text-center mb-8">Our Venues</h2>
+        <div className="max-w-7xl    px-6 md:px-8 container mx-auto">
+          <h2 className="sm:text-5xl  text-2xl font-bold text-center mb-8">
+            Our Venues
+          </h2>
           {loading ? (
             <div className="rounded-lg m-2 md:flex   text-center">
               <div className="w-full lg:w-1/2 h-120 m-2 bg-gray-400 animate-pulse rounded-lg"></div>
@@ -444,7 +446,7 @@ export default function Home() {
         {/* --------------------------------venues section end-------------------------------- */}
 
         {/* third party BANNER section start*/}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl px-6 md:px-8 container mx-auto">
           {bannerLoading ? (
             <div className="my-10 mx-10">
               <div className="bg-gray-400 h-50 w-full px-4 rounded-lg animate-pulse shadow-lg"></div>
@@ -457,7 +459,7 @@ export default function Home() {
             </div>
           ) : (
             <div className="max-w-7xl mx-auto py-8">
-              <h2 className="text-5xl font-bold text-center mb-8">
+              <h2 className="sm:text-5xl text-2xl font-bold text-center mb-8">
                 Advertisement
               </h2>
               {/* Group banners into chunks of 1, 2, 3 (or more if needed) */}
@@ -519,7 +521,7 @@ export default function Home() {
           <SkeletonLoaderEvents />
         ) : (
           <>
-            <h2 className="text-5xl font-bold text-center mb-8">
+            <h2 className="sm:text-5xl text-2xl font-bold text-center mb-8">
               Ongoing events
             </h2>
             <OngoingSlider />
@@ -531,7 +533,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 ">
           <section className="flex flex-col justify-center items-center">
             <div className="max-w-4xl text-center">
-              <h1 className="text-[48px] font-black">
+              <h1 className="sm:text-[48px] text-2xl font-black">
                 What's On: Wahana and Activities
               </h1>
             </div>
@@ -548,7 +550,7 @@ export default function Home() {
               {/* </div> */}
             </div>
           ) : (
-            <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-[33px] mt-12">
+            <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-[33px] container mx-auto">
               {wahanas
                 ?.filter((wahana) => wahana.featured)
                 ?.map((wahana) => (
