@@ -76,7 +76,7 @@ const AdminLayout = () => {
   // }, []);
 
   return (
-    <>
+    <AdminProtected>
       {state.isOpen && (
         <ScreenOverlayBlur onOverlayClicked={handleNavigationOnSmallScreen} />
       )}
@@ -96,7 +96,7 @@ const AdminLayout = () => {
           </div>
         </div>
       </div>
-    </>
+    </AdminProtected>
   );
 };
 

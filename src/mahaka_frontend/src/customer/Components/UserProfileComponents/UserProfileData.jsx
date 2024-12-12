@@ -225,11 +225,11 @@ const ProfileDetailsComponent = ({ editModalOpen, setEditModalOpen }) => {
             {currentUserByCaller && currentUserByCaller.email}
           </p>
         </div>
-        <div className="flex items-center p-4">
+        <div className="flex md:items-center flex-col md:flex-row p-4">
           <label className="block text-gray-700 font-semibold w-32">
             Principal ID
           </label>
-          <p className="font-semibold break-all">{principal}</p>
+          <p className="font-semibold break-all mt-4 md:mt-0">{principal}</p>
         </div>
       </div>
     );

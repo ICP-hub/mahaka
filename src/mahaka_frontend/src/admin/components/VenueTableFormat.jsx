@@ -37,19 +37,19 @@ const FormatTime = (nanoseconds) => {
 };
 const VenueTableFormat = ({ filteredVenues }) => {
   // console.log(filteredVenues);
-  const { venues, loading, deleteLoading } = useSelector(
+  const { venues, loading, deleteLoading, searchVenueLoading } = useSelector(
     (state) => state.venues
   );
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [selectedVenueId, setSelectedVenueId] = useState(null);
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
+
   // Show the modal for delete confirmation
   const handleDeleteClick = (venueId) => {
     setSelectedVenueId(venueId);
     setDeleteModalVisible(true);
   };
-
   console.log(deleteLoading);
 
   // Confirm deletion and dispatch deleteVenue action
@@ -61,7 +61,7 @@ const VenueTableFormat = ({ filteredVenues }) => {
       }
     );
   };
-
+  
   // const [expandedVenue, setExpandedVenue] = useState(null);
 
   // Accordion : venue detail
@@ -116,20 +116,20 @@ const VenueTableFormat = ({ filteredVenues }) => {
                 Details
               </div>
             </div>
-            {loading ? (
+            {(loading || searchVenueLoading) ? (
               <>
                 <VenueTableLoader />
                 <VenueTableLoader />
                 <VenueTableLoader />
                 <VenueTableLoader />
               </>
-            ) : venues && venues.length > 0 ? (
+            ) : filteredVenues && filteredVenues.length > 0 ? (
               <motion.div
                 variants={staggerContainer}
                 initial="hidden"
                 animate="show"
               >
-                {venues.map((venue, index) => (
+                {filteredVenues.map((venue, index) => (
                   <motion.div key={index} variants={staggerItem}>
                     <VenueTableData
                       key={index}
@@ -151,7 +151,7 @@ const VenueTableFormat = ({ filteredVenues }) => {
                   variants={staggerItem}
                   className="bg-card h-60 flex items-center justify-center text-text text-7xl font-black"
                 >
-                  No Venue found!
+                  No Venue Found!
                 </motion.div>
               </motion.div>
             )}

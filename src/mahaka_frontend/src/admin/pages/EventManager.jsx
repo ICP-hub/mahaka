@@ -83,6 +83,7 @@ const EventManager = () => {
     setIsOptionMenuOpen(false);
   };
 
+  
   // Filtered : memoized
   const filteredEvents = useMemo(() => {
     if (searchText && searchPerformed) return searchedEvents;
@@ -290,6 +291,9 @@ const EventManager = () => {
 
 // event cards
 const EventCard = ({ event }) => {
+  const statusLogo =  Object.keys(event.status)
+  //console.log("Keys in status:", statusLogo);
+
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
   const startInterVal = formatDateAndTime(parseInt(event.details.StartDate));
@@ -351,7 +355,11 @@ const EventCard = ({ event }) => {
               {event.venueId.split("#")[0]}
             </div>
             <div className="flex items-center">
-              <HiCheckBadge size={24} className="text-green-500" />
+              <div className={`${statusLogo[0]==="Ongoing"?"text-green-800 bg-green-100 rounded-full px-2 py-0.5 text-sm font-semibold":
+                statusLogo[0]==="AboutToStart"?"text-yellow-800  bg-yellow-100 rounded-full px-2 py-0.5 text-sm font-semibold":
+                "text-red-800  bg-red-100 rounded-full px-2 py-0.5 text-sm font-bold"}`} >
+            {statusLogo}
+            </div>
             </div>
           </div>
           <div className="mt-4 text-lg font-medium capitalize">

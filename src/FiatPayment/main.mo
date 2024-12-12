@@ -98,7 +98,7 @@ actor Fiat {
         let amount = (await _calculate_total_price(invoice.items));
         // Check if the caller is anonymous
         if (Validation.isAnonymous(sender)) {
-            // return Utils.generalResponse(false, Messages.not_authorized, #err({}), Http.Status.UnprocessableEntity);
+            return Utils.generalResponse(false, Messages.not_authorized, #err({}), Http.Status.UnprocessableEntity);
         }
         // Check if the payment method is empty
         else if (Validation.isEmpty(invoice.paymentMethod)) {
@@ -429,7 +429,6 @@ actor Fiat {
         else if (Validation.checkIfThePaymentMethodIsFound(invoiceReq.paymentMethod)) {
             return Utils.generalResponse(false, Messages.payment_method_invalid_value, #err({}), Http.Status.UnprocessableEntity);
         };
-
         // Retrieve the invoice value using the invoice number
         let invoiceVal = Trie.find(invoicesTrie, Utils.keyNat(invoiceReq.invoiceNo), Nat.equal);
 
