@@ -65,7 +65,7 @@ module {
                 body = ?Text.encodeUtf8(bodyText);
                 method = #post;
             };
-            Cycles.add(1_800_000_000);
+            Cycles.add(21_800_000_000);
             let http_response : Http.IcHttp.HttpResponse = await ic.http_request(http_request);
 
             let decoded_text: Text = switch (Text.decodeUtf8(http_response.body)) {
@@ -133,7 +133,7 @@ module {
             };
 
             // Minimum cycles needed to pass the CI tests. Cycles needed will vary on many things, such as the size of the HTTP response and subnet.
-            Cycles.add(1_800_000_000);
+            Cycles.add(21_800_000_000);
 
             // Send the HTTP request and await the response
             let http_response : Http.IcHttp.HttpResponse = await ic.http_request(http_request);
@@ -237,7 +237,7 @@ module {
                                 method = #post;
                            };
 
-                            Cycles.add(2_000_000_000);
+                            Cycles.add(21_800_000_000);
 
                             // Send the HTTP request and await the response
                             let http_response : Http.IcHttp.HttpResponse = await ic.http_request(http_request);
@@ -292,7 +292,7 @@ module {
             };
 
             // Minimum cycles needed to pass the CI tests. Cycles needed will vary on many things, such as the size of the HTTP response and subnet.
-            Cycles.add(2_000_000_000);
+            Cycles.add(21_800_000_000);
 
             // Send the HTTP request and await the response
             let http_response : Http.IcHttp.HttpResponse = await ic.http_request(http_request);
@@ -363,7 +363,7 @@ module {
                             };
 
                             // Minimum cycles needed to pass the CI tests. Cycles needed will vary on many things, such as the size of the HTTP response and subnet.
-                           Cycles.add(2_000_000_000);
+                           Cycles.add(21_800_000_000);
 
                             // Send the HTTP request and await the response
                             let http_response : Http.IcHttp.HttpResponse = await ic.http_request(http_request);
@@ -451,7 +451,7 @@ module {
             };
 
             // Minimum cycles needed to pass the CI tests. Cycles needed will vary on many things, such as the size of the HTTP response and subnet.
-            Cycles.add(2_000_000_000);
+            Cycles.add(21_800_000_000);
 
             // Send the HTTP request and await the response
             let http_response : Http.IcHttp.HttpResponse = await ic.http_request(http_request);
