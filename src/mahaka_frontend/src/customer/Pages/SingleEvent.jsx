@@ -250,7 +250,7 @@ export default function SingleEvent() {
                   </div>
                 </div>
               ) : (
-                <div className="lg:w-1/3 h-[100px] w-full shadow-lg lg:hidden rounded-lg mt-10  ">
+                <div className="lg:w-1/3 h-[150px] w-full shadow-lg lg:hidden rounded-lg mt-10  ">
                   <div className="p-8">
                     <h1 className="text-2xl font-black">Venue Details</h1>
                     <h3 className="text-lg font-normal"> </h3>

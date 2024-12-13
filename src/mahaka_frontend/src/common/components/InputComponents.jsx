@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import notificationManager from "../utils/notificationManager";
+import { BsInfoCircle } from "react-icons/bs";
 
 // input field
 export const FormFieldInput = ({
@@ -18,7 +19,7 @@ export const FormFieldInput = ({
           className="bg-transparent w-full my-3"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          disabled={disabled}
+          // disabled={disabled}
           onKeyDown={(e) => {
             const key = e.key;
             // console.log(key);
@@ -26,9 +27,18 @@ export const FormFieldInput = ({
               e.preventDefault();
             }
           }}
+          style={{
+            pointerEvents: disabled ? "none" : "auto",
+            fontWeight: disabled && "600",
+          }}
         />
       </div>
-      <div className="absolute -top-6">{label}</div>
+      <div
+        className="absolute -top-6"
+        style={{ fontWeight: disabled && "600" }}
+      >
+        {label}*
+      </div>
     </div>
   );
 };
@@ -46,7 +56,7 @@ export const FormFieldTextArea = ({ value, onChange, label }) => {
           onChange={(e) => onChange(e.target.value)}
         />
       </div>
-      <div className="absolute -top-6">{label}</div>
+      <div className="absolute -top-6">{label}*</div>
     </div>
   );
 };
@@ -78,7 +88,7 @@ export const FormFieldOptions = ({
           </option>
         ))}
       </select>
-      {label && <div className="absolute -top-6">{label}</div>}
+      {label && <div className="absolute -top-6">{label}*</div>}
     </div>
   );
 };
@@ -125,7 +135,14 @@ export const FormFieldImageUpload = ({ label, image, onChange }) => {
           </button>
         </div>
       </div>
-      <div className="absolute -top-6">{label}</div>
+      <div className="absolute -top-6 flex w-full items-center">
+        <div className="relative flex items-center">
+          <div>{label}*</div>
+        </div>
+        <div className="ml-auto italic text-sm">
+          Image size should be below 200KB
+        </div>
+      </div>
       {image && (
         <div className="mt-2 mb-4 h-48">
           <img
