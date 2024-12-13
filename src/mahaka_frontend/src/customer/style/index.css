@@ -147,6 +147,7 @@ input[type="radio"]:checked::before {
 .no-scrollbar::-webkit-scrollbar {
   display: none; /* Safari and Chrome */
 }
+
 /* .texthint {
   position: relative;
   display: inline-block;

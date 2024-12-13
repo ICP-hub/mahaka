@@ -19,7 +19,7 @@ export default function OngoingCard({
     <>
       {/* on going event section  */}
       <Link to={`/${venueId}/events/${eventId}`} className="my-18">
-        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl px-6 md:px-8 container mx-auto">
           <div className="relative w-full h-full ">
             <img
               src={ongoingEventData?.banner.data}
