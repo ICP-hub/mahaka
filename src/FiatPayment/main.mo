@@ -98,7 +98,7 @@ actor Fiat {
         let amount = (await _calculate_total_price(invoice.items));
         // Check if the caller is anonymous
         if (Validation.isAnonymous(sender)) {
-            // return Utils.generalResponse(false, Messages.not_authorized, #err({}), Http.Status.UnprocessableEntity);
+            return Utils.generalResponse(false, Messages.not_authorized, #err({}), Http.Status.UnprocessableEntity);
         }
         // Check if the payment method is empty
         else if (Validation.isEmpty(invoice.paymentMethod)) {
@@ -125,15 +125,20 @@ actor Fiat {
             return Utils.generalResponse(false, Messages.sum_invoice_items_is_incorrect, #err({}), Http.Status.UnprocessableEntity);
         };
 
+        let transform_context : Http.IcHttp.TransformContext = {
+            function = transform;
+            context = Blob.fromArray([]);
+        };
+
         // Check if the payment method specified in the invoice is "Stripe"
         if (Validation.isEqual(invoice.paymentMethod, "Stripe")) {
             // If it's "Stripe", create a Stripe payment session using the 'Service.Stripe.create_session' function
-            let sessionResult: Result.Result<?Service.Stripe.CreateSession, ?Service.Stripe.ErrorResponse> = await Service.Stripe.create_session(noInvoice + 1, invoice);
+            let sessionResult: Result.Result<?Service.Stripe.CreateSession, ?Service.Stripe.ErrorResponse> = await Service.Stripe.create_session(noInvoice + 1, invoice,transform_context);
             // Call the '_stripe_invoice' function with the appropriate parameters and wait for the result
             return await _stripe_invoice(sender, invoice, sessionResult);
         } else {
             // If the payment method is not "Stripe", assume it's "PayPal" and create a PayPal payment session
-            let sessionResult: Result.Result<?Service.Paypal.CreateOrder, ?Service.Paypal.ErrorResponse> = await Service.Paypal.create_order(noInvoice + 1, invoice);
+            let sessionResult: Result.Result<?Service.Paypal.CreateOrder, ?Service.Paypal.ErrorResponse> = await Service.Paypal.create_order(noInvoice + 1, invoice,transform_context);
             // Call the '_paypal_invoice' function with the appropriate parameters and wait for the result
             return await _paypal_invoice(sender, invoice, sessionResult);
         };
@@ -429,7 +434,6 @@ actor Fiat {
         else if (Validation.checkIfThePaymentMethodIsFound(invoiceReq.paymentMethod)) {
             return Utils.generalResponse(false, Messages.payment_method_invalid_value, #err({}), Http.Status.UnprocessableEntity);
         };
-
         // Retrieve the invoice value using the invoice number
         let invoiceVal = Trie.find(invoicesTrie, Utils.keyNat(invoiceReq.invoiceNo), Nat.equal);
 
@@ -450,16 +454,21 @@ actor Fiat {
                 else if(not(Validation.isEqual(invoiceFind.status, Types.InvoiceStatus.Pending))) {
                     return Utils.generalResponse(false, Messages.invoice_not_pending, #err({}), Http.Status.UnprocessableEntity);
                 };
+
+                let transform_context : Http.IcHttp.TransformContext = {
+                    function = transform;
+                    context = Blob.fromArray([]);
+                };
                 
                 // Check if the payment method specified in 'invoiceFind' is "Stripe".
                 if (Validation.isEqual(invoiceFind.paymentMethod, "Stripe")) {
                     // If the payment method is "Stripe", retrieve the session information using 'Service.Stripe.retrieve_session' function.
-                    let invoiceResult: Result.Result<?Service.Stripe.RetrieveSession, ?Service.Stripe.ErrorResponse> = await Service.Stripe.retrieve_session(invoiceFind.transactionId);
+                    let invoiceResult: Result.Result<?Service.Stripe.RetrieveSession, ?Service.Stripe.ErrorResponse> = await Service.Stripe.retrieve_session(invoiceFind.transactionId,transform_context);
                     // Call the '_change_invoice_status_stripe' function with the retrieved information and wait for the result.
                     return await _change_invoice_status_stripe(invoiceFind, invoiceReq, invoiceResult);
                 } else {
                     // If the payment method is not "Stripe", assume it's "PayPal" and retrieve the order information using 'Service.Paypal.retrieve_order' function.
-                    let invoiceResult: Result.Result<?Service.Paypal.RetrieveOrder, ?Service.Paypal.ErrorResponse> = await Service.Paypal.retrieve_order(invoiceFind.transactionId);
+                    let invoiceResult: Result.Result<?Service.Paypal.RetrieveOrder, ?Service.Paypal.ErrorResponse> = await Service.Paypal.retrieve_order(invoiceFind.transactionId,transform_context);
                     // Call the '_change_invoice_status_paypal' function with the retrieved information and wait for the result.
                     return await _change_invoice_status_paypal(invoiceFind, invoiceReq, invoiceResult);
                 };
@@ -627,6 +636,40 @@ actor Fiat {
     public query func get_actor_id_as_text() : async Text {
         // Convert the actor ID to text
         Principal.toText(Principal.fromActor(Fiat));
+    };
+
+    //function to transform the response
+    public query func transform(raw : Http.IcHttp.TransformArgs) : async Http.IcHttp.CanisterHttpResponsePayload {
+        let transformed : Http.IcHttp.CanisterHttpResponsePayload = {
+            status = raw.response.status;
+            body = raw.response.body;
+            headers = [
+                {
+                    name = "Content-Security-Policy";
+                    value = "default-src 'self'";
+                },
+                { 
+                    name = "Referrer-Policy"; 
+                    value = "strict-origin" 
+                },
+                { 
+                    name = "Permissions-Policy"; 
+                    value = "geolocation=(self)" },
+                {
+                    name = "Strict-Transport-Security";
+                    value = "max-age=63072000";
+                },
+                { 
+                    name = "X-Frame-Options"; 
+                    value = "DENY" 
+                },
+                { 
+                    name = "X-Content-Type-Options"; 
+                    value = "nosniff" 
+                },
+            ];
+        };
+        transformed;
     };
     
 }

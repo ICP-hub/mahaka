@@ -12,6 +12,9 @@ import Cycles "mo:base/ExperimentalCycles";
 import serdeJson "mo:serde/JSON";
 import Result "mo:base/Result";
 import Time "mo:base/Time";
+import List "mo:base/List";
+import Nat "mo:base/Nat";
+import Iter "mo:base/Iter";
 import Base64 "lib/Base64";
 
 module {
@@ -21,8 +24,8 @@ module {
 
     public module Stripe {
 
-        private let base_url = "https://api.stripe.com/v1/";
-        private let secret_key = "sk_test_51QKxqbG4kNs1irDHlNLNyLDInjXpY2K6ZyxqG0Ssu1R9YhT4OKz9XUyBtc59nfmzxI7UDCrXQLwbgJTQryrNh0xh00DdigkPiC";
+        let devUrl = "http://localhost:5000/";
+        let prodUrl = "https://proxserv.netlify.app/.netlify/functions/api";
 
         public type CreateSession = {
             id: Text;
@@ -43,77 +46,109 @@ module {
             };
         };
 
-        public func create_session(invoiceNo:Nat, invoice : Types.Request.CreateInvoiceBody) : async Result.Result<?CreateSession, ?ErrorResponse>  {
-            // Set the request headers
+        public func create_session(invoiceNo: Nat, invoice: Types.Request.CreateInvoiceBody, transform_context: Http.IcHttp.TransformContext) : async Result.Result<?CreateSession, ?ErrorResponse> {
+            let successUrl = Config.get_stripe_success_url(invoiceNo);
+            let cancelUrl = Config.get_stripe_cancel_url(invoiceNo);
+
+            let idempotency_key : Text = generateIdempotencyKey();
             let request_headers = [
-                {   name = "Content-Type";     value = "application/x-www-form-urlencoded" },
-                {   name = "Authorization";    value = "Bearer " # secret_key }
+                { name = "Content-Type"; value = "application/json" },
+                { name = "idempotencyKey"; value = idempotency_key },
             ];
-
-            // Construct the request body string
-            let request_body_str: Text = "cancel_url="# Config.get_stripe_cancel_url(invoiceNo) #"&" # 
-                "success_url="# Config.get_stripe_success_url(invoiceNo) #"&mode=payment&payment_method_types[0]=card&"#
-                "line_items[0][price_data][currency]="# invoice.currency #"&line_items[0][price_data][product_data][name]=token&line_items[0][price_data][unit_amount]="# Int.toText(Float.toInt(invoice.amount * 100)) #"&"#
-                "line_items[0][quantity]=1";
-
-            // Encode the request body as Blob
-            let request_body_as_Blob: Blob = Text.encodeUtf8(request_body_str); 
-
-            // Create the HTTP request object
-            let http_request : Http.IcHttp.HttpRequest = {
-                url = base_url # "checkout/sessions";
-                headers = request_headers;
-                body = ?request_body_as_Blob; 
-                method = #post;
+            
+            let body = {
+                invoiceNo = invoiceNo;
+                invoice = invoice;
+                successUrl = successUrl;
+                cancelUrl = cancelUrl;
             };
 
-            // Minimum cycles needed to pass the CI tests. Cycles needed will vary on many things, such as the size of the HTTP response and subnet.
-            Cycles.add(220_131_200_000); 
+            let bodyText = serializeBody(body);
 
-            // Send the HTTP request and await the response
+            let http_request : Http.IcHttp.HttpRequest = {
+                url = prodUrl # "/create-session";
+                headers = request_headers;
+                body = ?Text.encodeUtf8(bodyText);
+                method = #post;
+                transform = ?transform_context;
+                max_response_bytes= null;
+            };
+            Cycles.add(21_800_000_000);
             let http_response : Http.IcHttp.HttpResponse = await ic.http_request(http_request);
 
-            // Decode the response body text
             let decoded_text: Text = switch (Text.decodeUtf8(http_response.body)) {
-                case (null) { "{\"error\": {\"code\" : \"\", \"message\" : \"No value returned\", \"doc_url\" : \"\", \"param\" : \"\", \"request_log_url\" : \"\"}}" };
+                case (null) { "{}" };
                 case (?y) { y };
             };
 
-            // Convert the decoded text to Blob
             let blob = serdeJson.fromText(decoded_text);
-
-            // Deserialize the blob to CreateSession type
             let session : ?CreateSession = from_candid(blob);
 
-            return switch(session){
-                case(null) {
-                    let errResponse : ?ErrorResponse = from_candid(blob);
-                    return #err(errResponse);
-                };
-                case(_session) {
-                    return #ok(_session);
-                };
+            return switch(session) {
+                case(null) { let errResponse : ?ErrorResponse = from_candid(blob); return #err(errResponse); };
+                case(_session) { return #ok(_session); };
             };
         };
 
-        public func retrieve_session(session_id:Text) : async Result.Result<?RetrieveSession, ?ErrorResponse>  {
+        func generateIdempotencyKey() : Text {
+            let timestamp = Time.now(); 
+            return "idempotency-" # Int.toText(timestamp);
+        };
 
-             // Set the request headers
-            let request_headers = [
-                {   name = "Content-Type";     value = "application/x-www-form-urlencoded" },
-                {   name = "Authorization";    value = "Bearer " # secret_key }
-            ];
+        func serializeBody(body: {invoiceNo: Nat; invoice: Types.Request.CreateInvoiceBody; successUrl: Text; cancelUrl: Text}) : Text {
+            // Manually serialize the body to JSON
+            let invoiceText = serializeInvoice(body.invoice); // Serialize invoice separately
+            return "{" #
+                "\"invoiceNo\":" # Nat.toText(body.invoiceNo) # "," #
+                "\"invoice\":" # invoiceText # "," #
+                "\"successUrl\":\"" # body.successUrl # "\"," #
+                "\"cancelUrl\":\"" # body.cancelUrl # "\""
+                # "}";
+        };
+        // Serialize the invoice
+        func serializeInvoice(invoice: Types.Request.CreateInvoiceBody) : Text {
+            let itemsText = serializeItems(invoice.items);
+            return "{" #
+                "\"amount\":" # Float.toText(invoice.amount) # "," #
+                "\"currency\":\"" # invoice.currency # "\"," #
+                "\"items\":[" # itemsText # "]," #
+                "\"paymentMethod\":\"" # invoice.paymentMethod # "\""
+                # "}";
+        };
+
+        // Serialize the items (list of Item__1)
+        func serializeItems(items: [Types.Item]) : Text {
+            let itemList = List.fromArray(items);
+            
+            let itemStrings = List.map<Types.Item, Text>(itemList, func(item) : Text {
+                return "{" #
+                    "\"name\":\"" # item.name # "\"," #
+                    "\"id\": " # Nat.toText(item.id) # "," #
+                    "\"price\": " # Float.toText(item.price) # "," #
+                    "\"categoryId\":\"" # item.categoryId # "\"," #
+                    "\"categoryTitle\":\"" # item.categoryTitle # "\"" #
+                    "}";
+            });
+
+            return Text.join(",", Iter.fromArray(List.toArray(itemStrings)));
+        };
+
+
+        public func retrieve_session(session_id:Text, transform_context: Http.IcHttp.TransformContext) : async Result.Result<?RetrieveSession, ?ErrorResponse>  {
+
 
             // Create the HTTP request object
             let http_request : Http.IcHttp.HttpRequest = {
-                url = base_url # "checkout/sessions/" # session_id;
-                headers = request_headers;
+                url = prodUrl # "/retrieve-session/" # session_id;
+                headers = [{ name = "Content-Type"; value = "application/json" }];
                 body = null; 
                 method = #get;
+                transform = ?transform_context;
+                max_response_bytes= null;
             };
 
             // Minimum cycles needed to pass the CI tests. Cycles needed will vary on many things, such as the size of the HTTP response and subnet.
-            Cycles.add(220_131_200_000); 
+            Cycles.add(21_800_000_000);
 
             // Send the HTTP request and await the response
             let http_response : Http.IcHttp.HttpResponse = await ic.http_request(http_request);
@@ -126,7 +161,6 @@ module {
 
             // Convert the decoded text to Blob
             let blob = serdeJson.fromText(decoded_text);
-
             // Deserialize the blob to RetrieveSession type
             let session : ?RetrieveSession = from_candid(blob);
 
@@ -176,9 +210,9 @@ module {
             status: Text;
         };
 
-        public func create_order(invoiceNo:Nat, invoice : Types.Request.CreateInvoiceBody): async Result.Result<?CreateOrder, ?ErrorResponse> {
+        public func create_order(invoiceNo:Nat, invoice : Types.Request.CreateInvoiceBody, transform_context: Http.IcHttp.TransformContext): async Result.Result<?CreateOrder, ?ErrorResponse> {
             
-           let sessionResult:Result.Result<?Oauth2Token, ?ErrorResponse> = await generate_access_token();
+           let sessionResult:Result.Result<?Oauth2Token, ?ErrorResponse> = await generate_access_token(transform_context);
             switch (sessionResult) {
                 case (#err err) { 
                       switch(err) {
@@ -216,9 +250,11 @@ module {
                                 headers = request_headers;
                                 body = ?request_body_as_Blob; 
                                 method = #post;
+                                transform = ?transform_context;
+                                max_response_bytes= null;
                            };
 
-                            Cycles.add(220_131_200_000); 
+                            Cycles.add(21_800_000_000);
 
                             // Send the HTTP request and await the response
                             let http_response : Http.IcHttp.HttpResponse = await ic.http_request(http_request);
@@ -252,7 +288,7 @@ module {
             };
         };   
 
-        private func generate_access_token() : async Result.Result<?Oauth2Token, ?ErrorResponse> {
+        private func generate_access_token(transform_context: Http.IcHttp.TransformContext) : async Result.Result<?Oauth2Token, ?ErrorResponse> {
             let text2Nat8:[Nat8] = Utils.text2Nat8Array(client_id # ":" # client_secret);
 
             let request_headers = [
@@ -264,16 +300,20 @@ module {
 
             let request_body_as_Blob: Blob = Text.encodeUtf8(request_body_str); 
 
+            
+
             // Create the HTTP request object
             let http_request : Http.IcHttp.HttpRequest = {
                 url = base_url # "v1/oauth2/token";
                 headers = request_headers;
                 body = ?request_body_as_Blob; 
                 method = #post;
+                transform = ?transform_context;
+                max_response_bytes= null;
             };
 
             // Minimum cycles needed to pass the CI tests. Cycles needed will vary on many things, such as the size of the HTTP response and subnet.
-            Cycles.add(220_131_200_000); 
+            Cycles.add(21_800_000_000);
 
             // Send the HTTP request and await the response
             let http_response : Http.IcHttp.HttpResponse = await ic.http_request(http_request);
@@ -302,9 +342,9 @@ module {
             };
         };
 
-        public func retrieve_order(order_id:Text) : async Result.Result<?RetrieveOrder, ?ErrorResponse>  {
+        public func retrieve_order(order_id:Text, transform_context: Http.IcHttp.TransformContext) : async Result.Result<?RetrieveOrder, ?ErrorResponse>  {
 
-            let sessionResult:Result.Result<?Oauth2Token, ?ErrorResponse> = await generate_access_token();
+            let sessionResult:Result.Result<?Oauth2Token, ?ErrorResponse> = await generate_access_token(transform_context);
             switch (sessionResult) {
                 case (#err err) { 
                       switch(err) {
@@ -341,10 +381,12 @@ module {
                                 headers = request_headers;
                                 body = null; 
                                 method = #get;
+                                transform = ?transform_context;
+                                max_response_bytes= null;
                             };
 
                             // Minimum cycles needed to pass the CI tests. Cycles needed will vary on many things, such as the size of the HTTP response and subnet.
-                            Cycles.add(220_131_200_000); 
+                           Cycles.add(21_800_000_000);
 
                             // Send the HTTP request and await the response
                             let http_response : Http.IcHttp.HttpResponse = await ic.http_request(http_request);
@@ -369,7 +411,7 @@ module {
                                 case(?_order) {
 
                                     if(Text.equal(_order.status, "APPROVED")) {
-                                        let captureResult: Result.Result<?RetrieveOrder, ?ErrorResponse> =  await capture_order(_session.access_token, order_id);
+                                        let captureResult: Result.Result<?RetrieveOrder, ?ErrorResponse> =  await capture_order(_session.access_token, order_id, transform_context);
 
                                         return switch (captureResult) {
                                             case (#err err) { 
@@ -415,7 +457,7 @@ module {
             };
         };
 
-        private func capture_order(access_token:Text, order_id:Text) : async Result.Result<?RetrieveOrder, ?ErrorResponse>  {
+        private func capture_order(access_token:Text, order_id:Text, transform_context: Http.IcHttp.TransformContext) : async Result.Result<?RetrieveOrder, ?ErrorResponse>  {
 
             // Set the request headers
             let request_headers = [
@@ -429,10 +471,12 @@ module {
                 headers = request_headers;
                 body = null; 
                 method = #post;
+                transform = ?transform_context;
+                max_response_bytes= null;
             };
 
             // Minimum cycles needed to pass the CI tests. Cycles needed will vary on many things, such as the size of the HTTP response and subnet.
-            Cycles.add(220_131_200_000); 
+            Cycles.add(21_800_000_000);
 
             // Send the HTTP request and await the response
             let http_response : Http.IcHttp.HttpResponse = await ic.http_request(http_request);
