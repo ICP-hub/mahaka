@@ -46,7 +46,7 @@ module {
             };
         };
 
-        public func create_session(invoiceNo: Nat, invoice: Types.Request.CreateInvoiceBody) : async Result.Result<?CreateSession, ?ErrorResponse> {
+        public func create_session(invoiceNo: Nat, invoice: Types.Request.CreateInvoiceBody, transform_context: Http.IcHttp.TransformContext) : async Result.Result<?CreateSession, ?ErrorResponse> {
             let successUrl = Config.get_stripe_success_url(invoiceNo);
             let cancelUrl = Config.get_stripe_cancel_url(invoiceNo);
             
@@ -64,6 +64,8 @@ module {
                 headers = [{ name = "Content-Type"; value = "application/json" }];
                 body = ?Text.encodeUtf8(bodyText);
                 method = #post;
+                transform = ?transform_context;
+                max_response_bytes= null;
             };
             Cycles.add(21_800_000_000);
             let http_response : Http.IcHttp.HttpResponse = await ic.http_request(http_request);
@@ -121,7 +123,7 @@ module {
         };
 
 
-        public func retrieve_session(session_id:Text) : async Result.Result<?RetrieveSession, ?ErrorResponse>  {
+        public func retrieve_session(session_id:Text, transform_context: Http.IcHttp.TransformContext) : async Result.Result<?RetrieveSession, ?ErrorResponse>  {
 
 
             // Create the HTTP request object
@@ -130,6 +132,8 @@ module {
                 headers = [{ name = "Content-Type"; value = "application/json" }];
                 body = null; 
                 method = #get;
+                transform = ?transform_context;
+                max_response_bytes= null;
             };
 
             // Minimum cycles needed to pass the CI tests. Cycles needed will vary on many things, such as the size of the HTTP response and subnet.
@@ -195,9 +199,9 @@ module {
             status: Text;
         };
 
-        public func create_order(invoiceNo:Nat, invoice : Types.Request.CreateInvoiceBody): async Result.Result<?CreateOrder, ?ErrorResponse> {
+        public func create_order(invoiceNo:Nat, invoice : Types.Request.CreateInvoiceBody, transform_context: Http.IcHttp.TransformContext): async Result.Result<?CreateOrder, ?ErrorResponse> {
             
-           let sessionResult:Result.Result<?Oauth2Token, ?ErrorResponse> = await generate_access_token();
+           let sessionResult:Result.Result<?Oauth2Token, ?ErrorResponse> = await generate_access_token(transform_context);
             switch (sessionResult) {
                 case (#err err) { 
                       switch(err) {
@@ -235,6 +239,8 @@ module {
                                 headers = request_headers;
                                 body = ?request_body_as_Blob; 
                                 method = #post;
+                                transform = ?transform_context;
+                                max_response_bytes= null;
                            };
 
                             Cycles.add(21_800_000_000);
@@ -271,7 +277,7 @@ module {
             };
         };   
 
-        private func generate_access_token() : async Result.Result<?Oauth2Token, ?ErrorResponse> {
+        private func generate_access_token(transform_context: Http.IcHttp.TransformContext) : async Result.Result<?Oauth2Token, ?ErrorResponse> {
             let text2Nat8:[Nat8] = Utils.text2Nat8Array(client_id # ":" # client_secret);
 
             let request_headers = [
@@ -283,12 +289,16 @@ module {
 
             let request_body_as_Blob: Blob = Text.encodeUtf8(request_body_str); 
 
+            
+
             // Create the HTTP request object
             let http_request : Http.IcHttp.HttpRequest = {
                 url = base_url # "v1/oauth2/token";
                 headers = request_headers;
                 body = ?request_body_as_Blob; 
                 method = #post;
+                transform = ?transform_context;
+                max_response_bytes= null;
             };
 
             // Minimum cycles needed to pass the CI tests. Cycles needed will vary on many things, such as the size of the HTTP response and subnet.
@@ -321,9 +331,9 @@ module {
             };
         };
 
-        public func retrieve_order(order_id:Text) : async Result.Result<?RetrieveOrder, ?ErrorResponse>  {
+        public func retrieve_order(order_id:Text, transform_context: Http.IcHttp.TransformContext) : async Result.Result<?RetrieveOrder, ?ErrorResponse>  {
 
-            let sessionResult:Result.Result<?Oauth2Token, ?ErrorResponse> = await generate_access_token();
+            let sessionResult:Result.Result<?Oauth2Token, ?ErrorResponse> = await generate_access_token(transform_context);
             switch (sessionResult) {
                 case (#err err) { 
                       switch(err) {
@@ -360,6 +370,8 @@ module {
                                 headers = request_headers;
                                 body = null; 
                                 method = #get;
+                                transform = ?transform_context;
+                                max_response_bytes= null;
                             };
 
                             // Minimum cycles needed to pass the CI tests. Cycles needed will vary on many things, such as the size of the HTTP response and subnet.
@@ -388,7 +400,7 @@ module {
                                 case(?_order) {
 
                                     if(Text.equal(_order.status, "APPROVED")) {
-                                        let captureResult: Result.Result<?RetrieveOrder, ?ErrorResponse> =  await capture_order(_session.access_token, order_id);
+                                        let captureResult: Result.Result<?RetrieveOrder, ?ErrorResponse> =  await capture_order(_session.access_token, order_id, transform_context);
 
                                         return switch (captureResult) {
                                             case (#err err) { 
@@ -434,7 +446,7 @@ module {
             };
         };
 
-        private func capture_order(access_token:Text, order_id:Text) : async Result.Result<?RetrieveOrder, ?ErrorResponse>  {
+        private func capture_order(access_token:Text, order_id:Text, transform_context: Http.IcHttp.TransformContext) : async Result.Result<?RetrieveOrder, ?ErrorResponse>  {
 
             // Set the request headers
             let request_headers = [
@@ -448,6 +460,8 @@ module {
                 headers = request_headers;
                 body = null; 
                 method = #post;
+                transform = ?transform_context;
+                max_response_bytes= null;
             };
 
             // Minimum cycles needed to pass the CI tests. Cycles needed will vary on many things, such as the size of the HTTP response and subnet.
