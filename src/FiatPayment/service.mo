@@ -49,6 +49,12 @@ module {
         public func create_session(invoiceNo: Nat, invoice: Types.Request.CreateInvoiceBody, transform_context: Http.IcHttp.TransformContext) : async Result.Result<?CreateSession, ?ErrorResponse> {
             let successUrl = Config.get_stripe_success_url(invoiceNo);
             let cancelUrl = Config.get_stripe_cancel_url(invoiceNo);
+
+            let idempotency_key : Text = generateIdempotencyKey();
+            let request_headers = [
+                { name = "Content-Type"; value = "application/json" },
+                { name = "idempotencyKey"; value = idempotency_key },
+            ];
             
             let body = {
                 invoiceNo = invoiceNo;
@@ -61,7 +67,7 @@ module {
 
             let http_request : Http.IcHttp.HttpRequest = {
                 url = prodUrl # "/create-session";
-                headers = [{ name = "Content-Type"; value = "application/json" }];
+                headers = request_headers;
                 body = ?Text.encodeUtf8(bodyText);
                 method = #post;
                 transform = ?transform_context;
@@ -82,6 +88,11 @@ module {
                 case(null) { let errResponse : ?ErrorResponse = from_candid(blob); return #err(errResponse); };
                 case(_session) { return #ok(_session); };
             };
+        };
+
+        func generateIdempotencyKey() : Text {
+            let timestamp = Time.now(); 
+            return "idempotency-" # Int.toText(timestamp);
         };
 
         func serializeBody(body: {invoiceNo: Nat; invoice: Types.Request.CreateInvoiceBody; successUrl: Text; cancelUrl: Text}) : Text {
