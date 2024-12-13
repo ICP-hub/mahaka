@@ -5,10 +5,10 @@ import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
 
 import { useSelector, useDispatch } from "react-redux";
 
-
-
 const TestimonialCarousel = () => {
-  const {testimonials,  testimonialLoading  } = useSelector((state)=>state.testimonial)
+  const { testimonials, testimonialLoading } = useSelector(
+    (state) => state.testimonial
+  );
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const controls = useAnimationControls();
@@ -63,64 +63,68 @@ const TestimonialCarousel = () => {
     return "opacity-100";
   };
 
- 
   return (
     <>
-    <div className="relative mx-auto flex flex-col items-center w-full max-w-7xl p-4 overflow-hidden">
-      <h1 className="text-7xl font-black text-center pb-15">Testimonials</h1>
+      <div className="relative mx-auto flex flex-col items-center w-full max-w-7xl p-4 overflow-hidden">
+        <h1 className="sm:text-7xl text-2xl font-black text-center pb-15">
+          Testimonials
+        </h1>
 
-      <div className="relative w-full">
-        <motion.div
-          className="flex"
-          animate={{ x: `-${(currentIndex / itemsToShow) * 100}%` }}
-          transition={{ duration: 1, ease: "easeInOut", stiffness: 300 }}
-        >
-          {testimonials.map((testimonial, index) => (
-            <motion.div
-              key={index}
-              initial={{ rotate: 0 }}
-              animate={controls}
-              className={`flex-none ${getCardWidth()} px-4 ${getOpacity(
-                index
-              )}`}
-            >
-              <TestimonialCard testimonial={testimonial} testimonialLoading = {testimonialLoading}/>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
-      <div className="flex flex-col items-center justify-center mt-12">
-        <div className="flex mx-4">
-          {Array.from({
-            length: Math.ceil(testimonials.length / itemsToShow),
-          }).map((_, index) => (
+        <div className="relative w-full">
+          <motion.div
+            className="flex"
+            animate={{ x: `-${(currentIndex / itemsToShow) * 100}%` }}
+            transition={{ duration: 1, ease: "easeInOut", stiffness: 300 }}
+          >
+            {testimonials.map((testimonial, index) => (
+              <motion.div
+                key={index}
+                initial={{ rotate: 0 }}
+                animate={controls}
+                className={`flex-none ${getCardWidth()} px-4 ${getOpacity(
+                  index
+                )}`}
+              >
+                <TestimonialCard
+                  testimonial={testimonial}
+                  testimonialLoading={testimonialLoading}
+                />
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+        <div className="flex flex-col items-center justify-center mt-12">
+          <div className="flex mx-4">
+            {Array.from({
+              length: Math.ceil(testimonials.length / itemsToShow),
+            }).map((_, index) => (
+              <button
+                key={index}
+                onClick={() => handleDotClick(index)}
+                className={`w-3 h-3 mx-1 rounded-full ${
+                  index === Math.floor(currentIndex / itemsToShow)
+                    ? "bg-orange-500"
+                    : "bg-gray-400"
+                }`}
+              />
+            ))}
+          </div>
+          <div className="flex justify-center items-center mt-8 gap-5">
             <button
-              key={index}
-              onClick={() => handleDotClick(index)}
-              className={`w-3 h-3 mx-1 rounded-full ${
-                index === Math.floor(currentIndex / itemsToShow)
-                  ? "bg-orange-500"
-                  : "bg-gray-400"
-              }`}
-            />
-          ))}
-        </div>
-        <div className="flex justify-center items-center mt-8 gap-5">
-          <button
-            className="p-2 h-9 w-9 text-white bg-orange-500 rounded-full focus:outline-none"
-            onClick={handlePrev}
-          >
-            &#x3c;
-          </button>
-          <button
-            className="p-2 h-9 w-9 text-white bg-orange-500 rounded-full focus:outline-none"
-            onClick={handleNext}
-          >
-            &#x3e;
-          </button>
+              className="p-2 h-9 w-9 text-white bg-orange-500 rounded-full focus:outline-none"
+              onClick={handlePrev}
+            >
+              &#x3c;
+            </button>
+            <button
+              className="p-2 h-9 w-9 text-white bg-orange-500 rounded-full focus:outline-none"
+              onClick={handleNext}
+            >
+              &#x3e;
+            </button>
+          </div>
         </div>
       </div>
-    </div>
     </>
   );
 
@@ -129,24 +133,20 @@ const TestimonialCarousel = () => {
   }
 };
 
-
-
-const TestimonialCard = ({ testimonial, testimonialLoading}) => {
+const TestimonialCard = ({ testimonial, testimonialLoading }) => {
   return (
     <>
-    <div className="flex flex-col min-w-[300px] p-8 shadow-lg rounded-lg bg-[#F9F9F9]">
-      <img src={Frame} alt="frame" className="h-12 w-16 mb-4" />
-      <p className="mb-4 text-2xl font-medium text-gray-700 text-justify">
-        {testimonial.title}
-      </p>
-      <p className="text-lg font-light text-gray-600 mt-12">
-        {testimonial.location}
-      </p>
-      <p className="text-sm text-gray-600">{testimonial.description}</p>
-    </div>
-      
-    
-      </>
+      <div className="flex flex-col min-w-[300px] p-8 shadow-lg rounded-lg bg-[#F9F9F9]">
+        <img src={Frame} alt="frame" className="h-12 w-16 mb-4" />
+        <p className="mb-4 text-2xl font-medium text-gray-700 text-justify">
+          {testimonial.title}
+        </p>
+        <p className="text-lg font-light text-gray-600 mt-12">
+          {testimonial.location}
+        </p>
+        <p className="text-sm text-gray-600">{testimonial.description}</p>
+      </div>
+    </>
   );
 };
 
