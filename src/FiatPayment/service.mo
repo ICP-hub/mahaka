@@ -25,7 +25,7 @@ module {
     public module Stripe {
 
         let devUrl = "http://localhost:5000/";
-        let prodUrl = "https://proxy-server-cn76.onrender.com";
+        let prodUrl = "https://proxserv.netlify.app/.netlify/functions/api";
 
         public type CreateSession = {
             id: Text;
