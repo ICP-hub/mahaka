@@ -10,6 +10,7 @@ import {
   updateUserUserDetails,
 } from "../../../redux/reducers/apiReducers/userApiReducer";
 import { Principal } from "@dfinity/principal";
+import notificationManager from "../../../common/utils/notificationManager";
 
 const UserProfileData = () => {
   const { currentUserByCaller, userLoading } = useSelector(
@@ -88,6 +89,8 @@ const ProfileDetailsComponent = ({ editModalOpen, setEditModalOpen }) => {
     email: "",
   });
 
+  
+
   useEffect(() => {
     if (currentUserByCaller) {
       setFormValues({
@@ -108,7 +111,20 @@ const ProfileDetailsComponent = ({ editModalOpen, setEditModalOpen }) => {
   // console.log(currentUserByCaller);
   // console.log(formValues);
 
+  
+
   const handleFormSubmit = () => {
+    const isFormValid = Object.values(formValues).every(
+      (value) => value !== "" && value !== null
+    );
+
+    if (!isFormValid) {
+          notificationManager.error(
+            "Please check all the fields before proceeding"
+          );
+          return;
+        }
+    
     // console.log(formValues);
     if (currentUserByCaller) {
       dispatch(
