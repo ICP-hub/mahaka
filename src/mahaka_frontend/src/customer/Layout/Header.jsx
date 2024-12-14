@@ -425,11 +425,23 @@ const ProfileMenu = ({ onClose }) => {
   const { user, icpBalance, disconnect } = useIdentityKit();
   const { currentUserByCaller, userRole } = useSelector((state) => state.users);
   const { isConnected, login, logout, balance, principal } = useAuth();
+  const menuRef = useRef();
 
   console.log(userRole);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        onClose();
+      }
+    };
 
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [onClose]);
   return (
-    <div className="flex flex-col p-2 rounded-xl overflow-hidden">
+    <div ref={menuRef} className="flex flex-col p-2 rounded-xl overflow-hidden">
       {currentUserByCaller && userRole === "admin" && (
         <Link
           to="/admin"
