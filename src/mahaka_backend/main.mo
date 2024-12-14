@@ -3635,6 +3635,42 @@ actor mahaka {
         return { data = List.toArray(user_list); current_page = PageNo + 1; total_pages = index_pages.size(); };
     };
 
+    // Search members 
+     public shared func searchMembers(searchTerm: Text, chunkSize: Nat, pageNo: Nat) : async {data: [Types.User]; current_page: Nat; total_pages: Nat} {
+          
+          var matchingMembers = List.nil<Types.User>();
+          let loweredSearchTerm = Text.toLowercase(searchTerm);
+
+          for ((principal_id, member_index) in Users.entries()) {
+               let member_blob = await stable_get(member_index, Users_state);
+               let member: ?Types.User = from_candid(member_blob);
+               
+               switch (member) {
+                    case null {
+                         throw Error.reject("Members not found");
+                    };
+                    case (?u) {
+                         if (Text.contains(Text.toLowercase(Principal.toText(u.id)), #text loweredSearchTerm) or Text.contains(Text.toLowercase(u.firstName), #text loweredSearchTerm) or Text.contains(Text.toLowercase(u.lastName), #text loweredSearchTerm) or Text.contains(Text.toLowercase(u.email), #text loweredSearchTerm)) {
+                              matchingMembers := List.push(u, matchingMembers);
+                         };
+                    };
+               };
+          };
+
+          let matchingMembersArray = List.toArray(matchingMembers);
+          let indexPages = Utils.paginate<Types.User>(matchingMembersArray, chunkSize);
+          
+          if (indexPages.size() < pageNo) {
+               throw Error.reject("Page not found");
+          };
+          if (indexPages.size() == 0) {
+               throw Error.reject("No Member found matching the search Pattern");
+          };
+          
+          let pageData = indexPages[pageNo];
+          return { data = pageData; current_page = pageNo + 1; total_pages = indexPages.size() };
+     };
+
 
     public shared ({caller}) func deleteUserByPrincipal(user : Principal) : async Result.Result<?Types.User, Types.UpdateUserError> {
           // if (Principal.isAnonymous(user)) {
