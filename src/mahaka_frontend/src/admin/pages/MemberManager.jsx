@@ -1,7 +1,8 @@
 import Avvvatars from "avvvatars-react";
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { FaArrowRight } from "react-icons/fa";
 import {
+  HiArrowRightCircle,
   HiMagnifyingGlass,
   HiMiniShieldCheck,
   HiOutlineEnvelope,
@@ -15,6 +16,7 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   deleteUserByPrincipal,
   updateUser,
+  searchMembers
 } from "../../redux/reducers/apiReducers/userApiReducer";
 import { Principal } from "@dfinity/principal";
 import notificationManager from "../../common/utils/notificationManager";
@@ -29,13 +31,46 @@ const rolePermissions = {
 };
 
 const MemberManager = () => {
-  const { users, userLoading } = useSelector((state) => state.users);
+  const dispatch = useDispatch();
+  const { backend } = useSelector((state) => state.authentication);
+  const { users, userLoading, searchedUser, searchUserLoading } = useSelector((state) => state.users);
   const [isRtNavOpen, setIsRtNavOpen] = useState(false);
   const [currentMember, setCurrentMember] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-
+  const [searchText, setSearchText] = useState("");
+  const [searchPerformed, setSearchPerformed] = useState(false);
   const toggleNav = (isOpen) => {
     setIsRtNavOpen(isOpen);
+  };
+  const filteredUser = useMemo(() => {
+    if (searchText && searchPerformed) {
+      return searchedUser || [];
+    }
+    return users;
+  }, [searchText, searchedUser, searchPerformed, users]);
+
+  useEffect(() => {
+    if (!searchText.trim()) {
+      setSearchPerformed(false);
+      dispatch({ type: 'RESET_SEARCH_RESULTS' });
+    }
+  }, [searchText, dispatch]);
+
+
+  const handleSearch = () => {
+    if (searchText.trim()) {
+      setSearchPerformed(true); 
+      dispatch(
+        searchMembers({
+          backend,
+          searchText: searchText.trim(),
+          chunkSize: 10,
+          pageNo: 0,
+        })
+      );
+    } else {
+      notificationManager.error("Please enter a valid search term.");
+    }
   };
 
   const openDetailView = (member) => {
@@ -70,8 +105,18 @@ const MemberManager = () => {
                       type="text"
                       className="outline-none bg-transparent w-full"
                       placeholder="Search members"
+                      value={searchText}
+                      onChange={(e) => setSearchText(e.target.value)}
                     />
+                    <div className="ml-auto">
+                      <HiArrowRightCircle
+                        size={24}
+                        className="cursor-pointer"
+                        onClick={handleSearch}
+                      />
+                    </div>
                   </div>
+
                 </div>
                 <button
                   className="ml-4 px-4 items-center flex bg-secondary text-white min-h-10 rounded-full"
@@ -88,9 +133,9 @@ const MemberManager = () => {
               </div>
             </div>
           </div>
-          {userLoading ? (
+          {(userLoading || searchUserLoading ) ? (
             <div className="p-6 space-y-4">
-              {/* Skeleton for each member */}
+              {/* Skeleton loading */}
               {Array(3)
                 .fill(0)
                 .map((_, idx) => (
@@ -106,15 +151,15 @@ const MemberManager = () => {
                   </div>
                 ))}
             </div>
-          ) : users.length > 0 ? (
+          ) : filteredUser.length > 0 ? (
             <MemberList
-              members={users}
+              members={filteredUser}
               onMemberClick={openDetailView}
               isRtNavOpen={isRtNavOpen}
             />
           ) : (
             <div className="text-center text-gray-500 md:text-5xl text-3xl font-bold mt-10">
-              No users found
+              {searchPerformed ? "No search results found" : "No users found"}
             </div>
           )}
         </div>
@@ -398,15 +443,15 @@ const EditDetails = ({
             <div className="ml-4 flex items-center space-x-4">
               {permissions.length > 0
                 ? permissions.map((permission) => (
-                    <div
-                      key={permission}
-                      className="flex items-center justify-center rounded-full bg-gray-100 px-3 py-0.5 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300"
-                    >
-                      <span className="whitespace-nowrap text-sm font-medium">
-                        {permission}
-                      </span>
-                    </div>
-                  ))
+                  <div
+                    key={permission}
+                    className="flex items-center justify-center rounded-full bg-gray-100 px-3 py-0.5 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300"
+                  >
+                    <span className="whitespace-nowrap text-sm font-medium">
+                      {permission}
+                    </span>
+                  </div>
+                ))
                 : null}
             </div>
           )}
