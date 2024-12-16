@@ -149,17 +149,20 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
       <FormFieldInput
         type="text"
         label="Venue title"
+        placeholder="Enter venue name"
         value={formValues.title}
         onChange={(value) => handleInputChange("title", value)}
       />
       <FormFieldTextArea
         label="Venue description"
         value={formValues.description}
+        placeholder="Enter venue description"
         onChange={(value) => handleInputChange("description", value)}
       />
       <FormFieldInput
         type="text"
         label="Location"
+        placeholder="Enter venue location"
         value={formValues.location}
         onChange={(value) => handleInputChange("location", value)}
       />
@@ -168,18 +171,21 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         <FormFieldInput
           type="number"
           label="Group ticket limit"
+          placeholder="Number of group ticket"
           value={formValues.groupTicketLimit}
           onChange={(value) => handleInputChange("groupTicketLimit", value)}
         />
         <FormFieldInput
           type="number"
           label="Single ticket limit"
+          placeholder="Number of single ticket"
           value={formValues.singleTicketLimit}
           onChange={(value) => handleInputChange("singleTicketLimit", value)}
         />
         <FormFieldInput
           type="number"
           label="VIP ticket limit"
+          placeholder="Number of vip ticket"
           value={formValues.vipTicketLimit}
           onChange={(value) => handleInputChange("vipTicketLimit", value)}
         />
@@ -187,6 +193,7 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
       <FormFieldInput
         type="number"
         label="Total tickets"
+        placeholder="Number of total tickets"
         value={formValues.maxTicketLimit}
         onChange={(value) => handleInputChange("maxTicketLimit", value)}
         disabled={true}
@@ -196,18 +203,21 @@ const CreateVenueForm = ({ setIsModalOpen }) => {
         <FormFieldInput
           type="number"
           label="Group ticket price"
+          placeholder="Group ticket price Rp./person"
           value={formValues.groupTicketPrice}
           onChange={(value) => handleInputChange("groupTicketPrice", value)}
         />
         <FormFieldInput
           type="number"
           label="Single ticket price"
+          placeholder="Single ticket price Rp./person"
           value={formValues.singleTicketPrice}
           onChange={(value) => handleInputChange("singleTicketPrice", value)}
         />
         <FormFieldInput
           type="number"
           label="VIP ticket price"
+          placeholder="Vip ticket price Rp./person"
           value={formValues.vipTicketPrice}
           onChange={(value) => handleInputChange("vipTicketPrice", value)}
         />

@@ -137,7 +137,7 @@ const PaymentStatusUpdate = () => {
           >
             View Ticket
           </button>
-          <Confetti width="1029px" height="1000px" tweenDuration={1000} />
+          <Confetti width="full" height="1000px" tweenDuration={1000} />
         </div>
       ) : (
         <div className="text-center">

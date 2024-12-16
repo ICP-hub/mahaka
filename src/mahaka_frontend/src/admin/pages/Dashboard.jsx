@@ -151,79 +151,81 @@ const DashboardAnalytics = () => {
           </h2>
 
           <div className="space-y-2">
-            {dashboardData?.latestTxs?.map((transaction) => (
-              <div
-                key={transaction?.transactionId}
-                className="flex flex-col md:flex-row items-start md:items-center justify-between bg-gray-50 hover:bg-gray-100 transition rounded-lg p-2 shadow"
-              >
-                <div className="flex items-center space-x-4 mb-4 md:mb-0">
-                  <div
-                    className={`rounded-full p-2 flex items-center ${
-                      transaction?.status === "Completed"
-                        ? "bg-green-200 text-green-500"
-                        : "bg-red-100 text-red-500"
-                    }`}
-                  >
-                    {transaction.status === "Completed" ? "✔️" : "❌"}
-                  </div>
-                  <div>
-                    <p className="text-lg font-semibold text-gray-800">
-                      {transaction?.status}
-                    </p>
-                    {/* <p className="text-sm text-gray-500 line-clamp-1">
+            {dashboardData?.latestTxs != 0 ? (
+              dashboardData?.latestTxs?.map((transaction) => (
+                <div
+                  key={transaction?.transactionId}
+                  className="flex flex-col md:flex-row items-start md:items-center justify-between bg-gray-50 hover:bg-gray-100 transition rounded-lg p-2 shadow"
+                >
+                  <div className="flex items-center space-x-4 mb-4 md:mb-0">
+                    <div
+                      className={`rounded-full p-2 flex items-center ${
+                        transaction?.status === "Completed"
+                          ? "bg-green-200 text-green-500"
+                          : "bg-red-100 text-red-500"
+                      }`}
+                    >
+                      {transaction.status === "Completed" ? "✔️" : "❌"}
+                    </div>
+                    <div>
+                      <p className="text-lg font-semibold text-gray-800">
+                        {transaction?.status}
+                      </p>
+                      {/* <p className="text-sm text-gray-500 line-clamp-1">
                       Transaction ID: {transaction.transactionId}
                     </p> */}
+                    </div>
+                  </div>
+
+                  <div className="flex-1 md:ml-6">
+                    <p className="text-sm text-gray-500">
+                      Payment Method:{" "}
+                      <span className="font-medium text-gray-700">
+                        {transaction?.paymentMethod}
+                      </span>
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Date:{" "}
+                      <span className="font-medium">
+                        {new Date(
+                          Number(transaction?.createdAt / 1_000_000n)
+                        ).toLocaleString()}
+                      </span>
+                    </p>
+                    <a
+                      href={transaction?.paymentLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-500 hover:underline"
+                    >
+                      View Payment Details
+                    </a>
+                  </div>
+
+                  <div className="mt-4 md:mt-0 text-right">
+                    <p className="text-2xl font-bold text-green-600">
+                      {new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: transaction?.currency,
+                      }).format(transaction?.amount)}
+                    </p>
                   </div>
                 </div>
-
-                <div className="flex-1 md:ml-6">
-                  <p className="text-sm text-gray-500">
-                    Payment Method:{" "}
-                    <span className="font-medium text-gray-700">
-                      {transaction?.paymentMethod}
-                    </span>
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Date:{" "}
-                    <span className="font-medium">
-                      {new Date(
-                        Number(transaction?.createdAt / 1_000_000n)
-                      ).toLocaleString()}
-                    </span>
-                  </p>
-                  <a
-                    href={transaction?.paymentLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-blue-500 hover:underline"
-                  >
-                    View Payment Details
-                  </a>
-                </div>
-
-                <div className="mt-4 md:mt-0 text-right">
-                  <p className="text-2xl font-bold text-green-600">
-                    {new Intl.NumberFormat("en-US", {
-                      style: "currency",
-                      currency: transaction?.currency,
-                    }).format(transaction?.amount)}
-                  </p>
+              ))
+            ) : (
+              <div className="grid grid-cols-1 md:gid-cols-2">
+                <div className="bg-card mx-3 my-2 p-2 shadow-lg rounded-lg">
+                  <h1 className="text-lg  text-left mb-3 mx-3 font-semibold">
+                    No data available{" "}
+                  </h1>
                 </div>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>
     ) : (
-      <>
-        <div className="grid grid-cols-1 md:gid-cols-2">
-          <div className="bg-card mx-3 my-2 p-2 shadow-lg rounded-lg">
-            <h1 className="text-lg  text-left mb-3 mx-3 font-semibold">
-              No data available{" "}
-            </h1>
-          </div>
-        </div>
-      </>
+      <></>
     );
   };
 
