@@ -144,7 +144,9 @@ const TestimonialCard = ({ testimonial, testimonialLoading }) => {
         <p className="text-lg font-light text-gray-600 mt-12">
           {testimonial.location}
         </p>
-        <p className="text-sm text-gray-600">{testimonial.description}</p>
+        <p className="text-sm text-gray-600 line-clamp-5">
+          {testimonial.description}
+        </p>
       </div>
     </>
   );

@@ -8,7 +8,6 @@ import { formatDate } from "../../common/utils/dateFormater";
 import { HiArrowLeftCircle, HiOutlineMapPin } from "react-icons/hi2";
 //import { formatDateAndTime } from "./admin/EventManager";
 
-
 // const FormatTime = (timeString) => {
 //   const time = parseInt(timeString, 10);
 //   const hours = Math.floor(time / 100);
@@ -24,8 +23,7 @@ const MgtVenueDetailPage = () => {
   const { currentVenue, loading } = useSelector((state) => state.venues);
   const { id } = useParams();
 
-
-   function formatDateAndTime(timestamp) {
+  function formatDateAndTime(timestamp) {
     const dateObject = new Date(timestamp * 1000);
     const date = dateObject.toDateString();
     const time = dateObject.toLocaleTimeString("en-GB", { hour12: false });
@@ -38,8 +36,6 @@ const MgtVenueDetailPage = () => {
   useEffect(() => {
     dispatch(getVenue({ backend, venueId: id }));
   }, []);
-  
-  
 
   if (loading || !currentVenue) return <LoadingScreen />;
 
@@ -51,87 +47,83 @@ const MgtVenueDetailPage = () => {
   );
 
   console.log(startInterVal);
- 
-
-
 
   return (
     <div className="flex w-full flex-col">
-    <div className="relative h-40 w-full bg-accent-100 px-8 dark:bg-accent-700 sm:h-48 sm:px-12">
-      <img
-        src={currentVenue[1].banner.data}
-        alt="framer_3"
-        className="absolute inset-0 h-full w-full object-cover"
-      ></img>
-      <Link
-        to="/admin/venues"
-        className="mx-auto flex w-full max-w-3xl items-center justify-end pt-6 z-20 relative"
-      >
-        <HiArrowLeftCircle size={48} />
-      </Link>
-    </div>
-    <div className="relative flex flex-auto flex-col items-center p-6 pt-0 sm:p-12 sm:pt-0">
-      <div className="w-full max-w-3xl">
-        <div className="-mt-16 flex flex-auto items-end">
-          <div className="ring-bg-card flex h-32 w-32 items-center justify-center overflow-hidden rounded-full ring-4">
-            <img
-              src={currentVenue[1].logo.data}
-              alt="frame_4"
-              className="h-full w-full object-cover"
-            ></img>
-          </div>
-          {/* <div className="mb-1 ml-auto flex items-center">
+      <div className="relative h-40 w-full bg-accent-100 px-8 dark:bg-accent-700 sm:h-48 sm:px-12">
+        <img
+          src={currentVenue[1].banner.data}
+          alt="framer_3"
+          className="absolute inset-0 h-full w-full object-cover"
+        ></img>
+        <Link
+          to="/admin/venues"
+          className="mx-auto flex w-full max-w-3xl items-center justify-end pt-6 z-20 relative"
+        >
+          <HiArrowLeftCircle size={48} />
+        </Link>
+      </div>
+      <div className="relative flex flex-auto flex-col items-center p-6 pt-0 sm:p-12 sm:pt-0">
+        <div className="w-full max-w-3xl">
+          <div className="-mt-16 flex flex-auto items-end">
+            <div className="ring-bg-card flex h-32 w-32 items-center justify-center overflow-hidden rounded-full ring-4">
+              <img
+                src={currentVenue[1].logo.data}
+                alt="frame_4"
+                className="h-full w-full object-cover"
+              ></img>
+            </div>
+            {/* <div className="mb-1 ml-auto flex items-center">
             <button className="bg-indigo-600 flex items-center justify-center min-h-10 px-4 rounded-full text-white">
               Edit Venue
             </button>
           </div> */}
-        </div>
-        <div className="mt-3 truncate text-4xl font-bold">
-          {currentVenue[1].Title}
-        </div>
-        <div className="mt-2 flex flex-wrap items-center">
-          <div className="mb-3 mr-3 flex items-center justify-center rounded-full bg-gray-100 px-3 py-1 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300">
-            <span className="whitespace-nowrap text-sm font-medium">
-              Creator : {currentVenue[1].creator.toText()}
-            </span>
           </div>
-        </div>
-        <div className="mt-4 flex flex-col space-y-8 border-t pt-6">
-          <div className="flex sm:items-center">
-            <HiOutlineMapPin size={24} />
-            <div className="ml-6 leading-6">
-              {currentVenue[1].Details.Location}
+          <div className="mt-3 truncate text-4xl font-bold">
+            {currentVenue[1].Title}
+          </div>
+          <div className="mt-2 flex flex-wrap items-center">
+            <div className="mb-3 mr-3 flex items-center justify-center rounded-full bg-gray-100 px-3 py-1 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300">
+              <span className="whitespace-nowrap text-sm font-medium">
+                Creator : {currentVenue[1].creator.toText()}
+              </span>
             </div>
           </div>
-          <div className="flex sm:items-center">
-            <p>Maximum Capacity</p>
-            <div className="ml-6 leading-6">
-              {parseInt(currentVenue[1].capacity)}
+          <div className="mt-4 flex flex-col space-y-8 border-t pt-6">
+            <div className="flex sm:items-center">
+              <HiOutlineMapPin size={24} />
+              <div className="ml-6 leading-6">
+                {currentVenue[1].Details.Location}
+              </div>
             </div>
-          </div>
-          <div className="flex sm:items-center">
-            <p>Start Date</p>
-            <div className="ml-6 leading-6">Nov 25, 2024</div>
-          </div>
-          <div className="flex sm:items-center">
-            <p>End Date</p>
-            <div className="ml-6 leading-6">Nov 28, 2024</div>
-          </div>
-          <div className="flex sm:items-center">
-            <p>Venue id</p>
-            <div className="ml-6 leading-6">{currentVenue[1].id}</div>
-          </div>
-          <div className="flex">
-            <p>Venue Description</p>
-            <div className="prose prose-sm ml-6 max-w-none">
-              <p>{currentVenue[1].Description}</p>
+            <div className="flex sm:items-center">
+              <p>Maximum Capacity</p>
+              <div className="ml-6 leading-6">
+                {parseInt(currentVenue[1].capacity)}
+              </div>
+            </div>
+            <div className="flex sm:items-center">
+              <p>Start Date</p>
+              <div className="ml-6 leading-6">Nov 25, 2024</div>
+            </div>
+            <div className="flex sm:items-center">
+              <p>End Date</p>
+              <div className="ml-6 leading-6">Nov 28, 2024</div>
+            </div>
+            <div className="flex sm:items-center">
+              <p>Venue id</p>
+              <div className="ml-6 leading-6">{currentVenue[1].id}</div>
+            </div>
+            <div className="flex">
+              <p>Venue Description</p>
+              <div className="prose prose-sm ml-6 max-w-none">
+                <p>{currentVenue[1].Description}</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-      
   );
 };
 
@@ -162,7 +154,7 @@ const EventTable = ({ eventArr }) => {
                 <div className="inventory-grid grid items-center gap-4 border-b px-6 py-3 md:px-8 border-b-border">
                   <div className="flex items-center">
                     <div className="relative mr-6 flex h-12 w-12 flex-0 items-center justify-center overflow-hidden rounded border border-border">
-                      <img  src={event.logo.data} alt="Event_img" />
+                      <img src={event.logo.data} alt="Event_img" />
                     </div>
                   </div>
                   <div className="hidden truncate md:block">{event.title}</div>
@@ -188,7 +180,7 @@ const EventTable = ({ eventArr }) => {
                       <div className="mb-8 flex flex-col items-center sm:mb-0 sm:items-start">
                         <div className="w-32 border h-44 rounded-md border-border">
                           <img
-                             src={event.banner.data}
+                            src={event.banner.data}
                             alt="event_img"
                             className="h-full w-full object-cover"
                           />
@@ -350,7 +342,6 @@ const LoadingScreen = () => {
     </div>
   );
 };
-
 
 export default MgtVenueDetailPage;
 
