@@ -99,16 +99,16 @@ actor mahaka {
      private stable var pendingPayments : [(Nat,Types.ArgsStore)] = [];
      private stable var pendingPaymentsWahana : [(Nat,Types.ArgsStoreWahana)] = [];
 
+     private stable var testimonialsList : List.List<Types.Testimonial> = List.nil<Types.Testimonial>();
+     // private var testimonial = TrieMap.TrieMap<Principal, Types.Index>(Principal.equal, Principal.hash);
+     // private stable var _stableTestimonial : [(Principal, Types.Index)] = [];
 
-     private var testimonial = TrieMap.TrieMap<Principal, Types.Index>(Principal.equal, Principal.hash);
-     private stable var _stableTestimonial : [(Principal, Types.Index)] = [];
-
-     stable var Testimonial_state = {
-          bytes = Region.new();
-          var bytes_count : Nat64 = 0;
-          elems = Region.new ();
-          var elems_count : Nat64 = 0;
-     };
+     // stable var Testimonial_state = {
+     //      bytes = Region.new();
+     //      var bytes_count : Nat64 = 0;
+     //      elems = Region.new ();
+     //      var elems_count : Nat64 = 0;
+     // };
 
 
      // Dashboard stats
@@ -164,7 +164,7 @@ actor mahaka {
           _stableEventTicketsArray := Iter.toArray(_EventTicketsMap.entries());
           _stableWahanaTicketsArray := Iter.toArray(_WahanaTicketsMap.entries());
           _stableusers := Iter.toArray(Users.entries());
-          _stableTestimonial := Iter.toArray(testimonial.entries());
+          // _stableTestimonial := Iter.toArray(testimonial.entries());
           _stableeventTimerMap := Iter.toArray(eventTimerMap.entries());
      };
 
@@ -176,7 +176,7 @@ actor mahaka {
           _EventTicketsMap := TrieMap.fromEntries(_stableEventTicketsArray.vals(), Text.equal, Text.hash);
           _WahanaTicketsMap := TrieMap.fromEntries(_stableWahanaTicketsArray.vals(), Text.equal, Text.hash);
           Users := TrieMap.fromEntries(_stableusers.vals(), Principal.equal, Principal.hash);
-          testimonial := TrieMap.fromEntries(_stableTestimonial.vals(), Principal.equal, Principal.hash);
+          // testimonial := TrieMap.fromEntries(_stableTestimonial.vals(), Principal.equal, Principal.hash);
           eventTimerMap := TrieMap.fromEntries(_stableeventTimerMap.vals(), Text.equal, Text.hash);
 
      };
@@ -4315,10 +4315,25 @@ actor mahaka {
      /*                   Testimonials                    */
      /*********************************************************/
 
-     public shared ({caller = user}) func createTestimonial(description: Text, title: Text, location: Text): async Result.Result<Types.Testimonial, Text> {
-          switch (testimonial.get(user)) {
-               case (null) {
 
+     public shared ({caller}) func createTestimonial(user : Principal, description: Text, title: Text, location: Text): async Result.Result<Types.Testimonial, Text> {
+     //      if (Principal.isAnonymous(caller)) {
+     //           return #err("UserNotAuthenticated"); 
+     //      }; 
+     //     let roleResult = await getRoleByPrincipal(caller);
+     //      switch (roleResult) {
+     //           case (#err(error)) {
+     //                return #err("RoleError");
+     //           };
+     //           case (#ok(role)) {
+     //                if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+     //                     return #err("UserNotAuthorized");
+     //                };
+     //           };
+     //      };
+          let existingTestimonials = List.filter<Types.Testimonial>(testimonialsList, func(t : Types.Testimonial) { t.id == user });
+          switch (List.size(existingTestimonials)) {
+               case (0) {
                     let newTestimonial: Types.Testimonial = {
                          id = user;
                          description = description;
@@ -4326,110 +4341,179 @@ actor mahaka {
                          location = location;
                     };
 
-                    let testimonialBlob = to_candid(newTestimonial);
-                    let testimonialIndex = await stable_add(testimonialBlob, Testimonial_state);
-                    testimonial.put(user, testimonialIndex);
-
+                    testimonialsList := List.push<Types.Testimonial>(newTestimonial, testimonialsList);
                     return #ok(newTestimonial);
                };
-               case (?_) {
-                    return #err("You have already submitted a testimonial.");
+               case (_) {
+                    return #err("This person already submitted a testimonial.");
                };
           };
+ 
      };
 
-     public shared ({caller = user}) func deleteTestimonial(): async Result.Result<Text, Text> {
-          let testimonialIndex = testimonial.get(user);
+     public shared ({caller}) func getAllTestimonials(): async Result.Result<[Types.Testimonial], Text> {
+          if (List.size(testimonialsList) == 0) {
+               return #err("No testimonials available.");
+          };
+          return #ok(List.toArray(testimonialsList));
+     };
 
-          switch (testimonialIndex) {
-               case (null) {
+     public shared ({caller}) func deleteTestimonial(user: Principal): async Result.Result<Text, Text> {
+          // if (Principal.isAnonymous(user)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
+          // let roleResult = await getRoleByPrincipal(caller);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err("RoleError");
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err("UserNotAuthorized");
+          //           };
+          //      };
+          // };
+
+          let filteredTestimonials = List.filter<Types.Testimonial>(testimonialsList, func(t : Types.Testimonial) { t.id == user });
+
+          switch (List.size(filteredTestimonials)) {
+               case (0) {
                     return #err("Testimonial not found.");
                };
-               case (?index) {
-                    testimonial.delete(user);
+               case (_) {
+                    testimonialsList := List.filter<Types.Testimonial>(testimonialsList, func(t : Types.Testimonial) { t.id != user });
                     return #ok("Testimonial deleted successfully.");
                };
           };
      };
 
-     public shared ({caller = user}) func updateTestimonial(description: Text, title: Text, location: Text): async Result.Result<Types.Testimonial, Text> {
-          let testimonialIndex = testimonial.get(user);
 
-          switch (testimonialIndex) {
-               case (null) {
-                    return #err("Testimonial not found. Please create one first.");
-               };
-               case (?index) {
-                    let testimonialBlob = await stable_get(index, Testimonial_state);
-                    let foundTestimonial: ?Types.Testimonial = from_candid(testimonialBlob);
+     // public shared ({caller}) func createTestimonial(user : Principal, escription: Text, title: Text, location: Text): async Result.Result<Types.Testimonial, Text> {
+     //      // if (Principal.isAnonymous(user)) {
+     //      //      return #err(#UserNotAuthenticated); 
+     //      // }; 
+     //      let roleResult = switch (await getRoleByPrincipal(user)) {
+     //           case (#err(error)) {
+     //                return #err("RoleError");
+     //           };
+     //           case (#ok(role)) {
+     //                role
+     //           };
+     //      };
+     //      switch (testimonial.get(user)) {
+     //           case (null) {
 
-                    switch (foundTestimonial) {
-                         case null {
-                              return #err("Unable to retrieve testimonial data.");
-                         };
-                         case (?existingTestimonial) {
-                              let updatedTestimonial: Types.Testimonial = {
-                                   id = existingTestimonial.id;
-                                   description = description;
-                                   title = title;
-                                   location = location;
-                              };
+     //                let newTestimonial: Types.Testimonial = {
+     //                     id = user;
+     //                     description = description;
+     //                     title = title;
+     //                     location = location;
+     //                };
 
-                              let updatedBlob = to_candid(updatedTestimonial);
-                              let updated = await update_stable(index, updatedBlob, Testimonial_state);
+     //                let testimonialBlob = to_candid(newTestimonial);
+     //                let testimonialIndex = await stable_add(testimonialBlob, Testimonial_state);
+     //                testimonial.put(user, testimonialIndex);
 
-                              return #ok(updatedTestimonial);
-                         };
-                    };
-               };
-          };
-     };
+     //                return #ok(newTestimonial);
+     //           };
+     //           case (?_) {
+     //                return #err("You have already submitted a testimonial.");
+     //           };
+     //      };
+     // };
 
-     public shared ({caller}) func getAllTestimonials(): async Result.Result<[Types.Testimonial], Text> {
-          var allTestimonials: [Types.Testimonial] = [];
+     // public shared ({caller = user}) func deleteTestimonial(): async Result.Result<Text, Text> {
+     //      let testimonialIndex = testimonial.get(user);
 
-          for ((_, index) in testimonial.entries()) {
-               let testimonialBlob = await stable_get(index, Testimonial_state);
-               let testimonial: ?Types.Testimonial = from_candid(testimonialBlob);
+     //      switch (testimonialIndex) {
+     //           case (null) {
+     //                return #err("Testimonial not found.");
+     //           };
+     //           case (?index) {
+     //                testimonial.delete(user);
+     //                return #ok("Testimonial deleted successfully.");
+     //           };
+     //      };
+     // };
 
-               switch (testimonial) {
-                    case null {
-                         // Skip invalid entries.
-                    };
-                    case (?t) {
-                         allTestimonials := Array.append(allTestimonials, [t]);
-                    };
-               };
-          };
+     // public shared ({caller = user}) func updateTestimonial(description: Text, title: Text, location: Text): async Result.Result<Types.Testimonial, Text> {
+     //      let testimonialIndex = testimonial.get(user);
 
-          if (allTestimonials.size() == 0) {
-               return #err("No testimonials available.");
-          };
+     //      switch (testimonialIndex) {
+     //           case (null) {
+     //                return #err("Testimonial not found. Please create one first.");
+     //           };
+     //           case (?index) {
+     //                let testimonialBlob = await stable_get(index, Testimonial_state);
+     //                let foundTestimonial: ?Types.Testimonial = from_candid(testimonialBlob);
 
-          return #ok(allTestimonials);
-     };
+     //                switch (foundTestimonial) {
+     //                     case null {
+     //                          return #err("Unable to retrieve testimonial data.");
+     //                     };
+     //                     case (?existingTestimonial) {
+     //                          let updatedTestimonial: Types.Testimonial = {
+     //                               id = existingTestimonial.id;
+     //                               description = description;
+     //                               title = title;
+     //                               location = location;
+     //                          };
 
-     public shared ({caller}) func getTestimonial(userId: Principal): async Result.Result<Types.Testimonial, Text> {
-          let testimonialIndex = testimonial.get(userId);
+     //                          let updatedBlob = to_candid(updatedTestimonial);
+     //                          let updated = await update_stable(index, updatedBlob, Testimonial_state);
 
-          switch (testimonialIndex) {
-               case (null) {
-                    return #err("Testimonial not found.");
-               };
-               case (?index) {
-                    let testimonialBlob = await stable_get(index, Testimonial_state);
-                    let foundTestimonial: ?Types.Testimonial = from_candid(testimonialBlob);
+     //                          return #ok(updatedTestimonial);
+     //                     };
+     //                };
+     //           };
+     //      };
+     // };
 
-                    switch (foundTestimonial) {
-                         case (null) {
-                              return #err("Unable to retrieve testimonial data.");
-                         };
-                         case (?testimonial) {
-                              return #ok(testimonial);
-                         };
-                    };
-               };
-          };
-     };
+     // public shared ({caller}) func getAllTestimonials(): async Result.Result<[Types.Testimonial], Text> {
+     //      var allTestimonials: [Types.Testimonial] = [];
+
+     //      for ((_, index) in testimonial.entries()) {
+     //           let testimonialBlob = await stable_get(index, Testimonial_state);
+     //           let testimonial: ?Types.Testimonial = from_candid(testimonialBlob);
+
+     //           switch (testimonial) {
+     //                case null {
+     //                     // Skip invalid entries.
+     //                };
+     //                case (?t) {
+     //                     allTestimonials := Array.append(allTestimonials, [t]);
+     //                };
+     //           };
+     //      };
+
+     //      if (allTestimonials.size() == 0) {
+     //           return #err("No testimonials available.");
+     //      };
+
+     //      return #ok(allTestimonials);
+     // };
+
+     // public shared ({caller}) func getTestimonial(userId: Principal): async Result.Result<Types.Testimonial, Text> {
+     //      let testimonialIndex = testimonial.get(userId);
+
+     //      switch (testimonialIndex) {
+     //           case (null) {
+     //                return #err("Testimonial not found.");
+     //           };
+     //           case (?index) {
+     //                let testimonialBlob = await stable_get(index, Testimonial_state);
+     //                let foundTestimonial: ?Types.Testimonial = from_candid(testimonialBlob);
+
+     //                switch (foundTestimonial) {
+     //                     case (null) {
+     //                          return #err("Unable to retrieve testimonial data.");
+     //                     };
+     //                     case (?testimonial) {
+     //                          return #ok(testimonial);
+     //                     };
+     //                };
+     //           };
+     //      };
+     // };
 
 }
