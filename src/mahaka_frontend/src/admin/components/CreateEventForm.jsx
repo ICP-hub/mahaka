@@ -194,17 +194,20 @@ const CreateEventForm = ({ setIsModalOpen, venueIdentity }) => {
       <FormFieldInput
         type="text"
         label="Event title"
+        placeholder="Enter event name"
         value={formValues.title}
         onChange={(value) => handleInputChange("title", value)}
       />
       <FormFieldTextArea
-        label="Event Description"
+        label="Event description"
+        placeholder="Enter event description"
         value={formValues.description}
         onChange={(value) => handleInputChange("description", value)}
       />
       <FormFieldInput
         type="text"
         label="Location"
+        placeholder="Enter event location"
         value={formValues.location}
         onChange={(value) => handleInputChange("location", value)}
       />
@@ -240,19 +243,22 @@ const CreateEventForm = ({ setIsModalOpen, venueIdentity }) => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-4">
         <FormFieldInput
           type="number"
-          label="General ticket limit"
+          label="Group ticket limit"
+          placeholder="Number of group tickets"
           value={formValues.groupTicketLimit}
           onChange={(value) => handleInputChange("groupTicketLimit", value)}
         />
         <FormFieldInput
           type="number"
-          label="Student ticket limit"
+          label="Single ticket limit"
+          placeholder="Number of single tickets"
           value={formValues.singleTicketLimit}
           onChange={(value) => handleInputChange("singleTicketLimit", value)}
         />
         <FormFieldInput
           type="number"
           label="VIP ticket limit"
+          placeholder="Number of vip tickets"
           value={formValues.vipTicketLimit}
           onChange={(value) => handleInputChange("vipTicketLimit", value)}
         />
@@ -260,6 +266,7 @@ const CreateEventForm = ({ setIsModalOpen, venueIdentity }) => {
       <FormFieldInput
         type="number"
         label="Total tickets"
+        placeholder="Number of total tickets"
         value={formValues.maxTicketLimit}
         onChange={(value) => handleInputChange("maxTicketLimit", value)}
         disabled={true}
@@ -268,19 +275,22 @@ const CreateEventForm = ({ setIsModalOpen, venueIdentity }) => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-4">
         <FormFieldInput
           type="number"
-          label="General ticket price"
+          label="Group ticket price"
+          placeholder="Group ticket price Rp./person"
           value={formValues.groupTicketPrice}
           onChange={(value) => handleInputChange("groupTicketPrice", value)}
         />
         <FormFieldInput
           type="number"
-          label="Student ticket price"
+          label="Single ticket price"
+          placeholder="Single ticket price Rp./person"
           value={formValues.singleTicketPrice}
           onChange={(value) => handleInputChange("singleTicketPrice", value)}
         />
         <FormFieldInput
           type="number"
           label="VIP ticket price"
+          placeholder="VIP ticket price Rp./person"
           value={formValues.vipTicketPrice}
           onChange={(value) => handleInputChange("vipTicketPrice", value)}
         />
