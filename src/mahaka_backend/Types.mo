@@ -208,14 +208,22 @@ module {
         #EmptyLastName;
         #EmptyAssignedVenue;
         #NoMemoryFound;
-        #CyclesError
+        #CyclesError;
+        #Success;
+        #Fail;
+        #NotFound;
     };
 
     public type GetUserError = {
         #UserNotFound;
+        #UserNotAuthenticated;
     };
 
     public type CommonErrors = {
+        #UserNotAuthorized;
+        #UserNotAuthenticated;
+        #RoleError;
+        #UserNotFound;
         #TicketPriceError;
         #CyclesError;
         #WahanaNotFound;
@@ -318,6 +326,10 @@ module {
 
 
     public type MintError = {
+        #UserNotAuthenticated;
+        #RoleError;
+        #UserNotAuthorized;
+        #CardNotAvailable;
         #MintErr;
         #MaxLimitErr;
         #TicketTypeLimitErr;

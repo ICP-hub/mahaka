@@ -281,21 +281,21 @@ actor mahaka {
     };
 
 
-    public shared ({caller}) func addBanner(_details: [Types.AttractionBanner]): async Result.Result<Text, Text> {
-         // if (Principal.isAnonymous(user)) {
-          //      return #err(#UserNotAuthenticated); 
-          // }; 
-          // let roleResult = await getRoleByPrincipal(user);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
+    public shared ({caller = user}) func addBanner(_details: [Types.AttractionBanner]): async Result.Result<Text, Types.UpdateUserError> {
+         if (Principal.isAnonymous(user)) {
+               return #err(#UserNotAuthenticated); 
+          }; 
+          let roleResult = await getRoleByPrincipal(user);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
         try {
             for (banner in _details.vals()) {
                 switch (banner.category) {
@@ -307,9 +307,9 @@ actor mahaka {
                     };
                 };
             };
-            return #ok("Banners added successfully");
+            return #ok("Banner added successfully");
         } catch (err) {
-            return #err("Failed to add banners");
+            return #err(#Fail);
         };
     };
 
@@ -331,21 +331,21 @@ actor mahaka {
         };
     };
 
-    public shared ({caller}) func updateBannerByImage(imageUrl: Text, updatedBanner: Types.AttractionBanner): async Result.Result<Types.AttractionBanner, Text> {
-         // if (Principal.isAnonymous(user)) {
-          //      return #err(#UserNotAuthenticated); 
-          // }; 
-          // let roleResult = await getRoleByPrincipal(user);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
+    public shared ({caller}) func updateBannerByImage(imageUrl: Text, updatedBanner: Types.AttractionBanner): async Result.Result<Types.AttractionBanner, Types.UpdateUserError> {
+         if (Principal.isAnonymous(caller)) {
+               return #err(#UserNotAuthenticated); 
+          }; 
+          let roleResult = await getRoleByPrincipal(caller);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
         var updated = false;
         switch (updatedBanner.category) {
             case (#Attraction) {
@@ -379,25 +379,25 @@ actor mahaka {
         if (updated) {
             return #ok(updatedBanner);
         } else {
-            return #err("Banner not found with the given image URL");
+            return #err(#Fail);
         };
     };
 
-    public shared ({caller}) func deleteBannerByImage(imageUrl: Text): async Result.Result<Text, Text> {
-      // if (Principal.isAnonymous(user)) {
-          //      return #err(#UserNotAuthenticated); 
-          // }; 
-          // let roleResult = await getRoleByPrincipal(user);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
+    public shared ({caller}) func deleteBannerByImage(imageUrl: Text): async Result.Result<Text, Types.UpdateUserError> {
+      if (Principal.isAnonymous(caller)) {
+               return #err(#UserNotAuthenticated); 
+          }; 
+          let roleResult = await getRoleByPrincipal(caller);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
         let initialAttractionSize = Array.size(_AttractionBanner);
         let initialThirdPartySize = Array.size(_thirdPartyBanner);
 
@@ -414,25 +414,25 @@ actor mahaka {
         if (Array.size(_AttractionBanner) < initialAttractionSize or Array.size(_thirdPartyBanner) < initialThirdPartySize) {
             return #ok("Banner deleted successfully");
         } else {
-            return #err("Banner not found with the given image URL");
+            return #err(#NotFound);
         };
     };
 
-    public shared ({caller}) func clearAllBanners(category: Types.BannerCategory): async Result.Result<Text, Text> {
-      // if (Principal.isAnonymous(user)) {
-          //      return #err(#UserNotAuthenticated); 
-          // }; 
-          // let roleResult = await getRoleByPrincipal(user);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
+    public shared ({caller}) func clearAllBanners(category: Types.BannerCategory): async Result.Result<Text, Types.UpdateUserError> {
+          if (Principal.isAnonymous(caller)) {
+               return #err(#UserNotAuthenticated); 
+          }; 
+          let roleResult = await getRoleByPrincipal(caller);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
           switch (category) {
                case (#Attraction) {
                     _AttractionBanner := [];
@@ -540,26 +540,26 @@ actor mahaka {
           _details : Types.venueDetails , 
           _description : Text
      ) : async Result.Result<(id : Text,  venue :Types.Venue), Types.UpdateUserError> {
-          // if (Principal.isAnonymous(user)) {
-          //      return #err(#UserNotAuthenticated); 
-          // }; 
-          // let roleResult = await getRoleByPrincipal(user);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
-          /* if (collection_details.collection_args.sTicket_price < 10000.0
+          if (Principal.isAnonymous(user)) {
+               return #err(#UserNotAuthenticated); 
+          }; 
+          let roleResult = await getRoleByPrincipal(user);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
+          if (collection_details.collection_args.sTicket_price < 10000.0
                or collection_details.collection_args.vTicket_price < 10000.0
                or collection_details.collection_args.gTicket_price < 10000.0)
           {
                return #err(#TicketPriceError);
-          }; */
+          }; 
           let availablecycles : Nat = await availableCycles(); 
           if(availablecycles < 800_510_000_000 ){
                return #err(#CyclesError);
@@ -778,20 +778,20 @@ actor mahaka {
      };
 
      public shared ({caller = user}) func deleteVenue(Venue_id : Text) : async Result.Result<(Bool,?Types.Venue), Types.UpdateUserError> {
-          // if (Principal.isAnonymous(user)) {
-          //      return #err(#UserNotAuthenticated); 
-          // }; 
-          // let roleResult = await getRoleByPrincipal(user);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
+          if (Principal.isAnonymous(user)) {
+               return #err(#UserNotAuthenticated); 
+          }; 
+          let roleResult = await getRoleByPrincipal(user);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
           switch(_venueMap.get(Venue_id)){
                case null {
                     throw Error.reject("Venue not found");
@@ -832,9 +832,10 @@ actor mahaka {
 
 
 
-     public shared func getAllVenues(chunkSize : Nat , pageNo : Nat) : async {data : [Types.Venue] ; current_page : Nat ; Total_pages : Nat} {
-           // if (Principal.isAnonymous(user)) {
-          //      return #err(#UserNotAuthenticated); 
+     public shared ({caller = user}) func getAllVenues(chunkSize : Nat , pageNo : Nat) : async {data : [Types.Venue] ; current_page : Nat ; Total_pages : Nat} {
+          // if (Principal.isAnonymous(user)) {
+          //      throw Error.reject("Anonymous principals are not allowed");
+          //      // return #err(#UserNotAuthenticated); 
           // }; 
           // let roleResult = await getRoleByPrincipal(user);
           // switch (roleResult) {
@@ -915,30 +916,30 @@ actor mahaka {
           Event: Types.Events, 
           eCollection: Types.eventCollectionParams
      ): async Result.Result<Types.completeEvent, Types.UpdateUserError> {
-          // if (Principal.isAnonymous(user)) {
-          //      return #err(#UserNotAuthenticated); 
-          // };
-          // let roleResult = await getRoleByPrincipal(user);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not (
-          //                (await Validation.check_for_sysAdmin(role)) or 
-          //                (await Validation.check_for_Admin(role)) or 
-          //                (await Validation.check_for_Staff(role)))
-          //           ) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
-          /* if (eCollection.collection_args.sTicket_price < 10000 
-               or eCollection.collection_args.vTicket_price < 10000 
-               or eCollection.collection_args.gTicket_price < 10000) 
+          if (Principal.isAnonymous(user)) {
+               return #err(#UserNotAuthenticated); 
+          };
+          let roleResult = await getRoleByPrincipal(user);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not (
+                         (await Validation.check_for_sysAdmin(role)) or 
+                         (await Validation.check_for_Admin(role)) or 
+                         (await Validation.check_for_Staff(role)))
+                    ) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
+          if (eCollection.collection_args.sTicket_price < 10000.0
+               or eCollection.collection_args.vTicket_price < 10000.0 
+               or eCollection.collection_args.gTicket_price < 10000.0) 
           {
                return #err(#TicketPriceError);
-          }; */
+          };
           let availablecycles : Nat = await availableCycles(); 
           if(availablecycles < 800_510_000_000 ){
                return #err(#CyclesError);
@@ -1094,23 +1095,27 @@ actor mahaka {
           };
 
      public shared ({caller = user}) func getallEventsbyVenue(chunkSize : Nat , pageNo : Nat, venueId : Types.venueId) : async Result.Result<{data : [Types.completeEvent] ; current_page : Nat ; Total_pages : Nat}, Types.UpdateUserError> {
-          // let roleResult = await getRoleByPrincipal(user);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not (
-          //                (await Validation.check_for_sysAdmin(role)) or 
-          //                (await Validation.check_for_Admin(role)) or 
-          //                (await Validation.check_for_Staff(role)) or 
-          //                (await Validation.check_for_Manager(role)) or 
-          //                (await Validation.check_for_Bod(role)))
-          //           ) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
+          if (Principal.isAnonymous(user)) {
+               return #err(#UserNotAuthenticated); 
+          };
+          let roleResult = await getRoleByPrincipal(user);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not (
+                         (await Validation.check_for_sysAdmin(role)) or 
+                         (await Validation.check_for_Admin(role)) or 
+                         (await Validation.check_for_Staff(role)) or 
+                         (await Validation.check_for_Manager(role)) or 
+                         (await Validation.check_for_SuperVisor(role)) or 
+                         (await Validation.check_for_Bod(role)))
+                    ) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
           let events_object = _EventsMap.get(venueId);
           switch (events_object){
                case null {
@@ -1140,24 +1145,28 @@ actor mahaka {
           }; 
      };
 
-     public shared ({caller}) func getAllEventsPaginated(chunkSize : Nat, pageNo : Nat) : async Result.Result<{data : [Types.completeEvent]; current_page : Nat; Total_pages : Nat}, Types.CommonErrors> {
-          // let roleResult = await getRoleByPrincipal(user);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not (
-          //                (await Validation.check_for_sysAdmin(role)) or 
-          //                (await Validation.check_for_Admin(role)) or 
-          //                (await Validation.check_for_Staff(role)) or 
-          //                (await Validation.check_for_Manager(role)) or 
-          //                (await Validation.check_for_Bod(role)))
-          //           ) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
+     public shared ({caller}) func getAllEventsPaginated(chunkSize : Nat, pageNo : Nat) : async Result.Result<{data : [Types.completeEvent]; current_page : Nat; Total_pages : Nat}, Types.UpdateUserError> {
+          if (Principal.isAnonymous(caller)) {
+               return #err(#UserNotAuthenticated); 
+          };
+          let roleResult = await getRoleByPrincipal(caller);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not (
+                         (await Validation.check_for_sysAdmin(role)) or 
+                         (await Validation.check_for_Admin(role)) or 
+                         (await Validation.check_for_Staff(role)) or 
+                         (await Validation.check_for_Manager(role)) or 
+                         (await Validation.check_for_SuperVisor(role)) or 
+                         (await Validation.check_for_Bod(role)))
+                    ) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
           
           var allEvents : List.List<Types.completeEvent> = List.nil();
 
@@ -1167,7 +1176,7 @@ actor mahaka {
                
                switch (event_object) {
                     case (null) {
-                         return #err(#DataNotFound);
+                         return #err(#NotFound);
                     };
                     case (?eventData) {
                          allEvents := List.append(allEvents, eventData.Events);
@@ -1188,7 +1197,10 @@ actor mahaka {
 
 
      public shared ({caller}) func getAllEvents() : async Result.Result<[Types.completeEvent], Types.CommonErrors> {
-          // let roleResult = await getRoleByPrincipal(user);
+          // if (Principal.isAnonymous(caller)) {
+          //      return #err(#UserNotAuthenticated); 
+          // };
+          // let roleResult = await getRoleByPrincipal(caller);
           // switch (roleResult) {
           //      case (#err(error)) {
           //           return #err(#RoleError);
@@ -1199,6 +1211,7 @@ actor mahaka {
           //                (await Validation.check_for_Admin(role)) or 
           //                (await Validation.check_for_Staff(role)) or 
           //                (await Validation.check_for_Manager(role)) or 
+          //                (await Validation.check_for_SuperVisor(role)) or 
           //                (await Validation.check_for_Bod(role)))
           //           ) {
           //                return #err(#UserNotAuthorized);
@@ -1261,8 +1274,10 @@ actor mahaka {
 
 
      public shared ({caller}) func getEvent(eventId : Text, venueId : Text) : async Result.Result<Types.completeEvent, Types.CommonErrors> {
-          
-          // let roleResult = await getRoleByPrincipal(user);
+          if (Principal.isAnonymous(caller)) {
+               return #err(#UserNotAuthenticated); 
+          };
+          // let roleResult = await getRoleByPrincipal(caller);
           // switch (roleResult) {
           //      case (#err(error)) {
           //           return #err(#RoleError);
@@ -1425,24 +1440,24 @@ actor mahaka {
      // };
 
      public shared ({caller = user}) func deleteEvent (venue_id : Types.venueId, eventId : Text) : async Result.Result<(Bool, Types.Index), Types.UpdateUserError> {
-          // if (Principal.isAnonymous(user)) {
-          //      return #err(#UserNotAuthenticated); 
-          // };
-          // let roleResult = await getRoleByPrincipal(user);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not (
-          //                (await Validation.check_for_sysAdmin(role)) or 
-          //                (await Validation.check_for_Admin(role)) or
-          //                (await Validation.check_for_Staff(role)))
-          //           ) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
+          if (Principal.isAnonymous(user)) {
+               return #err(#UserNotAuthenticated); 
+          };
+          let roleResult = await getRoleByPrincipal(user);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not (
+                         (await Validation.check_for_sysAdmin(role)) or 
+                         (await Validation.check_for_Admin(role)) or
+                         (await Validation.check_for_Staff(role)))
+                    ) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
           switch(_EventsMap.get(venue_id)){
                case null {
                     throw(Error.reject("No venue found for the events"));
@@ -1843,6 +1858,9 @@ actor mahaka {
      };
 
      public shared ({caller}) func processPendingPayment(invoiceId: Nat, category : Types.category) : async Result.Result<[nftTypes.MintReceiptPart] or [icrcTypes.TxIndex], Text> {
+          if (Principal.isAnonymous(caller)) {
+               return #err("UserNotAuthenticated"); 
+          };
           let status = await FiatPayCanister.get_invoice(invoiceId);
           switch (status.body){
                case(#success(invoice)){
@@ -1994,7 +2012,9 @@ actor mahaka {
           saleDate : Time.Time,
           numOfVisitors: Nat
      ) : async Result.Result<Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>>, Text> {
-          
+          if (Principal.isAnonymous(caller)) {
+               return #err("UserNotAuthenticated"); 
+          };
           let venueResult = await getVenue(venueId);
           switch(venueResult){
                case (#ok(venue)){
@@ -2123,6 +2143,9 @@ actor mahaka {
           numOfVisitors: Nat,
           paymentType: Types.PaymentType
      ) : async Result.Result<Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>>, Text> {
+          if (Principal.isAnonymous(caller)) {
+               return #err("UserNotAuthenticated"); 
+          };
           let eventResult = await getEvent(_eventId, _venueId);
           switch (eventResult) {
                case (#ok(event)) {
@@ -2247,6 +2270,9 @@ actor mahaka {
           numOfVisitors: Nat,
           paymentType: Types.PaymentType
      ) : async Result.Result<Http.Response<Http.ResponseStatus<FiatTypes.Response.CreateInvoiceBody, {}>>, Text> {
+          if (Principal.isAnonymous(caller)) {
+               return #err("UserNotAuthenticated"); 
+          };
           let wahanaResult = await getWahana(wahanaId, venueId);
           switch (wahanaResult) {
                case (#ok(wahana)) {
@@ -2343,21 +2369,24 @@ actor mahaka {
           paymentType: Types.PaymentType,
           numOfVisitors: Nat
      ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError or Text> {
-          // let roleResult = await getRoleByPrincipal(user);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not (
-          //                (await Validation.check_for_sysAdmin(role)) or 
-          //                (await Validation.check_for_Admin(role)) or 
-          //                (await Validation.check_for_Staff(role)) or 
-          //           ) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
+          if (Principal.isAnonymous(caller)) {
+               return #err(#UserNotAuthenticated); 
+          };
+          let roleResult = await getRoleByPrincipal(caller);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not (
+                         (await Validation.check_for_sysAdmin(role)) or 
+                         (await Validation.check_for_Admin(role)) or 
+                         (await Validation.check_for_Staff(role))  
+                    )) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
           let collectionId = await Utils.extractCanisterId(venueId);
           let collectionActor = actor (collectionId) : actor {
                logoDip721: () -> async Types.LogoResult;
@@ -2433,21 +2462,24 @@ actor mahaka {
           numOfVisitors: Nat,
           paymentType: Types.PaymentType
      ) : async Result.Result<[nftTypes.MintReceiptPart], Types.MintError or Text> {
-          // let roleResult = await getRoleByPrincipal(user);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not (
-          //                (await Validation.check_for_sysAdmin(role)) or 
-          //                (await Validation.check_for_Admin(role)) or 
-          //                (await Validation.check_for_Staff(role)) or 
-          //           ) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
+          if (Principal.isAnonymous(caller)) {
+               return #err(#UserNotAuthenticated); 
+          };
+          let roleResult = await getRoleByPrincipal(caller);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not (
+                         (await Validation.check_for_sysAdmin(role)) or 
+                         (await Validation.check_for_Admin(role)) or 
+                         (await Validation.check_for_Staff(role)) 
+                    )) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
           let eventResult = await getEvent(_eventId, _venueId);
           switch (eventResult) {
                case (#ok(event)) {
@@ -2528,21 +2560,24 @@ actor mahaka {
           saleDate : Time.Time,
           paymentType: Types.PaymentType
      ) : async Result.Result<[icrcTypes.TxIndex], icrcTypes.TransferError or Text> {
-          // let roleResult = await getRoleByPrincipal(user);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not (
-          //                (await Validation.check_for_sysAdmin(role)) or 
-          //                (await Validation.check_for_Admin(role)) or 
-          //                (await Validation.check_for_Staff(role)) or 
-          //           ) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
+          if (Principal.isAnonymous(caller)) {
+               return #err("UserNotAuthenticated"); 
+          };
+          let roleResult = await getRoleByPrincipal(caller);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err("RoleError");
+               };
+               case (#ok(role)) {
+                    if (not (
+                         (await Validation.check_for_sysAdmin(role)) or 
+                         (await Validation.check_for_Admin(role)) or 
+                         (await Validation.check_for_Staff(role)) 
+                    )) {
+                         return #err("UserNotAuthorized");
+                    };
+               };
+          };
           let wahanaResult = await getWahana(wahanaId, venueId);
           switch (wahanaResult) {
                case (#ok(wahana)) {
@@ -3373,20 +3408,20 @@ actor mahaka {
      /*********************************************************/
 
     public shared ({ caller }) func updateUser(principalId : Principal, email : Text, firstName : Text, lastName : Text, role : Types.Roles, assignedVenueDetails : Types.assignedVenueDetails) : async Result.Result<(Types.User, Types.Index), Types.UpdateUserError> {
-          // if (Principal.isAnonymous(caller)) {
-          //      return #err(#UserNotAuthenticated); 
-          // }; 
-          // let roleResult = await getRoleByPrincipal(caller);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(roleRes)) {
-          //           if (not ((await Validation.check_for_sysAdmin(roleRes)) or (await Validation.check_for_Admin(roleRes)))) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
+          if (Principal.isAnonymous(caller)) {
+               return #err(#UserNotAuthenticated); 
+          }; 
+          let roleResult = await getRoleByPrincipal(caller);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(roleRes)) {
+                    if (not ((await Validation.check_for_sysAdmin(roleRes)) or (await Validation.check_for_Admin(roleRes)))) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
           if (email == "") { return #err(#EmptyEmail) };
           if (firstName == "") { return #err(#EmptyFirstName) };
           if (lastName == "") { return #err(#EmptyLastName) };
@@ -3422,20 +3457,20 @@ actor mahaka {
      };
 
      public shared ({ caller }) func createUser(principalId : Principal, email : Text, firstName : Text, lastName : Text) : async Result.Result<(Types.User, Types.Index), Types.UpdateUserError> {
-          // if (Principal.isAnonymous(caller)) {
-          //      return #err(#UserNotAuthenticated); 
-          // }; 
-          // let roleResult = await getRoleByPrincipal(caller);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(roleRes)) {
-          //           if (not ((await Validation.check_for_sysAdmin(roleRes)) or (await Validation.check_for_Admin(roleRes)))) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
+          if (Principal.isAnonymous(caller)) {
+               return #err(#UserNotAuthenticated); 
+          }; 
+          let roleResult = await getRoleByPrincipal(caller);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(roleRes)) {
+                    if (not ((await Validation.check_for_sysAdmin(roleRes)) or (await Validation.check_for_Admin(roleRes)))) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
           if (email == "") { return #err(#EmptyEmail) };
           if (firstName == "") { return #err(#EmptyFirstName) };
           if (lastName == "") { return #err(#EmptyLastName) };
@@ -3470,7 +3505,9 @@ actor mahaka {
           firstName: Text, 
           lastName: Text
      ) : async Result.Result<(Types.User, Types.Index), Types.UpdateUserError> {
-          
+          if (Principal.isAnonymous(caller)) {
+               return #err(#UserNotAuthenticated); 
+          }; 
           if (email == "") { return #err(#EmptyEmail) };
           if (firstName == "") { return #err(#EmptyFirstName) };
           if (lastName == "") { return #err(#EmptyLastName) };
@@ -3514,22 +3551,22 @@ actor mahaka {
 
 
      public shared ({ caller }) func addAdmins(principalId : Principal, email : Text, firstName : Text, lastName : Text, role : Types.Roles, assignedVenue : Types.assignedVenueDetails) : async Result.Result<(Types.User, Types.Index), Types.UpdateUserError> {
-          // if (Principal.isAnonymous(caller)) {
-          //      return #err(#UserNotAuthenticated); 
-          // }; 
-          // let roleResult = await getRoleByPrincipal(caller);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
+          if (Principal.isAnonymous(caller)) {
+               return #err(#UserNotAuthenticated); 
+          }; 
           if (not Principal.isController(caller)) {
                return #err(#UserNotAuthorized);
+          };
+          let roleResult = await getRoleByPrincipal(caller);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
           };
           if (email == "") { return #err(#EmptyEmail) };
           if (firstName == "") { return #err(#EmptyFirstName) };
@@ -3563,6 +3600,9 @@ actor mahaka {
      };
 
     public shared ({ caller }) func getUserdetailsbycaller() : async Result.Result<Types.User, Types.GetUserError> {
+        if (Principal.isAnonymous(caller)) {
+               return #err(#UserNotAuthenticated); 
+          }; 
         let index = Users.get(caller);
         switch(index){
             case null {
@@ -3584,7 +3624,10 @@ actor mahaka {
         };
     };
 
-    public shared func getUserdetailsbyid(id : Principal) : async Result.Result<Types.User, Types.GetUserError> {
+    public shared ({ caller }) func getUserdetailsbyid(id : Principal) : async Result.Result<Types.User, Types.GetUserError> {
+          if (Principal.isAnonymous(caller)) {
+               return #err(#UserNotAuthenticated); 
+          }; 
           let user = Users.get(id);
           switch(user){
                case null {
@@ -3607,7 +3650,24 @@ actor mahaka {
      };
 
     // 📍📍📍📍📍
-    public shared func listUsers(chunkSize : Nat , PageNo : Nat) : async{data : [Types.User]; current_page : Nat; total_pages : Nat} {
+    public shared ({ caller }) func listUsers(chunkSize : Nat , PageNo : Nat) : async{data : [Types.User]; current_page : Nat; total_pages : Nat} {
+          if (Principal.isAnonymous(caller)) {
+               throw Error.reject("User not Authenticated");
+               // return #err(#UserNotAuthenticated); 
+          }; 
+          let roleResult = await getRoleByPrincipal(caller);
+          switch (roleResult) {
+               case (#err(error)) {
+               throw Error.reject("Role error");
+                    // return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+                         throw Error.reject("UserNotAuthorized");
+                         // return #err(#UserNotAuthorized);
+                    };
+               };
+          };
         let index_pages =  Utils.paginate<(Principal , Types.Index)>(Iter.toArray(Users.entries()), chunkSize);
         if (index_pages.size() < PageNo) {
             throw Error.reject("Page not found");
@@ -3673,20 +3733,20 @@ actor mahaka {
 
 
     public shared ({caller}) func deleteUserByPrincipal(user : Principal) : async Result.Result<?Types.User, Types.UpdateUserError> {
-          // if (Principal.isAnonymous(user)) {
-          //      return #err(#UserNotAuthenticated); 
-          // }; 
-          // let roleResult = await getRoleByPrincipal(caller);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
+          if (Principal.isAnonymous(caller)) {
+               return #err(#UserNotAuthenticated); 
+          }; 
+          let roleResult = await getRoleByPrincipal(caller);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
           switch(Users.remove(user)){
                case null {
                     throw(Error.reject("No User found"));
@@ -3736,27 +3796,27 @@ actor mahaka {
           banner : Types.LogoResult, 
           price : Float,
      ) : async Result.Result<Types.Wahana_details, Types.UpdateUserError> {
-          // if (Principal.isAnonymous(user)) {
-          //      return #err(#UserNotAuthenticated); 
-          // }; 
-          // let roleResult = await getRoleByPrincipal(user);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not (
-          //                (await Validation.check_for_sysAdmin(role)) or 
-          //                (await Validation.check_for_Admin(role)) or 
-          //                (await Validation.check_for_Staff(role)))
-          //           ) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
-         /*  if (price < 10000.0){
+          if (Principal.isAnonymous(user)) {
+               return #err(#UserNotAuthenticated); 
+          }; 
+          let roleResult = await getRoleByPrincipal(user);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not (
+                         (await Validation.check_for_sysAdmin(role)) or 
+                         (await Validation.check_for_Admin(role)) or 
+                         (await Validation.check_for_Staff(role)))
+                    ) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
+          if (price < 10000.0){
                return #err(#TicketPriceError);
-          }; */
+          };
           let availablecycles : Nat = await availableCycles(); 
           if(availablecycles < 800_510_000_000 ){
                throw Error.reject("Canister doesnt have enough cycles");
@@ -3843,23 +3903,27 @@ actor mahaka {
      };
 
      public shared ({caller = user}) func getAllWahanasbyVenue(chunkSize : Nat , pageNo : Nat, venueId : Types.venueId) : async Result.Result<{data : [Types.Wahana_details] ; current_page : Nat ; Total_pages : Nat}, Types.UpdateUserError> {
-          // let roleResult = await getRoleByPrincipal(user);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not (
-          //                (await Validation.check_for_sysAdmin(role)) or 
-          //                (await Validation.check_for_Admin(role)) or 
-          //                (await Validation.check_for_Staff(role)) or 
-          //                (await Validation.check_for_Manager(role)) or 
-          //                (await Validation.check_for_Bod(role)))
-          //           ) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
+          if (Principal.isAnonymous(user)) {
+               return #err(#UserNotAuthenticated); 
+          }; 
+          let roleResult = await getRoleByPrincipal(user);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not (
+                         (await Validation.check_for_sysAdmin(role)) or 
+                         (await Validation.check_for_Admin(role)) or 
+                         (await Validation.check_for_Staff(role)) or 
+                         (await Validation.check_for_Manager(role)) or 
+                         (await Validation.check_for_SuperVisor(role)) or 
+                         (await Validation.check_for_Bod(role)))
+                    ) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
           let wahanas_object = _WahanaMap.get(venueId);
           switch (wahanas_object){
                case null {
@@ -3890,23 +3954,27 @@ actor mahaka {
      };
 
      public shared ({caller}) func getAllWahanas(chunkSize : Nat, pageNo : Nat) : async Result.Result<{data : [Types.Wahana_details]; current_page : Nat; Total_pages : Nat}, Types.CommonErrors> {
-          // let roleResult = await getRoleByPrincipal(user);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not (
-          //                (await Validation.check_for_sysAdmin(role)) or 
-          //                (await Validation.check_for_Admin(role)) or 
-          //                (await Validation.check_for_Staff(role)) or 
-          //                (await Validation.check_for_Manager(role)) or 
-          //                (await Validation.check_for_Bod(role)))
-          //           ) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
+          if (Principal.isAnonymous(caller)) {
+               return #err(#UserNotAuthenticated); 
+          }; 
+          let roleResult = await getRoleByPrincipal(caller);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not (
+                         (await Validation.check_for_sysAdmin(role)) or 
+                         (await Validation.check_for_Admin(role)) or 
+                         (await Validation.check_for_Staff(role)) or 
+                         (await Validation.check_for_Manager(role)) or 
+                         (await Validation.check_for_SuperVisor(role)) or 
+                         (await Validation.check_for_Bod(role)))
+                    ) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
           var allWahanas : List.List<Types.Wahana_details> = List.nil();
 
           for ((_, wahanaIndex) in _WahanaMap.entries()) {
@@ -3937,7 +4005,10 @@ actor mahaka {
 
 
      public shared ({caller}) func getWahana(wahanaId : Text, venueId : Text) : async Result.Result<Types.Wahana_details,Types.CommonErrors> {
-          // let roleResult = await getRoleByPrincipal(user);
+          if (Principal.isAnonymous(caller)) {
+               return #err(#UserNotAuthenticated); 
+          }; 
+          // let roleResult = await getRoleByPrincipal(caller);
           // switch (roleResult) {
           //      case (#err(error)) {
           //           return #err(#RoleError);
@@ -3948,6 +4019,7 @@ actor mahaka {
           //                (await Validation.check_for_Admin(role)) or 
           //                (await Validation.check_for_Staff(role)) or 
           //                (await Validation.check_for_Manager(role)) or 
+          //                (await Validation.check_for_SuperVisor(role)) or 
           //                (await Validation.check_for_Bod(role)))
           //           ) {
           //                return #err(#UserNotAuthorized);
@@ -4178,24 +4250,24 @@ actor mahaka {
 
 
      public shared ({caller = user}) func deleteWahana (venue_id: Types.venueId, wahanaId: Text) : async Result.Result<(Bool, Types.Index), Types.UpdateUserError> {
-          // if (Principal.isAnonymous(user)) {
-          //      return #err(#UserNotAuthenticated); 
-          // }; 
-          // let roleResult = await getRoleByPrincipal(user);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err(#RoleError);
-          //      };
-          //      case (#ok(role)) {
-          //           if (not (
-          //                (await Validation.check_for_sysAdmin(role)) or 
-          //                (await Validation.check_for_Admin(role)) or
-          //                (await Validation.check_for_Staff(role)))
-          //           ) {
-          //                return #err(#UserNotAuthorized);
-          //           };
-          //      };
-          // };
+          if (Principal.isAnonymous(user)) {
+               return #err(#UserNotAuthenticated); 
+          }; 
+          let roleResult = await getRoleByPrincipal(user);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err(#RoleError);
+               };
+               case (#ok(role)) {
+                    if (not (
+                         (await Validation.check_for_sysAdmin(role)) or 
+                         (await Validation.check_for_Admin(role)) or
+                         (await Validation.check_for_Staff(role)))
+                    ) {
+                         return #err(#UserNotAuthorized);
+                    };
+               };
+          };
           switch(_WahanaMap.get(venue_id)) {
                case null {
                     throw(Error.reject("No venue found for the events"));
@@ -4317,20 +4389,20 @@ actor mahaka {
 
 
      public shared ({caller}) func createTestimonial(user : Principal, description: Text, title: Text, location: Text): async Result.Result<Types.Testimonial, Text> {
-     //      if (Principal.isAnonymous(caller)) {
-     //           return #err("UserNotAuthenticated"); 
-     //      }; 
-     //     let roleResult = await getRoleByPrincipal(caller);
-     //      switch (roleResult) {
-     //           case (#err(error)) {
-     //                return #err("RoleError");
-     //           };
-     //           case (#ok(role)) {
-     //                if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-     //                     return #err("UserNotAuthorized");
-     //                };
-     //           };
-     //      };
+          if (Principal.isAnonymous(caller)) {
+               return #err("UserNotAuthenticated"); 
+          }; 
+         let roleResult = await getRoleByPrincipal(caller);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err("RoleError");
+               };
+               case (#ok(role)) {
+                    if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+                         return #err("UserNotAuthorized");
+                    };
+               };
+          };
           let existingTestimonials = List.filter<Types.Testimonial>(testimonialsList, func(t : Types.Testimonial) { t.id == user });
           switch (List.size(existingTestimonials)) {
                case (0) {
@@ -4359,20 +4431,20 @@ actor mahaka {
      };
 
      public shared ({caller}) func deleteTestimonial(user: Principal): async Result.Result<Text, Text> {
-          // if (Principal.isAnonymous(user)) {
-          //      return #err(#UserNotAuthenticated); 
-          // }; 
-          // let roleResult = await getRoleByPrincipal(caller);
-          // switch (roleResult) {
-          //      case (#err(error)) {
-          //           return #err("RoleError");
-          //      };
-          //      case (#ok(role)) {
-          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-          //                return #err("UserNotAuthorized");
-          //           };
-          //      };
-          // };
+          if (Principal.isAnonymous(user)) {
+               return #err("UserNotAuthenticated"); 
+          }; 
+          let roleResult = await getRoleByPrincipal(caller);
+          switch (roleResult) {
+               case (#err(error)) {
+                    return #err("RoleError");
+               };
+               case (#ok(role)) {
+                    if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+                         return #err("UserNotAuthorized");
+                    };
+               };
+          };
 
           let filteredTestimonials = List.filter<Types.Testimonial>(testimonialsList, func(t : Types.Testimonial) { t.id == user });
 
