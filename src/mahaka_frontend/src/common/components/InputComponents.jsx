@@ -9,6 +9,7 @@ export const FormFieldInput = ({
   onChange,
   label,
   disabled = false,
+  placeholder = "",
 }) => {
   return (
     <div className="relative">
@@ -18,6 +19,7 @@ export const FormFieldInput = ({
           type={type}
           className="bg-transparent w-full my-3"
           value={value}
+          placeholder={placeholder}
           onChange={(e) => onChange(e.target.value)}
           // disabled={disabled}
           onKeyDown={(e) => {
@@ -44,7 +46,7 @@ export const FormFieldInput = ({
 };
 
 // Form field textarea
-export const FormFieldTextArea = ({ value, onChange, label }) => {
+export const FormFieldTextArea = ({ value, onChange, label, placeholder }) => {
   return (
     <div className="relative">
       <div className="absolute inset-0 border border-border rounded-md -z-1"></div>
@@ -53,6 +55,7 @@ export const FormFieldTextArea = ({ value, onChange, label }) => {
           type="text"
           className="bg-transparent w-full my-3"
           value={value}
+          placeholder={placeholder}
           onChange={(e) => onChange(e.target.value)}
         />
       </div>

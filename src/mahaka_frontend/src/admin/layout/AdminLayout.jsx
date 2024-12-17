@@ -4,23 +4,19 @@ import NavigationVertical from "./navigation/NavigationVertical";
 import ScreenOverlayBlur from "../../common/ScreenOverlay";
 import useNavigationControl from "../../common/hooks/useNavigationControl";
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+// import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { listUsers } from "../../redux/reducers/apiReducers/userApiReducer";
-import { getAllWahanas } from "../../redux/reducers/apiReducers/wahanaApiReducer";
+// import { getAllWahanas } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import notificationManager from "../../common/utils/notificationManager";
 import LoadingScreenLarge from "../../common/components/LoadingScreenLarge";
 
 // Protected route for admin
 const AdminProtected = ({ children }) => {
-  const { userLoading, currentUserByCaller } = useSelector(
-    (state) => state.users
-  );
-  const [isAdmin, setIsAdmin] = useState(false);
+  const { userLoading, userRole } = useSelector((state) => state.users);
   const [layoutLoader, setLayoutLoader] = useState(true);
   const navigate = useNavigate();
 
-  // layoutloader : false after userLoading false: after 2 sec. for get the Object Keys
   useEffect(() => {
     if (!userLoading) {
       setTimeout(() => {
@@ -29,18 +25,11 @@ const AdminProtected = ({ children }) => {
     }
   }, [userLoading]);
 
-  useEffect(() => {
-    if (currentUserByCaller) {
-      const isAdmin = Object.keys(currentUserByCaller.role).includes("admin");
-      setIsAdmin(isAdmin);
-    }
-  }, [currentUserByCaller]);
-
   if (layoutLoader) return <LoadingScreenLarge />;
-  if (isAdmin) {
+  if (["admin"].includes(userRole)) {
     return children;
   } else {
-    notificationManager.error("User is not an admin!");
+    notificationManager.error("You are not authorized!");
     navigate("/");
   }
 };

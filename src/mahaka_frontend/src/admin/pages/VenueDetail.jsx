@@ -94,8 +94,8 @@ const VenueDetailPage = () => {
                 {currentVenue.id}
               </div>
             </div>
-            <TicketInfo label="General ticket" />
-            <TicketInfo label="Student ticket" />
+            <TicketInfo label="Group ticket" />
+            <TicketInfo label="Single ticket" />
             <TicketInfo label="Vip ticket" />
             <div className="flex">
               <div className="font-medium text-lg">Events</div>
@@ -159,6 +159,8 @@ export const TicketInfo = ({ label }) => {
   const { dipDetailsLoading, dipDetails } = useSelector(
     (state) => state.dipDetails
   );
+
+  // console.log("dd", dipDetails);
   return (
     <div className="flex font-medium">
       <p className="text-lg">{label}</p>
@@ -172,9 +174,9 @@ export const TicketInfo = ({ label }) => {
               <div className="ml-1.5 font-bold text-xl">
                 {label === "Vip ticket"
                   ? parseInt(dipDetails.vTicket_limit)
-                  : label === "Student ticket"
+                  : label === "Single ticket"
                   ? parseInt(dipDetails.sTicket_limit)
-                  : label === "General ticket"
+                  : label === "Group ticket"
                   ? parseInt(dipDetails.gTicket_limit)
                   : "N/A"}
               </div>
@@ -186,9 +188,9 @@ export const TicketInfo = ({ label }) => {
                 <span className="text-xl font-bold">
                   {label === "Vip ticket"
                     ? parseInt(dipDetails.vTicket_price)
-                    : label === "Student ticket"
+                    : label === "Single ticket"
                     ? parseInt(dipDetails.sTicket_price)
-                    : label === "General ticket"
+                    : label === "Group ticket"
                     ? parseInt(dipDetails.gTicket_price)
                     : 0}
                 </span>
