@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import notificationManager from "../../../common/utils/notificationManager";
+import { Principal } from "@dfinity/principal";
 
 const initialState = {
   testimonials: [],
@@ -12,9 +13,10 @@ const initialState = {
 
 export const createTestimonial = createAsyncThunk(
   "testimonial/createTestimonial",
-  async ({ backend, description, location, title }) => {
+  async ({ backend, user, description, location, title }) => {
     try {
       const response = await backend.createTestimonial(
+        Principal.fromText(user),
         description,
         title,
         location

@@ -440,6 +440,9 @@ const ProfileMenu = ({ onClose }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [onClose]);
+  const handleCopy = () => {
+    notificationManager.success("Principal copied successfully");
+  };
   return (
     <div ref={menuRef} className="flex flex-col p-2 rounded-xl overflow-hidden">
       {currentUserByCaller && userRole === "admin" && (
@@ -495,7 +498,10 @@ const ProfileMenu = ({ onClose }) => {
         </div>
         <div className="ml-auto flex items-center space-x-2">
           <CopyToClipboard text={principal?.toText()}>
-            <button className="p-2 hover:bg-indigo-600 rounded-full">
+            <button
+              className="p-2 hover:bg-indigo-600 rounded-full"
+              onClick={handleCopy}
+            >
               <GrCopy />
             </button>
           </CopyToClipboard>

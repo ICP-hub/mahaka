@@ -24,7 +24,7 @@ const AdminTestimonial = () => {
   const { testimonials, testimonialLoading } = useSelector(
     (state) => state.testimonial
   );
-  const { backend } = useSelector((state) => state.authentication);
+  const { backend ,principal} = useSelector((state) => state.authentication);
 
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
