@@ -1,11 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { HiArrowLeftCircle, HiOutlineMapPin } from "react-icons/hi2";
-import { LoadingScreen } from "../../admin/pages/VenueDetail";
+import { LoadingScreen, TicketInfo } from "../../admin/pages/VenueDetail";
+import { getDIPdetails } from "../../redux/reducers/apiReducers/dipapireducer";
 
 const MgtVenueManger = () => {
   const { currentVenue, loading } = useSelector((state) => state.venues);
+  const { backend } = useSelector((state) => state.authentication);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (currentVenue) {
+      dispatch(
+        getDIPdetails({
+          backend: backend,
+          principal: currentVenue.Collection_id,
+        })
+      );
+    }
+  }, [currentVenue]);
 
   if (loading || !currentVenue) return <LoadingScreen />;
 
@@ -35,17 +49,15 @@ const MgtVenueManger = () => {
               ></img>
             </div>
             {/* <div className="mb-1 ml-auto flex items-center">
-              <button className="bg-indigo-600 flex items-center justify-center min-h-10 px-4 rounded-full text-white">
-                Edit Venue
-              </button>
-            </div> */}
+                  <button className="bg-indigo-600 flex items-center justify-center min-h-10 px-4 rounded-full text-white">
+                    Edit Venue
+                  </button>
+                </div> */}
           </div>
-          <div className="mt-3 truncate text-4xl font-bold">
-            {currentVenue.Title}
-          </div>
+          <div className="mt-3 text-4xl font-bold">{currentVenue.Title}</div>
           <div className="mt-2 flex flex-wrap items-center">
             <div className="mb-3 mr-3 flex items-center justify-center rounded-full bg-icon px-3 py-1 leading-normal text-white dark:bg-gray-700 dark:text-gray-300">
-              <span className="whitespace-nowrap text-sm font-medium max-w-xs md:max-w-full flex items-center">
+              <span className="whitespace-nowrap text-sm font-medium max-w-[280px] md:max-w-full flex items-center">
                 Creator :{" "}
                 <p className="ml-1.5 truncate">
                   {currentVenue.creator.toText()}
@@ -66,18 +78,15 @@ const MgtVenueManger = () => {
                 {parseInt(currentVenue.capacity)}
               </div>
             </div>
-            {/* <div className="flex sm:items-center">
-              <p>Start Date</p>
-              <div className="ml-6 leading-6">Nov 25, 2024</div>
-            </div>
-            <div className="flex sm:items-center">
-              <p>End Date</p>
-              <div className="ml-6 leading-6">Nov 28, 2024</div>
-            </div> */}
             <div className="flex sm:items-center">
               <p className="font-medium text-lg">Venue id</p>
-              <div className="ml-6 leading-6">{currentVenue.id}</div>
+              <div className="ml-6 leading-6 font-medium">
+                {currentVenue.id}
+              </div>
             </div>
+            <TicketInfo label="Group ticket" />
+            <TicketInfo label="Single ticket" />
+            <TicketInfo label="Vip ticket" />
             <div className="flex">
               <div className="font-medium text-lg">Events</div>
               <div className="ml-6 min-w-0 space-y-1">

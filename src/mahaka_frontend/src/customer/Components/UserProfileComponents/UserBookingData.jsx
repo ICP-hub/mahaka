@@ -51,8 +51,22 @@ const UserBookingData = () => {
 
   if (error) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <h1 className="text-red-500 text-lg font-semibold">{error}</h1>
+      <div className="flex justify-center ">
+        <div className="bg-white shadow-lg rounded-lg p-6 max-w-sm text-center mt-24">
+          <h2 className="text-gray-800 text-lg font-bold mb-2">
+            No Data Found
+          </h2>
+          <p className="text-gray-600 text-sm">
+            Sorry, we couldn’t find any data to display. Please check back later
+            or try refreshing the page.
+          </p>
+          <button
+            className="mt-4 px-4 py-2 bg-secondary text-white text-sm font-semibold rounded hover:bg-primary"
+            onClick={() => window.location.reload()}
+          >
+            Refresh
+          </button>
+        </div>
       </div>
     );
   }

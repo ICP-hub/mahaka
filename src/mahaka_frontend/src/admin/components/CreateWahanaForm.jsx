@@ -146,10 +146,12 @@ const CreateWahanaForm = ({ setIsModalOpen, venueIdentity }) => {
         type="text"
         label="Wahana title"
         value={formValues.title}
+        placeholder="Enter wahana name"
         onChange={(value) => handleInputChange("title", value)}
       />
       <FormFieldTextArea
         label="Wahana Description"
+        placeholder="Enter wahana description"
         value={formValues.description}
         onChange={(value) => handleInputChange("description", value)}
       />
@@ -191,6 +193,7 @@ const CreateWahanaForm = ({ setIsModalOpen, venueIdentity }) => {
       <FormFieldInput
         type="number"
         label="Total Tickets"
+        placeholder="Enter number of total tickets"
         value={formValues.totalSupply}
         onChange={(value) => handleInputChange("totalSupply", value)}
       />
@@ -205,6 +208,7 @@ const CreateWahanaForm = ({ setIsModalOpen, venueIdentity }) => {
       <FormFieldInput
         type="number"
         label="Ticket Price(IDR)"
+        placeholder="Enter ticket price Rp./person"
         value={formValues.priceIDR}
         onChange={(value) => handleInputChange("priceIDR", value)}
       />
@@ -217,7 +221,12 @@ const CreateWahanaForm = ({ setIsModalOpen, venueIdentity }) => {
 
       {/* Featured */}
       <div className="flex flex-col space-y-1">
-        <div>Featured</div>
+        <div className="flex items-center">
+          <div>Featured*</div>
+          <div className="ml-2 italic font-light">
+            Featured wahana will display at homepage
+          </div>
+        </div>
         <div className="relative flex w-fit items-center rounded-full">
           <button
             className={`${FEATURED_CLASSES} ${

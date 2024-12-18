@@ -9,6 +9,7 @@ export const FormFieldInput = ({
   onChange,
   label,
   disabled = false,
+  placeholder = "",
 }) => {
   return (
     <div className="relative">
@@ -18,6 +19,7 @@ export const FormFieldInput = ({
           type={type}
           className="bg-transparent w-full my-3"
           value={value}
+          placeholder={placeholder}
           onChange={(e) => onChange(e.target.value)}
           // disabled={disabled}
           onKeyDown={(e) => {
@@ -44,7 +46,7 @@ export const FormFieldInput = ({
 };
 
 // Form field textarea
-export const FormFieldTextArea = ({ value, onChange, label }) => {
+export const FormFieldTextArea = ({ value, onChange, label, placeholder }) => {
   return (
     <div className="relative">
       <div className="absolute inset-0 border border-border rounded-md -z-1"></div>
@@ -53,6 +55,7 @@ export const FormFieldTextArea = ({ value, onChange, label }) => {
           type="text"
           className="bg-transparent w-full my-3"
           value={value}
+          placeholder={placeholder}
           onChange={(e) => onChange(e.target.value)}
         />
       </div>
@@ -137,7 +140,12 @@ export const FormFieldImageUpload = ({ label, image, onChange }) => {
       </div>
       <div className="absolute -top-6 flex w-full items-center">
         <div className="relative flex items-center">
-          <div>{label}*</div>
+          <div>
+            {label}
+            {label === "Banner"
+              ? "(1584x396px)*"
+              : label === "Logo" && "(300x300px)*"}
+          </div>
         </div>
         <div className="ml-auto italic text-sm">
           Image size should be below 200KB

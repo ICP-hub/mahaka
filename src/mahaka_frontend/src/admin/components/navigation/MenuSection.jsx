@@ -6,7 +6,7 @@ import {
   MdEqualizer,
   MdEvent,
   MdOutlineSpaceDashboard,
-  MdOutlineLibraryBooks
+  MdOutlineLibraryBooks,
 } from "react-icons/md";
 import { HiOutlineStar, HiOutlineUserGroup } from "react-icons/hi2";
 import { Link, useLocation } from "react-router-dom";
@@ -29,7 +29,11 @@ const MenuSection = () => {
     },
     { path: "/admin/members", label: "Members", icon: <MdPerson size={24} /> },
     { path: "/admin/banner", label: "Banner", icon: <MdEqualizer size={24} /> },
-    { path: "/admin/testimonial", label: "Testimonial", icon: <MdOutlineLibraryBooks size={24} /> },
+    {
+      path: "/admin/testimonial",
+      label: "Testimonial",
+      icon: <MdOutlineLibraryBooks size={24} />,
+    },
     // { path: "/admin/sales", label: "Sales", icon: <MdEqualizer size={24} /> },
     // {
     //   path: "/admin/purchaseTicket",
@@ -47,7 +51,7 @@ const MenuSection = () => {
         <div className="relative flex items-center justify-start p-2.5 font-medium leading-5 no-underline rounded-md text-secondaryText">
           <div className="text-secondaryText">
             <div className="text-white text-md">DASHBOARDS</div>
-            <div className="text-sm">Admin</div>
+            <div className="text-sm">Super Admin</div>
           </div>
         </div>
       </div>

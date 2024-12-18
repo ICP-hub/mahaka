@@ -185,14 +185,14 @@ const AdminBanner = () => {
                   </h1>
                 </div>
               ) : (
-                <div className="bg-white rounded-lg shadow-lg p-6 space-y-4">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-4 justify-start flex">
+                <div className="bg-card rounded-lg shadow-lg p-6 space-y-4 border border-gray-50">
+                  <h2 className="text-2xl font-bold  mb-4 justify-start flex">
                     Attraction Banners
                   </h2>
                   {attractionbanners.map((banner, index) => (
                     <div
                       key={index}
-                      className="flex items-center bg-gray-50 rounded-full p-4 hover:shadow-md transition-shadow duration-300"
+                      className="flex items-center bg-gray-100 rounded-full p-4 hover:shadow-md transition-shadow duration-300"
                     >
                       <img
                         src={banner.image}
@@ -236,14 +236,14 @@ const AdminBanner = () => {
               </h1>
             </div>
           ) : (
-            <div className="bg-white rounded-lg shadow-lg p-6 space-y-4">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4 justify-start flex">
+            <div className="bg-card rounded-lg shadow-lg p-6 space-y-4">
+              <h2 className="text-2xl font-bold  mb-4 justify-start flex">
                 ThirdParty Banners
               </h2>
               {banners.map((banner, index) => (
                 <div
                   key={index}
-                  className="flex items-center bg-gray-50 rounded-full p-4 hover:shadow-md transition-shadow duration-300"
+                  className="flex items-center bg-gray-100 rounded-full p-4 hover:shadow-md transition-shadow duration-300"
                 >
                   <img
                     src={banner.image}

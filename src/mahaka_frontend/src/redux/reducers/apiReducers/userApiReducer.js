@@ -14,6 +14,8 @@ const initialState = {
   totalPages: 1,
   newLoading: false,
   deleteLoading: false,
+  searchedUser: null,
+  searchUserLoading: false,
 };
 
 // Async operations
@@ -77,6 +79,7 @@ export const createUser = createAsyncThunk(
 export const updateUser = createAsyncThunk(
   "users/updateUser",
   async ({ backend, user, onToggle }, { rejectWithValue }) => {
+    // console.log(user);
     try {
       const response = await backend.updateUser(
         Principal.fromText(user.principal),
@@ -144,6 +147,26 @@ export const deleteUserByPrincipal = createAsyncThunk(
       notificationManager.error("Failed to remove member details!");
       console.error("Error deleting member", error);
       return rejectWithValue(error || "An unexpected error occurred");
+    }
+  }
+);
+
+export const searchMembers = createAsyncThunk(
+  "users/searchMembers",
+  async ({ backend, searchText, chunkSize, pageNo }, { rejectWithValue }) => {
+    try {
+      const response = await backend.searchMembers(
+        searchText,
+        chunkSize,
+        pageNo
+      );
+      if (!response) {
+        throw new Error("No data received");
+      }
+      return response;
+    } catch (err) {
+      console.error("Error searching members", err);
+      return rejectWithValue(err.message || "An unexpected error occurred");
     }
   }
 );
@@ -274,6 +297,20 @@ const userSlice = createSlice({
       .addCase(createUser.rejected, (state, action) => {
         state.newLoading = false;
         state.error = action.error.message;
+      })
+      // Search members
+      .addCase(searchMembers.pending, (state) => {
+        state.searchUserLoading = true;
+      })
+      .addCase(searchMembers.fulfilled, (state, action) => {
+        state.searchUserLoading = false;
+        state.searchedUser = action.payload.data;
+        state.error = null;
+      })
+      .addCase(searchMembers.rejected, (state, action) => {
+        state.searchUserLoading = false;
+        state.searchedUser = [];
+        state.error = action.payload;
       });
   },
 });
