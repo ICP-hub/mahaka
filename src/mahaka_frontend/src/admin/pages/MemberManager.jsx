@@ -16,7 +16,7 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   deleteUserByPrincipal,
   updateUser,
-  searchMembers
+  searchMembers,
 } from "../../redux/reducers/apiReducers/userApiReducer";
 import { Principal } from "@dfinity/principal";
 import notificationManager from "../../common/utils/notificationManager";
@@ -28,12 +28,15 @@ const rolePermissions = {
   manager: ["Read"],
   bod: ["Read"],
   supervisor: ["Edit"],
+  user: [],
 };
 
 const MemberManager = () => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
-  const { users, userLoading, searchedUser, searchUserLoading } = useSelector((state) => state.users);
+  const { users, userLoading, searchedUser, searchUserLoading } = useSelector(
+    (state) => state.users
+  );
   const [isRtNavOpen, setIsRtNavOpen] = useState(false);
   const [currentMember, setCurrentMember] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -52,14 +55,13 @@ const MemberManager = () => {
   useEffect(() => {
     if (!searchText.trim()) {
       setSearchPerformed(false);
-      dispatch({ type: 'RESET_SEARCH_RESULTS' });
+      dispatch({ type: "RESET_SEARCH_RESULTS" });
     }
   }, [searchText, dispatch]);
 
-
   const handleSearch = () => {
     if (searchText.trim()) {
-      setSearchPerformed(true); 
+      setSearchPerformed(true);
       dispatch(
         searchMembers({
           backend,
@@ -116,7 +118,6 @@ const MemberManager = () => {
                       />
                     </div>
                   </div>
-
                 </div>
                 <button
                   className="ml-4 px-4 items-center flex bg-secondary text-white min-h-10 rounded-full"
@@ -133,7 +134,7 @@ const MemberManager = () => {
               </div>
             </div>
           </div>
-          {(userLoading || searchUserLoading ) ? (
+          {userLoading || searchUserLoading ? (
             <div className="p-6 space-y-4">
               {/* Skeleton loading */}
               {Array(3)
@@ -247,10 +248,13 @@ const UpdateMember = ({ member, onToggle, isEditing, setIsEditing }) => {
         "Invalid email format.",
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       ) ||
-      !validateField(role, "Role is required.") ||
-      !validateField(selectedVenue.id, "Assigned venue is required.")
+      !validateField(role, "Role is required.")
     ) {
       return;
+    }
+
+    if (role !== "admin" || role !== "user") {
+      !validateField(selectedVenue.id, "Assigned venue is required.");
     }
 
     // pass validation
@@ -363,7 +367,14 @@ const EditDetails = ({
   onSubmit,
   onToggle,
 }) => {
-  const availableRoles = ["staff", "manager", "supervisor", "bod", "admin"];
+  const availableRoles = [
+    "staff",
+    "manager",
+    "supervisor",
+    "bod",
+    "admin",
+    "user",
+  ];
   const dispatch = useDispatch();
   const { venues } = useSelector((state) => state.venues);
   const { newLoading, deleteLoading } = useSelector((state) => state.users);
@@ -443,15 +454,15 @@ const EditDetails = ({
             <div className="ml-4 flex items-center space-x-4">
               {permissions.length > 0
                 ? permissions.map((permission) => (
-                  <div
-                    key={permission}
-                    className="flex items-center justify-center rounded-full bg-gray-100 px-3 py-0.5 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300"
-                  >
-                    <span className="whitespace-nowrap text-sm font-medium">
-                      {permission}
-                    </span>
-                  </div>
-                ))
+                    <div
+                      key={permission}
+                      className="flex items-center justify-center rounded-full bg-gray-100 px-3 py-0.5 leading-normal text-gray-500 dark:bg-gray-700 dark:text-gray-300"
+                    >
+                      <span className="whitespace-nowrap text-sm font-medium">
+                        {permission}
+                      </span>
+                    </div>
+                  ))
                 : null}
             </div>
           )}
@@ -475,23 +486,25 @@ const EditDetails = ({
           ))}
         </select>
       </div>
-      <div className="mt-4">
-        <div className="font-medium">Assigned Venue*</div>
-        <select
-          className="w-full border border-border rounded-md px-2 min-h-12 bg-card focus-within:border-secondary"
-          value={selectedVenue ? selectedVenue.id : ""}
-          onChange={handleSelectedVenue}
-        >
-          <option value="" disabled>
-            Select a venue
-          </option>
-          {venues.map(({ Title, id }) => (
-            <option key={Title} value={id} className="bg-card">
-              {Title}
+      {role !== "user" && role !== "admin" && (
+        <div className="mt-4">
+          <div className="font-medium">Assigned Venue*</div>
+          <select
+            className="w-full border border-border rounded-md px-2 min-h-12 bg-card focus-within:border-secondary"
+            value={selectedVenue ? selectedVenue.id : ""}
+            onChange={handleSelectedVenue}
+          >
+            <option value="" disabled>
+              Select a venue
             </option>
-          ))}
-        </select>
-      </div>
+            {venues.map(({ Title, id }) => (
+              <option key={Title} value={id} className="bg-card">
+                {Title}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       <div className="-mx-6 mt-10 flex items-center border-t bg-gray-50 py-4 pl-1 pr-4 dark:bg-transparent sm:-mx-12 sm:pl-7 sm:pr-12 border-t-border font-medium">
         <button
           onClick={handleDeleteMember}
