@@ -577,14 +577,16 @@ const ViewDetails = ({ member, venues }) => {
             {member.email}
           </div>
         </div>
-        <div className="flex">
-          <HiOutlineFlag size={24} />
-          <div className="ml-6 min-w-0 space-y-1">
-            <div className="flex items-center leading-6 cursor-pointer">
-              <div>{member.assignedVenue.title}</div>
+        {Object.keys(member.role)[0] !== "admin" && "user" && (
+          <div className="flex">
+            <HiOutlineFlag size={24} />
+            <div className="ml-6 min-w-0 space-y-1">
+              <div className="flex items-center leading-6 cursor-pointer">
+                <div>{member.assignedVenue.title}</div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
