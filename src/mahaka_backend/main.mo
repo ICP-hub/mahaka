@@ -1095,9 +1095,9 @@ actor mahaka {
           };
 
      public shared ({caller = user}) func getallEventsbyVenue(chunkSize : Nat , pageNo : Nat, venueId : Types.venueId) : async Result.Result<{data : [Types.completeEvent] ; current_page : Nat ; Total_pages : Nat}, Types.UpdateUserError> {
-          if (Principal.isAnonymous(user)) {
-               return #err(#UserNotAuthenticated); 
-          };
+          // if (Principal.isAnonymous(user)) {
+          //      return #err(#UserNotAuthenticated); 
+          // };
           // let roleResult = await getRoleByPrincipal(user);
           // switch (roleResult) {
           //      case (#err(error)) {
@@ -1146,9 +1146,9 @@ actor mahaka {
      };
 
      public shared ({caller}) func getAllEventsPaginated(chunkSize : Nat, pageNo : Nat) : async Result.Result<{data : [Types.completeEvent]; current_page : Nat; Total_pages : Nat}, Types.UpdateUserError> {
-          if (Principal.isAnonymous(caller)) {
-               return #err(#UserNotAuthenticated); 
-          };
+          // if (Principal.isAnonymous(caller)) {
+          //      return #err(#UserNotAuthenticated); 
+          // };
           // let roleResult = await getRoleByPrincipal(caller);
           // switch (roleResult) {
           //      case (#err(error)) {
@@ -1197,9 +1197,9 @@ actor mahaka {
 
 
      public shared ({caller}) func getAllEvents() : async Result.Result<[Types.completeEvent], Types.CommonErrors> {
-          if (Principal.isAnonymous(caller)) {
-               return #err(#UserNotAuthenticated); 
-          };
+          // if (Principal.isAnonymous(caller)) {
+          //      return #err(#UserNotAuthenticated); 
+          // };
           // let roleResult = await getRoleByPrincipal(caller);
           // switch (roleResult) {
           //      case (#err(error)) {
@@ -1274,9 +1274,9 @@ actor mahaka {
 
 
      public shared ({caller}) func getEvent(eventId : Text, venueId : Text) : async Result.Result<Types.completeEvent, Types.CommonErrors> {
-          if (Principal.isAnonymous(caller)) {
-               return #err(#UserNotAuthenticated); 
-          };
+          // if (Principal.isAnonymous(caller)) {
+          //      return #err(#UserNotAuthenticated); 
+          // };
           // let roleResult = await getRoleByPrincipal(caller);
           // switch (roleResult) {
           //      case (#err(error)) {
@@ -1858,9 +1858,9 @@ actor mahaka {
      };
 
      public shared ({caller}) func processPendingPayment(invoiceId: Nat, category : Types.category) : async Result.Result<[nftTypes.MintReceiptPart] or [icrcTypes.TxIndex], Text> {
-          if (Principal.isAnonymous(caller)) {
-               return #err("UserNotAuthenticated"); 
-          };
+          // if (Principal.isAnonymous(caller)) {
+          //      return #err("UserNotAuthenticated"); 
+          // };
           let status = await FiatPayCanister.get_invoice(invoiceId);
           switch (status.body){
                case(#success(invoice)){
@@ -3655,10 +3655,10 @@ actor mahaka {
 
     // 📍📍📍📍📍
     public shared ({ caller }) func listUsers(chunkSize : Nat , PageNo : Nat) : async{data : [Types.User]; current_page : Nat; total_pages : Nat} {
-          if (Principal.isAnonymous(caller)) {
-               throw Error.reject("User not Authenticated");
-               // return #err(#UserNotAuthenticated); 
-          }; 
+          // if (Principal.isAnonymous(caller)) {
+          //      throw Error.reject("User not Authenticated");
+          //      // return #err(#UserNotAuthenticated); 
+          // }; 
           // let roleResult = await getRoleByPrincipal(caller);
           // switch (roleResult) {
           //      case (#err(error)) {
@@ -3907,9 +3907,9 @@ actor mahaka {
      };
 
      public shared ({caller = user}) func getAllWahanasbyVenue(chunkSize : Nat , pageNo : Nat, venueId : Types.venueId) : async Result.Result<{data : [Types.Wahana_details] ; current_page : Nat ; Total_pages : Nat}, Types.UpdateUserError> {
-          if (Principal.isAnonymous(user)) {
-               return #err(#UserNotAuthenticated); 
-          }; 
+          // if (Principal.isAnonymous(user)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
           // let roleResult = await getRoleByPrincipal(user);
           // switch (roleResult) {
           //      case (#err(error)) {
@@ -3958,9 +3958,9 @@ actor mahaka {
      };
 
      public shared ({caller}) func getAllWahanas(chunkSize : Nat, pageNo : Nat) : async Result.Result<{data : [Types.Wahana_details]; current_page : Nat; Total_pages : Nat}, Types.CommonErrors> {
-          if (Principal.isAnonymous(caller)) {
-               return #err(#UserNotAuthenticated); 
-          }; 
+          // if (Principal.isAnonymous(caller)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
           // let roleResult = await getRoleByPrincipal(caller);
           // switch (roleResult) {
           //      case (#err(error)) {
@@ -4009,9 +4009,9 @@ actor mahaka {
 
 
      public shared ({caller}) func getWahana(wahanaId : Text, venueId : Text) : async Result.Result<Types.Wahana_details,Types.CommonErrors> {
-          if (Principal.isAnonymous(caller)) {
-               return #err(#UserNotAuthenticated); 
-          }; 
+          // if (Principal.isAnonymous(caller)) {
+          //      return #err(#UserNotAuthenticated); 
+          // }; 
           // let roleResult = await getRoleByPrincipal(caller);
           // switch (roleResult) {
           //      case (#err(error)) {
