@@ -3460,17 +3460,17 @@ actor mahaka {
           if (Principal.isAnonymous(caller)) {
                return #err(#UserNotAuthenticated); 
           }; 
-          let roleResult = await getRoleByPrincipal(caller);
-          switch (roleResult) {
-               case (#err(error)) {
-                    return #err(#RoleError);
-               };
-               case (#ok(roleRes)) {
-                    if (not ((await Validation.check_for_sysAdmin(roleRes)) or (await Validation.check_for_Admin(roleRes)))) {
-                         return #err(#UserNotAuthorized);
-                    };
-               };
-          };
+          // let roleResult = await getRoleByPrincipal(caller);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(roleRes)) {
+          //           if (not ((await Validation.check_for_sysAdmin(roleRes)) or (await Validation.check_for_Admin(roleRes)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           if (email == "") { return #err(#EmptyEmail) };
           if (firstName == "") { return #err(#EmptyFirstName) };
           if (lastName == "") { return #err(#EmptyLastName) };
@@ -3557,17 +3557,17 @@ actor mahaka {
           if (not Principal.isController(caller)) {
                return #err(#UserNotAuthorized);
           };
-          let roleResult = await getRoleByPrincipal(caller);
-          switch (roleResult) {
-               case (#err(error)) {
-                    return #err(#RoleError);
-               };
-               case (#ok(role)) {
-                    if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
-                         return #err(#UserNotAuthorized);
-                    };
-               };
-          };
+          // let roleResult = await getRoleByPrincipal(caller);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not ((await Validation.check_for_sysAdmin(role)) or (await Validation.check_for_Admin(role)))) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
           if (email == "") { return #err(#EmptyEmail) };
           if (firstName == "") { return #err(#EmptyFirstName) };
           if (lastName == "") { return #err(#EmptyLastName) };
