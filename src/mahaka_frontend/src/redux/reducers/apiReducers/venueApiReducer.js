@@ -102,15 +102,15 @@ export const createVenue = createAsyncThunk(
     description,
     action,
   }) => {
-    console.log(
-      // backend,
-      collectionDetails,
-      title,
-      capacity,
-      details,
-      description
-      // action
-    );
+    // console.log(
+    //   // backend,
+    //   collectionDetails,
+    //   title,
+    //   capacity,
+    //   details,
+    //   description
+    //   // action
+    // );
 
     try {
       const response = await backend.createVenue(
@@ -120,12 +120,14 @@ export const createVenue = createAsyncThunk(
         details,
         description
       );
-      action(false);
+      if (response.ok) {
+        action(false);
+      }
       console.log("response creating venue", response);
       return response;
     } catch (error) {
       console.error("Error creating venue", error);
-      throw new Error("Error creating venue", error);
+      return response;
     }
   }
 );
@@ -242,11 +244,16 @@ const venueSlice = createSlice({
         state.error = null;
       })
       .addCase(createVenue.fulfilled, (state, action) => {
-        state.createVenueLoader = false;
-
-        state.venues.push(action.payload.ok[1]);
-        state.error = null;
-        notificationManager.success("Venue created successfully");
+        if (action.payload.ok) {
+          state.venues.push(action.payload.ok[1]);
+          state.error = null;
+          notificationManager.success("Venue created successfully");
+          state.createVenueLoader = false;
+        }
+        if (action.payload.err) {
+          state.createVenueLoader = false;
+          notificationManager.error("Failed to create venue");
+        }
       })
       .addCase(createVenue.rejected, (state, action) => {
         state.createVenueLoader = false;

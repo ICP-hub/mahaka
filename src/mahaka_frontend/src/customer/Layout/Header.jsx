@@ -34,6 +34,7 @@ import { searchVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
 import { searchEvents } from "../../redux/reducers/apiReducers/eventApiReducer";
 import { searchWahanas } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import { CiWallet } from "react-icons/ci";
+import { useLogout } from "../../common/hooks/useLogout";
 
 const NavLinks = [
   { title: "HOME", url: "/" },
@@ -431,6 +432,7 @@ const ProfileMenu = ({ onClose }) => {
   const { currentUserByCaller, userRole } = useSelector((state) => state.users);
   const { isConnected, login, logout, balance, principal } = useAuth();
   const menuRef = useRef();
+  const logoutAndRedirect = useLogout();
 
   console.log(userRole);
   useEffect(() => {
@@ -529,8 +531,8 @@ const ProfileMenu = ({ onClose }) => {
       <div
         className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto cursor-pointer"
         onClick={() => {
-          logout();
-          onClose();
+          logoutAndRedirect();
+          // onClose();
         }}
       >
         <div className="flex items-center space-x-2">

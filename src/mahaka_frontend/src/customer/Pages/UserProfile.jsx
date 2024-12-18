@@ -1,13 +1,38 @@
 import { useEffect, useState } from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { useIdentityKit } from "@nfid/identitykit/react";
+import LoadingScreenLarge from "../../common/components/LoadingScreenLarge";
+import notificationManager from "../../common/utils/notificationManager";
+
+const UserProfileProtected = ({ children }) => {
+  const { isConnected } = useSelector((state) => state.authentication);
+  const [layoutLoader, setLayoutLoader] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isConnected) {
+      setTimeout(() => {
+        setLayoutLoader(false);
+      }, [2000]);
+    } else {
+      setLayoutLoader(false);
+    }
+  }, [isConnected]);
+
+  if (layoutLoader) return <LoadingScreenLarge />;
+  if (isConnected) {
+    return children;
+  } else {
+    notificationManager.error("Please login to your account first!");
+    navigate("/");
+  }
+};
 
 /* User profile Comp */
 const UserProfile = () => {
   const { pathname } = useLocation();
-
   const profileTabs = [
     { tab: "User Profile", link: "/user/my-profile" },
     { tab: "Bookings", link: "/user/my-booking" },
@@ -21,7 +46,7 @@ const UserProfile = () => {
   }, [pathname]);
 
   return (
-    <>
+    <UserProfileProtected>
       <div className="container mx-auto py-8 px-6 md:px-8 min-h-screen">
         <div className="flex justify-between mb-8 items-center relative">
           <div className="flex items-center flex-wrap">
@@ -47,7 +72,7 @@ const UserProfile = () => {
           <Outlet />
         </div>
       </div>
-    </>
+    </UserProfileProtected>
   );
 };
 
