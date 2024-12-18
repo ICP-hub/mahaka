@@ -15,7 +15,7 @@ const initialState = {
   newLoading: false,
   deleteLoading: false,
   searchedUser: null,
-  searchUserLoading : false,
+  searchUserLoading: false,
 };
 
 // Async operations
@@ -79,6 +79,7 @@ export const createUser = createAsyncThunk(
 export const updateUser = createAsyncThunk(
   "users/updateUser",
   async ({ backend, user, onToggle }, { rejectWithValue }) => {
+    // console.log(user);
     try {
       const response = await backend.updateUser(
         Principal.fromText(user.principal),
@@ -150,21 +151,24 @@ export const deleteUserByPrincipal = createAsyncThunk(
   }
 );
 
-  export const searchMembers = createAsyncThunk(
-    "users/searchMembers",
-    async ({ backend, searchText, chunkSize, pageNo }, { rejectWithValue }) => {
-      try {
-        const response = await backend.searchMembers(searchText, chunkSize, pageNo);
-        if (!response) {
-          throw new Error("No data received");
-        }
-        return response;
-      } catch (err) {
-        console.error("Error searching members", err);
-        return rejectWithValue(err.message || "An unexpected error occurred");
+export const searchMembers = createAsyncThunk(
+  "users/searchMembers",
+  async ({ backend, searchText, chunkSize, pageNo }, { rejectWithValue }) => {
+    try {
+      const response = await backend.searchMembers(
+        searchText,
+        chunkSize,
+        pageNo
+      );
+      if (!response) {
+        throw new Error("No data received");
       }
+      return response;
+    } catch (err) {
+      console.error("Error searching members", err);
+      return rejectWithValue(err.message || "An unexpected error occurred");
     }
-
+  }
 );
 
 // Create slice
@@ -300,7 +304,7 @@ const userSlice = createSlice({
       })
       .addCase(searchMembers.fulfilled, (state, action) => {
         state.searchUserLoading = false;
-        state.searchedUser= action.payload.data;
+        state.searchedUser = action.payload.data;
         state.error = null;
       })
       .addCase(searchMembers.rejected, (state, action) => {
