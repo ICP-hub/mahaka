@@ -14,6 +14,7 @@ const initialState = {
 export const createTestimonial = createAsyncThunk(
   "testimonial/createTestimonial",
   async ({ backend, user, description, location, title }) => {
+    console.log(user, description, title, location, "hello");
     try {
       const response = await backend.createTestimonial(
         Principal.fromText(user),
@@ -21,10 +22,12 @@ export const createTestimonial = createAsyncThunk(
         title,
         location
       );
+      console.log(response);
       // action(false);
       // console.log("testimonial created successfully")
       return response;
     } catch (error) {
+      console.log(error);
       notificationManager.error(error?.err);
 
       throw error;
