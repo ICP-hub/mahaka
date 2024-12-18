@@ -47,8 +47,13 @@ export const getUserDetailsById = createAsyncThunk(
 export const listUsers = createAsyncThunk(
   "users/listUsers",
   async ({ backend, pageLimit, currPage }) => {
-    const response = await backend.listUsers(pageLimit, currPage);
-    return response;
+    try {
+      const response = await backend.listUsers(pageLimit, currPage);
+      console.log("repsonse list user", response);
+      return response;
+    } catch (err) {
+      console.log("Error fetching list user", err);
+    }
   }
 );
 
