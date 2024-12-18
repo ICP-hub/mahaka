@@ -3575,8 +3575,8 @@ actor mahaka {
           if (lastName == "") { return #err(#EmptyLastName) };
           //    if (role == "") { return #err(#EmptyRole) };
           if (not ((role == #sysAdmin) or (role == #admin) or (role == #user))) {
-               if (assignedVenueDetails.id == "") { return #err(#EmptyAssignedVenue) };
-               if (assignedVenueDetails.title == "") { return #err(#EmptyAssignedVenue) };
+               if (assignedVenue.id == "") { return #err(#EmptyAssignedVenue) };
+               if (assignedVenue.title == "") { return #err(#EmptyAssignedVenue) };
           };
 
           let user : Types.User = {
