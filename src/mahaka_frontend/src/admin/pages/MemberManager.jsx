@@ -268,10 +268,11 @@ const UpdateMember = ({ member, onToggle, isEditing, setIsEditing }) => {
       email: email,
       principal: principalId,
       venue: {
-        id: role === "admin" || "user" ? "" : selectedVenue.id,
+        id:
+          role === "admin" || role === "user" ? "All Venues" : selectedVenue.id,
         title:
-          role === "admin" || "user"
-            ? ""
+          role === "admin" || role === "user"
+            ? "All Venues"
             : selectedVenue.Title || selectedVenue.title,
       },
     };
