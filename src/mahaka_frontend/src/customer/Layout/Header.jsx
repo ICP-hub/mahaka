@@ -210,6 +210,11 @@ const SearchBox = () => {
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           placeholder="Search for events, venues and more"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSearch();
+            }
+          }}
           className="bg-transparent outline-none w-full placeholder:text-white placeholder:truncate"
         />
         <div className="mx-2 relative right-6">

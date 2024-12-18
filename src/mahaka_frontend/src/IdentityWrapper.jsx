@@ -27,6 +27,13 @@ export default function IdentityWrapper() {
       authType={IdentityKitAuthType.DELEGATION}
       signerClientOptions={{
         targets: [canisterID, canisterIDFiat],
+        maxTimeToLive: BigInt(7 * 24 * 60 * 60 * 1000 * 1000 * 1000), // 1 week in nanoseconds
+        idleOptions: {
+          idleTimeout: 4 * 60 * 60 * 1000, // 4 hours in milliseconds
+          disableIdle: false, // Enable logout on idle timeout
+        },
+        keyType: "Ed25519", // Use Ed25519 key type for compatibility
+        allowInternetIdentityPinAuthentication: true, // Enable PIN authentication
       }}
     >
       <Provider store={store}>
