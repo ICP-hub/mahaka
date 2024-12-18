@@ -79,7 +79,7 @@ export const createUser = createAsyncThunk(
 export const updateUser = createAsyncThunk(
   "users/updateUser",
   async ({ backend, user, onToggle }, { rejectWithValue }) => {
-    // console.log(user);
+    console.log(user);
     try {
       const response = await backend.updateUser(
         Principal.fromText(user.principal),
@@ -95,6 +95,7 @@ export const updateUser = createAsyncThunk(
         onToggle(false);
         return response;
       } else {
+        // onToggle(false);
         return response;
       }
     } catch (error) {
@@ -230,21 +231,26 @@ const userSlice = createSlice({
         state.newLoading = true;
       })
       .addCase(updateUser.fulfilled, (state, action) => {
-        state.newLoading = false;
-        const updatedUser = action.payload.ok;
-        const userIndex = state.users.findIndex(
-          (user) => user.id.toText() === updatedUser[0].id.toText()
-        );
+        if (action.payload.ok) {
+          state.newLoading = false;
+          const updatedUser = action.payload.ok;
+          const userIndex = state.users.findIndex(
+            (user) => user.id.toText() === updatedUser[0].id.toText()
+          );
 
-        if (userIndex !== -1) {
-          state.users[userIndex] = {
-            ...state.users[userIndex],
-            ...updatedUser[0],
-          };
-        } else {
-          state.users.push(updatedUser[0]);
+          if (userIndex !== -1) {
+            state.users[userIndex] = {
+              ...state.users[userIndex],
+              ...updatedUser[0],
+            };
+          } else {
+            state.users.push(updatedUser[0]);
+          }
+          state.error = null;
+        } else if (action.payload.err) {
+          state.newLoading = false;
+          notificationManager.error("Failed to create member");
         }
-        state.error = null;
       })
       .addCase(updateUser.rejected, (state, action) => {
         state.newLoading = false;
