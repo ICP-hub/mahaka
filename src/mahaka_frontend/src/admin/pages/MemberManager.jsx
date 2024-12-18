@@ -253,7 +253,7 @@ const UpdateMember = ({ member, onToggle, isEditing, setIsEditing }) => {
       return;
     }
 
-    if (role !== "admin" || role !== "user") {
+    if (role !== "admin" && role !== "user") {
       !validateField(selectedVenue.id, "Assigned venue is required.");
     }
 
@@ -268,8 +268,11 @@ const UpdateMember = ({ member, onToggle, isEditing, setIsEditing }) => {
       email: email,
       principal: principalId,
       venue: {
-        id: selectedVenue.id,
-        title: selectedVenue.Title || selectedVenue.title,
+        id: role === "admin" || "user" ? "" : selectedVenue.id,
+        title:
+          role === "admin" || "user"
+            ? ""
+            : selectedVenue.Title || selectedVenue.title,
       },
     };
 
