@@ -4,28 +4,38 @@ import Types "./Types";
 module {
 
     public func check_for_sysAdmin(role : Types.Roles) : async Bool {
-        assert (role == #sysAdmin);
-        return true;
+        if(role == #sysAdmin){
+            return true;
+        };
+        return false;
     };
 
     public func check_for_Manager(role : Types.Roles) : async Bool {
-        assert (role == #manager);
-        return true;
+        if(role == #manager){
+            return true;
+        };
+        return false;
     };
 
     public func check_for_Admin(role : Types.Roles) : async Bool {
-        assert (role == #admin);
-        return true;
+        if(role == #admin){
+            return true;
+        };
+        return false;
     };
 
     public func check_for_User(role : Types.Roles) : async Bool {
-        assert (role == #user);
-        return true;
+        if(role == #user){
+            return true;
+        };
+        return false;
     };
 
     public func check_for_Bod(role : Types.Roles) : async Bool {
-        assert (role == #bod);
-        return true;
+        if(role == #bod){
+            return true;
+        };
+        return false;
     };
 
     // public func check_for_vendor(role : Types.Roles) : async Bool {
@@ -34,12 +44,16 @@ module {
     // };
 
     public func check_for_Staff(role : Types.Roles) : async Bool {
-        assert (role == #staff);
-        return true;
+        if(role == #staff){
+            return true;
+        };
+        return false;
     };
     public func check_for_SuperVisor(role : Types.Roles) : async Bool {
-        assert (role == #supervisor);
-        return true;
+        if(role == #supervisor){
+            return true;
+        };
+        return false;
     };
     // 
 
