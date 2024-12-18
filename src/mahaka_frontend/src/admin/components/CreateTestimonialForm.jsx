@@ -18,7 +18,7 @@ const CreateTestimonialForm = ({ onClose }) => {
     principal: "",
   });
 
-  const [wordCount, setWordCount] = useState(0); // Track word count for description
+  const [charCount, setCharCount] = useState(0); // Track character count for description
 
   const validateForm = () => {
     const errors = {};
@@ -27,8 +27,8 @@ const CreateTestimonialForm = ({ onClose }) => {
     }
     if (!testimonialData.description) {
       errors.description = "Description is required";
-    } else if (wordCount > 100) {
-      errors.description = "Description must be 100 words or less";
+    } else if (testimonialData.description.length > 200) {
+      errors.description = "Description must be 200 characters or less";
     }
     if (!testimonialData.location) {
       errors.location = "Location is required";
@@ -51,15 +51,14 @@ const CreateTestimonialForm = ({ onClose }) => {
     const { name, value } = e.target;
 
     if (name === "description") {
-      const words = value.trim().split(/\s+/); // Split description into words
-      if (words.length > 100) {
+      if (value.length > 200) {
         setFormErrors((prevErrors) => ({
           ...prevErrors,
-          description: "Description must be 100 words or less",
+          description: "Description must be 200 characters or less",
         }));
-        return; // Prevent input beyond 100 words
+        return; // Prevent input beyond 200 characters
       }
-      setWordCount(words.length); // Update word count
+      setCharCount(value.length); // Update character count
     }
 
     setTestimonialData((prevState) => ({
@@ -160,7 +159,7 @@ const CreateTestimonialForm = ({ onClose }) => {
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <label className="font-semibold">Description</label>
-            <TextHint text="Enter the description of the testimonial (100 words max)." />
+            <TextHint text="Enter the description of the testimonial (200 characters max)." />
           </div>
           <div
             className={`border ${
@@ -182,7 +181,7 @@ const CreateTestimonialForm = ({ onClose }) => {
               {formErrors.description}
             </p>
           )}
-          <p className="text-sm text-gray-500 mt-1">{wordCount}/100 words</p>
+          <p className="text-sm text-gray-500 mt-1">{charCount}/200 characters</p>
         </div>
 
         {/* Principal */}

@@ -28,7 +28,9 @@ const MgtTicket = () => {
 
   const { currentUserByCaller } = useSelector((state) => state.users);
 
-  const { events, eventLoading } = useSelector((state) => state.events);
+  const { eventByVenue, singleEventLoading } = useSelector(
+    (state) => state.events
+  );
   const { wahanasByVenue, singleWahanaLoading } = useSelector(
     (state) => state.wahana
   );
@@ -75,9 +77,9 @@ const MgtTicket = () => {
 
   useEffect(() => {
     // Automatically select the first venue and fetch its ticket details
-    if (!eventLoading && events.length > 0) {
-      const defaultVenue = events[0];
-      console.log(events[0]);
+    if (!singleEventLoading && eventByVenue?.length > 0) {
+      const defaultVenue = eventByVenue[0];
+
       setSelectedEvent(defaultVenue);
 
       const eventData = async () => {
@@ -96,7 +98,7 @@ const MgtTicket = () => {
 
       eventData();
     }
-  }, [eventLoading, events]);
+  }, [singleEventLoading, eventByVenue]);
   useEffect(() => {
     // Automatically select the first venue and fetch its ticket details
     if (!singleWahanaLoading && wahanasByVenue.length > 0) {
@@ -116,7 +118,7 @@ const MgtTicket = () => {
     setLoadingDetails(true);
     try {
       // Fetch ticket details from the actor
-      console.log("hello after events");
+      console.log("hello after  eventByVenue");
       const details = await backend.getDIPdetails(venue?.Collection_id);
       console.log(details);
       setTicketDetails(details);
@@ -135,7 +137,7 @@ const MgtTicket = () => {
     const selectedEventId = event.target.value;
 
     console.log(selectedEventId);
-    const selectedEvent = events.find((v) => v.id === selectedEventId);
+    const selectedEvent = eventByVenue.find((v) => v.id === selectedEventId);
 
     if (selectedEvent) {
       setSelectedEvent(selectedEvent); // Update selected event immediately
@@ -257,7 +259,7 @@ const MgtTicket = () => {
         <p>No ticket details available for the selected venue.</p>
       )}
 
-      {events.length > 0 && (
+      {eventByVenue?.length > 0 && (
         <>
           <label className="block mb-2 text-lg font-medium">Select Event</label>
           <select
@@ -269,7 +271,7 @@ const MgtTicket = () => {
             <option value="" disabled>
               Choose a event
             </option>
-            {events.map((venue) => (
+            {eventByVenue?.map((venue) => (
               <option key={venue.id} value={venue.id}>
                 {venue.title}
               </option>

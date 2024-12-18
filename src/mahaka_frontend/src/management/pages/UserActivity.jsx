@@ -16,6 +16,9 @@ const MgtUserActivity = () => {
     } catch (err) {
       console.error(err);
       setError("Failed to fetch tickets.");
+      setLoading(false);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -29,7 +32,9 @@ const MgtUserActivity = () => {
     <div className="relative flex flex-col min-w-0 flex-auto p-6 bg-card min-h-screen">
       <h1 className="text-2xl font-bold mb-6 ">Ticket Purchase History</h1>
       {error && (
-        <div className="text-red-600 bg-red-100 p-4 rounded mb-6">{error}</div>
+        <div className="text-red-600 bg-red-100 p-4 rounded mb-6">
+          No ticket history available
+        </div>
       )}
       {loading ? (
         <div className="text-gray-400 text-center py-12">Loading...</div>

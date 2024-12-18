@@ -22,16 +22,36 @@ export default function EventTickets({
   const [selectedDate, setSelectedDate] = useState("");
   const [ticketQuantity, setTicketQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(""); // New error state
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
+    setError(""); // Reset error when modal is closed
   };
+  const validate = () => {
+    if (!selectedDate) {
+      notificationManager.error("Please select a date");
+    }
+  };
+
   const convertDateToNanoseconds = (dateString) => {
     const date = new Date(dateString);
     return date.getTime() * 1_000_000; // Convert milliseconds to nanoseconds
   };
 
   const buyVenueTicketHandler = async () => {
+    // Validation: Ensure the date is selected
+    if (!selectedDate) {
+      notificationManager.error("Please select a date");
+      return;
+    }
+
+    // Validation: Ensure ticket quantity is less than or equal to availability
+    if (ticketQuantity > availability) {
+      setError(`Only ${availability} tickets are available.`);
+      return;
+    }
+
     try {
       setLoading(true);
       const ticketTypeVariant = { [ticketType]: null };
@@ -54,28 +74,26 @@ export default function EventTickets({
         selectedVenue.id,
         { ticket_type: ticketTypeVariant, price: price },
         record,
-
         Principal.fromText(principal),
         dateInNanoseconds,
-
         ticketQuantity,
         { Cash: null }
       );
 
-      console.log("event ticket purchased successfully:", response);
-      notificationManager.success("Ticket purchase successfully");
+      console.log("Event ticket purchased successfully:", response);
+      notificationManager.success("Ticket purchase successful");
 
       toggleModal();
     } catch (err) {
       console.error("Error in buying event tickets:", err);
-      toggleModal();
+      setError("An error occurred while purchasing the ticket.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className=" flex justify-center  p-2 py-5">
+    <div className="flex justify-center p-2 py-5">
       {/* Ticket Card */}
       <div
         onClick={toggleModal}
@@ -95,8 +113,8 @@ export default function EventTickets({
             <h3 className="text-xl font-black">{name}</h3>
             {/* <p className="text-base font-normal">{description}</p> */}
             <div className="flex justify-between mt-[5rem]">
-              <span className="  font-black">Rp.{price}</span>
-              <span className="  font-normal">{availability} TICKETS LEFT</span>
+              <span className="font-black">Rp.{price}</span>
+              <span className="font-normal">{availability} TICKETS LEFT</span>
             </div>
           </div>
         </div>
@@ -109,6 +127,9 @@ export default function EventTickets({
             <h2 className="text-3xl font-bold text-secondary mb-6 text-center">
               {name}
             </h2>
+            {error && (
+              <div className="text-red-500 text-center mb-4">{error}</div>
+            )}
             <div className="mb-6">
               <label className="block text-lg font-semibold text-gray-800 mb-2">
                 Select Date:
@@ -155,13 +176,13 @@ export default function EventTickets({
             <div className="flex justify-between items-center text-gray-700 mb-4">
               <span className="text-lg font-medium">Price:</span>
               <span className="text-lg font-semibold text-secondary">
-                Rp.{parseInt(tickets.sTicket_price) * ticketQuantity}
+                Rp.{parseInt(price) * ticketQuantity}
               </span>
             </div>
             <div className="flex justify-between items-center text-gray-700 mb-4">
               <span className="text-lg font-medium">Tickets Left:</span>
               <span className="text-lg font-semibold text-secondary">
-                {parseInt(tickets.sTicket_limit)}
+                {parseInt(availability) - ticketQuantity}
               </span>
             </div>
             <div className="flex justify-between items-center text-gray-700 mb-4">

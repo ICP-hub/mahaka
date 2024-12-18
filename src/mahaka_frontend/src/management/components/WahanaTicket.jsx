@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { Principal } from "@dfinity/principal";
 import notificationManager from "../../common/utils/notificationManager";
-
 import { FaPlus, FaMinus } from "react-icons/fa";
 
 export default function WahanaTicket({
@@ -33,29 +32,36 @@ export default function WahanaTicket({
   };
 
   const buyVenueTicketHandler = async () => {
+    if (!selectedDate) {
+      notificationManager.error("Please select a date");
+      return;
+    }
+
+    if (ticketQuantity > availability) {
+      notificationManager.error(`Only ${availability} tickets are available`);
+      return;
+    }
+
     try {
       setLoading(true);
-
       const dateInNanoseconds = convertDateToNanoseconds(selectedDate);
-
-      console.log(selectedVenue);
 
       const response = await backend.buyOfflineWahanaToken(
         selectedVenue,
         id,
-
         Principal.fromText(principal),
         ticketQuantity,
         dateInNanoseconds,
         { Cash: null }
       );
 
-      console.log("wahana ticket purchased successfully:", response);
-      notificationManager.success("Ticket purchase successfully");
+      console.log("Wahana ticket purchased successfully:", response);
+      notificationManager.success("Ticket purchase successful");
 
       toggleModal();
     } catch (err) {
-      console.error("Error in buying wahana tickets:", err);
+      console.error("Error in buying Wahana tickets:", err);
+      notificationManager.error("Failed to purchase tickets");
       toggleModal();
     } finally {
       setLoading(false);
@@ -80,14 +86,14 @@ export default function WahanaTicket({
           </div>
           <div className="w-3/4 p-4">
             <h3 className="text-xl font-black">{name}</h3>
-            {/* <p className="text-base font-normal">{description}</p> */}
             <div className="flex justify-between mt-[5rem]">
-              <span className="  font-black">Rp.{price}</span>
+              <span className="font-black">Rp.{price}</span>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
           <div className="bg-white rounded-3xl shadow-lg p-6 w-96">
@@ -121,6 +127,7 @@ export default function WahanaTicket({
                     setTicketQuantity(Math.max(1, ticketQuantity - 1))
                   }
                   className="px-3 py-2 bg-gray-200 rounded-xl text-gray-600 hover:bg-gray-300 transition shadow-sm"
+                  disabled={ticketQuantity === 1}
                 >
                   <FaMinus size={12} />
                 </button>
@@ -132,6 +139,7 @@ export default function WahanaTicket({
                     )
                   }
                   className="px-3 py-2 bg-gray-200 rounded-xl text-gray-600 hover:bg-gray-300 transition shadow-sm"
+                  disabled={ticketQuantity === availability}
                 >
                   <FaPlus size={12} />
                 </button>

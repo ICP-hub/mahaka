@@ -23,6 +23,12 @@ export default function Ticket({
   const [ticketQuantity, setTicketQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
 
+  const validate = () => {
+    if (!selectedDate) {
+      notificationManager.error("Please select a date");
+    }
+  };
+
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
@@ -34,6 +40,7 @@ export default function Ticket({
 
   const buyVenueTicketHandler = async () => {
     try {
+      validate();
       setLoading(true);
       const ticketTypeVariant = { [ticketType]: null };
 
@@ -65,12 +72,12 @@ export default function Ticket({
       );
 
       console.log("venue ticket purchased successfully:", response);
+      if (response.ok) {
+        toggleModal();
+      }
       notificationManager.success("Ticket purchase successfully");
-
-      toggleModal();
     } catch (err) {
       console.error("Error in buying venue tickets:", err);
-      toggleModal();
     } finally {
       setLoading(false);
     }
@@ -161,7 +168,7 @@ export default function Ticket({
             <div className="flex justify-between items-center text-gray-700 mb-4">
               <span className="text-lg font-medium">Tickets Left:</span>
               <span className="text-lg font-semibold text-secondary">
-                {parseInt(availability)}
+                {parseInt(availability) - ticketQuantity}
               </span>
             </div>
             <div className="flex justify-between items-center text-gray-700 mb-4">
