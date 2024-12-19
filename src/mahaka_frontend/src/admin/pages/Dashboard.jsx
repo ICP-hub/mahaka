@@ -143,10 +143,10 @@ const DashboardAnalytics = () => {
       },
     ];
 
-    return dashboardData?.latestTxs != 0 ? (
+    return (
       <div className="grid grid-cols-1 md:gid-cols-2">
         <div className="bg-card mx-3 my-2 p-3 shadow-lg rounded-lg">
-          <h2 className="text-2xl mt-4 font-bold text-gray-800 mb-6 border-b pb-4">
+          <h2 className="text-2xl mt-4 font-bold  mb-6 border-b pb-4">
             Transactions Overview
           </h2>
 
@@ -178,13 +178,13 @@ const DashboardAnalytics = () => {
                   </div>
 
                   <div className="flex-1 md:ml-6">
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm ">
                       Payment Method:{" "}
-                      <span className="font-medium text-gray-700">
+                      <span className="font-medium ">
                         {transaction?.paymentMethod}
                       </span>
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm ">
                       Date:{" "}
                       <span className="font-medium">
                         {new Date(
@@ -224,8 +224,6 @@ const DashboardAnalytics = () => {
           </div>
         </div>
       </div>
-    ) : (
-      <></>
     );
   };
 
@@ -260,7 +258,7 @@ const DashboardAnalytics = () => {
         {/* special card earnings on top events card */}
         <div className="grid grid-cols-1 md:gid-cols-2">
           <div className="bg-card mx-3 my-2 p-2 shadow-lg rounded-lg">
-            <h2 className="text-2xl mt-4 font-bold text-gray-800 mb-6 border-b pb-4">
+            <h2 className="text-2xl mt-4 font-bold   mb-6 border-b pb-4">
               Earnings On Top Events
             </h2>
             {dashboardData?.top3Events != 0 ? (
@@ -332,7 +330,7 @@ const DashboardAnalytics = () => {
             {/* <!-- Sales --> */}
             {/* <div className="flex flex-col items-center">
               <div className="bg-purple-100 p-2 rounded-full mb-2">
-                <BsFileBarGraph className="text-3xl text-purple-500" />
+                <BsFileBarGraph className="text-3xl text-purple-500" /> 
               </div>
               <h4 className="text-lg font-semibold">230k</h4>
               <p className="text-lg ">Sales</p>

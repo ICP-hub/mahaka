@@ -338,7 +338,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
       {/* Ticket Limits */}
       <div className="flex space-x-4">
         <div className="w-1/3">
-          <label className="font-semibold">General Ticket Limit</label>
+          <label className="font-semibold">Single Ticket Limit</label>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               type="number"
@@ -351,7 +351,7 @@ const CreateEventForm = ({ setIsModalOpen, venueId, venueTitle }) => {
           </div>
         </div>
         <div className="w-1/3">
-          <label className="font-semibold">Student Ticket Limit</label>
+          <label className="font-semibold">Group Ticket Limit</label>
           <div className="border border-border rounded-lg px-4 focus-within:border-indigo-600 dark:focus-within:border-border">
             <input
               type="number"
