@@ -27,6 +27,7 @@ import {
 import ModalOverlay from "../../customer/Components/Modal-overlay";
 import { IoTrashBinSharp } from "react-icons/io5";
 import { Link } from "react-router-dom";
+import Pagination from "../../common/components/Pagination";
 
 const MgtEvents = () => {
   const { backend } = useSelector((state) => state.authentication);
@@ -36,6 +37,8 @@ const MgtEvents = () => {
     singleEventLoading,
     searchedEvents,
     searchEventLoading,
+    currentPage,
+    totalPages,
   } = useSelector((state) => state.events);
   const { currentUserByCaller, userRole } = useSelector((state) => state.users);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -73,109 +76,123 @@ const MgtEvents = () => {
   // console.log(eventByVenue);
 
   return (
-    <div className="flex flex-auto flex-col relative min-h-screen">
-      <div className="flex min-w-0 flex-col">
-        <div className="dark relative flex-0 overflow-hidden bg-gray-800 px-4 py-8 sm:p-16">
-          <svg
-            viewBox="0 0 960 540"
-            width="100%"
-            height="100%"
-            preserveAspectRatio="xMidYMax slice"
-            xmlns="http://www.w3.org/2000/svg"
-            className="absolute inset-0 pointer-events-none"
-          >
-            <g
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="100"
-              className="text-gray-700 opacity-25"
+    <>
+      <div className="flex flex-auto flex-col relative min-h-screen">
+        <div className="flex min-w-0 flex-col">
+          <div className="dark relative flex-0 overflow-hidden bg-gray-800 px-4 py-8 sm:p-16">
+            <svg
+              viewBox="0 0 960 540"
+              width="100%"
+              height="100%"
+              preserveAspectRatio="xMidYMax slice"
+              xmlns="http://www.w3.org/2000/svg"
+              className="absolute inset-0 pointer-events-none"
             >
-              <circle r="234" cx="196" cy="23"></circle>
-              <circle r="234" cx="790" cy="491"></circle>
-            </g>
-          </svg>
-          <div className="relative z-10 flex flex-col items-center text-text">
-            <div className="text-xl font-semibold">MAHAKA'S</div>
-            <div className="mt-1 text-center text-4xl font-extrabold leading-tight tracking-tight sm:text-7xl">
-              EXCLUSIVE EVENTS
+              <g
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="100"
+                className="text-gray-700 opacity-25"
+              >
+                <circle r="234" cx="196" cy="23"></circle>
+                <circle r="234" cx="790" cy="491"></circle>
+              </g>
+            </svg>
+            <div className="relative z-10 flex flex-col items-center text-text">
+              <div className="text-xl font-semibold">MAHAKA'S</div>
+              <div className="mt-1 text-center text-4xl font-extrabold leading-tight tracking-tight sm:text-7xl">
+                EXCLUSIVE EVENTS
+              </div>
             </div>
           </div>
-        </div>
-        <div className="flex flex-auto p-6 sm:p-10">
-          <div className="mx-auto flex w-full max-w-xs flex-auto flex-col sm:max-w-5xl">
-            <div className="flex w-full max-w-xs flex-col sm:items-center sm:max-w-none sm:flex-row">
-              <div className="w-full sm:w-72 bg-card p-4 rounded-xl">
-                <div className="relative flex items-center flex-auto">
-                  <div>
-                    <HiOutlineMagnifyingGlass size={24} />
+          <div className="flex flex-auto p-6 sm:p-10">
+            <div className="mx-auto flex w-full max-w-xs flex-auto flex-col sm:max-w-5xl">
+              <div className="flex w-full max-w-xs flex-col sm:items-center sm:max-w-none sm:flex-row">
+                <div className="w-full sm:w-72 bg-card p-4 rounded-xl">
+                  <div className="relative flex items-center flex-auto">
+                    <div>
+                      <HiOutlineMagnifyingGlass size={24} />
+                    </div>
+                    <div className="w-full mx-1">
+                      <input
+                        type="text"
+                        placeholder="Search for events..."
+                        className="outline-none bg-transparent w-full"
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                      />
+                    </div>
+                    <button className="ml-auto" onClick={handleSearch}>
+                      <HiArrowRightCircle
+                        size={24}
+                        className="cursor-pointer"
+                      />
+                    </button>
                   </div>
-                  <div className="w-full mx-1">
-                    <input
-                      type="text"
-                      placeholder="Search for events..."
-                      className="outline-none bg-transparent w-full"
-                      value={searchInput}
-                      onChange={(e) => setSearchInput(e.target.value)}
-                    />
-                  </div>
-                  <button className="ml-auto" onClick={handleSearch}>
-                    <HiArrowRightCircle size={24} className="cursor-pointer" />
-                  </button>
                 </div>
+                {(userRole === "staff" || userRole === "supervisor") && (
+                  <div className="sm:ml-auto mt-4 sm:mt-0 flex items-center justify-center w-full sm:w-fit h-full">
+                    <button
+                      className="bg-indigo-600 hover:bg-indigo-700 rounded-xl cursor-pointer w-full text-white p-4"
+                      disabled={!currentUserByCaller}
+                      onClick={() => setIsModalOpen(true)}
+                    >
+                      Add a new event
+                    </button>
+                  </div>
+                )}
               </div>
-              {(userRole === "staff" || userRole === "supervisor") && (
-                <div className="sm:ml-auto mt-4 sm:mt-0 flex items-center justify-center w-full sm:w-fit h-full">
-                  <button
-                    className="bg-indigo-600 hover:bg-indigo-700 rounded-xl cursor-pointer w-full text-white p-4"
-                    disabled={!currentUserByCaller}
-                    onClick={() => setIsModalOpen(true)}
-                  >
-                    Add a new event
-                  </button>
+              {!currentUserByCaller ||
+              singleEventLoading ||
+              searchEventLoading ? (
+                <div className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3">
+                  <SkeletonLoader />
+                  <SkeletonLoader />
+                  <SkeletonLoader />
                 </div>
+              ) : filteredEvents && filteredEvents.length > 0 ? (
+                <motion.div
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="show"
+                  className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3"
+                >
+                  {filteredEvents.map((event, index) => (
+                    <motion.div key={index} variants={cardVariants}>
+                      <EventCard event={event} />
+                    </motion.div>
+                  ))}
+                </motion.div>
+              ) : (
+                <div className="mt-8">No Events Found</div>
               )}
             </div>
-            {!currentUserByCaller ||
-            singleEventLoading ||
-            searchEventLoading ? (
-              <div className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3">
-                <SkeletonLoader />
-                <SkeletonLoader />
-                <SkeletonLoader />
-              </div>
-            ) : filteredEvents && filteredEvents.length > 0 ? (
-              <motion.div
-                variants={containerVariants}
-                initial="hidden"
-                animate="show"
-                className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3"
-              >
-                {filteredEvents.map((event, index) => (
-                  <motion.div key={index} variants={cardVariants}>
-                    <EventCard event={event} />
-                  </motion.div>
-                ))}
-              </motion.div>
-            ) : (
-              <div className="mt-8">No Events Found</div>
-            )}
           </div>
         </div>
+        {/* Create event modal */}
+        {!singleEventLoading && !searchEventLoading && totalPages !== 0 && (
+          <div className="mt-auto">
+            <Pagination
+              base="eventlistPageNum"
+              currentPage={currentPage}
+              totalPage={totalPages}
+            />
+          </div>
+        )}
+        {isModalOpen && (
+          <ModalOverlay
+            isOpen={isModalOpen}
+            setIsOpen={setIsModalOpen}
+            title="Create Event"
+          >
+            <CreateEventForm
+              setIsModalOpen={setIsModalOpen}
+              venueIdentity={currentUserByCaller.assignedVenue.id}
+            />
+          </ModalOverlay>
+        )}
       </div>
-      {/* Create event modal */}
-      {isModalOpen && (
-        <ModalOverlay
-          isOpen={isModalOpen}
-          setIsOpen={setIsModalOpen}
-          title="Create Event"
-        >
-          <CreateEventForm
-            setIsModalOpen={setIsModalOpen}
-            venueIdentity={currentUserByCaller.assignedVenue.id}
-          />
-        </ModalOverlay>
-      )}
-    </div>
+    </>
   );
 };
 

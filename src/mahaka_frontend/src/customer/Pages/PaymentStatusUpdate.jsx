@@ -137,7 +137,7 @@ const PaymentStatusUpdate = () => {
           >
             View Ticket
           </button>
-          <Confetti width="full" height="1000px" tweenDuration={1000} />
+          <ConfettiComponent />
         </div>
       ) : (
         <div className="text-center">
@@ -156,3 +156,39 @@ const PaymentStatusUpdate = () => {
 };
 
 export default PaymentStatusUpdate;
+
+function ConfettiComponent() {
+  const [showConfetti, setShowConfetti] = useState(true);
+  function easeInOutQuad(currentTime, currentValue, targetValue, duration) {
+    currentTime /= duration / 2;
+    if (currentTime < 1)
+      return (targetValue / 2) * currentTime * currentTime + currentValue;
+    currentTime--;
+    return (
+      (-targetValue / 2) * (currentTime * (currentTime - 2) - 1) + currentValue
+    );
+  }
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowConfetti(false); // Stop showing confetti after 5 seconds
+    }, 5000); // 5 seconds
+
+    return () => clearTimeout(timer); // Cleanup timer on unmount
+  }, []);
+
+  return (
+    <>
+      {showConfetti && (
+        <Confetti
+          width={window?.innerWidth || 300}
+          height={window?.innerHeight || 200}
+          tweenDuration={5000} // Duration in milliseconds (5 seconds)
+          tweenFunction={
+            (currentTime, currentValue, targetValue, duration) =>
+              easeInOutQuad(currentTime, currentValue, targetValue, 5000) // Pass duration of 5 seconds
+          }
+        />
+      )}
+    </>
+  );
+}

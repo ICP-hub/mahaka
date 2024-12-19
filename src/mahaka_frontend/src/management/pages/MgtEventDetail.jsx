@@ -97,8 +97,8 @@ const MgtEventDetail = () => {
                 {endInterVal.date}, {endInterVal.time}
               </div>
             </div>
-            <TicketInfo label="General ticket" />
-            <TicketInfo label="Student ticket" />
+            <TicketInfo label="Single ticket" />
+            <TicketInfo label="Group ticket" />
             <TicketInfo label="Vip ticket" />
             <div className="flex">
               <p className="font-medium text-lg">Event Description</p>

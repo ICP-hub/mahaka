@@ -70,7 +70,13 @@ function App() {
   }, []);
 
   useEffect(() => {
-    dispatch(getAllEventsPaginated({ backend: backend }));
+    dispatch(
+      getAllEventsPaginated({
+        backend: backend,
+        pageLimit: 6,
+        currPage: 0,
+      })
+    );
   }, []);
 
   useEffect(() => {

@@ -39,6 +39,7 @@ const AdminLayout = () => {
   const { state, toggleNavigation } = useNavigationControl();
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
+  const { userlistPageNum } = useSelector((state) => state.pagination);
 
   // Initialize `selected` state from localStorage or default to 'light'
   const [selected, setSelected] = useState(
@@ -56,8 +57,14 @@ const AdminLayout = () => {
 
   // Init members in admin side
   useEffect(() => {
-    dispatch(listUsers({ backend: backend, pageLimit: 100, currPage: 0 }));
-  }, []);
+    dispatch(
+      listUsers({
+        backend: backend,
+        pageLimit: 8,
+        currPage: userlistPageNum - 1,
+      })
+    );
+  }, [userlistPageNum]);
 
   // Fetch wahanas
   // useEffect(() => {
@@ -79,7 +86,7 @@ const AdminLayout = () => {
               setSelected={setSelected}
             />
 
-            <div className="sm:overflow-y-auto custom-scroll">
+            <div className="sm:overflow-y-auto custom-scroll h-full relative flex flex-col">
               <Outlet />
             </div>
           </div>

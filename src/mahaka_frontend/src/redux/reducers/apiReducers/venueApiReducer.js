@@ -122,9 +122,22 @@ export const createVenue = createAsyncThunk(
       );
       if (response.ok) {
         action(false);
+        console.log("response creating venue", response);
+        return response;
       }
-      console.log("response creating venue", response);
-      return response;
+      if (response.err) {
+        const errorMessage = Object.keys(response.err);
+        // console.log(errorMessage);
+        console.error("Error creating event ", response.err);
+        if (errorMessage.includes("TicketPriceError")) {
+          notificationManager.error("Ticket price is too low to proceed");
+        } else if (errorMessage.includes("CyclesError")) {
+          notificationManager.error("Insufficient Cycles");
+        } else {
+          notificationManager.error("Error creating event!");
+        }
+        return response;
+      }
     } catch (error) {
       console.error("Error creating venue", error);
       return response;
@@ -252,7 +265,6 @@ const venueSlice = createSlice({
         }
         if (action.payload.err) {
           state.createVenueLoader = false;
-          notificationManager.error("Failed to create venue");
         }
       })
       .addCase(createVenue.rejected, (state, action) => {

@@ -217,13 +217,13 @@ const EventTable = ({ eventArr }) => {
                         <div className="flex w-full sm:pl-8 flex-col md:flex-row">
                           <div className="md:w-1/3 md:pr-2">
                             <EventViewBlock
-                              label="General Ticket Limit"
+                              label="Single Ticket Limit"
                               value={parseInt(event.gTicket_limit)}
                             />
                           </div>
                           <div className="md:w-1/3 md:pl-2">
                             <EventViewBlock
-                              label="Student Ticket Limit"
+                              label="Group Ticket Limit"
                               value={parseInt(event.sTicket_limit)}
                             />
                           </div>

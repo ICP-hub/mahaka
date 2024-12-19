@@ -137,7 +137,7 @@ const WahanaPayment = () => {
       return;
     }
     if (!timestemp) {
-      notificationManager.error("Please fill all details");
+      notificationManager.error("Please select date");
       return;
     }
 

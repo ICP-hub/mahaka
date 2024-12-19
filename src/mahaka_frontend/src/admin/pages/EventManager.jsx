@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   HiArrowRightCircle,
   HiCheckBadge,
@@ -18,6 +18,7 @@ import CreateEventForm from "../components/CreateEventForm";
 import {
   deleteEvent,
   getAllEventsByVenue,
+  getAllEventsPaginated,
   searchEvents,
 } from "../../redux/reducers/apiReducers/eventApiReducer";
 import {
@@ -26,6 +27,7 @@ import {
 } from "../../common/animationVariants";
 import { IoTrashBinSharp } from "react-icons/io5";
 import { Link } from "react-router-dom";
+import Pagination from "../../common/components/Pagination";
 
 // Timstamp convert
 export function formatDateAndTime(timestamp) {
@@ -65,6 +67,8 @@ const EventManager = () => {
     singleEventLoading,
     searchedEvents,
     searchEventLoading,
+    currentPage,
+    totalPages,
   } = useSelector((state) => state.events);
   const { backend } = useSelector((state) => state.authentication);
   const dispatch = useDispatch();
@@ -76,14 +80,14 @@ const EventManager = () => {
     option: "All",
     id: "",
   });
-
+  const { eventlistPageNum } = useSelector((state) => state.pagination);
   const toggleOptionMenu = () => setIsOptionMenuOpen((pv) => !pv);
   const handleSelectOption = (option, id) => {
     setSelectedVenue((pv) => ({ ...pv, option: option, id: id }));
     setIsOptionMenuOpen(false);
   };
+  const isVenMounted = useRef(false);
 
-  
   // Filtered : memoized
   const filteredEvents = useMemo(() => {
     if (searchText && searchPerformed) return searchedEvents;
@@ -106,17 +110,29 @@ const EventManager = () => {
   }, [searchText]);
 
   useEffect(() => {
-    if (selectedVenue.option !== "All") {
-      dispatch(
-        getAllEventsByVenue({
-          backend,
-          chunkSize: 10,
-          pageNo: 0,
-          venueId: selectedVenue.id,
-        })
-      );
+    if (isVenMounted.current) {
+      if (selectedVenue.option !== "All") {
+        dispatch(
+          getAllEventsByVenue({
+            backend,
+            chunkSize: 6,
+            pageNo: eventlistPageNum - 1,
+            venueId: selectedVenue.id,
+          })
+        );
+      } else {
+        dispatch(
+          getAllEventsPaginated({
+            backend: backend,
+            pageLimit: 6,
+            currPage: eventlistPageNum - 1,
+          })
+        );
+      }
+    } else {
+      isVenMounted.current = true;
     }
-  }, [selectedVenue]);
+  }, [selectedVenue, eventlistPageNum]);
 
   // console.log("filtered", filteredEvents);
   const handleSearch = () => {
@@ -267,14 +283,29 @@ const EventManager = () => {
                   </motion.div>
                 ))}
               </motion.div>
-            ) : searchPerformed && !searchEventLoading ? (
-              <div className="text-center text-gray-500 md:text-5xl text-3xl font-bold mt-10">
-                No Events Found
-              </div>
-            ) : null}
+            ) : (
+              totalPages === 0 && (
+                <div className="text-center text-gray-500 md:text-5xl text-3xl font-bold mt-10">
+                  No Events Found
+                </div>
+              )
+            )}
           </div>
         </div>
       </div>
+      {!eventsLoading &&
+        !singleEventLoading &&
+        !searchEventLoading &&
+        totalPages !== 0 && (
+          <div className="mt-auto">
+            <Pagination
+              base="eventlistPageNum"
+              currentPage={currentPage}
+              totalPage={totalPages}
+            />
+          </div>
+        )}
+
       {/* Create event modal */}
       {isModalOpen && (
         <ModalOverlay
@@ -291,7 +322,7 @@ const EventManager = () => {
 
 // event cards
 const EventCard = ({ event }) => {
-  const statusLogo =  Object.keys(event.status)
+  const statusLogo = Object.keys(event.status);
   //console.log("Keys in status:", statusLogo);
 
   const dispatch = useDispatch();
@@ -355,11 +386,17 @@ const EventCard = ({ event }) => {
               {event.venueId.split("#")[0]}
             </div>
             <div className="flex items-center">
-              <div className={`${statusLogo[0]==="Ongoing"?"text-green-800 bg-green-100 rounded-full px-2 py-0.5 text-sm font-semibold":
-                statusLogo[0]==="AboutToStart"?"text-yellow-800  bg-yellow-100 rounded-full px-2 py-0.5 text-sm font-semibold":
-                "text-red-800  bg-red-100 rounded-full px-2 py-0.5 text-sm font-bold"}`} >
-            {statusLogo}
-            </div>
+              <div
+                className={`${
+                  statusLogo[0] === "Ongoing"
+                    ? "text-green-800 bg-green-100 rounded-full px-2 py-0.5 text-sm font-semibold"
+                    : statusLogo[0] === "AboutToStart"
+                    ? "text-yellow-800  bg-yellow-100 rounded-full px-2 py-0.5 text-sm font-semibold"
+                    : "text-red-800  bg-red-100 rounded-full px-2 py-0.5 text-sm font-bold"
+                }`}
+              >
+                {statusLogo}
+              </div>
             </div>
           </div>
           <div className="mt-4 text-lg font-medium capitalize">

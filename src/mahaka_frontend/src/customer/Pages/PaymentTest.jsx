@@ -114,7 +114,7 @@ const PaymentTest = () => {
     }
 
     if (!timestemp || !ticketprice) {
-      notificationManager.error("Please fill all the details");
+      notificationManager.error("Please select the date");
       return;
     }
 

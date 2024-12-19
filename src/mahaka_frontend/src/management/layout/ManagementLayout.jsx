@@ -41,6 +41,10 @@ const ManagementLayout = () => {
   const { backend } = useSelector((state) => state.authentication);
   const dispatch = useDispatch();
 
+  const { eventlistPageNum, wahanalistPageNum } = useSelector(
+    (state) => state.pagination
+  );
+
   // Initialize `selected` state from localStorage or default to 'light'
   const [selected, setSelected] = useState(
     () => localStorage.getItem("theme") || "light"
@@ -60,13 +64,13 @@ const ManagementLayout = () => {
       dispatch(
         getAllEventsByVenue({
           backend,
-          chunkSize: 10,
-          pageNo: 0,
+          chunkSize: 6,
+          pageNo: eventlistPageNum - 1,
           venueId: currentUserByCaller.assignedVenue.id,
         })
       );
     }
-  }, [currentUserByCaller]);
+  }, [currentUserByCaller, eventlistPageNum]);
 
   // user wise venue
   useEffect(() => {
@@ -86,13 +90,13 @@ const ManagementLayout = () => {
       dispatch(
         getAllWahanasbyVenue({
           backend,
-          chunkSize: 10,
-          pageNo: 0,
+          chunkSize: 6,
+          pageNo: wahanalistPageNum - 1,
           venueId: currentUserByCaller.assignedVenue.id,
         })
       );
     }
-  }, [currentUserByCaller]);
+  }, [currentUserByCaller, wahanalistPageNum]);
 
   return (
     <ManagementProtected>
