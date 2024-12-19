@@ -24,6 +24,7 @@ import {
   searchWahanas,
 } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import { Link } from "react-router-dom";
+import Pagination from "../../common/components/Pagination";
 
 // Main component
 const MgtWahana = () => {
@@ -34,6 +35,8 @@ const MgtWahana = () => {
     searchedWahana,
     // wahanas,
     searchedWahanaLoading,
+    totalPages,
+    currentPage,
   } = useSelector((state) => state.wahana);
   const dispatch = useDispatch();
   const { currentUserByCaller, userRole } = useSelector((state) => state.users);
@@ -160,6 +163,15 @@ const MgtWahana = () => {
           </div>
         </div>
       </div>
+      {!singleWahanaLoading && !searchedWahanaLoading && totalPages !== 0 && (
+        <div className="mt-auto">
+          <Pagination
+            base="wahanalistPageNum"
+            currentPage={currentPage}
+            totalPage={totalPages}
+          />
+        </div>
+      )}
       {/* Create event modal */}
       {isModalOpen && (
         <ModalOverlay

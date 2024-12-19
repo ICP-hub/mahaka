@@ -14,7 +14,7 @@ const Pagination = ({ totalPage = 0, currentPage = 0, base }) => {
   };
 
   return (
-    <div className="flex justify-center items-center px-4 py-2 space-x-4">
+    <div className="flex justify-between items-center px-6 sm:px-10 py-2 space-x-4">
       <button
         className="px-4 py-2 border rounded bg-card border-border hover:bg-hover"
         onClick={() => dispatch(decrementPage({ key: base }))}
@@ -22,7 +22,10 @@ const Pagination = ({ totalPage = 0, currentPage = 0, base }) => {
         Previous
       </button>
       <div className="flex items-center space-x-2">
-        <div className="text-sm">Page</div>
+        <div className="text-sm">
+          Page {currentPage} of {totalPage}
+        </div>
+
         <select
           className="w-16 p-2 border-border border bg-card rounded text-center"
           value={currentPage}
@@ -37,9 +40,7 @@ const Pagination = ({ totalPage = 0, currentPage = 0, base }) => {
           )}
         </select>
       </div>
-      <div className="text-sm">
-        Page {currentPage} of {totalPage}
-      </div>
+
       <button
         className="px-4 py-2 border rounded bg-card border-border hover:bg-hover"
         onClick={() => dispatch(incrementPage({ key: base }))}
