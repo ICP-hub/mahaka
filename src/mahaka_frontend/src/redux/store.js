@@ -8,6 +8,7 @@ import wahanaApiReducer from "./reducers/apiReducers/wahanaApiReducer";
 import testimonialApiReducer from "./reducers/apiReducers/testimonialApiReducer";
 import ongoingEventsApiReducer from "./reducers/apiReducers/ongoingEventsApiReducer";
 import DIPApiReducer from "./reducers/apiReducers/dipapireducer";
+import paginationReducer from "./reducers/paginationReducer/paginationReducer";
 
 import authenticationReducer from "./reducers/auth/authenticationReducer";
 
@@ -22,6 +23,7 @@ const store = configureStore({
     testimonial: testimonialApiReducer,
     ongoingevents: ongoingEventsApiReducer,
     dipDetails: DIPApiReducer,
+    pagination: paginationReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -20,6 +20,7 @@ import {
 } from "../../redux/reducers/apiReducers/userApiReducer";
 import { Principal } from "@dfinity/principal";
 import notificationManager from "../../common/utils/notificationManager";
+import Pagination from "../../common/components/Pagination";
 
 // Permissions
 const rolePermissions = {
@@ -34,9 +35,11 @@ const rolePermissions = {
 const MemberManager = () => {
   const dispatch = useDispatch();
   const { backend } = useSelector((state) => state.authentication);
-  const { users, userLoading, searchedUser, searchUserLoading } = useSelector(
-    (state) => state.users
-  );
+  const { users, userLoading, searchedUser, searchUserLoading, totalPages } =
+    useSelector((state) => state.users);
+
+  const { userlistPageNum } = useSelector((state) => state.pagination);
+
   const [isRtNavOpen, setIsRtNavOpen] = useState(false);
   const [currentMember, setCurrentMember] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -82,99 +85,112 @@ const MemberManager = () => {
   };
 
   return (
-    <div className="flex flex-auto flex-col">
-      <div className="flex min-w-0 overflow-hidden">
-        <div className="relative overflow-y-auto overflow-x-hidden flex-auto custom-scroll">
-          <div className="flex flex-auto flex-col justify-between border-b px-6 py-8 sm:flex-row md:flex-col md:px-8 bg-card border-b-border">
-            <div>
-              <div className="text-4xl font-extrabold leading-none tracking-tight">
-                Members
-              </div>
-              <div className="text-secondary ml-0.5 font-medium">
-                {userLoading ? (
-                  <div className="animate-pulse bg-gray-500 rounded-md h-6 w-16"></div>
-                ) : (
-                  <div>{users.length} members</div>
-                )}
-              </div>
-            </div>
-            <div className="mt-4 flex items-center sm:mt-0 md:mt-4">
-              <div className="flex-auto flex items-center">
-                <div className="flex flex-auto">
-                  <div className="relative px-4 rounded-full border border-border min-h-10 flex items-center w-full">
-                    <HiMagnifyingGlass size={20} className="mr-1" />
-                    <input
-                      type="text"
-                      className="outline-none bg-transparent w-full"
-                      placeholder="Search members"
-                      value={searchText}
-                      onChange={(e) => setSearchText(e.target.value)}
-                    />
-                    <div className="ml-auto">
-                      <HiArrowRightCircle
-                        size={24}
-                        className="cursor-pointer"
-                        onClick={handleSearch}
-                      />
-                    </div>
-                  </div>
+    <>
+      <div className="flex flex-auto flex-col">
+        <div className="flex min-w-0 overflow-hidden">
+          <div className="relative overflow-y-auto overflow-x-hidden flex-auto custom-scroll">
+            <div className="flex flex-auto flex-col justify-between border-b px-6 py-8 sm:flex-row md:flex-col md:px-8 bg-card border-b-border">
+              <div>
+                <div className="text-4xl font-extrabold leading-none tracking-tight">
+                  Members
                 </div>
-                <button
-                  className="ml-4 px-4 items-center flex bg-secondary text-white min-h-10 rounded-full"
-                  onClick={() => {
-                    if (!isRtNavOpen) {
-                      setCurrentMember(null);
-                      setIsEditing(false);
-                      toggleNav(true);
-                    }
-                  }}
-                >
-                  <HiOutlinePlusSmall size={20} /> Add
-                </button>
+                <div className="text-secondary ml-0.5 font-medium">
+                  {userLoading ? (
+                    <div className="animate-pulse bg-gray-500 rounded-md h-6 w-16"></div>
+                  ) : (
+                    <div>{users.length} members</div>
+                  )}
+                </div>
               </div>
-            </div>
-          </div>
-          {userLoading || searchUserLoading ? (
-            <div className="p-6 space-y-4">
-              {/* Skeleton loading */}
-              {Array(3)
-                .fill(0)
-                .map((_, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center space-x-4 animate-pulse"
-                  >
-                    <div className="h-10 w-10 bg-gray-300 rounded-full"></div>
-                    <div className="flex-1 space-y-2">
-                      <div className="h-4 w-1/3 bg-gray-300 rounded"></div>
-                      <div className="h-4 w-1/4 bg-gray-300 rounded"></div>
+              <div className="mt-4 flex items-center sm:mt-0 md:mt-4">
+                <div className="flex-auto flex items-center">
+                  <div className="flex flex-auto">
+                    <div className="relative px-4 rounded-full border border-border min-h-10 flex items-center w-full">
+                      <HiMagnifyingGlass size={20} className="mr-1" />
+                      <input
+                        type="text"
+                        className="outline-none bg-transparent w-full"
+                        placeholder="Search members"
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                      />
+                      <div className="ml-auto">
+                        <HiArrowRightCircle
+                          size={24}
+                          className="cursor-pointer"
+                          onClick={handleSearch}
+                        />
+                      </div>
                     </div>
                   </div>
-                ))}
+                  <button
+                    className="ml-4 px-4 items-center flex bg-secondary text-white min-h-10 rounded-full"
+                    onClick={() => {
+                      if (!isRtNavOpen) {
+                        setCurrentMember(null);
+                        setIsEditing(false);
+                        toggleNav(true);
+                      }
+                    }}
+                  >
+                    <HiOutlinePlusSmall size={20} /> Add
+                  </button>
+                </div>
+              </div>
             </div>
-          ) : filteredUser.length > 0 ? (
-            <MemberList
-              members={filteredUser}
-              onMemberClick={openDetailView}
-              isRtNavOpen={isRtNavOpen}
+            {userLoading || searchUserLoading ? (
+              <div className="p-6 space-y-4">
+                {/* Skeleton loading */}
+                {Array(3)
+                  .fill(0)
+                  .map((_, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center space-x-4 animate-pulse"
+                    >
+                      <div className="h-10 w-10 bg-gray-300 rounded-full"></div>
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 w-1/3 bg-gray-300 rounded"></div>
+                        <div className="h-4 w-1/4 bg-gray-300 rounded"></div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            ) : filteredUser.length > 0 ? (
+              <div>
+                <MemberList
+                  members={filteredUser}
+                  onMemberClick={openDetailView}
+                  isRtNavOpen={isRtNavOpen}
+                />
+              </div>
+            ) : (
+              <div className="text-center text-gray-500 md:text-5xl text-3xl font-bold mt-10">
+                {searchPerformed ? "No search results found" : "No users found"}
+              </div>
+            )}
+          </div>
+          <NavigationRight isOpen={isRtNavOpen}>
+            <UpdateMember
+              member={currentMember}
+              onToggle={toggleNav}
+              isEditing={isEditing}
+              setIsEditing={setIsEditing}
+              members={users}
             />
-          ) : (
-            <div className="text-center text-gray-500 md:text-5xl text-3xl font-bold mt-10">
-              {searchPerformed ? "No search results found" : "No users found"}
-            </div>
-          )}
+          </NavigationRight>
         </div>
-        <NavigationRight isOpen={isRtNavOpen}>
-          <UpdateMember
-            member={currentMember}
-            onToggle={toggleNav}
-            isEditing={isEditing}
-            setIsEditing={setIsEditing}
-            members={users}
-          />
-        </NavigationRight>
       </div>
-    </div>
+      {!userLoading && (
+        <div className="mt-auto">
+          <Pagination
+            base="userlistPageNum"
+            currentPage={userlistPageNum}
+            totalPage={totalPages}
+          />
+        </div>
+      )}
+    </>
   );
 };
 

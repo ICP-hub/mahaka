@@ -10,8 +10,8 @@ const initialState = {
   userLoading: true,
   userRole: null,
   error: null,
-  currentPage: 1,
-  totalPages: 1,
+  currentPage: 0,
+  totalPages: 0,
   newLoading: false,
   deleteLoading: false,
   searchedUser: null,
@@ -220,10 +220,11 @@ const userSlice = createSlice({
         state.userLoading = true;
       })
       .addCase(listUsers.fulfilled, (state, action) => {
+        // console.log(action);
         state.userLoading = false;
         state.users = action.payload.data;
-        state.currentPage = action.payload.current_page;
-        state.totalPages = action.payload.total_pages;
+        state.currentPage = parseInt(action.payload.current_page);
+        state.totalPages = parseInt(action.payload.total_pages);
         state.error = null;
       })
       .addCase(listUsers.rejected, (state, action) => {

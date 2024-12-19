@@ -7,8 +7,8 @@ const initialState = {
   eventByVenue: [],
   currentEvent: null,
   error: null,
-  currentPage: 1,
-  totalPages: 1,
+  currentPage: 0,
+  totalPages: 0,
   eventsLoading: true,
   createEventLoader: false,
   buyTicketLoading: false,
@@ -24,9 +24,24 @@ export const createEvent = createAsyncThunk(
   async ({ closeModal, backend, id, record, collection_args }) => {
     try {
       const response = await backend.createEvent(id, record, collection_args);
-      console.log("respones creating event", response);
-      closeModal();
-      return response;
+      if (response.ok) {
+        console.log("respones creating event", response);
+        closeModal();
+        return response;
+      }
+      if (response.err) {
+        const errorMessage = Object.keys(response.err);
+        // console.log(errorMessage);
+        console.error("Error creating event ", response.err);
+        if (errorMessage.includes("TicketPriceError")) {
+          notificationManager.error("Ticket price is too low to proceed");
+        } else if (errorMessage.includes("CyclesError")) {
+          notificationManager.error("Insufficient Cycles");
+        } else {
+          notificationManager.error("Error creating event!");
+        }
+        return response;
+      }
     } catch (err) {
       console.error("Error creating event ", err);
       notificationManager.error("Error creating event!");
@@ -56,7 +71,7 @@ export const deleteEvent = createAsyncThunk(
 // getting all events by venue
 export const getAllEventsByVenue = createAsyncThunk(
   "events/getAllEventsByVenue",
-  async ({ backend, chunkSize, pageNo, venueId }) => {
+  async ({ backend, chunkSize, pageNo, venueId }, { rejectWithValue }) => {
     try {
       const response = await backend.getallEventsbyVenue(
         chunkSize,
@@ -67,7 +82,7 @@ export const getAllEventsByVenue = createAsyncThunk(
       return response;
     } catch (error) {
       console.error("Error fetching events:", error);
-      throw new Error("Error fetching events", error);
+      return rejectWithValue({ currentPage: 0, totalPages: 0 });
     }
   }
 );
@@ -75,14 +90,14 @@ export const getAllEventsByVenue = createAsyncThunk(
 // getallevents
 export const getAllEventsPaginated = createAsyncThunk(
   "events/getAllEventsPaginated",
-  async ({ backend }) => {
+  async ({ backend, pageLimit, currPage }, { rejectWithValue }) => {
     try {
-      const response = await backend.getAllEventsPaginated(10, 0);
+      const response = await backend.getAllEventsPaginated(pageLimit, currPage);
       // console.log("Events fetched:", response);
       return response;
     } catch (error) {
       console.error("Error fetching events:", error);
-      throw new Error("Error fetching events", error);
+      return rejectWithValue({ currentPage: 0, totalPages: 0 });
     }
   }
 );
@@ -125,7 +140,7 @@ export const getEvent = createAsyncThunk(
 
 export const searchEvents = createAsyncThunk(
   "events/searchEvents",
-  async ({ backend, searchText, chunkSize, pageNo }) => {
+  async ({ backend, searchText, chunkSize, pageNo }, { rejectWithValue }) => {
     try {
       const response = await backend.searchEvents(
         searchText,
@@ -133,10 +148,10 @@ export const searchEvents = createAsyncThunk(
         pageNo
       );
       console.log("search response is ", response);
-      return response.data;
+      return response;
     } catch (error) {
       console.error("error searching the events", error);
-      throw new Error("Error searching event", error);
+      return rejectWithValue({ currentPage: 0, totalPages: 0 });
     }
   }
 );
@@ -158,11 +173,16 @@ const eventSlice = createSlice({
       })
       .addCase(createEvent.fulfilled, (state, action) => {
         // console.log(action);
-        state.createEventLoader = false;
-        state.events = [...state.events, action.payload.ok];
-        state.eventByVenue = [...state.eventByVenue, action.payload.ok];
-        state.error = null;
-        notificationManager.success("Event created successfully");
+        if (action.payload.ok) {
+          state.createEventLoader = false;
+          state.events = [...state.events, action.payload.ok];
+          state.eventByVenue = [...state.eventByVenue, action.payload.ok];
+          state.error = null;
+          notificationManager.success("Event created successfully");
+        }
+        if (action.payload.err) {
+          state.createEventLoader = false;
+        }
       })
       .addCase(createEvent.rejected, (state, action) => {
         state.createEventLoader = false;
@@ -176,15 +196,20 @@ const eventSlice = createSlice({
         state.searchEventLoading = true;
       })
       .addCase(searchEvents.fulfilled, (state, action) => {
+        console.log(action);
         // state.singleEventLoading = false;
         // state.events = action.payload;
+        state.currentPage = parseInt(action.payload.current_page);
+        state.totalPages = parseInt(action.payload.total_pages);
         state.searchEventLoading = false;
-        state.searchedEvents = action.payload;
+        state.searchedEvents = action.payload.data;
         state.error = null;
       })
       .addCase(searchEvents.rejected, (state, action) => {
         // state.singleEventLoading = false;
         state.searchEventLoading = false;
+        state.currentPage = 0;
+        state.totalPages = 0;
         state.searchedEvents = [];
         state.error = "Error searching event";
       })
@@ -213,11 +238,16 @@ const eventSlice = createSlice({
         state.singleEventLoading = true;
       })
       .addCase(getAllEventsByVenue.fulfilled, (state, action) => {
+        // console.log(action);
         state.singleEventLoading = false;
+        state.currentPage = parseInt(action.payload.ok.current_page);
+        state.totalPages = parseInt(action.payload.ok.Total_pages);
         state.eventByVenue = action.payload.ok.data;
       })
       .addCase(getAllEventsByVenue.rejected, (state, action) => {
         state.singleEventLoading = false;
+        state.currentPage = 0;
+        state.totalPages = 0;
         state.eventByVenue = [];
         state.error = action.error.message;
       })
@@ -229,7 +259,10 @@ const eventSlice = createSlice({
         state.error = null;
       })
       .addCase(getAllEventsPaginated.fulfilled, (state, action) => {
+        // console.log(action);
         state.eventsLoading = false;
+        state.currentPage = parseInt(action.payload.ok.current_page);
+        state.totalPages = parseInt(action.payload.ok.Total_pages);
         state.events = [...action.payload.ok.data];
         state.error = null;
         state.status = "succeeded";
@@ -237,6 +270,8 @@ const eventSlice = createSlice({
       .addCase(getAllEventsPaginated.rejected, (state, action) => {
         state.status = "failed";
         // state.events = [];
+        state.currentPage = 0;
+        state.totalPages = 0;
         (state.eventsLoading = false), (state.error = action.error.message);
         // notificationManager.error("Failed to fetch events");
       })

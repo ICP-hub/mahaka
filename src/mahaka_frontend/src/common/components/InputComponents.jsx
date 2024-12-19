@@ -143,8 +143,8 @@ export const FormFieldImageUpload = ({ label, image, onChange }) => {
           <div>
             {label}
             {label === "Banner"
-              ? "(1584x396px)*"
-              : label === "Logo" && "(300x300px)*"}
+              ? "(Aspect ratio: 3:1)*"
+              : label === "Logo" && "(Aspect ratio: 1:1)*"}
           </div>
         </div>
         <div className="ml-auto italic text-sm">

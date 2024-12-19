@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   HiArrowRightCircle,
   HiCheckBadge,
@@ -17,6 +17,7 @@ import { motion } from "framer-motion";
 import ModalOverlay from "../../customer/Components/Modal-overlay";
 import {
   deleteWahana,
+  getAllWahanas,
   getAllWahanasbyVenue,
   searchWahanas,
 } from "../../redux/reducers/apiReducers/wahanaApiReducer";
@@ -28,26 +29,36 @@ import CreateWahanaForm from "../components/CreateWahanaForm";
 import { formatDateAndTime } from "./EventManager";
 import { IoTrashBinSharp } from "react-icons/io5";
 import { Link } from "react-router-dom";
+import Pagination from "../../common/components/Pagination";
 
 // Main component
 const WahanaManager = () => {
   const { venues } = useSelector((state) => state.venues);
   const { backend } = useSelector((state) => state.authentication);
-  const { wahanas, wahanasByVenue, singleWahanaLoading, loading,searchedWahana, searchedWahanaLoading  } = useSelector(
-    (state) => state.wahana
-  );
+  const {
+    wahanas,
+    wahanasByVenue,
+    singleWahanaLoading,
+    loading,
+    searchedWahana,
+    searchedWahanaLoading,
+    currentPage,
+    totalPages,
+  } = useSelector((state) => state.wahana);
   // console.log("total wahanas are",wahanas)
   // console.log(" wahanas by venue are",wahanasByVenue)
   // console.log("search wahanas are",searchedWahana)
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOptionMenuOpen, setIsOptionMenuOpen] = useState(false);
-  const [searchBtnClick, setSearchBtnClick] = useState(false)
-  const [searchInput, setSearchInput] = useState("")
+  const [searchBtnClick, setSearchBtnClick] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
   const [selectedVenue, setSelectedVenue] = useState({
     option: "All",
     id: "",
   });
+  const { wahanalistPageNum } = useSelector((state) => state.pagination);
+  const isVenMounted = useRef(false);
 
   const toggleOptionMenu = () => setIsOptionMenuOpen((pv) => !pv);
 
@@ -64,34 +75,58 @@ const WahanaManager = () => {
     } else {
       return wahanasByVenue;
     }
-  }, [selectedVenue, wahanas, wahanasByVenue,searchInput,searchedWahana,searchBtnClick]);
+  }, [
+    selectedVenue,
+    wahanas,
+    wahanasByVenue,
+    searchInput,
+    searchedWahana,
+    searchBtnClick,
+  ]);
 
   useEffect(() => {
-    if (selectedVenue.option !== "All") {
+    if (isVenMounted.current) {
+      if (selectedVenue.option !== "All") {
+        dispatch(
+          getAllWahanasbyVenue({
+            backend,
+            chunkSize: 6,
+            pageNo: wahanalistPageNum - 1,
+            venueId: selectedVenue.id,
+          })
+        );
+      } else {
+        dispatch(
+          getAllWahanas({
+            backend: backend,
+            chunkSize: 6,
+            pageNo: wahanalistPageNum - 1,
+          })
+        );
+      }
+    } else {
+      isVenMounted.current = true;
+    }
+  }, [selectedVenue, wahanalistPageNum]);
+
+  useEffect(() => {
+    setSearchBtnClick(false);
+  }, [searchInput]);
+
+  const handleSearch = () => {
+    if (searchInput.trim()) {
+      setSearchBtnClick(true);
+      // console.log("search value is",searchInput)
       dispatch(
-        getAllWahanasbyVenue({
-          backend,
+        searchWahanas({
+          backend: backend,
+          searchText: searchInput,
           chunkSize: 10,
           pageNo: 0,
-          venueId: selectedVenue.id,
         })
       );
     }
-  }, [selectedVenue]);
-
-  useEffect(() => {
-    setSearchBtnClick(false); 
-  }, [searchInput]);
-  
-
-
-  const handleSearch = ()=>{
-    if (searchInput.trim()) {
-     setSearchBtnClick(true); 
-  // console.log("search value is",searchInput)
-   dispatch(searchWahanas({backend:backend,searchText:searchInput,chunkSize:10,pageNo:0}))
-    }
- }
+  };
   // console.log("filtered", filteredWahanas);
 
   const containerVariants = createStaggerContainer(0.4);
@@ -142,7 +177,10 @@ const WahanaManager = () => {
                           onClick={toggleOptionMenu}
                         >
                           {selectedVenue.option}
-                          <HiMiniChevronUpDown size={25} className ="ml-auto dark:text-white"/>
+                          <HiMiniChevronUpDown
+                            size={25}
+                            className="ml-auto dark:text-white"
+                          />
                         </div>
                         {isOptionMenuOpen && (
                           <>
@@ -191,11 +229,11 @@ const WahanaManager = () => {
                       type="text"
                       placeholder="Search wahanas..."
                       className="outline-none bg-transparent w-full"
-                      value = {searchInput}
-                      onChange= {(e)=>setSearchInput(e.target.value)}
+                      value={searchInput}
+                      onChange={(e) => setSearchInput(e.target.value)}
                     />
                   </div>
-                  <button className="ml-auto" onClick ={handleSearch}>
+                  <button className="ml-auto" onClick={handleSearch}>
                     <HiArrowRightCircle size={24} className="cursor-pointer" />
                   </button>
                 </div>
@@ -209,7 +247,7 @@ const WahanaManager = () => {
                 </div>
               </div>
             </div>
-            {loading || singleWahanaLoading ||  searchedWahanaLoading ? (
+            {loading || singleWahanaLoading || searchedWahanaLoading ? (
               <div className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:grid-cols-2 lg:grid-cols-3">
                 <SkeletonLoader />
                 <SkeletonLoader />
@@ -229,11 +267,25 @@ const WahanaManager = () => {
                 ))}
               </motion.div>
             ) : (
-              <div className="mt-10 flex justify-center text-3xl font-bold text-gray-600">No Wahana Found</div>
+              <div className="mt-10 flex justify-center text-3xl font-bold text-gray-600">
+                No Wahana Found
+              </div>
             )}
           </div>
         </div>
       </div>
+      {!loading &&
+        !singleWahanaLoading &&
+        !searchedWahanaLoading &&
+        totalPages !== 0 && (
+          <div className="mt-auto">
+            <Pagination
+              base="wahanalistPageNum"
+              currentPage={currentPage}
+              totalPage={totalPages}
+            />
+          </div>
+        )}
       {/* Create event modal */}
       {isModalOpen && (
         <ModalOverlay
