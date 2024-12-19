@@ -121,16 +121,16 @@ const Ticket = ({ ticket }) => {
           {/* Rotated Content Section */}
           <div
             className="flex flex-col items-center justify-center 
-                        md:transform md:-rotate-90"
+                       md:transform md:-rotate-90"
             style={{ transformOrigin: "center" }}
           >
             <p className="text-center text-white pb-2 md:pb-3 tracking-wide">
               Please present this ticket at the entrance
             </p>
             {/* <p className="text-center text-base">
-               Questions? <br />
-               <span className="font-semibold">987 654 321</span>
-             </p> */}
+              Questions? <br />
+              <span className="font-semibold">987 654 321</span>
+            </p> */}
           </div>
         </div>
 

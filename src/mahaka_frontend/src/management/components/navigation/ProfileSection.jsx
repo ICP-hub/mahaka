@@ -2,31 +2,14 @@ import ProfileDemoPng from "@/assets/images/profile-demo.png";
 import Avvvatars from "avvvatars-react";
 import { useSelector } from "react-redux";
 import notificationManager from "../../../common/utils/notificationManager";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 const ProfileSection = () => {
   const { principal } = useSelector((state) => state.authentication);
   const { currentUserByCaller } = useSelector((state) => state.users);
 
   const handleCopyPrincipal = () => {
-    if (principal) {
-      // Try using the modern Clipboard API first
-      if (navigator.clipboard) {
-        navigator.clipboard
-          .writeText(principal)
-          .then(() => {
-            notificationManager.success("Principal copied");
-          })
-          .catch((err) => {
-            console.error("Clipboard API failed:", err);
-            fallbackCopy();
-          });
-      } else {
-        // Fallback to document.execCommand if Clipboard API is unavailable
-        fallbackCopy();
-      }
-    } else {
-      notificationManager.error("No principal to copy");
-    }
+    notificationManager.error("principal copied");
   };
 
   // Fallback method using document.execCommand
@@ -66,12 +49,14 @@ const ProfileSection = () => {
             "Manager Name"
           )}
         </div>
-        <div
-          className="text-secondaryText mt-0.5 w-full overflow-hidden text-ellipsis whitespace-nowrap text-center text-md font-medium leading-normal cursor-pointer"
-          onClick={handleCopyPrincipal}
-        >
-          {principal}
-        </div>
+        <CopyToClipboard text={principal}>
+          <div
+            className="text-secondaryText mt-0.5 w-full overflow-hidden text-ellipsis whitespace-nowrap text-center text-md font-medium leading-normal cursor-pointer"
+            onClick={handleCopyPrincipal}
+          >
+            {principal}
+          </div>
+        </CopyToClipboard>
       </div>
     </div>
   );

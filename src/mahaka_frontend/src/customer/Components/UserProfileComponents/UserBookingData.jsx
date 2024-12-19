@@ -8,12 +8,17 @@ const UserBookingData = () => {
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0); // Current page
+  const [totalPages, setTotalPages] = useState(1); // Total pages
+  const chunkSize = 6; // Number of items per page
 
-  const getTickets = async () => {
+  const getTickets = async (page) => {
     try {
-      const res = await backend.getAllCallerTickets(10, 0);
+      setLoading(true);
+      const res = await backend.getAllCallerTickets(chunkSize, page);
       console.log(res);
       setTickets(res.ok.data || []);
+      setTotalPages(parseInt(res.ok.total_pages) || 1);
       setLoading(false);
     } catch (err) {
       console.error(err);
@@ -21,20 +26,27 @@ const UserBookingData = () => {
       setLoading(false);
     }
   };
-  console.log(backend);
 
   useEffect(() => {
     if (backend) {
-      getTickets();
+      getTickets(page);
     }
-  }, [backend]);
+  }, [backend, page]);
 
   const closeModal = () => setSelectedTicket(null);
+
+  const handleNextPage = () => {
+    if (page < totalPages - 1) setPage((prev) => prev + 1);
+  };
+
+  const handlePrevPage = () => {
+    if (page > 0) setPage((prev) => prev - 1);
+  };
 
   if (loading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6 p-4">
-        {Array.from({ length: 8 }).map((_, index) => (
+        {Array.from({ length: 6 }).map((_, index) => (
           <div
             key={index}
             className="p-6 bg-white border border-gray-200 rounded-xl shadow-md animate-pulse"
@@ -51,7 +63,7 @@ const UserBookingData = () => {
 
   if (error) {
     return (
-      <div className="flex justify-center ">
+      <div className="flex justify-center">
         <div className="bg-white shadow-lg rounded-lg p-6 max-w-sm text-center mt-24">
           <h2 className="text-gray-800 text-lg font-bold mb-2">
             No Data Found
@@ -78,11 +90,9 @@ const UserBookingData = () => {
         {tickets.map((ticket, index) => (
           <div key={index}>
             <div className="relative p-4 bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-lg transition-shadow">
-              {/* Ticket ID Badge */}
               <div className="absolute -top-4 -right-4 bg-secondary text-white text-xs font-bold rounded-full px-3 py-1 shadow-md">
                 #{parseInt(ticket.ticketId)}
               </div>
-              {/* Dummy Image */}
               <div className="h-72 w-full bg-gray-200 rounded-md mb-4">
                 <img
                   src={ticket.banner}
@@ -90,12 +100,11 @@ const UserBookingData = () => {
                   className="h-full w-full object-cover rounded-md"
                 />
               </div>
-              {/* Ticket Information */}
               <div className="space-y-2">
                 <h2 className="text-lg font-semibold text-gray-800 truncate">
                   {ticket.categoryId}
                 </h2>
-                {/* Price and Visitors */}
+
                 <div className="flex justify-between items-center">
                   <p className="text-sm text-gray-600">
                     <strong className="text-secondary">Visitors:</strong>{" "}
@@ -107,11 +116,8 @@ const UserBookingData = () => {
                   </p>
                 </div>
               </div>
-              {/* View Details Button */}
               <button
-                onClick={() => {
-                  setSelectedTicket(ticket);
-                }}
+                onClick={() => setSelectedTicket(ticket)}
                 className="w-full mt-4 py-2 bg-secondary text-white font-medium rounded-lg transition-colors"
               >
                 View Details
@@ -121,17 +127,37 @@ const UserBookingData = () => {
         ))}
       </div>
 
-      {/* Modal */}
+      <div className="flex justify-between items-center mt-6">
+        <button
+          onClick={handlePrevPage}
+          disabled={page === 0}
+          className={`px-4 py-2 text-white bg-secondary rounded ${
+            page === 0 && "opacity-50 cursor-not-allowed"
+          }`}
+        >
+          Previous
+        </button>
+        <span className="text-gray-600">
+          Page {page + 1} of {totalPages}
+        </span>
+        <button
+          onClick={handleNextPage}
+          disabled={page >= totalPages - 1}
+          className={`px-4 py-2 text-white bg-secondary rounded ${
+            page >= totalPages - 1 && "opacity-50 cursor-not-allowed"
+          }`}
+        >
+          Next
+        </button>
+      </div>
+
       {selectedTicket && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
           onClick={closeModal}
         >
           <div className="bg-white rounded-lg shadow-xl w-[90%] max-w-2xl relative">
-            {/* Close Button */}
-
             <Ticket ticket={selectedTicket} />
-            {/* Modal Header */}
           </div>
         </div>
       )}
