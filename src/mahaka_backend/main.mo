@@ -1145,6 +1145,85 @@ actor mahaka {
           }; 
      };
 
+     public shared ({caller = user}) func getEventDetailsByVenue(
+          venueId : Types.venueId
+     ) : async Result.Result<{data : [{id: Text; title: Text; event_collectionid: Principal}]}, Types.UpdateUserError> {
+
+          let events_object = _EventsMap.get(venueId);
+          switch (events_object){
+               case null {
+                    throw (Error.reject("No event found in the venue"));
+               };
+               case (?v){
+                    let events_object_blob = await stable_get(v, Events_state);
+                    let events_object : ?Types.Events_data = from_candid(events_object_blob);
+                    switch (events_object){
+                         case null {
+                              throw (Error.reject("No object found in the memory"));
+                         };
+                         case (?v){
+                              let events_list = v.Events;
+                              
+                              let transformed_data = List.map(events_list, func(event : Types.completeEvent) : {id: Text; title: Text; event_collectionid: Principal} {
+                                   return {
+                                        id = event.id;
+                                        title = event.title;
+                                        event_collectionid = event.event_collectionid;
+                                   };
+                              });
+                              
+                              return #ok {data = List.toArray(transformed_data)};
+                         };
+                    };
+               };
+          };
+     };
+
+
+
+     public shared ({caller = user}) func getallEventsbyVenueNoPaginate(venueId : Types.venueId) : async Result.Result<[Types.completeEvent], Types.CommonErrors> {
+          // if (Principal.isAnonymous(user)) {
+          //      return #err(#UserNotAuthenticated); 
+          // };
+          // let roleResult = await getRoleByPrincipal(user);
+          // switch (roleResult) {
+          //      case (#err(error)) {
+          //           return #err(#RoleError);
+          //      };
+          //      case (#ok(role)) {
+          //           if (not (
+          //                (await Validation.check_for_sysAdmin(role)) or 
+          //                (await Validation.check_for_Admin(role)) or 
+          //                (await Validation.check_for_Staff(role)) or 
+          //                (await Validation.check_for_Manager(role)) or 
+          //                (await Validation.check_for_SuperVisor(role)) or 
+          //                (await Validation.check_for_Bod(role)))
+          //           ) {
+          //                return #err(#UserNotAuthorized);
+          //           };
+          //      };
+          // };
+          let events_object = _EventsMap.get(venueId);
+          switch (events_object){
+               case null {
+                    throw (Error.reject("No event found in the venue"));
+               };
+               case (?v){
+                    let events_object_blob = await stable_get(v,Events_state);
+                    let events_object : ?Types.Events_data = from_candid(events_object_blob);
+                    switch (events_object){
+                         case null {
+                              throw (Error.reject("No object found in the memory"));
+                         };
+                         case (?v){
+                              let events_list = v;
+                              return #ok(List.toArray(events_list.Events));
+                         };
+                    };
+               };
+          }; 
+     };
+
      public shared ({caller}) func getAllEventsPaginated(chunkSize : Nat, pageNo : Nat) : async Result.Result<{data : [Types.completeEvent]; current_page : Nat; Total_pages : Nat}, Types.UpdateUserError> {
           // if (Principal.isAnonymous(caller)) {
           //      return #err(#UserNotAuthenticated); 
@@ -1240,6 +1319,39 @@ actor mahaka {
 
      public shared ({caller}) func getOngoingEvents(chunkSize : Nat, pageNo : Nat) : async Result.Result<{data : [Types.completeEvent]; current_page : Nat; Total_pages : Nat}, Types.CommonErrors> {
           let allEventsResult = await getAllEvents();
+          switch (allEventsResult) {
+               case (#err(error)) {
+                    return #err(error);
+               };
+               case (#ok(allEventsData)) {
+                    let currentTime = Time.now();
+                    
+                    let ongoingEvents = Array.filter<Types.completeEvent>(
+                         allEventsData,
+                         func (event) {
+                              (event.details.StartDate <= currentTime) and (event.details.EndDate > currentTime)
+                         }
+                    );
+
+                    if (Array.size(ongoingEvents) == 0) {
+                         return #err(#DataNotFound);
+                    };
+
+                    let index_pages = Utils.paginate<Types.completeEvent>(ongoingEvents, chunkSize);
+                    if (index_pages.size() < pageNo) {
+                         throw Error.reject("Page not found");
+                    };
+                    if (index_pages.size() == 0) {
+                         throw Error.reject("No ongoing events found");
+                    };
+
+                    let pages_data = index_pages[pageNo];
+                    return #ok{data = pages_data; current_page = pageNo + 1; Total_pages = index_pages.size()};
+               };
+          };
+     };
+     public shared ({caller}) func getOngoingEventsbyVenue(venueId : Text, chunkSize : Nat, pageNo : Nat) : async Result.Result<{data : [Types.completeEvent]; current_page : Nat; Total_pages : Nat}, Types.CommonErrors> {
+          let allEventsResult = await getallEventsbyVenueNoPaginate(venueId);
           switch (allEventsResult) {
                case (#err(error)) {
                     return #err(error);
