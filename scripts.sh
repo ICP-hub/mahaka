@@ -52,9 +52,9 @@ do
         "(principal \"$(dfx identity get-principal --identity "$IDENTITY_NAME")\", \"email@example.com\", \"FirstName\", \"LastName\", variant { admin },  record { id = \"1\"; title = \"Venue A\" })" 2>&1)
     
     if [[ $? -eq 0 ]]; then
-        echo "Venue created successfully for user $IDENTITY_NAME : $add_RESULT."
+        echo "admin added successfully for user $IDENTITY_NAME : $add_RESULT."
     else
-        echo "Error creating venue for user $IDENTITY_NAME: $add_RESULT"
+        echo "Error making admin for user $IDENTITY_NAME: $add_RESULT"
     fi
 
     dfx identity use "$IDENTITY_NAME"
@@ -66,7 +66,7 @@ do
         "(record  $VENUE_COLLECTION_ARGS, \"$VENUE_TITLE\", $VENUE_CAPACITY,record { \"Location\" =  \"$VENUE_LOCATION\"}, \"$VENUE_DESCRIPTION\")" 2>&1)
     
     if [[ $? -eq 0 ]]; then
-        echo $VENUE_ID    
+        VENUE_ID=$(echo "$VENUE_RESULT" | grep -oP '(?<=id = ")[^"]*')
         echo "Venue created successfully for user $IDENTITY_NAME : $VENUE_RESULT."
     else
         echo "Error creating venue for user $IDENTITY_NAME: $VENUE_RESULT"
@@ -76,10 +76,10 @@ do
     # 2. Create Event
     echo "Creating event for user $IDENTITY_NAME..."
     EVENT_RESULT=$(dfx canister call "$CANISTER_ID" createEvent \
-        "(\"ID\", record {\"id\" = \"id\" ; \"title\" = \"$EVENT_TITLE\"; \"description\" = \"$EVENT_DESCRIPTION\"; \"logo\" = record $VENUE_LOGO; \"banner\" =record $VENUE_BANNER; \"details\" = record {\"StartDate\" = $EVENT_START_DATE; \"StartTime\" = $EVENT_START_TIME; \"EndDate\" = $EVENT_END_DATE ; \"EndTime\" = $EVENT_END_TIME ; \"Location\" = \"$EVENT_LOCATION\"}; \"sTicket_limit\" = $EVENT_S_TICKET_LIMIT; \"vTicket_limit\" = $EVENT_V_TICKET_LIMIT ; \"gTicket_limit\" = $EVENT_G_TICKET_LIMIT ; \"creator\" = principal \"$(dfx identity get-principal)\" ; \"venueId\" = \"hey\"; \"status\" = variant {AboutToStart}}, record  $VENUE_COLLECTION_ARGS)" 2>&1)
+        "(\"$VENUE_ID\", record {\"id\" = \"id\" ; \"title\" = \"$EVENT_TITLE\"; \"description\" = \"$EVENT_DESCRIPTION\"; \"logo\" = record $VENUE_LOGO; \"banner\" =record $VENUE_BANNER; \"details\" = record {\"StartDate\" = $EVENT_START_DATE; \"StartTime\" = $EVENT_START_TIME; \"EndDate\" = $EVENT_END_DATE ; \"EndTime\" = $EVENT_END_TIME ; \"Location\" = \"$EVENT_LOCATION\"}; \"sTicket_limit\" = $EVENT_S_TICKET_LIMIT; \"vTicket_limit\" = $EVENT_V_TICKET_LIMIT ; \"gTicket_limit\" = $EVENT_G_TICKET_LIMIT ; \"creator\" = principal \"$(dfx identity get-principal)\" ; \"venueId\" = \"hey\"; \"status\" = variant {AboutToStart}}, record  $VENUE_COLLECTION_ARGS)" 2>&1)
     
     if [[ $? -eq 0 ]]; then
-        echo "Event created successfully for user $IDENTITY_NAME."
+        echo "Event created successfully for user $IDENTITY_NAME : $EVENT_RESULT"
     else
         echo "Error creating event for user $IDENTITY_NAME: $EVENT_RESULT"
     fi
@@ -87,22 +87,22 @@ do
     # 3. Create Wahana
     echo "Creating wahana for user $IDENTITY_NAME..."
     WAHANA_RESULT=$(dfx canister call "$CANISTER_ID" createWahana \
-        "(\"$VENUE_CANISTER_ID\", \"$WAHANA_NAME\", \"$WAHANA_SYMBOL\", 10, 1000,\"$WAHANA_DESCRIPTION\" , true, record $VENUE_BANNER , 10000.0 )" 2>&1)
+        "(\"$VENUE_ID\", \"$WAHANA_NAME\", \"$WAHANA_SYMBOL\", 10, 1000,\"$WAHANA_DESCRIPTION\" , true, record $VENUE_BANNER , 10000.0 )" 2>&1)
     
     if [[ $? -eq 0 ]]; then
-        echo "Wahana created successfully for user $IDENTITY_NAME."
+        echo "Wahana created successfully for user $IDENTITY_NAME : $WAHANA_RESULT"
     else
         echo "Error creating wahana for user $IDENTITY_NAME: $WAHANA_RESULT"
     fi
 
     echo "topping up cycles..."
     dfx identity use "default"
-    VENUE_RESULT=$(dfx canister deposit-cycles 810000000000 "$CANISTER_ID"  2>&1)
+    TOPUP=$(dfx canister deposit-cycles 2400000000000 "$CANISTER_ID"  2>&1)
     
     if [[ $? -eq 0 ]]; then
-        echo "Venue created successfully for user $IDENTITY_NAME : $VENUE_RESULT."
+        echo "Venue created successfully for user $IDENTITY_NAME : $TOPUP."
     else
-        echo "Error creating venue for user $IDENTITY_NAME: $VENUE_RESULT"
+        echo "Error creating venue for user $IDENTITY_NAME: $TOPUP"
     fi
 
 done
