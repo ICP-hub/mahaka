@@ -164,7 +164,7 @@ export const searchWahanas = createAsyncThunk(
         pageNo
       );
       console.log("Response Searching wahana", response);
-      return response.data;
+      return response;
     } catch (error) {
       console.error("error searching the wahanas", error);
       return rejectWithValue({ currentPage: 0, totalPages: 0 });
@@ -231,9 +231,9 @@ const wahanaSlice = createSlice({
         // console.log("searched wahanas in redux",action.payload)
         state.loading = false;
         state.searchedWahanaLoading = false;
-        state.searchedWahana = action.payload;
-        state.totalPages = parseInt(action.payload.ok.total_pages);
-        state.currentPage = parseInt(action.payload.ok.current_page);
+        state.searchedWahana = action.payload.data;
+        state.totalPages = parseInt(action.payload.total_pages);
+        state.currentPage = parseInt(action.payload.current_page);
         //state.wahanas = action.payload;
         state.error = null;
       })
