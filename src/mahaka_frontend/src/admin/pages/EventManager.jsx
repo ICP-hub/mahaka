@@ -105,6 +105,12 @@ const EventManager = () => {
     searchPerformed,
   ]);
 
+  const memoizedPagination = useMemo(() => {
+    if (searchText.length === 0) {
+      return { currentPage: currentPage, totalPages: totalPages };
+    }
+  }, [searchText]);
+
   useEffect(() => {
     setSearchPerformed(false);
   }, [searchText]);
@@ -293,18 +299,15 @@ const EventManager = () => {
           </div>
         </div>
       </div>
-      {!eventsLoading &&
-        !singleEventLoading &&
-        !searchEventLoading &&
-        totalPages !== 0 && (
-          <div className="mt-auto">
-            <Pagination
-              base="eventlistPageNum"
-              currentPage={currentPage}
-              totalPage={totalPages}
-            />
-          </div>
-        )}
+      {!eventsLoading && !singleEventLoading && !searchEventLoading && (
+        <div className="mt-auto">
+          <Pagination
+            base="eventlistPageNum"
+            currentPage={currentPage}
+            totalPage={totalPages}
+          />
+        </div>
+      )}
 
       {/* Create event modal */}
       {isModalOpen && (
