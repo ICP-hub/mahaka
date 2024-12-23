@@ -25,36 +25,37 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { getAllBanners } from "../../redux/reducers/apiReducers/bannerApiReducer";
 import { getAllWahanas } from "../../redux/reducers/apiReducers/wahanaApiReducer";
+import VenueSection from "../Components/Venues/VenueSection";
 
-const VenueCard = ({ venue, layout }) => (
-  <Link
-    to={`/venues/${venue.id}`}
-    className={`shadow-lg rounded-2xl overflow-hidden flex ${layout.flexDirection} ${layout.height}`}
-  >
-    <div className={`${layout.bgColor} text-white ${layout.textArea}`}>
-      <div className={`${layout.padding} h-full flex flex-col justify-between`}>
-        <div>
-          <h3 className="text-3xl font-black mb-2">{venue.Title}</h3>
-          <p className="mb-4 text-[14px] font-normal line-clamp-3">
-            {venue.Description}
-          </p>
-        </div>
-        <div className={`${layout.iconPadding}`}>
-          <GoArrowUpRight className="bg-white w-[30px] h-[30px] text-[#E2AF4E] rounded-full p-1" />
-        </div>
-      </div>
-    </div>
-    {layout.imageArea && (
-      <div className={layout.imageArea}>
-        <img
-          src={venue.banner.data}
-          alt={venue.Title}
-          className="object-fit object-center h-full w-full"
-        />
-      </div>
-    )}
-  </Link>
-);
+// const VenueCard = ({ venue, layout }) => (
+//   <Link
+//     to={`/venues/${venue.id}`}
+//     className={`shadow-lg rounded-2xl overflow-hidden flex ${layout.flexDirection} ${layout.height}`}
+//   >
+//     <div className={`${layout.bgColor} text-white ${layout.textArea}`}>
+//       <div className={`${layout.padding} h-full flex flex-col justify-between`}>
+//         <div>
+//           <h3 className="text-3xl font-black mb-2">{venue.Title}</h3>
+//           <p className="mb-4 text-[14px] font-normal line-clamp-3">
+//             {venue.Description}
+//           </p>
+//         </div>
+//         <div className={`${layout.iconPadding}`}>
+//           <GoArrowUpRight className="bg-white w-[30px] h-[30px] text-[#E2AF4E] rounded-full p-1" />
+//         </div>
+//       </div>
+//     </div>
+//     {layout.imageArea && (
+//       <div className={layout.imageArea}>
+//         <img
+//           src={venue.banner.data}
+//           alt={venue.Title}
+//           className="object-fit object-center h-full w-full"
+//         />
+//       </div>
+//     )}
+//   </Link>
+// );
 
 export default function Home() {
   const { venues, loading } = useSelector((state) => state.venues);
@@ -104,71 +105,71 @@ export default function Home() {
     return result;
   };
 
-  const layoutConfigs = [
-    {
-      flexDirection: "flex-col-reverse md:flex-row",
-      bgColor: "bg-[#E2AF4E]",
-      textArea: "w-full md:h-full",
-      imageArea: "h-full md:h-full",
-      height: "h-[400px] md:h-[545px]",
-      padding: "p-6",
-      iconPadding: "mt-4",
-    },
-    {
-      flexDirection: "flex-col-reverse md:flex-col",
-      bgColor: "bg-[#41B2A7]",
-      textArea: "h-1/2",
-      imageArea: "h-1/2",
-      height: "h-[400px] md:h-[545px]",
-      padding: "p-6",
-      iconPadding: "mt-4",
-    },
-    {
-      flexDirection: "flex-col-reverse md:flex-col",
-      bgColor: "bg-[#41B2A7]",
-      textArea: "h-1/2",
-      imageArea: "h-1/2",
-      height: "h-[400px] md:h-full",
-      padding: "p-6",
-      iconPadding: "mt-4",
-    },
-    {
-      flexDirection: "flex-col-reverse md:flex-col-reverse",
-      bgColor: "bg-[#16B5E3]",
-      textArea: "h-full md:h-2/5",
-      imageArea: "h-full md:h-3/5",
-      height: "h-[400px] md:h-full",
-      padding: "p-6",
-      iconPadding: "mt-4",
-    },
-    {
-      flexDirection: "flex-col-reverse md:flex-col",
-      bgColor: "bg-[#E2AF4E]",
-      textArea: "h-1/2",
-      imageArea: "h-1/2",
-      height: "h-[400px] md:h-full",
-      padding: "p-6",
-      iconPadding: "mt-4",
-    },
-    {
-      flexDirection: "flex-col-reverse md:flex-row",
-      bgColor: "bg-[#E2AF4E]",
-      textArea: "w-full md:h-full",
-      imageArea: "h-full md:h-full",
-      height: "h-[400px] md:h-[300px]",
-      padding: "p-6",
-      iconPadding: "mt-4",
-    },
-    {
-      flexDirection: "flex-col-reverse md:flex-row",
-      bgColor: "bg-[#16B5E3]",
-      textArea: "w-full md:h-full",
-      imageArea: "h-full md:h-full",
-      height: "h-[400px] md:h-[300px]",
-      padding: "p-6",
-      iconPadding: "mt-4",
-    },
-  ];
+  // const layoutConfigs = [
+  //   {
+  //     flexDirection: "flex-col-reverse md:flex-row",
+  //     bgColor: "bg-[#E2AF4E]",
+  //     textArea: "w-full md:h-full",
+  //     imageArea: "h-full md:h-full",
+  //     height: "h-[400px] md:h-[545px]",
+  //     padding: "p-6",
+  //     iconPadding: "mt-4",
+  //   },
+  //   {
+  //     flexDirection: "flex-col-reverse md:flex-col",
+  //     bgColor: "bg-[#41B2A7]",
+  //     textArea: "h-1/2",
+  //     imageArea: "h-1/2",
+  //     height: "h-[400px] md:h-[545px]",
+  //     padding: "p-6",
+  //     iconPadding: "mt-4",
+  //   },
+  //   {
+  //     flexDirection: "flex-col-reverse md:flex-col",
+  //     bgColor: "bg-[#41B2A7]",
+  //     textArea: "h-1/2",
+  //     imageArea: "h-1/2",
+  //     height: "h-[400px] md:h-full",
+  //     padding: "p-6",
+  //     iconPadding: "mt-4",
+  //   },
+  //   {
+  //     flexDirection: "flex-col-reverse md:flex-col-reverse",
+  //     bgColor: "bg-[#16B5E3]",
+  //     textArea: "h-full md:h-2/5",
+  //     imageArea: "h-full md:h-3/5",
+  //     height: "h-[400px] md:h-full",
+  //     padding: "p-6",
+  //     iconPadding: "mt-4",
+  //   },
+  //   {
+  //     flexDirection: "flex-col-reverse md:flex-col",
+  //     bgColor: "bg-[#E2AF4E]",
+  //     textArea: "h-1/2",
+  //     imageArea: "h-1/2",
+  //     height: "h-[400px] md:h-full",
+  //     padding: "p-6",
+  //     iconPadding: "mt-4",
+  //   },
+  //   {
+  //     flexDirection: "flex-col-reverse md:flex-row",
+  //     bgColor: "bg-[#E2AF4E]",
+  //     textArea: "w-full md:h-full",
+  //     imageArea: "h-full md:h-full",
+  //     height: "h-[400px] md:h-[300px]",
+  //     padding: "p-6",
+  //     iconPadding: "mt-4",
+  //   },
+  //   {
+  //     flexDirection: "flex-col-reverse md:flex-row",
+  //     bgColor: "bg-[#16B5E3]",
+  //     textArea: "w-full md:h-full",
+  //     imageArea: "h-full md:h-full",
+  //     height: "h-[400px] md:h-[300px]",
+  //     padding: "p-6",
+  //     iconPadding: "mt-4",
+  //   },
+  // ];
 
   const SkeletonLoaderAttraction = () => {
     return (
@@ -277,169 +278,170 @@ export default function Home() {
               </h1>
             </div>
           ) : (
-            <div>
-              {/* if length equals 1 */}
-              {venues?.length === 1 && (
-                <div className="flex justify-center">
-                  <div className="w-full max-w-4xl shadow-lg rounded-2xl flex flex-col overflow-hidden">
-                    <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
-                  </div>
-                </div>
-              )}
+            <VenueSection />
+            // <div>
+            //   if length equals 1
+            //   {venues?.length === 1 && (
+            //     <div className="flex justify-center">
+            //       <div className="w-full max-w-4xl shadow-lg rounded-2xl flex flex-col overflow-hidden">
+            //         <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
+            //       </div>
+            //     </div>
+            //   )}
 
-              {/* if length equals 2 */}
-              {venues?.length === 2 && (
-                <>
-                  <div className="flex flex-col lg:flex-row gap-4 mb-12">
-                    <div className="lg:w-[60%]">
-                      <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
-                    </div>
-                    <div className="lg:w-[40%]">
-                      <VenueCard venue={venues[1]} layout={layoutConfigs[1]} />
-                    </div>
-                  </div>
-                </>
-              )}
-              {/* </div> */}
+            //   {/* if length equals 2 */}
+            //   {venues?.length === 2 && (
+            //     <>
+            //       <div className="flex flex-col lg:flex-row gap-4 mb-12">
+            //         <div className="lg:w-[60%]">
+            //           <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
+            //         </div>
+            //         <div className="lg:w-[40%]">
+            //           <VenueCard venue={venues[1]} layout={layoutConfigs[1]} />
+            //         </div>
+            //       </div>
+            //     </>
+            //   )}
+            //   {/* </div> */}
 
-              {/* if length equals 3 */}
-              {venues?.length === 3 && (
-                <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-[33px] mb-12">
-                  {venues.map((venue, index) => (
-                    <div
-                      className="col-span-1 shadow-lg rounded-2xl"
-                      style={{ height: layoutConfigs[4].height }}
-                      key={venue.id}
-                    >
-                      <VenueCard
-                        venue={venue}
-                        layout={layoutConfigs[index + 2]}
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
+            //   {/* if length equals 3 */}
+            //   {venues?.length === 3 && (
+            //     <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-[33px] mb-12">
+            //       {venues.map((venue, index) => (
+            //         <div
+            //           className="col-span-1 shadow-lg rounded-2xl"
+            //           style={{ height: layoutConfigs[4].height }}
+            //           key={venue.id}
+            //         >
+            //           <VenueCard
+            //             venue={venue}
+            //             layout={layoutConfigs[index + 2]}
+            //           />
+            //         </div>
+            //       ))}
+            //     </div>
+            //   )}
 
-              {/* if length equals 4 */}
-              {venues?.length === 4 && (
-                <>
-                  <div className="flex flex-col lg:flex-row gap-4 mb-12">
-                    <div className="lg:w-[60%]">
-                      <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
-                    </div>
-                    <div className="lg:w-[40%]">
-                      <VenueCard venue={venues[1]} layout={layoutConfigs[1]} />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                    <div className="col-span-1 shadow-lg rounded-2xl">
-                      <VenueCard venue={venues[2]} layout={layoutConfigs[6]} />
-                    </div>
-                    <div className="col-span-1 shadow-lg rounded-2xl">
-                      <VenueCard venue={venues[3]} layout={layoutConfigs[5]} />
-                    </div>
-                  </div>
-                </>
-              )}
+            //   {/* if length equals 4 */}
+            //   {venues?.length === 4 && (
+            //     <>
+            //       <div className="flex flex-col lg:flex-row gap-4 mb-12">
+            //         <div className="lg:w-[60%]">
+            //           <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
+            //         </div>
+            //         <div className="lg:w-[40%]">
+            //           <VenueCard venue={venues[1]} layout={layoutConfigs[1]} />
+            //         </div>
+            //       </div>
+            //       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            //         <div className="col-span-1 shadow-lg rounded-2xl">
+            //           <VenueCard venue={venues[2]} layout={layoutConfigs[6]} />
+            //         </div>
+            //         <div className="col-span-1 shadow-lg rounded-2xl">
+            //           <VenueCard venue={venues[3]} layout={layoutConfigs[5]} />
+            //         </div>
+            //       </div>
+            //     </>
+            //   )}
 
-              {/* if length equals 6 */}
-              {venues?.length === 6 && (
-                <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                    <div className="col-span-1 shadow-lg rounded-2xl">
-                      <VenueCard venue={venues[2]} layout={layoutConfigs[6]} />
-                    </div>
-                    <div className="col-span-1 shadow-lg rounded-2xl">
-                      <VenueCard venue={venues[3]} layout={layoutConfigs[5]} />
-                    </div>
-                  </div>
+            //   {/* if length equals 6 */}
+            //   {venues?.length === 6 && (
+            //     <>
+            //       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            //         <div className="col-span-1 shadow-lg rounded-2xl">
+            //           <VenueCard venue={venues[2]} layout={layoutConfigs[6]} />
+            //         </div>
+            //         <div className="col-span-1 shadow-lg rounded-2xl">
+            //           <VenueCard venue={venues[3]} layout={layoutConfigs[5]} />
+            //         </div>
+            //       </div>
 
-                  <div className="flex flex-col lg:flex-row gap-4 mb-12">
-                    <div className="lg:w-[60%]">
-                      <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
-                    </div>
-                    <div className="lg:w-[40%]">
-                      <VenueCard venue={venues[1]} layout={layoutConfigs[1]} />
-                    </div>
-                  </div>
+            //       <div className="flex flex-col lg:flex-row gap-4 mb-12">
+            //         <div className="lg:w-[60%]">
+            //           <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
+            //         </div>
+            //         <div className="lg:w-[40%]">
+            //           <VenueCard venue={venues[1]} layout={layoutConfigs[1]} />
+            //         </div>
+            //       </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                    <div className="col-span-1 shadow-lg rounded-2xl">
-                      <VenueCard venue={venues[2]} layout={layoutConfigs[6]} />
-                    </div>
-                    <div className="col-span-1 shadow-lg rounded-2xl">
-                      <VenueCard venue={venues[3]} layout={layoutConfigs[5]} />
-                    </div>
-                  </div>
-                </>
-              )}
+            //       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            //         <div className="col-span-1 shadow-lg rounded-2xl">
+            //           <VenueCard venue={venues[2]} layout={layoutConfigs[6]} />
+            //         </div>
+            //         <div className="col-span-1 shadow-lg rounded-2xl">
+            //           <VenueCard venue={venues[3]} layout={layoutConfigs[5]} />
+            //         </div>
+            //       </div>
+            //     </>
+            //   )}
 
-              {/* if length equals 5 or more than equal to 7 */}
-              {/* First Row */}
-              {(venues?.length === 5 || venues?.length === 7) && (
-                <>
-                  {/* First Row */}
-                  <div className="flex flex-col lg:flex-row gap-4 mb-12">
-                    <div className="lg:w-[60%]">
-                      <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
-                    </div>
-                    <div className="lg:w-[40%]">
-                      <VenueCard venue={venues[1]} layout={layoutConfigs[1]} />
-                    </div>
-                  </div>
+            //   {/* if length equals 5 or more than equal to 7 */}
+            //   {/* First Row */}
+            //   {(venues?.length === 5 || venues?.length === 7) && (
+            //     <>
+            //       {/* First Row */}
+            //       <div className="flex flex-col lg:flex-row gap-4 mb-12">
+            //         <div className="lg:w-[60%]">
+            //           <VenueCard venue={venues[0]} layout={layoutConfigs[0]} />
+            //         </div>
+            //         <div className="lg:w-[40%]">
+            //           <VenueCard venue={venues[1]} layout={layoutConfigs[1]} />
+            //         </div>
+            //       </div>
 
-                  {/* Second Row */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-[33px] mb-8">
-                    {venues.slice(2, 5).map((venue, index) => (
-                      <div
-                        className="col-span-1 shadow-lg rounded-2xl"
-                        style={{ height: layoutConfigs[4].height }}
-                        key={venue.id}
-                      >
-                        <VenueCard
-                          venue={venue}
-                          layout={layoutConfigs[index + 2]}
-                        />
-                      </div>
-                    ))}
-                  </div>
+            //       {/* Second Row */}
+            //       <div className="grid grid-cols-1 md:grid-cols-3 gap-[33px] mb-8">
+            //         {venues.slice(2, 5).map((venue, index) => (
+            //           <div
+            //             className="col-span-1 shadow-lg rounded-2xl"
+            //             style={{ height: layoutConfigs[4].height }}
+            //             key={venue.id}
+            //           >
+            //             <VenueCard
+            //               venue={venue}
+            //               layout={layoutConfigs[index + 2]}
+            //             />
+            //           </div>
+            //         ))}
+            //       </div>
 
-                  {/* Third Row */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                    {venues.slice(5, 7).map((venue, index) => (
-                      <div
-                        className="col-span-1 shadow-lg rounded-2xl"
-                        style={{ height: layoutConfigs[4].height }}
-                        key={venue.id}
-                      >
-                        <VenueCard
-                          venue={venue}
-                          layout={layoutConfigs[index + 5]}
-                        />
-                      </div>
-                    ))}
-                  </div>
+            //       {/* Third Row */}
+            //       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            //         {venues.slice(5, 7).map((venue, index) => (
+            //           <div
+            //             className="col-span-1 shadow-lg rounded-2xl"
+            //             style={{ height: layoutConfigs[4].height }}
+            //             key={venue.id}
+            //           >
+            //             <VenueCard
+            //               venue={venue}
+            //               layout={layoutConfigs[index + 5]}
+            //             />
+            //           </div>
+            //         ))}
+            //       </div>
 
-                  {/* Additional Rows for Remaining Venues */}
-                  {venues?.length > 7 && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-[33px]">
-                      {venues.slice(7).map((venue, index) => (
-                        <div
-                          className="col-span-1 shadow-lg rounded-2xl mb-8"
-                          style={{ height: layoutConfigs[4].height }}
-                          key={venue.id}
-                        >
-                          <VenueCard
-                            venue={venue}
-                            layout={layoutConfigs[(index % 6) + 1]}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
+            //       {/* Additional Rows for Remaining Venues */}
+            //       {venues?.length > 7 && (
+            //         <div className="grid grid-cols-1 md:grid-cols-3 gap-[33px]">
+            //           {venues.slice(7).map((venue, index) => (
+            //             <div
+            //               className="col-span-1 shadow-lg rounded-2xl mb-8"
+            //               style={{ height: layoutConfigs[4].height }}
+            //               key={venue.id}
+            //             >
+            //               <VenueCard
+            //                 venue={venue}
+            //                 layout={layoutConfigs[(index % 6) + 1]}
+            //               />
+            //             </div>
+            //           ))}
+            //         </div>
+            //       )}
+            //     </>
+            //   )}
+            // </div>
           )}
         </div>
 
