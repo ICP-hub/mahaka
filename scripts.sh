@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Constants
-NUM_USERS=1
+NUM_USERS=1000
 CANISTER_ID="bd3sg-teaaa-aaaaa-qaaba-cai"  
 VENUE_CANISTER_ID="venue-canister-id"  
 EVENT_CANISTER_ID="event-canister-id"  
@@ -50,17 +50,28 @@ do
     dfx identity use "default"
     add_RESULT=$(dfx canister call "$CANISTER_ID" addAdmins  \
         "(principal \"$(dfx identity get-principal --identity "$IDENTITY_NAME")\", \"email@example.com\", \"FirstName\", \"LastName\", variant { admin },  record { id = \"1\"; title = \"Venue A\" })" 2>&1)
-    
+     
     if [[ $? -eq 0 ]]; then
         echo "admin added successfully for user $IDENTITY_NAME : $add_RESULT."
     else
         echo "Error making admin for user $IDENTITY_NAME: $add_RESULT"
     fi
 
+    # echo "adding member $IDENTITY_NAME..."
+    # dfx identity use "default"
+    # MEMBER_RESULT=$(dfx canister call "$CANISTER_ID" updateUser  \
+    #     "(principal \"$(dfx identity get-principal --identity "$IDENTITY_NAME")\", \"email@example.com\", \"FirstName\", \"LastName\", variant { user },  record { id = \"1\"; title = \"Venue A\" })" 2>&1)
+    
+    # if [[ $? -eq 0 ]]; then
+    #     echo "member added successfully for user $IDENTITY_NAME : $MEMBER_RESULT."
+    # else
+    #     echo "Error ading a member for user $IDENTITY_NAME: $MEMBER_RESULT"
+    # fi
+
+    # dfx identity use "$IDENTITY_NAME"
+
     dfx identity use "$IDENTITY_NAME"
-
-
-    # 1. Create Venue
+    # # 1. Create Venue
     echo "Creating venue for user $IDENTITY_NAME..."
     VENUE_RESULT=$(dfx canister call "$CANISTER_ID" createVenue \
         "(record  $VENUE_COLLECTION_ARGS, \"$VENUE_TITLE\", $VENUE_CAPACITY,record { \"Location\" =  \"$VENUE_LOCATION\"}, \"$VENUE_DESCRIPTION\")" 2>&1)
@@ -97,12 +108,12 @@ do
 
     echo "topping up cycles..."
     dfx identity use "default"
-    TOPUP=$(dfx canister deposit-cycles 2400000000000 "$CANISTER_ID"  2>&1)
+    TOPUP=$(dfx canister deposit-cycles 2600000000000 "$CANISTER_ID"  2>&1)
     
     if [[ $? -eq 0 ]]; then
-        echo "Venue created successfully for user $IDENTITY_NAME : $TOPUP."
+        echo "cycles deposited successfully $IDENTITY_NAME : $TOPUP."
     else
-        echo "Error creating venue for user $IDENTITY_NAME: $TOPUP"
+        echo "Error depositing cycles $IDENTITY_NAME: $TOPUP"
     fi
 
 done

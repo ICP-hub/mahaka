@@ -1329,7 +1329,7 @@ actor mahaka {
                     let ongoingEvents = Array.filter<Types.completeEvent>(
                          allEventsData,
                          func (event) {
-                              (event.details.StartDate <= currentTime) and (event.details.EndDate > currentTime)
+                              (event.status == #AboutToStart) or (event.status == #Ongoing)
                          }
                     );
 
@@ -1362,7 +1362,7 @@ actor mahaka {
                     let ongoingEvents = Array.filter<Types.completeEvent>(
                          allEventsData,
                          func (event) {
-                              (event.details.StartDate <= currentTime) and (event.details.EndDate > currentTime)
+                              (event.status == #AboutToStart) or (event.status == #Ongoing)
                          }
                     );
 
@@ -2269,8 +2269,11 @@ actor mahaka {
                          totalSupplyDip721 : () -> async Nat64;
                          getMaxLimitDip721 : () -> async Nat16
                     };
-                    if(event.status != #Ongoing){
-                         return #err("Check the event start and end timeline");
+                    if(event.status == #Expired or event.status == #Completed){
+                         return #err("Check the event status, You can't buy for expired or completed event");
+                    };
+                    if(not (saleDate >= event.details.StartDate and saleDate <= event.details.EndDate) ){
+                         return #err("Check the saleDate");
                     };
                     let totalTickets = await collectionActor.totalSupplyDip721();
                     let maxLimit = await collectionActor.getMaxLimitDip721();
@@ -2603,8 +2606,11 @@ actor mahaka {
                          totalSupplyDip721 : () -> async Nat64;
                          getMaxLimitDip721 : () -> async Nat16
                     };
-                    if(event.status != #Ongoing){
-                         return #err("Check the event start and end timeline");
+                    if(event.status == #Expired or event.status == #Completed){
+                         return #err("Check the event status, You can't buy for expired or completed event");
+                    };
+                    if(not (saleDate >= event.details.StartDate and saleDate <= event.details.EndDate) ){
+                         return #err("Check the saleDate");
                     };
                     let totalTickets = await collectionActor.totalSupplyDip721();
                     let maxLimit = await collectionActor.getMaxLimitDip721();
