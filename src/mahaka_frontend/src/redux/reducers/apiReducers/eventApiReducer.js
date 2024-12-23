@@ -5,6 +5,7 @@ import notificationManager from "../../../common/utils/notificationManager";
 const initialState = {
   events: [],
   eventByVenue: [],
+  OngoingEventByVenue: [],
   currentEvent: null,
   error: null,
   currentPage: 0,
@@ -71,6 +72,23 @@ export const deleteEvent = createAsyncThunk(
 // getting all events by venue
 export const getAllEventsByVenue = createAsyncThunk(
   "events/getAllEventsByVenue",
+  async ({ backend, chunkSize, pageNo, venueId }, { rejectWithValue }) => {
+    try {
+      const response = await backend.getallEventsbyVenue(
+        chunkSize,
+        pageNo,
+        venueId
+      );
+      console.log("Events fetched:", response);
+      return response;
+    } catch (error) {
+      console.error("Error fetching events:", error);
+      return rejectWithValue({ currentPage: 0, totalPages: 0 });
+    }
+  }
+);
+export const getAllOngoingEventsByVenue = createAsyncThunk(
+  "events/getAllOngoingEventsByVenue",
   async ({ backend, chunkSize, pageNo, venueId }, { rejectWithValue }) => {
     try {
       const response = await backend.getallEventsbyVenue(
@@ -249,6 +267,24 @@ const eventSlice = createSlice({
         state.currentPage = 0;
         state.totalPages = 0;
         state.eventByVenue = [];
+        state.error = action.error.message;
+      })
+
+      .addCase(getAllOngoingEventsByVenue.pending, (state) => {
+        state.singleEventLoading = true;
+      })
+      .addCase(getAllOngoingEventsByVenue.fulfilled, (state, action) => {
+        // console.log(action);
+        state.singleEventLoading = false;
+        state.currentPage = parseInt(action.payload.ok.current_page);
+        state.totalPages = parseInt(action.payload.ok.Total_pages);
+        state.OngoingEventByVenue = action.payload.ok.data;
+      })
+      .addCase(getAllOngoingEventsByVenue.rejected, (state, action) => {
+        state.singleEventLoading = false;
+        state.currentPage = 0;
+        state.totalPages = 0;
+        state.OngoingEventByVenue = [];
         state.error = action.error.message;
       })
 

@@ -7,7 +7,7 @@ import { getAllVenues } from "../../redux/reducers/apiReducers/venueApiReducer";
 import { getAllWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 
 import { useIdentityKit } from "@nfid/identitykit/react";
-import { getAllEventsByVenue } from "../../redux/reducers/apiReducers/eventApiReducer";
+import { getAllOngoingEventsByVenue } from "../../redux/reducers/apiReducers/eventApiReducer";
 import { fetchTicketDetails } from "../../redux/reducers/apiReducers/ticketApiReducer";
 import { getVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
 import EventTickets from "../components/EventTickets";
@@ -28,7 +28,7 @@ const MgtTicket = () => {
 
   const { currentUserByCaller } = useSelector((state) => state.users);
 
-  const { eventByVenue, singleEventLoading } = useSelector(
+  const { ongoingEventByVenue, singleEventLoading } = useSelector(
     (state) => state.events
   );
   const { wahanasByVenue, singleWahanaLoading } = useSelector(
@@ -49,7 +49,7 @@ const MgtTicket = () => {
   }, [backend]);
   useEffect(() => {
     dispatch(
-      getAllEventsByVenue({
+      getAllOngoingEventsByVenue({
         backend,
         chunkSize: 100,
         pageNo: 0,
@@ -77,8 +77,8 @@ const MgtTicket = () => {
 
   useEffect(() => {
     // Automatically select the first venue and fetch its ticket details
-    if (!singleEventLoading && eventByVenue?.length > 0) {
-      const defaultVenue = eventByVenue[0];
+    if (!singleEventLoading && ongoingEventByVenue?.length > 0) {
+      const defaultVenue = ongoingEventByVenue[0];
 
       setSelectedEvent(defaultVenue);
 
@@ -98,7 +98,7 @@ const MgtTicket = () => {
 
       eventData();
     }
-  }, [singleEventLoading, eventByVenue]);
+  }, [singleEventLoading, ongoingEventByVenue]);
   useEffect(() => {
     // Automatically select the first venue and fetch its ticket details
     if (!singleWahanaLoading && wahanasByVenue.length > 0) {
@@ -118,7 +118,7 @@ const MgtTicket = () => {
     setLoadingDetails(true);
     try {
       // Fetch ticket details from the actor
-      console.log("hello after  eventByVenue");
+      console.log("hello after   ongoingEventByVenue");
       const details = await backend.getDIPdetails(venue?.Collection_id);
       console.log(details);
       setTicketDetails(details);
@@ -137,7 +137,9 @@ const MgtTicket = () => {
     const selectedEventId = event.target.value;
 
     console.log(selectedEventId);
-    const selectedEvent = eventByVenue.find((v) => v.id === selectedEventId);
+    const selectedEvent = ongoingEventByVenue.find(
+      (v) => v.id === selectedEventId
+    );
 
     if (selectedEvent) {
       setSelectedEvent(selectedEvent); // Update selected event immediately
@@ -259,7 +261,7 @@ const MgtTicket = () => {
         <p>No ticket details available for the selected venue.</p>
       )}
 
-      {eventByVenue?.length > 0 && (
+      {ongoingEventByVenue?.length > 0 && (
         <>
           <label className="block mb-2 text-lg font-medium">Select Event</label>
           <select
@@ -271,7 +273,7 @@ const MgtTicket = () => {
             <option value="" disabled>
               Choose a event
             </option>
-            {eventByVenue?.map((venue) => (
+            {ongoingEventByVenue?.map((venue) => (
               <option key={venue.id} value={venue.id}>
                 {venue.title}
               </option>
