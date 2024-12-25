@@ -1321,6 +1321,7 @@ actor mahaka {
           let allEventsResult = await getAllEvents();
           switch (allEventsResult) {
                case (#err(error)) {
+                    throw Error.reject(debug_show(error));
                     return #err(error);
                };
                case (#ok(allEventsData)) {
@@ -1334,6 +1335,7 @@ actor mahaka {
                     );
 
                     if (Array.size(ongoingEvents) == 0) {
+                         throw Error.reject("No Ongoing events found");
                          return #err(#DataNotFound);
                     };
 
@@ -1353,6 +1355,7 @@ actor mahaka {
      public shared ({caller}) func getOngoingEventsbyVenue(venueId : Text, chunkSize : Nat, pageNo : Nat) : async Result.Result<{data : [Types.completeEvent]; current_page : Nat; Total_pages : Nat}, Types.CommonErrors> {
           let allEventsResult = await getallEventsbyVenueNoPaginate(venueId);
           switch (allEventsResult) {
+               throw Error.reject(debug_show(error));
                case (#err(error)) {
                     return #err(error);
                };
@@ -1367,6 +1370,7 @@ actor mahaka {
                     );
 
                     if (Array.size(ongoingEvents) == 0) {
+                         throw Error.reject("No Ongoing events found");
                          return #err(#DataNotFound);
                     };
 
@@ -2272,7 +2276,7 @@ actor mahaka {
                     if(event.status == #Expired or event.status == #Completed){
                          return #err("Check the event status, You can't buy for expired or completed event");
                     };
-                    if(not (saleDate > event.details.StartDate and saleDate <= event.details.EndDate) ){
+                    if(not (saleDate >= event.details.StartDate and saleDate <= event.details.EndDate) ){
                          return #err("Check the saleDate");
                     };
                     let totalTickets = await collectionActor.totalSupplyDip721();
@@ -2609,7 +2613,7 @@ actor mahaka {
                     if(event.status == #Expired or event.status == #Completed){
                          return #err("Check the event status, You can't buy for expired or completed event");
                     };
-                    if(not (saleDate > event.details.StartDate and saleDate <= event.details.EndDate) ){
+                    if(not (saleDate >= event.details.StartDate and saleDate <= event.details.EndDate) ){
                          return #err("Check the saleDate");
                     };
                     let totalTickets = await collectionActor.totalSupplyDip721();
