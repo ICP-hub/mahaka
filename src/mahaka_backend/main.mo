@@ -2272,7 +2272,7 @@ actor mahaka {
                     if(event.status == #Expired or event.status == #Completed){
                          return #err("Check the event status, You can't buy for expired or completed event");
                     };
-                    if(not (saleDate >= event.details.StartDate and saleDate <= event.details.EndDate) ){
+                    if(not (saleDate > event.details.StartDate and saleDate <= event.details.EndDate) ){
                          return #err("Check the saleDate");
                     };
                     let totalTickets = await collectionActor.totalSupplyDip721();
@@ -2609,7 +2609,7 @@ actor mahaka {
                     if(event.status == #Expired or event.status == #Completed){
                          return #err("Check the event status, You can't buy for expired or completed event");
                     };
-                    if(not (saleDate >= event.details.StartDate and saleDate <= event.details.EndDate) ){
+                    if(not (saleDate > event.details.StartDate and saleDate <= event.details.EndDate) ){
                          return #err("Check the saleDate");
                     };
                     let totalTickets = await collectionActor.totalSupplyDip721();
