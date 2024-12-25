@@ -1355,8 +1355,8 @@ actor mahaka {
      public shared ({caller}) func getOngoingEventsbyVenue(venueId : Text, chunkSize : Nat, pageNo : Nat) : async Result.Result<{data : [Types.completeEvent]; current_page : Nat; Total_pages : Nat}, Types.CommonErrors> {
           let allEventsResult = await getallEventsbyVenueNoPaginate(venueId);
           switch (allEventsResult) {
-               throw Error.reject(debug_show(error));
                case (#err(error)) {
+                    throw Error.reject(debug_show(error));
                     return #err(error);
                };
                case (#ok(allEventsData)) {
