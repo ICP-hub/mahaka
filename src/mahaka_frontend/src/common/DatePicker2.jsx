@@ -6,9 +6,11 @@ const DatePicker = ({ timestemp, setTimeStemp, startTime, endTime }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  // Convert nanoseconds to milliseconds
-  const startMillis = Number(startTime / 1_000_000n);
-  const endMillis = Number(endTime / 1_000_000n);
+  // Convert nanoseconds to milliseconds and normalize to midnight
+  const startMillis = new Date(Number(startTime / 1_000_000n));
+  startMillis.setHours(0, 0, 0, 0); // Normalize to midnight
+  const endMillis = new Date(Number(endTime / 1_000_000n));
+  endMillis.setHours(0, 0, 0, 0); // Normalize to midnight
 
   const toggleCalendar = () => setIsOpen(!isOpen);
 
@@ -21,8 +23,8 @@ const DatePicker = ({ timestemp, setTimeStemp, startTime, endTime }) => {
     selectedDate.setHours(0, 0, 0, 0); // Normalize time to midnight
 
     if (
-      selectedDate.getTime() >= startMillis &&
-      selectedDate.getTime() <= endMillis
+      selectedDate.getTime() >= startMillis.getTime() &&
+      selectedDate.getTime() <= endMillis.getTime()
     ) {
       // Convert selected date back to nanoseconds
       setTimeStemp(BigInt(selectedDate.getTime()) * 1_000_000n);
@@ -128,7 +130,8 @@ const DatePicker = ({ timestemp, setTimeStemp, startTime, endTime }) => {
               date.setHours(0, 0, 0, 0); // Normalize to midnight
 
               const isSelectable =
-                date.getTime() >= startMillis && date.getTime() <= endMillis;
+                date.getTime() >= startMillis.getTime() &&
+                date.getTime() <= endMillis.getTime();
               const isSelected =
                 timestemp &&
                 date.toDateString() ===
