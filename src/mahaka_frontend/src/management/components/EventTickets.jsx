@@ -23,16 +23,27 @@ export default function EventTickets({
   const [ticketQuantity, setTicketQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(""); // New error state
+  console.log(selectedVenue.details, "selected event dinveri");
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
     setError(""); // Reset error when modal is closed
   };
-  const validate = () => {
-    if (!selectedDate) {
-      notificationManager.error("Please select a date");
-    }
+
+  const convertNanosecondsToDate = (nanoseconds) => {
+    const milliseconds = Number(nanoseconds) / 1_000_000; // Convert BigInt to Number and then to milliseconds
+    return new Date(milliseconds).toISOString().split("T")[0]; // Convert to YYYY-MM-DD format
   };
+
+  const minDate = selectedVenue?.details?.StartDate
+    ? convertNanosecondsToDate(selectedVenue.details.StartDate)
+    : new Date().toISOString().split("T")[0]; // Fallback to today's date
+
+  const maxDate = selectedVenue?.details?.EndDate
+    ? convertNanosecondsToDate(selectedVenue.details.EndDate)
+    : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0]; // Fallback to 7 days from now
 
   const convertDateToNanoseconds = (dateString) => {
     const date = new Date(dateString);
@@ -138,12 +149,8 @@ export default function EventTickets({
                 type="date"
                 className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-secondary"
                 value={selectedDate}
-                min={new Date().toISOString().split("T")[0]} // Today's date
-                max={
-                  new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-                    .toISOString()
-                    .split("T")[0]
-                } // One week from now
+                min={minDate}
+                max={maxDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
               />
             </div>

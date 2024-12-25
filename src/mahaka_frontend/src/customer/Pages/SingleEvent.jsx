@@ -435,7 +435,7 @@ export default function SingleEvent() {
 
         {/* bottom crousel section  */}
         <div className="py-12 mx-auto px-4 sm:px-6 lg:px-8">
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <section className="max-w-7xl  px-4 sm:px-6 lg:px-8">
             <h1 className="text-4xl font-black">Check Events</h1>
           </section>
 
@@ -496,7 +496,7 @@ export default function SingleEvent() {
             )}
           </div>
 
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <section className="max-w-7xl   px-4 sm:px-6 lg:px-8">
             <h1 className="text-4xl font-black">Wahana</h1>
           </section>
           <div className="max-w-7xl mx-auto">

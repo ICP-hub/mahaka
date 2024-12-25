@@ -28,7 +28,7 @@ const MgtTicket = () => {
 
   const { currentUserByCaller } = useSelector((state) => state.users);
 
-  const { ongoingEventByVenue, singleEventLoading } = useSelector(
+  const { OngoingEventByVenue, singleEventLoading } = useSelector(
     (state) => state.events
   );
   const { wahanasByVenue, singleWahanaLoading } = useSelector(
@@ -51,9 +51,9 @@ const MgtTicket = () => {
     dispatch(
       getAllOngoingEventsByVenue({
         backend,
+        venueId: currentUserByCaller?.assignedVenue?.id,
         chunkSize: 100,
         pageNo: 0,
-        venueId: currentUserByCaller?.assignedVenue?.id,
       })
     );
 
@@ -77,8 +77,8 @@ const MgtTicket = () => {
 
   useEffect(() => {
     // Automatically select the first venue and fetch its ticket details
-    if (!singleEventLoading && ongoingEventByVenue?.length > 0) {
-      const defaultVenue = ongoingEventByVenue[0];
+    if (!singleEventLoading && OngoingEventByVenue?.length > 0) {
+      const defaultVenue = OngoingEventByVenue[0];
 
       setSelectedEvent(defaultVenue);
 
@@ -98,7 +98,7 @@ const MgtTicket = () => {
 
       eventData();
     }
-  }, [singleEventLoading, ongoingEventByVenue]);
+  }, [singleEventLoading, OngoingEventByVenue]);
   useEffect(() => {
     // Automatically select the first venue and fetch its ticket details
     if (!singleWahanaLoading && wahanasByVenue.length > 0) {
@@ -118,7 +118,7 @@ const MgtTicket = () => {
     setLoadingDetails(true);
     try {
       // Fetch ticket details from the actor
-      console.log("hello after   ongoingEventByVenue");
+
       const details = await backend.getDIPdetails(venue?.Collection_id);
       console.log(details);
       setTicketDetails(details);
@@ -137,7 +137,7 @@ const MgtTicket = () => {
     const selectedEventId = event.target.value;
 
     console.log(selectedEventId);
-    const selectedEvent = ongoingEventByVenue.find(
+    const selectedEvent = OngoingEventByVenue.find(
       (v) => v.id === selectedEventId
     );
 
@@ -261,7 +261,7 @@ const MgtTicket = () => {
         <p>No ticket details available for the selected venue.</p>
       )}
 
-      {ongoingEventByVenue?.length > 0 && (
+      {OngoingEventByVenue?.length > 0 && (
         <>
           <label className="block mb-2 text-lg font-medium">Select Event</label>
           <select
@@ -273,7 +273,7 @@ const MgtTicket = () => {
             <option value="" disabled>
               Choose a event
             </option>
-            {ongoingEventByVenue?.map((venue) => (
+            {OngoingEventByVenue?.map((venue) => (
               <option key={venue.id} value={venue.id}>
                 {venue.title}
               </option>
@@ -328,7 +328,7 @@ const MgtTicket = () => {
         </>
       )}
 
-      {wahanasByVenue.length > 0 && (
+      {wahanasByVenue?.length > 0 && (
         <>
           <label className="block mb-2 text-lg font-medium">
             Select Wahana

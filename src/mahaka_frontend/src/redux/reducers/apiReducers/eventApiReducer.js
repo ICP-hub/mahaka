@@ -91,12 +91,12 @@ export const getAllOngoingEventsByVenue = createAsyncThunk(
   "events/getAllOngoingEventsByVenue",
   async ({ backend, chunkSize, pageNo, venueId }, { rejectWithValue }) => {
     try {
-      const response = await backend.getallEventsbyVenue(
+      const response = await backend.getOngoingEventsbyVenue(
+        venueId,
         chunkSize,
-        pageNo,
-        venueId
+        pageNo
       );
-      console.log("Events fetched:", response);
+      console.log(" ongoing Events fetched:", response);
       return response;
     } catch (error) {
       console.error("Error fetching events:", error);
