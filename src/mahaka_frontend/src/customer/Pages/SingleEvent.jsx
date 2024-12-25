@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getVenue } from "../../redux/reducers/apiReducers/venueApiReducer";
-import { getAllEventsByVenue } from "../../redux/reducers/apiReducers/eventApiReducer";
+import { getAllOngoingEventsByVenue } from "../../redux/reducers/apiReducers/eventApiReducer";
 import { getAllWahanasbyVenue } from "../../redux/reducers/apiReducers/wahanaApiReducer";
 import { getDIPdetails } from "../../redux/reducers/apiReducers/dipapireducer";
 import MoreWahanaCard from "../Components/MoreWahanaCard";
@@ -108,7 +108,7 @@ export default function SingleEvent() {
     (state) => state.wahana
   );
   const {
-    eventByVenue,
+    OngoingEventByVenue,
     singleEventLoading,
     error: eventError,
   } = useSelector((state) => state.events);
@@ -158,7 +158,12 @@ export default function SingleEvent() {
       });
 
     dispatch(
-      getAllEventsByVenue({ backend, chunkSize: 100, pageNo: 0, venueId })
+      getAllOngoingEventsByVenue({
+        backend,
+        chunkSize: 100,
+        pageNo: 0,
+        venueId,
+      })
     )
       .unwrap()
       .catch((err) => {
@@ -189,7 +194,7 @@ export default function SingleEvent() {
   // console.log(singleWahanaLoading, "wahanaLoading");
 
   // Assuming the first event is the main event for this venue
-  const event = eventByVenue ? eventByVenue : null;
+  const event = OngoingEventByVenue ? OngoingEventByVenue : null;
   const duration =
     venue?.Details.StartDate && venue?.Details.EndDate
       ? calculateDuration(venue.Details.StartDate, venue.Details.EndDate)
@@ -430,7 +435,7 @@ export default function SingleEvent() {
 
         {/* bottom crousel section  */}
         <div className="py-12 mx-auto px-4 sm:px-6 lg:px-8">
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <section className="max-w-7xl  px-4 sm:px-6 lg:px-8">
             <h1 className="text-4xl font-black">Check Events</h1>
           </section>
 
@@ -491,7 +496,7 @@ export default function SingleEvent() {
             )}
           </div>
 
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <section className="max-w-7xl   px-4 sm:px-6 lg:px-8">
             <h1 className="text-4xl font-black">Wahana</h1>
           </section>
           <div className="max-w-7xl mx-auto">

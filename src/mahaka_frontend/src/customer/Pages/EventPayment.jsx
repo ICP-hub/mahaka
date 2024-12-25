@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from "react";
 import payimg from "../../assets/images/payment.png";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { idlFactory } from "../../connect/token-cicp-ladger";
 import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
 import { Actor } from "@dfinity/agent";
 import { Principal } from "@dfinity/principal";
-import DatePicker from "../../common/DatePicker";
+import DatePicker from "../../common/DatePicker2";
 import VisitorPicker from "../Components/single-event/VisitorPicker";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../connect/useClient";
 import { HttpAgent } from "@dfinity/agent";
 import notificationManager from "../../common/utils/notificationManager";
+import { getEvent } from "../../redux/reducers/apiReducers/eventApiReducer";
 
 const EventPayment = () => {
   const authenticatedAgent = useAgent();
@@ -20,6 +21,10 @@ const EventPayment = () => {
   const [eventdetail, seteventdetail] = useState(null);
   const location = useLocation();
   const fullPath = location.pathname + location.hash;
+  const { currentEvent, singleEventLoading } = useSelector(
+    (state) => state.events
+  );
+  console.log(currentEvent, "event detailssss");
 
   const match = fullPath.match(/^(.+?)\/events\/(.+?)\/(.+?)\/payment/);
 
@@ -34,6 +39,7 @@ const EventPayment = () => {
   const [paymenttype, setPaymentType] = useState("Card");
   const [loading, setLoading] = useState(false);
   const [loadingdata, setLoadingData] = useState(false);
+  const [loading1, setLoading1] = useState(true);
   const navigate = useNavigate();
   const eventIds = `${decodeURIComponent(eventId).replace(/_/g, "#")}${
     window.location.hash
@@ -51,6 +57,24 @@ const EventPayment = () => {
   const [unauthenticatedAgent, setUnauthenticatedAgent] = useState(null);
   const [ticketprice, setTicketPrice] = useState(0);
   const [ticketleft, SetTicketLeft] = useState(0);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const fetchEvent = async () => {
+      try {
+        await dispatch(
+          getEvent({ backend: backend, eventIds: eventIds, venueId: vanueids })
+        );
+      } catch (error) {
+        console.error("Error fetching event:", error);
+      } finally {
+        setLoading1(false);
+      }
+    };
+    fetchEvent();
+  }, [eventId, vanueid, backend]);
+  console.log(singleEventLoading);
+
   useEffect(() => {
     (async () => {
       const agent = new HttpAgent({ host: ICP_API_HOST });
@@ -263,7 +287,16 @@ const EventPayment = () => {
             )}
           </div>
           <div className="py-4 space-y-12 ">
-            <DatePicker timestemp={timestemp} setTimeStemp={setTimeStemp} />
+            {loading1 ? (
+              <div className="px-20 rounded-lg py-[2px] w-[500px]  h-12 animate-pulse bg-gray-200"></div>
+            ) : (
+              <DatePicker
+                timestemp={timestemp}
+                setTimeStemp={setTimeStemp}
+                startTime={currentEvent?.details?.StartTime}
+                endTime={currentEvent?.details?.EndTime}
+              />
+            )}
             <VisitorPicker
               max={Number(ticketleft) - Number(ticketSold)}
               numberOFVisitor={numberOFVisitor}

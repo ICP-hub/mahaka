@@ -72,6 +72,12 @@ module.exports = {
       animation: {
         "spin-slow": "spin 3s linear infinite",
       },
+      lineClamp: {
+        7: "7",
+        8: "8",
+        9: "9",
+        10: "10",
+      },
       flex: {
         0: "0 0 auto",
       },
