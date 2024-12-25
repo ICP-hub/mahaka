@@ -20,12 +20,27 @@ const DatePicker = ({ timestemp, setTimeStemp, startTime, endTime }) => {
       currentDate.getMonth(),
       day
     );
-    selectedDate.setHours(0, 0, 0, 0); // Normalize time to midnight
+    selectedDate.setHours(0, 0, 0, 0); // Normalize to midnight
 
     if (
       selectedDate.getTime() >= startMillis.getTime() &&
       selectedDate.getTime() <= endMillis.getTime()
     ) {
+      if (selectedDate.getTime() === startMillis.getTime()) {
+        // Use the time from the original startTime
+        const originalStartTime = new Date(Number(startTime / 1_000_000n));
+        selectedDate.setHours(
+          originalStartTime.getHours(),
+          originalStartTime.getMinutes() + 1, // Add 1 minute
+          originalStartTime.getSeconds(),
+          originalStartTime.getMilliseconds()
+        );
+        console.log("selectedDate", selectedDate);
+      } else {
+        // Add one minute to the selected date
+        selectedDate.setMinutes(selectedDate.getMinutes() + 1);
+      }
+
       // Convert selected date back to nanoseconds
       setTimeStemp(BigInt(selectedDate.getTime()) * 1_000_000n);
       setIsOpen(false);

@@ -22,8 +22,7 @@ export default function EventTickets({
   const [selectedDate, setSelectedDate] = useState("");
   const [ticketQuantity, setTicketQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(""); // New error state
-  console.log(selectedVenue.details, "selected event dinveri");
+  const [error, setError] = useState("");
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
@@ -31,33 +30,36 @@ export default function EventTickets({
   };
 
   const convertNanosecondsToDate = (nanoseconds) => {
-    const milliseconds = Number(nanoseconds) / 1_000_000; // Convert BigInt to Number and then to milliseconds
-    return new Date(milliseconds).toISOString().split("T")[0]; // Convert to YYYY-MM-DD format
+    const milliseconds = Number(nanoseconds) / 1_000_000;
+    return new Date(milliseconds).toISOString().split("T")[0];
+  };
+
+  const convertNanosecondsToTime = (nanoseconds) => {
+    const milliseconds = Number(nanoseconds) / 1_000_000;
+    return new Date(milliseconds).toISOString().split("T")[1];
   };
 
   const minDate = selectedVenue?.details?.StartDate
     ? convertNanosecondsToDate(selectedVenue.details.StartDate)
-    : new Date().toISOString().split("T")[0]; // Fallback to today's date
+    : new Date().toISOString().split("T")[0];
 
   const maxDate = selectedVenue?.details?.EndDate
     ? convertNanosecondsToDate(selectedVenue.details.EndDate)
     : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
         .toISOString()
-        .split("T")[0]; // Fallback to 7 days from now
+        .split("T")[0];
 
   const convertDateToNanoseconds = (dateString) => {
     const date = new Date(dateString);
-    return date.getTime() * 1_000_000; // Convert milliseconds to nanoseconds
+    return date.getTime() * 1_000_000;
   };
 
   const buyVenueTicketHandler = async () => {
-    // Validation: Ensure the date is selected
     if (!selectedDate) {
       notificationManager.error("Please select a date");
       return;
     }
 
-    // Validation: Ensure ticket quantity is less than or equal to availability
     if (ticketQuantity > availability) {
       setError(`Only ${availability} tickets are available.`);
       return;
@@ -72,13 +74,26 @@ export default function EventTickets({
           description: "Ticket metadata",
           key_val_data: [
             { key: "venueName", val: { TextContent: "Amazing Concert" } },
-            { key: "date", val: { TextContent: "2024-12-31" } },
+            { key: "date", val: { TextContent: selectedDate } },
           ],
           purpose: { Rendered: null },
         },
       ];
 
-      const dateInNanoseconds = convertDateToNanoseconds(selectedDate);
+      const startTimeInMs = Number(selectedVenue.details.StartDate) / 1_000_000;
+      let fullDate = `${selectedDate}T00:00:00`;
+
+      if (
+        selectedDate ===
+        convertNanosecondsToDate(selectedVenue?.details?.StartDate)
+      ) {
+        const startDateTime = new Date(startTimeInMs);
+        startDateTime.setMinutes(startDateTime.getMinutes() + 1); // Add 1 minute
+        const updatedStartTime = startDateTime.toISOString().split("T")[1];
+        fullDate = `${selectedDate}T${updatedStartTime}`;
+      }
+
+      const dateInNanoseconds = convertDateToNanoseconds(fullDate);
 
       const response = await backend.buyOfflineEventTicket(
         id,
@@ -105,7 +120,6 @@ export default function EventTickets({
 
   return (
     <div className="flex justify-center p-2 py-5">
-      {/* Ticket Card */}
       <div
         onClick={toggleModal}
         className={`relative ${gradientClass} rounded-xl w-full h-[160px] overflow-hidden cursor-pointer`}
@@ -122,7 +136,6 @@ export default function EventTickets({
           </div>
           <div className="w-3/4 p-4">
             <h3 className="text-xl font-black">{name}</h3>
-            {/* <p className="text-base font-normal">{description}</p> */}
             <div className="flex justify-between mt-[5rem]">
               <span className="font-black">Rp.{price}</span>
               <span className="font-normal">{availability} TICKETS LEFT</span>
@@ -131,7 +144,6 @@ export default function EventTickets({
         </div>
       </div>
 
-      {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
           <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md relative">

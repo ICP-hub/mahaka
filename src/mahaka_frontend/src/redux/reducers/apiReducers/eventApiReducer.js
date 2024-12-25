@@ -274,8 +274,9 @@ const eventSlice = createSlice({
         state.singleEventLoading = true;
       })
       .addCase(getAllOngoingEventsByVenue.fulfilled, (state, action) => {
-        // console.log(action);
         state.singleEventLoading = false;
+        console.log(state.singleEventLoading);
+        console.log(action);
         state.currentPage = parseInt(action.payload.ok.current_page);
         state.totalPages = parseInt(action.payload.ok.Total_pages);
         state.OngoingEventByVenue = action.payload.ok.data;
