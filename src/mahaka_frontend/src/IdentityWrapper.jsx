@@ -5,20 +5,30 @@ import { Provider } from "react-redux";
 import store from "./redux/store";
 import App from "./App";
 import { AuthProvider } from "./connect/useClient";
-import { Canister } from "@dfinity/utils";
 
 export default function IdentityWrapper() {
   const [isMounted, setIsMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const canisterID = process.env.CANISTER_ID_MAHAKA_BACKEND;
   const canisterIDFiat = process.env.CANISTER_ID_FIATPAYMENT;
-  const signers = [NFIDW, Plug];
 
   useEffect(() => {
     setIsMounted(true);
+    const updateView = () => {
+      setIsMobile(window.innerWidth <= 768); // Adjust the breakpoint as needed
+    };
+    updateView();
+    window.addEventListener("resize", updateView);
+    return () => {
+      window.removeEventListener("resize", updateView);
+    };
   }, []);
 
   if (!isMounted) return null;
+
+  // Only NFID for mobile, both Plug and NFID for desktop
+  const signers = isMobile ? [NFIDW] : [NFIDW, Plug];
 
   return (
     <IdentityKitProvider

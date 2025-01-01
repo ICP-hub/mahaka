@@ -555,9 +555,10 @@ export default function Home() {
             <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-[33px] container mx-auto">
               {wahanas
                 ?.filter((wahana) => wahana.featured)
+                ?.slice(0, 3) // Limit to the first 3 featured items
                 ?.map((wahana) => (
                   <div className="overflow-hidden" key={wahana.id}>
-                    <div className="  w-full h-full ">
+                    <div className="w-full h-full">
                       <img
                         src={wahana.banner.data}
                         alt={wahana.title}
