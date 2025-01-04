@@ -155,9 +155,9 @@ const DashboardAnalytics = () => {
               dashboardData?.latestTxs?.map((transaction) => (
                 <div
                   key={transaction?.transactionId}
-                  className="flex flex-col md:flex-row items-start md:items-center justify-between bg-gray-50 hover:bg-gray-100 transition rounded-lg p-2 shadow"
+                  className="flex   flex-col md:flex-row items-start md:items-center justify-between  bg-card transition rounded-lg p-2 shadow"
                 >
-                  <div className="flex items-center space-x-4 mb-4 md:mb-0">
+                  <div className="flex  items-center space-x-4 mb-4 md:mb-0">
                     <div
                       className={`rounded-full p-2 flex items-center ${
                         transaction?.status === "Completed"
@@ -168,7 +168,7 @@ const DashboardAnalytics = () => {
                       {transaction.status === "Completed" ? "✔️" : "❌"}
                     </div>
                     <div>
-                      <p className="text-lg font-semibold text-gray-800">
+                      <p className="text-lg font-semibold ">
                         {transaction?.status}
                       </p>
                       {/* <p className="text-sm text-gray-500 line-clamp-1">
@@ -177,7 +177,7 @@ const DashboardAnalytics = () => {
                     </div>
                   </div>
 
-                  <div className="flex-1 md:ml-6">
+                  <div className="flex-1 md:ml-6 ">
                     <p className="text-sm ">
                       Payment Method:{" "}
                       <span className="font-medium ">
@@ -192,14 +192,14 @@ const DashboardAnalytics = () => {
                         ).toLocaleString()}
                       </span>
                     </p>
-                    <a
+                    {/* <a
                       href={transaction?.paymentLink}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-blue-500 hover:underline"
                     >
                       View Payment Details
-                    </a>
+                    </a> */}
                   </div>
 
                   <div className="mt-4 md:mt-0 text-right">
@@ -265,7 +265,7 @@ const DashboardAnalytics = () => {
               dashboardData?.top3Events?.map((data, index) => (
                 <>
                   <div key={index} className="mx-2 my-4 mt-2">
-                    <div className="bg-gray-50 border border-green-300 px-2 py-2 rounded-lg">
+                    <div className="  bg-card border border-green-300 px-2 py-2 rounded-lg">
                       <p className="text-xl font-semibold line-clamp-1">
                         ID : - {data[0]?.eventId}
                       </p>

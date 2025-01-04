@@ -456,6 +456,7 @@ const ProfileMenu = ({ onClose }) => {
         <Link
           to="/admin"
           className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto space-x-2"
+          target="_blank"
           onClick={onClose}
         >
           <div>
@@ -470,6 +471,7 @@ const ProfileMenu = ({ onClose }) => {
           <Link
             to="/management"
             className="px-4 py-2 hover:bg-hover rounded-md flex items-center flex-auto space-x-2"
+            target="_blank"
             onClick={onClose}
           >
             <div>

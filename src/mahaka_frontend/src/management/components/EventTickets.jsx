@@ -145,8 +145,8 @@ export default function EventTickets({
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
-          <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md relative">
+        <div className="fixed inset-0  flex items-center justify-center bg-black bg-opacity-60 z-50">
+          <div className="bg-white rounded-3xl  shadow-2xl p-8 w-full max-w-md relative">
             <h2 className="text-3xl font-bold text-secondary mb-6 text-center">
               {name}
             </h2>

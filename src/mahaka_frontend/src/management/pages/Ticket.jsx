@@ -266,7 +266,7 @@ const MgtTicket = () => {
           <label className="block mb-2 text-lg font-medium">Select Event</label>
           <select
             id="event"
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-6"
+            className="w-full border bg-card border-gray-300 rounded-lg px-4 py-2 mb-6"
             value={selectedEvent?.id || ""}
             onChange={handleEventChange}
           >
@@ -335,7 +335,7 @@ const MgtTicket = () => {
           </label>
           <select
             id="wahana"
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-6"
+            className="w-full border bg-card border-gray-300 rounded-lg px-4 py-2 mb-6"
             value={selectedWahana?.id || ""}
             onChange={handleWahanaChange}
           >
