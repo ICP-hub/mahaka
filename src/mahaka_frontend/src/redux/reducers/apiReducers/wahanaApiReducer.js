@@ -49,7 +49,9 @@ export const createWahana = createAsyncThunk(
         // console.log(errorMessage);
         console.error("Error creating wahana ", response.err);
         if (errorMessage.includes("TicketPriceError")) {
-          notificationManager.error("Ticket price is too low to proceed");
+          notificationManager.error(
+            "Ticket price must be greater than 11000 IDR"
+          );
         } else if (errorMessage.includes("CyclesError")) {
           notificationManager.error("Insufficient Cycles");
         } else {
