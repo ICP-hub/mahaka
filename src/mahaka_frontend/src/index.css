@@ -78,6 +78,11 @@
 .ik-min-w-\[140px\] {
   min-width: 50px !important;
 }
+.ik-text-primary {
+  /* --tw-text-opacity: 1; */
+  display: none !important;
+  color: rgb(20 111 104 / var(--tw-text-opacity));
+}
 
 /*Inventory grid for event table */
 .inventory-grid {
