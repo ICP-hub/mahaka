@@ -393,7 +393,7 @@ export default function SingleEvent() {
                       aria-labelledby="dashboard-tab"
                     >
                       <div className="p-6 font-sans">
-                        <div className="space-y-4">{venue.Description}</div>
+                        <div className="space-y-4">{venue?.Description}</div>
                       </div>
                     </motion.div>
                   )}

@@ -377,7 +377,7 @@ const EventPage = () => {
                       aria-labelledby="dashboard-tab"
                     >
                       <div className="p-6 font-sans">
-                        <div className="space-y-4">{venue.description}</div>
+                        <div className="space-y-4">{venue?.description}</div>
                       </div>
                     </motion.div>
                   )}

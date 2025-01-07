@@ -232,7 +232,7 @@ const WahanaPage = () => {
                     >
                       <div className="p-6 font-sans">
                         <div className="space-y-4">
-                          <div>{currentWahana.description || " "}</div>
+                          <div>{currentWahana?.description || " "}</div>
                         </div>
                       </div>
                     </motion.div>
