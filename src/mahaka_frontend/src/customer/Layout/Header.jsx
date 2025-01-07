@@ -64,7 +64,7 @@ export default function Header() {
 
   return (
     <div className="bg-[#124076]">
-      <div className="flex px-6 md:px-8 container mx-auto user_header items-center z-10">
+      <div className="flex px-6 md:px-8 container mx-auto user_header items-center z-[999]">
         <LogoSection />
         <div className="hidden md:flex items-center w-full">
           <div className="flex items-center relative gap-8 w-full px-6">
