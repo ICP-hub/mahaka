@@ -11,6 +11,7 @@ import {
 } from "../../../redux/reducers/apiReducers/userApiReducer";
 import { Principal } from "@dfinity/principal";
 import notificationManager from "../../../common/utils/notificationManager";
+import { useLogout } from "../../../common/hooks/useLogout";
 
 const UserProfileData = () => {
   const { currentUserByCaller, userLoading } = useSelector(
@@ -18,6 +19,7 @@ const UserProfileData = () => {
   );
   const { principal } = useSelector((state) => state.authentication);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const logoutAndRedirect = useLogout();
 
   if (userLoading) return <ProfileDataLoader />;
 
@@ -62,7 +64,10 @@ const UserProfileData = () => {
                 {currentUserByCaller && currentUserByCaller.lastName}
               </span>
             </h1>
-            <button className="text-blue-900 font-semibold text-sm flex gap-2 hover:underline">
+            <button
+              className="text-blue-900 font-semibold text-sm flex gap-2 hover:underline"
+              onClick={() => logoutAndRedirect()}
+            >
               Disconnect
               <MdLogout size={18} />
             </button>
@@ -89,8 +94,6 @@ const ProfileDetailsComponent = ({ editModalOpen, setEditModalOpen }) => {
     email: "",
   });
 
-  
-
   useEffect(() => {
     if (currentUserByCaller) {
       setFormValues({
@@ -111,20 +114,18 @@ const ProfileDetailsComponent = ({ editModalOpen, setEditModalOpen }) => {
   // console.log(currentUserByCaller);
   // console.log(formValues);
 
-  
-
   const handleFormSubmit = () => {
     const isFormValid = Object.values(formValues).every(
-      (value) => value !== "" && value !== null
+      (value) => value !== "" && value !== null && value.trim() !== ""
     );
 
     if (!isFormValid) {
-          notificationManager.error(
-            "Please check all the fields before proceeding"
-          );
-          return;
-        }
-    
+      notificationManager.error(
+        "Please check all the fields before proceeding"
+      );
+      return;
+    }
+
     // console.log(formValues);
     if (currentUserByCaller) {
       dispatch(
